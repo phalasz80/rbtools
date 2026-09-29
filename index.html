@@ -116,7 +116,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
       <li><strong>Szerkesztés:</strong> a WYSIWYG-ben közvetlenül használható a formázás, link, felsorolás, igazítás, keretes, kép, iframe és blokkmozgatás. Az <strong>x² / x₂</strong> gomb HTML <code>&lt;sup&gt;</code>/<code>&lt;sub&gt;</code> formázást készít a kijelölt szövegből.</li>
       <li><strong>Különleges jelek:</strong> nyisd le az <strong>Ω Különleges karakterek…</strong> panelt Unicode-jelekhez, emojihoz, Unicode felső/alsó indexhez és HTML-entitásokhoz. Kijelölt szövegnél a beszúrt jel vagy entitás <strong>lecseréli a kijelölést</strong>; a <code>&amp;nbsp;</code> rózsaszín szerkesztői jelölést kap.</li>
       <li><strong>Keresés:</strong> a <strong>Keresés a cikkben</strong> mező az aktuális WYSIWYG-szöveg találatait megszámolja és sárgával kiemeli. A kiemelés csak szerkesztési segédlet, nem kerül a Blogger HTML-be.</li>
-      <li><strong>Mentés:</strong> a <strong>Mentés Blogger-piszkozatba</strong> új draftot készít vagy ugyanazt a post ID-t frissíti. Az időzítés külön gombbal kérhető; azonnali publikálás nincs.</li>
+      <li><strong>Mentés:</strong> a <strong>Mentés Blogger-piszkozatba</strong> új draftot készít vagy ugyanazt a post ID-t frissíti. Minden normál draftmentés után az időzítési mező biztonsági alapértéke <strong>2049. 12. 31. 23:59</strong>; valódi időzítéshez ezt kézzel kell átírni. Azonnali publikálás nincs.</li>
       <li><strong>Statikus oldal:</strong> a kész HTML-t másold a Blogger oldal HTML-nézetébe. Választható évválasztó gombsoros vagy egyszerű, ömlesztett sablon.</li>
       <li>A széles <strong>állapotsáv</strong> mindig jelzi, hogy éppen betöltés, mentés, sikeres művelet, figyelmeztetés vagy hiba történt.</li>
     </ol>
@@ -169,7 +169,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
 
     <div class="grid2">
       <div class="field"><label>Címkék / labels</label><input id="rbtools-bloggerLabels" placeholder="vasút, Berlin, DB"></div>
-      <div class="field"><label>Időzített publikálás</label><input id="rbtools-bloggerSchedule" type="datetime-local"></div>
+      <div class="field"><label>Időzített publikálás</label><input id="rbtools-bloggerSchedule" type="datetime-local" value="2049-12-31T23:59"><span class="small">Biztonsági alapérték: 2049. 12. 31. 23:59. Normál piszkozatmentés után erre áll vissza.</span></div>
     </div>
     <div class="toolbar">
       <button id="rbtools-bloggerSaveDraft" class="primary" disabled>☁ Mentés Blogger-piszkozatba</button>
@@ -882,7 +882,7 @@ A következő cikk rövid ajánlója.</pre>
     <p>Ha bizonytalan vagy, mentés után nyisd meg vagy frissítsd a Blogger szerkesztőt is. Nagyobb átalakítás előtt jó gyakorlat egy külön tesztdrafton kipróbálni az új funkciót.</p>
 
     <h3>20. Időzítés és visszaállítás piszkozatba</h3>
-    <p>Az <strong>Időzített publikálás</strong> mezőben válassz jövőbeli időpontot, majd <strong>Piszkozat időzítése</strong>. A program megerősítést kér. Ha a bejegyzés még nincs elmentve, előbb draftként menti. A <strong>Vissza piszkozatba</strong> gomb támogatott scheduled/live állapotból draftba állít vissza.</p>
+    <p>Az <strong>Időzített publikálás</strong> mező biztonsági alapértéke <strong>2049. 12. 31. 23:59</strong>. Új helyi cikknél, draft megnyitásakor, normál Blogger-piszkozatmentés után és piszkozatba visszaállításkor az RBTools erre az értékre állítja a mezőt, hogy egy véletlen időzítés se eredményezzen közeli publikálást. Valódi időzítéshez ezt az értéket kézzel írd át a tényleges jövőbeli dátumra, majd kattints a <strong>Piszkozat időzítése</strong> gombra. A program megerősítést kér. Ha a bejegyzés még nincs elmentve, előbb draftként menti úgy, hogy a szándékosan megadott időpontot nem írja felül. A <strong>Vissza piszkozatba</strong> gomb támogatott scheduled/live állapotból draftba állít vissza, és ismét visszateszi a 2049-es biztonsági alapértéket.</p>
     <p><strong>Azonnali Publish gomb nincs.</strong> Ez szándékos biztonsági döntés: az éles azonnali publikálás a Bloggerben marad. Az egyéni permalinket szintén a Blogger felületén kell beállítani.</p>
 
     <h3>21. Statikus oldalak</h3>
@@ -1243,7 +1243,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v19";
+const RBTOOLS_VERSION="pages-v20";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -1891,6 +1891,7 @@ updateReporterFields();
 
 
 /* ---------- Blogger API / Google OAuth ---------- */
+const BLOGGER_SAFE_SCHEDULE="2049-12-31T23:59";
 const BLOGGER_API="https://www.googleapis.com/blogger/v3";
 const BLOGGER_SCOPE="https://www.googleapis.com/auth/blogger";
 const BLOGGER_CLIENT_ID_KEY="rbtools-blogger-client-id";
@@ -2035,10 +2036,13 @@ async function bloggerOpenDraft(){
   rbGet("adminSource").value="";rbGet("adminImageSource").value="";rbGet("adminExistingHtml").value=post.content||"";
   adminLoadExistingHtml(post.content||"");
   rbGet("adminTitle").value=post.title||rbGet("adminTitle").value;
-  adminRenderCanvas();adminGenerateHtml(false);bloggerPostMeta();
-  bloggerStatus("Piszkozat megnyitva. A mentés ugyanazt a Blogger-bejegyzést frissíti.");
+  adminRenderCanvas();adminGenerateHtml(false);bloggerPostMeta();bloggerSetSafeSchedule();
+  bloggerStatus("Piszkozat megnyitva. A mentés ugyanazt a Blogger-bejegyzést frissíti. Biztonsági időzítés: 2049. 12. 31. 23:59.");
 }
-async function bloggerSaveDraft(){
+function bloggerSetSafeSchedule(){
+  const el=rbGet("bloggerSchedule");if(el)el.value=BLOGGER_SAFE_SCHEDULE;
+}
+async function bloggerSaveDraft({resetSchedule=true}={}){
   const blogId=rbGet("bloggerBlogSelect").value;if(!blogId)throw new Error("Nincs kiválasztott blog.");
   adminGenerateHtml(false);
   const title=rbGet("adminTitle").value.trim(),content=rbGet("adminOutput").value;
@@ -2056,7 +2060,7 @@ async function bloggerSaveDraft(){
     bloggerStatus("Új Blogger-piszkozat létrehozva.");
   }
   bloggerCurrentPost=post;bloggerPostMeta();await bloggerLoadDrafts();
-  rbGet("bloggerDraftSelect").value=post.id||"";bloggerSetUi();return post;
+  rbGet("bloggerDraftSelect").value=post.id||"";if(resetSchedule)bloggerSetSafeSchedule();bloggerSetUi();return post;
 }
 async function bloggerSaveDraftClick(){
   try{bloggerStatus("Mentés a Bloggerbe…");await bloggerSaveDraft();}
@@ -2068,7 +2072,7 @@ async function bloggerSchedulePost(){
     const dt=new Date(raw);if(Number.isNaN(dt.getTime()))throw new Error("Érvénytelen időpont.");
     if(dt.getTime()<=Date.now()+60000)throw new Error("Az időzítésnek legalább egy perccel a jövőben kell lennie.");
     let post=bloggerCurrentPost;
-    if(!post?.id||String(post.status||"draft").toLowerCase()==="draft")post=await bloggerSaveDraft();
+    if(!post?.id||String(post.status||"draft").toLowerCase()==="draft")post=await bloggerSaveDraft({resetSchedule:false});
     if(String(post.status||"draft").toLowerCase()!=="draft")throw new Error("Csak piszkozat időzíthető.");
     const human=dt.toLocaleString("hu-HU");
     if(!window.confirm("Biztosan időzíted a cikket erre az időpontra?\n\n"+human))return;
@@ -2085,11 +2089,11 @@ async function bloggerRevertPost(){
     if(!window.confirm("Visszaállítod ezt a bejegyzést piszkozat állapotba?"))return;
     const blogId=rbGet("bloggerBlogSelect").value;
     const post=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts/"+encodeURIComponent(bloggerCurrentPost.id)+"/revert",{method:"POST"});
-    bloggerCurrentPost=post;bloggerPostMeta();await bloggerLoadDrafts();bloggerStatus("A bejegyzés visszaállt piszkozatba.");
+    bloggerCurrentPost=post;bloggerPostMeta();await bloggerLoadDrafts();bloggerSetSafeSchedule();bloggerStatus("A bejegyzés visszaállt piszkozatba. Biztonsági időzítés: 2049. 12. 31. 23:59.");
   }catch(e){console.error(e);bloggerStatus("Visszaállítási hiba: "+e.message);}
 }
 function bloggerNewLocal(){
-  rbGet("bloggerLabels").value="";rbGet("bloggerSchedule").value="";adminClear();bloggerStatus("Új helyi cikk. A Mentés Blogger-piszkozatba új draftot fog létrehozni.");
+  rbGet("bloggerLabels").value="";bloggerSetSafeSchedule();adminClear();bloggerStatus("Új helyi cikk. A Mentés Blogger-piszkozatba új draftot fog létrehozni. Biztonsági időzítés: 2049. 12. 31. 23:59.");
 }
 try{rbGet("bloggerClientId").value=localStorage.getItem(BLOGGER_CLIENT_ID_KEY)||BLOGGER_DEFAULT_CLIENT_ID;}catch{rbGet("bloggerClientId").value=BLOGGER_DEFAULT_CLIENT_ID;}
 rbGet("bloggerSaveClientId").addEventListener("click",bloggerSaveClientId);
@@ -2106,6 +2110,7 @@ rbGet("bloggerNewLocal").addEventListener("click",bloggerNewLocal);
 rbGet("bloggerSaveDraft").addEventListener("click",bloggerSaveDraftClick);
 rbGet("bloggerSchedulePost").addEventListener("click",bloggerSchedulePost);
 rbGet("bloggerRevertPost").addEventListener("click",bloggerRevertPost);
+bloggerSetSafeSchedule();
 bloggerSetUi();
 
 
