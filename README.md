@@ -74,6 +74,8 @@ A Cikkadminban külön tartalomtípus választható: **Cikk**, **#nyúz / Hétv�
 - bekezdés-, alcím-, keretes- és iframe-blokkok balra, középre, jobbra vagy sorkizártra igazítása;
 - iframe embedek beszúrása, meglévő iframe-ek visszaolvasása, élő előnézete és több soros kódszerkesztése;
 - rendezetlen és számozott listák, valamint lista-behúzás és -kihúzás;
+- Unicode- és emoji-beszúró, HTML-entitás paletta (kiemelt `&nbsp;` jelöléssel), HTML `<sup>`/`<sub>` formázás és Unicode felső/alsó index számok;
+- WYSIWYG szövegkereső sárga találatkiemeléssel;
 - képtár és főkép;
 - képek húzása konkrét bekezdések közé;
 - kép húzása keretes blokkba;
