@@ -165,6 +165,7 @@ További szöveg..."></textarea>
       <button id="rbtools-adminFmtStrike" type="button" title="Áthúzott"><s>S</s></button>
       <button id="rbtools-adminFmtLink" type="button" title="Link hozzáadása">🔗 Link</button>
       <button id="rbtools-adminFmtUnlink" type="button" title="Link eltávolítása">⛓ Link törlése</button>
+      <button id="rbtools-adminFmtBox" type="button" title="Az aktuális szövegblokk keretessé alakítása">▣ Keretes</button>
     </div>
     <div id="rbtools-adminCanvas" class="admin-canvas">
       <div class="admin-empty">Tölts be vagy illessz be cikkszöveget, majd kattints a „Cikk felépítése” gombra.</div>
@@ -840,7 +841,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v5";
+const RBTOOLS_VERSION="pages-v6";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -1654,7 +1655,7 @@ function adminTrackEditable(el,onInput){
   el.addEventListener("blur",()=>adminGenerateHtml());
 }
 function adminTextBlockElement(block,cls){
-  const e=document.createElement("div");e.className="admin-editable "+cls;e.contentEditable="true";e.spellcheck=true;e.innerHTML=block.html||"";
+  const e=document.createElement("div");e.className="admin-editable "+cls;e.contentEditable="true";e.spellcheck=true;e.innerHTML=block.html||"";e.dataset.adminBlockId=block.id;
   adminTrackEditable(e,()=>{block.html=e.innerHTML;});return e;
 }
 function adminImageBlockElement(block){
@@ -1763,6 +1764,30 @@ function adminRenderImageLibrary(){
     const mainBtn=document.createElement("button");mainBtn.type="button";mainBtn.textContent=img.id===adminMainImageId?"★ Főkép":"☆ Főkép";mainBtn.addEventListener("click",()=>{adminMainImageId=adminMainImageId===img.id?null:img.id;adminRenderImageLibrary();adminRenderCanvas();adminGenerateHtml();});
     buttons.append(addBtn,mainBtn);fields.appendChild(buttons);tile.append(thumb,fields);host.appendChild(tile);
   });
+}
+function adminQuickBox(){
+  let blockId=adminActiveEditable?.dataset?.adminBlockId||"";
+  let idx=blockId?adminBlocks.findIndex(x=>x.id===blockId):-1;
+  if(idx>=0){
+    const block=adminBlocks[idx];
+    if(block.type==="box"){
+      rbGet("adminStatus").textContent="Ez a blokk már keretes.";
+      return;
+    }
+    if(["p","h3","h4"].includes(block.type)){
+      const html=adminNormalizeInlineHtml(block.html||"");
+      const title=block.type==="h3"||block.type==="h4"?html:"";
+      const body=block.type==="p"?html:"Keretes szöveg.";
+      adminBlocks.splice(idx,1,{id:block.id,type:"box",title:title,html:body,imageId:null});
+      adminActiveEditable=null;adminSavedRange=null;
+      adminRenderCanvas();adminGenerateHtml();
+      rbGet("adminStatus").textContent="Az aktuális blokk keretessé alakítva.";
+      return;
+    }
+  }
+  adminBlocks.push({id:adminUid("b"),type:"box",title:"Keretes cím",html:"Keretes szöveg.",imageId:null});
+  adminRenderCanvas();adminGenerateHtml();
+  rbGet("adminStatus").textContent="Új keretes blokk beszúrva a cikk végére.";
 }
 function adminRememberRange(){
   const sel=window.getSelection();if(!sel||!sel.rangeCount)return;const r=sel.getRangeAt(0);
@@ -1885,13 +1910,14 @@ rbGet("adminAddParagraph").addEventListener("click",()=>{adminBlocks.push({id:ad
 rbGet("adminAddH3").addEventListener("click",()=>{adminBlocks.push({id:adminUid("b"),type:"h3",html:"<strong>Új alcím</strong>"});adminRenderCanvas();adminGenerateHtml();});
 rbGet("adminAddBox").addEventListener("click",()=>{adminBlocks.push({id:adminUid("b"),type:"box",title:"Keretes cím",html:"Keretes szöveg.",imageId:null});adminRenderCanvas();adminGenerateHtml();});
 rbGet("adminAddRule").addEventListener("click",()=>{adminBlocks.push({id:adminUid("b"),type:"hr"});adminRenderCanvas();adminGenerateHtml();});
-for(const id of ["adminFmtBold","adminFmtItalic","adminFmtUnderline","adminFmtStrike","adminFmtLink","adminFmtUnlink"])rbGet(id).addEventListener("mousedown",e=>e.preventDefault());
+for(const id of ["adminFmtBold","adminFmtItalic","adminFmtUnderline","adminFmtStrike","adminFmtLink","adminFmtUnlink","adminFmtBox"])rbGet(id).addEventListener("mousedown",e=>e.preventDefault());
 rbGet("adminFmtBold").addEventListener("click",()=>adminExec("bold"));
 rbGet("adminFmtItalic").addEventListener("click",()=>adminExec("italic"));
 rbGet("adminFmtUnderline").addEventListener("click",()=>adminExec("underline"));
 rbGet("adminFmtStrike").addEventListener("click",()=>adminExec("strikeThrough"));
 rbGet("adminFmtLink").addEventListener("click",adminLink);
 rbGet("adminFmtUnlink").addEventListener("click",()=>adminExec("unlink"));
+rbGet("adminFmtBox").addEventListener("click",adminQuickBox);
 ["adminTitle","adminAuthor"].forEach(id=>rbGet(id).addEventListener("input",()=>{if(id==="adminTitle")adminRenderCanvas();adminGenerateHtml(false);}));
 ["adminTopTextMode","adminFooter"].forEach(id=>rbGet(id).addEventListener("change",()=>{adminRenderCanvas();adminGenerateHtml();}));
 rbGet("adminSource").addEventListener("input",()=>{if(adminBlocks.length)rbGet("adminStatus").textContent="A forrásszöveg módosult. A WYSIWYG változat újrafelépítéséhez kattints a „Cikk felépítése” gombra.";});
