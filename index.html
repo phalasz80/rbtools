@@ -8,6 +8,7 @@
 <meta name="googlebot" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
 <meta name="bingbot" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
 <meta name="referrer" content="no-referrer">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 html,body{margin:0;min-height:100%;background:#f3f4f6;}
 @media (prefers-color-scheme:dark){html,body{background:#101114;}}
@@ -52,7 +53,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
       <button id="rbtools-adminCopyTitle">▣ Cím másolása</button>
       <button id="rbtools-adminCopyHtml">⧉ Végleges HTML másolása</button>
       <button id="rbtools-adminDownload">⇩ HTML mentése</button>
-      <button id="rbtools-adminClear">× Új cikk</button>
+      <button id="rbtools-adminClear">✎ Új cikk</button>
       <span id="rbtools-adminStatus" class="status">Készen áll.</span>
     </div>
   </div>
@@ -61,18 +62,70 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
     <div class="admin-section-head">
       <div>
         <h2 style="margin:0">Gyorstalpaló</h2>
-        <p class="small" style="margin:3px 0 0">Bloggerben csak a képek előkészítése szükséges; a cikk összeállítása az RBToolsban történik.</p>
+        <p class="small" style="margin:3px 0 0">A Blogger-kapcsolattal a cím és a kész HTML kézi másolása sem szükséges.</p>
       </div>
-      <span class="badge">Blogger → RBTools → Blogger</span>
+      <span class="badge">Blogger ↔ RBTools</span>
     </div>
     <ol class="admin-quicksteps">
-      <li><strong>Blogger:</strong> nyiss egy új piszkozatot, és töltsd fel az összes szükséges képet.</li>
-      <li>Válts <strong>HTML-nézetre</strong>, majd másold ki a képek által generált HTML-kódot.</li>
-      <li><strong>RBTools:</strong> töltsd be vagy illeszd be a cikkszöveget, a képkódot pedig a jobb oldali mezőbe.</li>
-      <li>A <strong>Cikkadminban</strong> állítsd be a főképét, a képaláírásokat, a sorrendet, a formázást és a kereteseket.</li>
-      <li>A végén másold ki külön a <strong>Blogger-címet</strong> és a <strong>Végleges HTML-t</strong>.</li>
-      <li><strong>Blogger:</strong> a címet a címmezőbe, a kész HTML-t az HTML-nézetbe illeszd, majd ellenőrzés után mentsd vagy publikáld.</li>
+      <li><strong>Új cikk kép nélkül:</strong> kattints az <strong>Új cikk</strong> gombra, és írj közvetlenül a WYSIWYG szerkesztőben.</li>
+      <li><strong>Új cikk képekkel:</strong> Bloggerben készíts piszkozatot és töltsd fel a képeket; az RBToolsban kapcsold össze a Bloggert, frissítsd a piszkozatlistát, majd nyisd meg a draftot. A képeket az RBTools automatikusan kiveszi a HTML-ből.</li>
+      <li><strong>Meglévő cikk:</strong> válaszd ki a Blogger-piszkozatot és kattints a <strong>Piszkozat megnyitása</strong> gombra.</li>
+      <li>Szerkeszd a címet, leadet, szöveget, képeket, képaláírásokat, kereteseket és címkéket. Minden maradjon WYSIWYG-ben.</li>
+      <li>A <strong>Mentés Blogger-piszkozatba</strong> az új cikkből draftot hoz létre, a megnyitott draftot pedig ugyanazon a post ID-n frissíti.</li>
+      <li>Az egyéni permalinket továbbra is a Bloggerben állítsd be. A cikket itt opcionálisan időzítheted is; az azonnali publikálást szándékosan a Bloggerre hagyjuk.</li>
     </ol>
+  </div>
+
+  <div class="panel admin-blogger-panel">
+    <div class="admin-section-head">
+      <div>
+        <h2 style="margin:0">Blogger-kapcsolat</h2>
+        <p class="small" style="margin:3px 0 0">Google OAuth + Blogger API. Az access token nem kerül tartós tárolásra; oldalfrissítés után újra kapcsolódni kell.</p>
+      </div>
+      <span id="rbtools-bloggerConnectionBadge" class="badge">Nincs kapcsolat</span>
+    </div>
+
+    <details id="rbtools-bloggerSetupDetails" class="admin-blogger-setup">
+      <summary>Egyszeri Google API / OAuth beállítás</summary>
+      <div class="grid2" style="margin-top:10px">
+        <div class="field"><label>Google OAuth Web Client ID</label><input id="rbtools-bloggerClientId" placeholder="1234567890-….apps.googleusercontent.com"></div>
+        <div class="toolbar" style="margin:0">
+          <button id="rbtools-bloggerSaveClientId">Client ID megjegyzése ezen a böngészőn</button>
+          <button id="rbtools-bloggerForgetClientId">Elfelejtés</button>
+        </div>
+      </div>
+      <p class="small" style="margin:8px 0 0">A Google Cloud projektben engedélyezni kell a <strong>Blogger API v3</strong>-at, létre kell hozni egy <strong>Web application</strong> OAuth klienst, és Authorized JavaScript originként fel kell venni: <code>https://tools.regionalbahn.hu</code>. A Client ID nem titok; kliens titkot ide ne írj.</p>
+    </details>
+
+    <div class="toolbar">
+      <button id="rbtools-bloggerConnect" class="primary">🔐 Kapcsolódás a Bloggerhez</button>
+      <button id="rbtools-bloggerDisconnect" disabled>Kapcsolat bontása</button>
+      <button id="rbtools-bloggerRefreshBlogs" disabled>↻ Blogok frissítése</button>
+      <span id="rbtools-bloggerStatus" class="status">Nincs Google-kapcsolat.</span>
+    </div>
+
+    <div class="grid3">
+      <div class="field"><label>Blog</label><select id="rbtools-bloggerBlogSelect" disabled><option value="">Kapcsolódás után választható</option></select></div>
+      <div class="field"><label>Piszkozat keresése</label><input id="rbtools-bloggerDraftSearch" placeholder="Cím vagy post ID…" disabled></div>
+      <div class="field"><label>Piszkozat</label><select id="rbtools-bloggerDraftSelect" disabled><option value="">Nincs betöltve</option></select></div>
+    </div>
+    <div class="toolbar">
+      <button id="rbtools-bloggerRefreshDrafts" disabled>↻ Piszkozatok frissítése</button>
+      <button id="rbtools-bloggerOpenDraft" disabled>📄 Piszkozat megnyitása</button>
+      <button id="rbtools-bloggerNewLocal">✎ Új helyi cikk</button>
+      <span id="rbtools-bloggerCurrentPost" class="small">Nincs Blogger-bejegyzés hozzárendelve.</span>
+    </div>
+
+    <div class="grid2">
+      <div class="field"><label>Címkék / labels</label><input id="rbtools-bloggerLabels" placeholder="vasút, Berlin, DB"></div>
+      <div class="field"><label>Időzített publikálás</label><input id="rbtools-bloggerSchedule" type="datetime-local"></div>
+    </div>
+    <div class="toolbar">
+      <button id="rbtools-bloggerSaveDraft" class="primary" disabled>☁ Mentés Blogger-piszkozatba</button>
+      <button id="rbtools-bloggerSchedulePost" disabled>🕒 Piszkozat időzítése</button>
+      <button id="rbtools-bloggerRevertPost" disabled>↩ Vissza piszkozatba</button>
+      <span class="small">Az <strong>egyéni permalink</strong> nincs dokumentáltan írható Blogger API-mezőként, ezért azt a Blogger felületén kell beállítani.</span>
+    </div>
   </div>
 
   <div class="grid2 admin-import-grid">
@@ -739,6 +792,11 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-quicksteps{margin:12px 0 0;padding-left:24px;display:grid;gap:7px}
 #rbtools-app .admin-quicksteps li{padding-left:3px}
 #rbtools-app .admin-quicksteps strong{font-weight:750}
+#rbtools-app .admin-blogger-panel{border-left:4px solid var(--line)}
+#rbtools-app .admin-blogger-panel.connected{border-left-color:var(--ok)}
+#rbtools-app .admin-blogger-setup{margin:10px 0}
+#rbtools-app .admin-blogger-panel select:disabled,#rbtools-app .admin-blogger-panel input:disabled{opacity:.62}
+#rbtools-app #rbtools-bloggerCurrentPost{margin-left:0;overflow-wrap:anywhere}
 #rbtools-app .admin-source{min-height:260px}
 #rbtools-app .admin-existing-source{min-height:220px;margin-top:8px;border:1px solid var(--line);border-radius:9px}
 #rbtools-app .admin-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -841,7 +899,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v6";
+const RBTOOLS_VERSION="pages-v7";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -1453,6 +1511,217 @@ drop.addEventListener("drop",e=>loadArticleFile(e.dataTransfer.files[0]));drop.a
 updateReporterFields();
 
 
+/* ---------- Blogger API / Google OAuth ---------- */
+const BLOGGER_API="https://www.googleapis.com/blogger/v3";
+const BLOGGER_SCOPE="https://www.googleapis.com/auth/blogger";
+const BLOGGER_CLIENT_ID_KEY="rbtools-blogger-client-id";
+let bloggerAccessToken="";
+let bloggerTokenExpiresAt=0;
+let bloggerTokenClient=null;
+let bloggerBlogs=[];
+let bloggerDrafts=[];
+let bloggerCurrentPost=null;
+
+function bloggerStatus(msg){const el=rbGet("bloggerStatus");if(el)el.textContent=msg;}
+function bloggerConnected(){return !!bloggerAccessToken&&Date.now()<bloggerTokenExpiresAt-15000;}
+function bloggerSetUi(){
+  const connected=bloggerConnected();
+  rbGet("bloggerConnectionBadge").textContent=connected?"Kapcsolódva":"Nincs kapcsolat";
+  rbGet("bloggerDisconnect").disabled=!connected;
+  rbGet("bloggerRefreshBlogs").disabled=!connected;
+  rbGet("bloggerBlogSelect").disabled=!connected;
+  rbGet("bloggerDraftSearch").disabled=!connected;
+  rbGet("bloggerRefreshDrafts").disabled=!connected||!rbGet("bloggerBlogSelect").value;
+  rbGet("bloggerDraftSelect").disabled=!connected||!bloggerDrafts.length;
+  rbGet("bloggerOpenDraft").disabled=!connected||!rbGet("bloggerDraftSelect").value;
+  rbGet("bloggerSaveDraft").disabled=!connected||!rbGet("bloggerBlogSelect").value;
+  rbGet("bloggerSchedulePost").disabled=!connected||!rbGet("bloggerBlogSelect").value;
+  rbGet("bloggerRevertPost").disabled=!connected||!bloggerCurrentPost||!["scheduled","live"].includes(String(bloggerCurrentPost.status||"").toLowerCase());
+  rbGet("bloggerConnectionBadge").closest(".admin-blogger-panel")?.classList.toggle("connected",connected);
+}
+function bloggerClientId(){
+  return rbGet("bloggerClientId").value.trim();
+}
+function bloggerSaveClientId(){
+  const id=bloggerClientId();
+  if(!id){bloggerStatus("Adj meg Google OAuth Client ID-t.");return;}
+  try{localStorage.setItem(BLOGGER_CLIENT_ID_KEY,id);bloggerStatus("Client ID elmentve ezen a böngészőn.");}
+  catch{bloggerStatus("A böngésző nem engedte a Client ID helyi mentését.");}
+}
+function bloggerForgetClientId(){
+  try{localStorage.removeItem(BLOGGER_CLIENT_ID_KEY);}catch{}
+  rbGet("bloggerClientId").value="";bloggerStatus("Client ID helyi mentése törölve.");
+}
+function bloggerDisconnect(){
+  bloggerAccessToken="";bloggerTokenExpiresAt=0;bloggerTokenClient=null;bloggerBlogs=[];bloggerDrafts=[];bloggerCurrentPost=null;
+  rbGet("bloggerBlogSelect").innerHTML='<option value="">Kapcsolódás után választható</option>';
+  rbGet("bloggerDraftSelect").innerHTML='<option value="">Nincs betöltve</option>';
+  rbGet("bloggerCurrentPost").textContent="Nincs Blogger-bejegyzés hozzárendelve.";
+  bloggerStatus("Kapcsolat bontva. Az access token elfelejtve.");bloggerSetUi();
+}
+async function bloggerApi(path,{method="GET",body=null}={}){
+  if(!bloggerConnected()){
+    bloggerAccessToken="";bloggerSetUi();throw new Error("A Google-hozzáférés lejárt. Kapcsolódj újra a Bloggerhez.");
+  }
+  const headers={Authorization:"Bearer "+bloggerAccessToken};
+  if(body!==null)headers["Content-Type"]="application/json";
+  const r=await fetch(BLOGGER_API+path,{method,headers,body:body===null?undefined:JSON.stringify(body)});
+  let data=null;const txt=await r.text();if(txt){try{data=JSON.parse(txt);}catch{data={raw:txt};}}
+  if(r.status===401){bloggerAccessToken="";bloggerTokenExpiresAt=0;bloggerSetUi();}
+  if(!r.ok)throw new Error(data?.error?.message||data?.error_description||("Blogger API HTTP "+r.status));
+  return data||{};
+}
+async function bloggerConnect(){
+  const clientId=bloggerClientId();
+  if(!clientId){bloggerStatus("Előbb add meg a Google OAuth Web Client ID-t az Egyszeri beállítás részben.");rbGet("bloggerSetupDetails").open=true;return;}
+  if(!window.google?.accounts?.oauth2){bloggerStatus("A Google Identity Services még nem töltődött be. Próbáld újra néhány másodperc múlva.");return;}
+  bloggerStatus("Google engedélykérés megnyitása…");
+  bloggerTokenClient=google.accounts.oauth2.initTokenClient({
+    client_id:clientId,
+    scope:BLOGGER_SCOPE,
+    callback:async response=>{
+      if(response.error){bloggerStatus("OAuth hiba: "+response.error);return;}
+      bloggerAccessToken=response.access_token||"";
+      bloggerTokenExpiresAt=Date.now()+(Number(response.expires_in)||3600)*1000;
+      bloggerSetUi();bloggerStatus("Kapcsolódva. Blogok lekérése…");
+      try{await bloggerLoadBlogs();}catch(e){bloggerStatus("Blogger API hiba: "+e.message);}
+    },
+    error_callback:e=>bloggerStatus("Google OAuth ablak hiba: "+(e?.type||"ismeretlen hiba"))
+  });
+  bloggerTokenClient.requestAccessToken({prompt:""});
+}
+async function bloggerLoadBlogs(){
+  const data=await bloggerApi("/users/self/blogs?view=ADMIN");
+  bloggerBlogs=Array.isArray(data.items)?data.items:[];
+  const sel=rbGet("bloggerBlogSelect");sel.textContent="";
+  if(!bloggerBlogs.length){const o=document.createElement("option");o.value="";o.textContent="Nem található szerkeszthető blog";sel.appendChild(o);bloggerSetUi();bloggerStatus("A Google-fiókhoz nem találtam Blogger-blogot.");return;}
+  bloggerBlogs.forEach(b=>{const o=document.createElement("option");o.value=b.id;o.textContent=(b.name||"Blog")+" — "+(b.url||b.id);sel.appendChild(o);});
+  const preferred=bloggerBlogs.find(b=>/regionalbahn\.hu/i.test(b.url||"")||/regionalbahn/i.test(b.name||""));
+  if(preferred)sel.value=preferred.id;
+  bloggerSetUi();bloggerStatus(bloggerBlogs.length+" blog betöltve.");
+  await bloggerLoadDrafts();
+}
+function bloggerDraftLabel(p){
+  const title=(p.title||"(cím nélküli)").trim(),when=p.updated?new Date(p.updated).toLocaleString("hu-HU"):"";
+  return title+(when?" • "+when:"");
+}
+function bloggerRenderDrafts(){
+  const q=rbGet("bloggerDraftSearch").value.trim().toLowerCase(),sel=rbGet("bloggerDraftSelect"),previous=sel.value;sel.textContent="";
+  const list=bloggerDrafts.filter(p=>!q||(p.title||"").toLowerCase().includes(q)||String(p.id||"").includes(q));
+  const empty=document.createElement("option");empty.value="";empty.textContent=list.length?"Válassz piszkozatot…":"Nincs találat";sel.appendChild(empty);
+  list.forEach(p=>{const o=document.createElement("option");o.value=p.id;o.textContent=bloggerDraftLabel(p);sel.appendChild(o);});
+  if(list.some(p=>String(p.id)===String(previous)))sel.value=previous;
+  bloggerSetUi();
+}
+async function bloggerLoadDrafts(){
+  const blogId=rbGet("bloggerBlogSelect").value;if(!blogId)return;
+  bloggerStatus("Piszkozatok lekérése…");bloggerDrafts=[];
+  let token="",guard=0;
+  do{
+    const qs=new URLSearchParams({status:"draft",orderBy:"updated",fetchBodies:"false",fetchImages:"false",maxResults:"50",view:"ADMIN"});
+    if(token)qs.set("pageToken",token);
+    const data=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts?"+qs.toString());
+    if(Array.isArray(data.items))bloggerDrafts.push(...data.items);
+    token=data.nextPageToken||"";guard++;
+  }while(token&&guard<20);
+  bloggerRenderDrafts();bloggerStatus(bloggerDrafts.length+" piszkozat betöltve.");
+}
+function bloggerPostMeta(){
+  if(!bloggerCurrentPost){rbGet("bloggerCurrentPost").textContent="Nincs Blogger-bejegyzés hozzárendelve.";return;}
+  const status=String(bloggerCurrentPost.status||"draft").toLowerCase();
+  const updated=bloggerCurrentPost.updated?new Date(bloggerCurrentPost.updated).toLocaleString("hu-HU"):"";
+  rbGet("bloggerCurrentPost").textContent="Post ID: "+bloggerCurrentPost.id+" • "+status+(updated?" • frissítve: "+updated:"");
+  bloggerSetUi();
+}
+function bloggerParseLabels(){
+  return [...new Set(rbGet("bloggerLabels").value.split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean))];
+}
+async function bloggerOpenDraft(){
+  const blogId=rbGet("bloggerBlogSelect").value,postId=rbGet("bloggerDraftSelect").value;
+  if(!blogId||!postId)return;
+  bloggerStatus("Piszkozat megnyitása…");
+  const qs=new URLSearchParams({view:"ADMIN",fetchBody:"true",fetchImages:"true"});
+  const post=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts/"+encodeURIComponent(postId)+"?"+qs.toString());
+  bloggerCurrentPost=post;
+  rbGet("adminTitle").value=post.title||"";
+  rbGet("bloggerLabels").value=Array.isArray(post.labels)?post.labels.join(", "):"";
+  rbGet("adminSource").value="";rbGet("adminImageSource").value="";rbGet("adminExistingHtml").value=post.content||"";
+  adminLoadExistingHtml(post.content||"");
+  rbGet("adminTitle").value=post.title||rbGet("adminTitle").value;
+  adminRenderCanvas();adminGenerateHtml(false);bloggerPostMeta();
+  bloggerStatus("Piszkozat megnyitva. A mentés ugyanazt a Blogger-bejegyzést frissíti.");
+}
+async function bloggerSaveDraft(){
+  const blogId=rbGet("bloggerBlogSelect").value;if(!blogId)throw new Error("Nincs kiválasztott blog.");
+  adminGenerateHtml(false);
+  const title=rbGet("adminTitle").value.trim(),content=rbGet("adminOutput").value;
+  if(!title)throw new Error("A cikknek nincs címe.");
+  if(!content.trim())throw new Error("A cikk tartalma üres.");
+  const body={kind:"blogger#post",title,content,labels:bloggerParseLabels()};
+  let post;
+  if(bloggerCurrentPost?.id){
+    const status=String(bloggerCurrentPost.status||"draft").toLowerCase();
+    if(status!=="draft")throw new Error("A hozzárendelt bejegyzés már nem piszkozat. Előbb állítsd vissza piszkozatba.");
+    post=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts/"+encodeURIComponent(bloggerCurrentPost.id),{method:"PATCH",body});
+    bloggerStatus("Meglévő Blogger-piszkozat frissítve.");
+  }else{
+    post=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts?isDraft=true",{method:"POST",body});
+    bloggerStatus("Új Blogger-piszkozat létrehozva.");
+  }
+  bloggerCurrentPost=post;bloggerPostMeta();await bloggerLoadDrafts();
+  rbGet("bloggerDraftSelect").value=post.id||"";bloggerSetUi();return post;
+}
+async function bloggerSaveDraftClick(){
+  try{bloggerStatus("Mentés a Bloggerbe…");await bloggerSaveDraft();}
+  catch(e){console.error(e);bloggerStatus("Mentési hiba: "+e.message);}
+}
+async function bloggerSchedulePost(){
+  try{
+    const raw=rbGet("bloggerSchedule").value;if(!raw)throw new Error("Adj meg publikálási dátumot és időt.");
+    const dt=new Date(raw);if(Number.isNaN(dt.getTime()))throw new Error("Érvénytelen időpont.");
+    if(dt.getTime()<=Date.now()+60000)throw new Error("Az időzítésnek legalább egy perccel a jövőben kell lennie.");
+    let post=bloggerCurrentPost;
+    if(!post?.id||String(post.status||"draft").toLowerCase()==="draft")post=await bloggerSaveDraft();
+    if(String(post.status||"draft").toLowerCase()!=="draft")throw new Error("Csak piszkozat időzíthető.");
+    const human=dt.toLocaleString("hu-HU");
+    if(!window.confirm("Biztosan időzíted a cikket erre az időpontra?\n\n"+human))return;
+    const blogId=rbGet("bloggerBlogSelect").value;
+    const qs=new URLSearchParams({publishDate:dt.toISOString()});
+    const scheduled=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts/"+encodeURIComponent(post.id)+"/publish?"+qs.toString(),{method:"POST"});
+    bloggerCurrentPost=scheduled;bloggerPostMeta();await bloggerLoadDrafts();
+    bloggerStatus("A bejegyzés időzítve: "+human+".");
+  }catch(e){console.error(e);bloggerStatus("Időzítési hiba: "+e.message);}
+}
+async function bloggerRevertPost(){
+  try{
+    if(!bloggerCurrentPost?.id)throw new Error("Nincs hozzárendelt bejegyzés.");
+    if(!window.confirm("Visszaállítod ezt a bejegyzést piszkozat állapotba?"))return;
+    const blogId=rbGet("bloggerBlogSelect").value;
+    const post=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts/"+encodeURIComponent(bloggerCurrentPost.id)+"/revert",{method:"POST"});
+    bloggerCurrentPost=post;bloggerPostMeta();await bloggerLoadDrafts();bloggerStatus("A bejegyzés visszaállt piszkozatba.");
+  }catch(e){console.error(e);bloggerStatus("Visszaállítási hiba: "+e.message);}
+}
+function bloggerNewLocal(){
+  rbGet("bloggerLabels").value="";rbGet("bloggerSchedule").value="";adminClear();bloggerStatus("Új helyi cikk. A Mentés Blogger-piszkozatba új draftot fog létrehozni.");
+}
+try{rbGet("bloggerClientId").value=localStorage.getItem(BLOGGER_CLIENT_ID_KEY)||"";}catch{}
+rbGet("bloggerSaveClientId").addEventListener("click",bloggerSaveClientId);
+rbGet("bloggerForgetClientId").addEventListener("click",bloggerForgetClientId);
+rbGet("bloggerConnect").addEventListener("click",bloggerConnect);
+rbGet("bloggerDisconnect").addEventListener("click",bloggerDisconnect);
+rbGet("bloggerRefreshBlogs").addEventListener("click",()=>bloggerLoadBlogs().catch(e=>bloggerStatus("Hiba: "+e.message)));
+rbGet("bloggerBlogSelect").addEventListener("change",()=>{bloggerCurrentPost=null;bloggerPostMeta();bloggerLoadDrafts().catch(e=>bloggerStatus("Hiba: "+e.message));});
+rbGet("bloggerDraftSearch").addEventListener("input",bloggerRenderDrafts);
+rbGet("bloggerDraftSelect").addEventListener("change",bloggerSetUi);
+rbGet("bloggerRefreshDrafts").addEventListener("click",()=>bloggerLoadDrafts().catch(e=>bloggerStatus("Hiba: "+e.message)));
+rbGet("bloggerOpenDraft").addEventListener("click",()=>bloggerOpenDraft().catch(e=>bloggerStatus("Megnyitási hiba: "+e.message)));
+rbGet("bloggerNewLocal").addEventListener("click",bloggerNewLocal);
+rbGet("bloggerSaveDraft").addEventListener("click",bloggerSaveDraftClick);
+rbGet("bloggerSchedulePost").addEventListener("click",bloggerSchedulePost);
+rbGet("bloggerRevertPost").addEventListener("click",bloggerRevertPost);
+bloggerSetUi();
+
+
 /* ---------- Cikkadmin: blokkos WYSIWYG cikképítő ---------- */
 let adminBlocks=[];
 let adminImages=[];
@@ -1463,6 +1732,7 @@ let adminSeq=0;
 let adminActiveEditable=null;
 let adminSavedRange=null;
 const adminUid=prefix=>prefix+"-"+(++adminSeq);
+adminBlocks.push({id:adminUid("b"),type:"p",html:""});
 
 function adminNormalizeInlineHtml(html){
   const t=document.createElement("template");t.innerHTML=String(html||"");
@@ -1891,9 +2161,11 @@ function adminInsertAllImages(){
 }
 function adminClear(){
   adminBlocks=[];adminImages=[];adminSourcesHtml="";adminLeadHtml="";adminMainImageId=null;adminActiveEditable=null;adminSavedRange=null;
+  adminBlocks.push({id:adminUid("b"),type:"p",html:""});
   ["adminSource","adminImageSource","adminExistingHtml","adminTitle","adminOutput"].forEach(id=>rbGet(id).value="");
   rbGet("adminAuthor").value="Halász Péter";rbGet("adminFooter").value="author";rbGet("adminTopTextMode").value="lead";
-  adminRenderImageLibrary();adminRenderCanvas();rbGet("adminStatus").textContent="Új, üres cikk.";
+  bloggerCurrentPost=null;bloggerPostMeta();
+  adminRenderImageLibrary();adminRenderCanvas();adminGenerateHtml(false);rbGet("adminStatus").textContent="Új, üres cikk. Írhatsz közvetlenül a WYSIWYG szerkesztőben.";
 }
 rbGet("adminBuild").addEventListener("click",adminBuildFromSource);
 rbGet("adminParseImages").addEventListener("click",()=>adminParseImages(rbGet("adminImageSource").value));
