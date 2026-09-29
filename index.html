@@ -58,21 +58,64 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
     </div>
   </div>
 
+  <div id="rbtools-mainStatus" class="admin-statusbar info" role="status" aria-live="polite" aria-atomic="true">
+    <div class="admin-statusbar-icon" id="rbtools-mainStatusIcon">ℹ</div>
+    <div class="admin-statusbar-copy">
+      <strong id="rbtools-mainStatusSource">Cikkadmin</strong>
+      <div id="rbtools-mainStatusText">Készen áll. Válassz tartalomtípust, nyiss meg egy Blogger-piszkozatot, vagy kezdj új anyagot.</div>
+    </div>
+  </div>
+
+  <div class="panel admin-template-panel">
+    <div class="admin-section-head">
+      <div>
+        <h2 style="margin:0">Mit írunk?</h2>
+        <p class="small" style="margin:3px 0 0">Válaszd ki a tartalom típusát, majd tölts be hozzá szerkeszthető RegionalBahn-sablont. A képtár és a megnyitott Blogger-bejegyzés hozzárendelése sablonváltáskor megmarad.</p>
+      </div>
+      <span class="badge">Sablonindító</span>
+    </div>
+    <div class="grid3 admin-template-grid">
+      <div class="field">
+        <label>Tartalomtípus</label>
+        <select id="rbtools-adminContentType">
+          <option value="article">Cikk</option>
+          <option value="news">#nyúz / Hétvégi gyors</option>
+          <option value="podcast">Podcast shownotes</option>
+          <option value="innotrans">InnoTrans cikk</option>
+          <option value="static">Statikus oldal</option>
+        </select>
+      </div>
+      <div class="field" id="rbtools-adminStaticLayoutField" hidden>
+        <label>Statikus oldal felépítése</label>
+        <select id="rbtools-adminStaticLayout">
+          <option value="buttons-all">Évválasztó gombsor + „Összes”</option>
+          <option value="buttons">Évválasztó gombsor</option>
+          <option value="simple">Ömlesztett / egyszerű oldal</option>
+        </select>
+      </div>
+      <div class="toolbar" style="margin:0;align-self:stretch">
+        <button id="rbtools-adminLoadTemplate" class="primary" type="button">▣ Sablon betöltése</button>
+      </div>
+    </div>
+    <p id="rbtools-adminTemplateHint" class="small admin-template-hint">Általános RegionalBahn-cikk: lead, törzsszöveg, keretes blokk és szerzői footer.</p>
+  </div>
+
   <div class="panel admin-quickguide">
     <div class="admin-section-head">
       <div>
         <h2 style="margin:0">Gyorstalpaló</h2>
-        <p class="small" style="margin:3px 0 0">A Blogger-kapcsolattal a cím és a kész HTML kézi másolása sem szükséges.</p>
+        <p class="small" style="margin:3px 0 0">A teljes szerkesztési kör az RBToolsban végezhető; képfeltöltéshez továbbra is a Blogger saját feltöltője kell.</p>
       </div>
       <span class="badge">Blogger ↔ RBTools</span>
     </div>
     <ol class="admin-quicksteps">
-      <li><strong>Új cikk kép nélkül:</strong> kattints az <strong>Új cikk</strong> gombra, és írj közvetlenül a WYSIWYG szerkesztőben.</li>
-      <li><strong>Új cikk képekkel:</strong> Bloggerben készíts piszkozatot és töltsd fel a képeket; az RBToolsban kapcsold össze a Bloggert, frissítsd a piszkozatlistát, majd nyisd meg a draftot. A képeket az RBTools automatikusan kiveszi a HTML-ből.</li>
-      <li><strong>Meglévő cikk:</strong> válaszd ki a Blogger-piszkozatot és kattints a <strong>Piszkozat megnyitása</strong> gombra.</li>
-      <li>Szerkeszd a címet, leadet, szöveget, képeket, képaláírásokat, kereteseket és címkéket. Minden maradjon WYSIWYG-ben.</li>
-      <li>A <strong>Mentés Blogger-piszkozatba</strong> az új cikkből draftot hoz létre, a megnyitott draftot pedig ugyanazon a post ID-n frissíti.</li>
-      <li>Az egyéni permalinket továbbra is a Bloggerben állítsd be. A cikket itt opcionálisan időzítheted is; az azonnali publikálást szándékosan a Bloggerre hagyjuk.</li>
+      <li><strong>Válassz tartalomtípust:</strong> cikk, #nyúz, podcast shownotes, InnoTrans vagy statikus oldal; igény szerint töltsd be a hozzá tartozó sablont.</li>
+      <li><strong>Új anyag:</strong> írj közvetlenül a WYSIWYG-ben, vagy importálj Markdown/TXT/DOCX szöveget. Képes cikknél Bloggerben előbb töltsd fel a képeket egy draftba, majd nyisd meg azt itt.</li>
+      <li><strong>Meglévő draft:</strong> kapcsolódj a Bloggerhez, válaszd ki a piszkozatot, majd <strong>Piszkozat megnyitása</strong>. A cím, címkék, szöveg, képek és iframe-ek betöltődnek.</li>
+      <li><strong>Szerkesztés:</strong> formázás, link, felsorolás, igazítás, keretes, kép, iframe, blokkmozgatás és képaláírás közvetlenül a vizuális szerkesztőben.</li>
+      <li><strong>Mentés:</strong> a <strong>Mentés Blogger-piszkozatba</strong> új draftot készít vagy ugyanazt a post ID-t frissíti. Az időzítés külön gombbal kérhető; azonnali publikálás nincs.</li>
+      <li><strong>Statikus oldal:</strong> a kész HTML-t másold a Blogger oldal HTML-nézetébe. Választható évválasztó gombsoros vagy egyszerű, ömlesztett sablon.</li>
+      <li>A széles <strong>állapotsáv</strong> mindig jelzi, hogy éppen betöltés, mentés, sikeres művelet, figyelmeztetés vagy hiba történt.</li>
     </ol>
   </div>
 
@@ -220,6 +263,12 @@ További szöveg..."></textarea>
       <button id="rbtools-adminFmtLink" type="button" title="Link hozzáadása">🔗 Link</button>
       <button id="rbtools-adminFmtUnlink" type="button" title="Link eltávolítása">⛓ Link törlése</button>
       <button id="rbtools-adminFmtBox" type="button" title="Az aktuális szövegblokk keretessé alakítása">▣ Keretes</button>
+      <span class="admin-format-sep" aria-hidden="true"></span>
+      <span class="small">Felsorolás:</span>
+      <button id="rbtools-adminFmtUl" type="button" title="Felsorolásjelekkel">• Lista</button>
+      <button id="rbtools-adminFmtOl" type="button" title="Számozott felsorolás">1. Lista</button>
+      <button id="rbtools-adminFmtIndent" type="button" title="Listaelem behúzása">→ Behúzás</button>
+      <button id="rbtools-adminFmtOutdent" type="button" title="Listaelem kihúzása">← Kihúzás</button>
       <span class="admin-format-sep" aria-hidden="true"></span>
       <span class="small">Blokk igazítása:</span>
       <button id="rbtools-adminAlignLeft" type="button" title="Balra zárt">≡←</button>
@@ -648,6 +697,45 @@ A következő cikk rövid ajánlója.</pre>
 </section>
 
 <section id="rbtools-tab-help" class="tab">
+  <div class="panel help-admin-guide">
+    <h2>Cikkadmin – részletes használati útmutató</h2>
+    <p>A <strong>Cikkadmin</strong> a RegionalBahn teljes vizuális szerkesztője. Képes új anyagot üres lapról felépíteni, meglévő Blogger-piszkozatot megnyitni és ugyanabba visszamenteni, valamint régi Blogger HTML-t szerkeszthető blokkokra bontani. A szerkesztőben végzett változtatásokból folyamatosan újragenerálódik a Bloggerbe illeszthető végleges HTML.</p>
+
+    <h3>1. Tartalomtípus és sablon</h3>
+    <p>A <strong>Mit írunk?</strong> választóval előre beállítható az anyag szerkezete. A <strong>Cikk</strong> általános leades RegionalBahn-anyagot, a <strong>#nyúz</strong> egymást elválasztó híregységeket, a <strong>Podcast shownotes</strong> Spotify/egyéb iframe-et és időkódlistát, az <strong>InnoTrans cikk</strong> gyártói szekciókat és rövid híreket, a <strong>Statikus oldal</strong> pedig Blogger-oldalhoz való szerkezetet készít. A sablon betöltése lecseréli a szerkesztő tartalmi blokkjait, de a már beolvasott képtárat és a megnyitott Blogger-bejegyzés hozzárendelését megtartja.</p>
+    <p>Statikus oldalnál három induló forma van: <strong>évválasztó gombsor + Összes</strong>, <strong>évválasztó gombsor</strong>, illetve <strong>ömlesztett/egyszerű</strong>. A gombsoros sablon a Közvetlen Kocsi és InnoTrans gyűjtőoldalak logikáját követi; az ömlesztett változat hosszú, fejezetes oldalhoz való. Statikus módban a cikkes <code>&lt;!--more--&gt;</code> és szerzői cikkfooter nem készül el automatikusan.</p>
+
+    <h3>2. Új cikk vagy meglévő Blogger-draft</h3>
+    <p><strong>Új cikk:</strong> az <strong>Új cikk</strong> gomb üres WYSIWYG-anyagot nyit. A címet a papír tetején, a leadet közvetlenül alatta, a törzsszöveget pedig a blokkokban lehet gépelni. Importálható <strong>.md, .txt és .docx</strong> is. <strong>Meglévő draft:</strong> a Blogger-kapcsolat után válaszd ki a blogot és a piszkozatot, majd nyisd meg; az RBTools ugyanahhoz a post ID-hoz köti a munkát.</p>
+    <p>Képes új cikknél a biztos munkamenet: Bloggerben hozz létre draftot, töltsd fel a képeket, majd nyisd meg a draftot az RBToolsban. A Blogger HTML-jében már szereplő képeket a program automatikusan képtárba gyűjti. A Blogger API nem ad külön, dokumentált képfeltöltési műveletet, ezért maga a fájlfeltöltés továbbra is a Blogger felületén történik.</p>
+
+    <h3>3. Blogger-kapcsolat, mentés és időzítés</h3>
+    <p>A <strong>Kapcsolódás a Bloggerhez</strong> Google OAuth engedélyt kér. A kapcsolat csak az adott böngészőmunkamenetre szól. A draftlista kereshető és frissíthető. <strong>Mentés Blogger-piszkozatba</strong> új helyi cikknél új draftot hoz létre, megnyitott draftnál ugyanazt a bejegyzést frissíti. A cím és a Blogger-címkék is átmennek. Az <strong>Időzítés</strong> külön megerősítés után scheduled állapotba teszi a bejegyzést; a <strong>Vissza piszkozatba</strong> gomb a támogatott live/scheduled bejegyzést visszaállítja draftba.</p>
+    <p>Az <strong>egyéni permalink</strong> továbbra is a Blogger felületén állítandó. Az RBTools nem tartalmaz egykattintásos azonnali Publish gombot, így a végleges közzététel külön szerkesztői döntés marad.</p>
+
+    <h3>4. WYSIWYG blokkok és mozgatás</h3>
+    <p>A törzsszöveg blokkokból áll. Van bekezdés, alcím, keretes, kép, iframe, elválasztó és speciális HTML-blokk. Minden blokk jobb oldalán található fel/le és törlés vezérlő; asztali böngészőben a blokk a kék beszúrási sávokra húzható. A képtár elemei ugyanígy behúzhatók a cikk tetszőleges pontjára vagy egy keretesbe.</p>
+    <p>A <strong>Bekezdés</strong>, <strong>Alcím</strong>, <strong>Keretes</strong>, <strong>iframe</strong> és <strong>Elválasztó</strong> gyorsgombok új blokkot adnak hozzá. A keretes RegionalBahn-szürke dobozzá alakítható az aktuális szövegblokk is.</p>
+
+    <h3>5. Szövegformázás, igazítás és felsorolások</h3>
+    <p>Jelölj ki szöveget a WYSIWYG-ben, majd használhatod a félkövér, dőlt, aláhúzott, áthúzott, link és linktörlés gombokat. A <strong>• Lista</strong> rendezetlen, az <strong>1. Lista</strong> számozott listát készít; a <strong>Behúzás/Kihúzás</strong> gombok többszintű listát kezelnek. A négy igazítási gomb az aktuális bekezdést, alcímet, leadet, keretes címet/törzset vagy iframe-blokkot balra, középre, jobbra vagy sorkizártra állítja.</p>
+
+    <h3>6. Képek</h3>
+    <p>A képtárban minden képhez külön megadható képaláírás és kredit, valamint kijelölhető a <strong>főkép</strong>. A főkép a cikk elején 200 pixeles megjelenítéssel kerül a lead mellé, a normál képek blokkban, középre zárva jelennek meg. A képtárból a képek húzással vagy a <strong>Cikk végére</strong> gombbal helyezhetők el. Keretesbe húzott kép a keretes saját szürke hátterű képsablonját kapja.</p>
+
+    <h3>7. iframe és beágyazások</h3>
+    <p>Az <strong>iframe beszúrása</strong> mezőbe teljes, akár több soros <code>&lt;iframe&gt;</code> kód illeszthető. A beszúrt iframe külön blokk lesz, előnézettel és saját több soros kódszerkesztővel. Meglévő Blogger-draft megnyitásakor az iframe-eket a program megpróbálja külön blokkként felismerni, így például Facebook- vagy Spotify-embed közvetlenül módosítható.</p>
+
+    <h3>8. Statikus oldalak</h3>
+    <p>Statikus módban a végleges kimenet nem cikk, ezért nincs automatikus lead, <code>&lt;!--more--&gt;</code> és cikkfooter. A gombsoros sablon évszekciókat és böngészőben működő szűrőgombokat hoz létre, az egyszerű sablon pedig fejezetes, folyamatos oldalt. A kész HTML-t a Blogger <strong>Oldalak</strong> szerkesztőjének HTML-nézetébe kell illeszteni. A statikus oldal közvetlen Blogger-post mentése szándékosan le van tiltva.</p>
+
+    <h3>9. Állapotsáv és hibaellenőrzés</h3>
+    <p>A Cikkadmin tetején lévő széles állapotsáv több sorban mutatja a legutóbbi fontos műveletet. <strong>Kék</strong> az általános információ, <strong>zöld</strong> a siker, <strong>sárga</strong> a figyelmeztetés vagy teendő, <strong>piros</strong> a hiba, a feldolgozás pedig külön folyamatjelzést kap. Ha valami nem a vártnak megfelelően történik, először ezt a sávot érdemes elolvasni.</p>
+
+    <h3>10. Végleges HTML és tartalék kézi munkamenet</h3>
+    <p>A <strong>Végleges Blogger HTML</strong> mező a szerkesztés közben automatikusan frissül. A címet és a HTML-t külön gombbal is lehet másolni, illetve HTML-fájl menthető. Ha a Blogger API-kapcsolat átmenetileg nem használható, ez a kézi út teljes értékű tartalék: cím másolása, HTML másolása, Blogger HTML-nézetbe beillesztés.</p>
+  </div>
+
   <div class="panel">
     <h2>Markdown formázási szabályok</h2>
     <div class="helpgrid">
@@ -756,12 +844,40 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .intro,#rbtools-app .note{color:var(--muted);margin:0 0 10px}
 #rbtools-app .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
 #rbtools-app .status{margin-left:auto;color:var(--muted);font-size:13px}
+#rbtools-app .admin-statusbar{display:flex;gap:12px;align-items:flex-start;width:100%;min-height:58px;margin:-3px 0 15px;padding:12px 15px;border:1px solid transparent;border-radius:11px;font:14px/1.45 Arial,Helvetica,sans-serif;white-space:normal;overflow-wrap:anywhere}
+#rbtools-app .admin-statusbar-icon{flex:0 0 auto;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800}
+#rbtools-app .admin-statusbar-copy{min-width:0;flex:1}
+#rbtools-app .admin-statusbar-copy strong{display:block;margin-bottom:2px}
+#rbtools-app .admin-statusbar.info{background:#eaf3ff;color:#173a63;border-color:#b6d5fa}
+#rbtools-app .admin-statusbar.info .admin-statusbar-icon{background:#cfe4ff;color:#173a63}
+#rbtools-app .admin-statusbar.success{background:#e8f7ee;color:#14532d;border-color:#a7ddb9}
+#rbtools-app .admin-statusbar.success .admin-statusbar-icon{background:#c7ecd3;color:#14532d}
+#rbtools-app .admin-statusbar.warning{background:#fff7db;color:#664d03;border-color:#ecd37d}
+#rbtools-app .admin-statusbar.warning .admin-statusbar-icon{background:#f7e5a4;color:#664d03}
+#rbtools-app .admin-statusbar.error{background:#fdecec;color:#7f1d1d;border-color:#efb0b0}
+#rbtools-app .admin-statusbar.error .admin-statusbar-icon{background:#f7caca;color:#7f1d1d}
+#rbtools-app .admin-statusbar.working{background:#eef1f5;color:#374151;border-color:#cbd1da}
+#rbtools-app .admin-statusbar.working .admin-statusbar-icon{background:#dfe4ea;color:#374151}
+#rbtools-app .admin-template-hint{margin:8px 0 0;color:var(--muted)}
+#rbtools-app .admin-template-grid .toolbar{display:flex;align-items:center}
+#rbtools-app .help-admin-guide h3{margin-top:18px}
+#rbtools-app .help-admin-guide p{max-width:1200px}
+#rbtools-app select{color-scheme:light;background:var(--panel);color:var(--ink)}
+#rbtools-app select option,#rbtools-app select optgroup{background:#fff;color:#111}
+#rbtools-app[data-theme="dark"] select{color-scheme:dark!important;background:#1b1e24!important;color:#f4f4f5!important}
+#rbtools-app[data-theme="dark"] select option,#rbtools-app[data-theme="dark"] select optgroup{background:#1b1e24!important;color:#f4f4f5!important}
+@media (prefers-color-scheme:dark){
+  #rbtools-app:not([data-theme]) select{color-scheme:dark;background:#1b1e24!important;color:#f4f4f5!important}
+  #rbtools-app:not([data-theme]) select option,#rbtools-app:not([data-theme]) select optgroup{background:#1b1e24!important;color:#f4f4f5!important}
+}
 #rbtools-app .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 #rbtools-app .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 #rbtools-app .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 #rbtools-app .field{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 10px}
 #rbtools-app .field label{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}
-#rbtools-app .field input,#rbtools-app .field select{width:100%;border:0;background:transparent;padding:3px 0;outline:0;border-radius:0}
+#rbtools-app .field input,#rbtools-app .field select{width:100%;border:0;padding:3px 0;outline:0;border-radius:0}
+#rbtools-app .field input{background:transparent}
+#rbtools-app .field select{background:var(--panel);padding:5px 7px;border-radius:6px}
 #rbtools-app textarea{width:100%;min-height:500px;resize:vertical;border:0;outline:0;padding:13px;background:var(--panel);color:var(--ink);font:13px/1.45 Consolas,"Courier New",monospace}
 #rbtools-app .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
 #rbtools-app .cardhead{padding:10px 12px;background:var(--panel2);border-bottom:1px solid var(--line);font-weight:700}
