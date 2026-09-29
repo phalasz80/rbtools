@@ -82,10 +82,20 @@ A Cikkadminban külön tartalomtípus választható: **Cikk**, **#nyúz / Hétv�
 - képaláírás és kredit;
 - blokkok drag-and-drop rendezése;
 - meglévő RegionalBahn Blogger HTML visszatöltése szerkesztésre;
-- haladó forráskonverzió a Cikkadminon belül: Markdown/plain text/DOCX/Google Dokumentum, profilok, presetek, RB-jelölések, közvetlen HTML-kimenet és előnézet;
+- haladó forráskonverzió a Cikkadminon belül: Markdown/plain text/DOCX/ODT/RTF/Google Dokumentum, profilok, presetek, RB-jelölések, közvetlen HTML-kimenet és előnézet;
 - a haladó konverter kimenetének visszatöltése a WYSIWYG Cikkadminba;
 - folyamatosan generált végleges Blogger HTML;
 - széles, színkódolt állapotsáv a betöltési, mentési, siker-, figyelmeztetési és hibaállapotokhoz.
+
+## Dokumentumimport
+
+A Cikkadmin és a haladó forráskonverter közvetlenül fogad **.md, .txt, .docx, .odt és .rtf** fájlokat. A **Keretes** eszköz ugyanígy támogatja ezeket a formátumokat.
+
+### ODT és RTF import
+
+- **ODT:** a böngésző helyben bontja ki az OpenDocument csomagot; a bekezdések, címsorok, alapvető karakterformázás, linkek, listák és táblázatok Markdownná alakulnak. A beágyazott képek helyén helyőrző marad.
+- **RTF:** a szöveg, bekezdések, sortörések, félkövér, dőlt, aláhúzott, áthúzott, felső és alsó index alapformázása kerül át. Régi vagy gyártóspecifikus RTF-kiterjesztéseknél az eredményt ellenőrizni kell.
+- Az import teljesen kliensoldali, a dokumentumot az RBTools nem tölti fel saját szerverre.
 
 ## Kézi tartalék munkamenet
 
