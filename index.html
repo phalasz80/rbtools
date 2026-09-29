@@ -113,7 +113,9 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
       <li><strong>Válassz tartalomtípust:</strong> cikk, #nyúz, podcast shownotes, InnoTrans vagy statikus oldal; igény szerint töltsd be a hozzá tartozó sablont.</li>
       <li><strong>Új anyag:</strong> írj közvetlenül a WYSIWYG-ben, vagy importálj Markdown/TXT/DOCX szöveget. Képes cikknél Bloggerben előbb töltsd fel a képeket egy draftba, majd nyisd meg azt itt.</li>
       <li><strong>Meglévő draft:</strong> kapcsolódj a Bloggerhez, válaszd ki a piszkozatot, majd <strong>Piszkozat megnyitása</strong>. A cím, címkék, szöveg, képek és iframe-ek betöltődnek.</li>
-      <li><strong>Szerkesztés:</strong> formázás, link, felső/alsó index, felsorolás, igazítás, különleges karakter/emoji/HTML-entitás, keresés, keretes, kép, iframe és blokkmozgatás közvetlenül a vizuális szerkesztőben.</li>
+      <li><strong>Szerkesztés:</strong> a WYSIWYG-ben közvetlenül használható a formázás, link, felsorolás, igazítás, keretes, kép, iframe és blokkmozgatás. Az <strong>x² / x₂</strong> gomb HTML <code>&lt;sup&gt;</code>/<code>&lt;sub&gt;</code> formázást készít a kijelölt szövegből.</li>
+      <li><strong>Különleges jelek:</strong> nyisd le az <strong>Ω Különleges karakterek…</strong> panelt Unicode-jelekhez, emojihoz, Unicode felső/alsó indexhez és HTML-entitásokhoz. Kijelölt szövegnél a beszúrt jel vagy entitás <strong>lecseréli a kijelölést</strong>; a <code>&amp;nbsp;</code> rózsaszín szerkesztői jelölést kap.</li>
+      <li><strong>Keresés:</strong> a <strong>Keresés a cikkben</strong> mező az aktuális WYSIWYG-szöveg találatait megszámolja és sárgával kiemeli. A kiemelés csak szerkesztési segédlet, nem kerül a Blogger HTML-be.</li>
       <li><strong>Mentés:</strong> a <strong>Mentés Blogger-piszkozatba</strong> új draftot készít vagy ugyanazt a post ID-t frissíti. Az időzítés külön gombbal kérhető; azonnali publikálás nincs.</li>
       <li><strong>Statikus oldal:</strong> a kész HTML-t másold a Blogger oldal HTML-nézetébe. Választható évválasztó gombsoros vagy egyszerű, ömlesztett sablon.</li>
       <li>A széles <strong>állapotsáv</strong> mindig jelzi, hogy éppen betöltés, mentés, sikeres művelet, figyelmeztetés vagy hiba történt.</li>
@@ -121,7 +123,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
     <div class="admin-help-callout">
       <strong>Első használat vagy hiba esetén:</strong>
       a <a href="#rbtools-help-cikkadmin" id="rbtools-adminHelpLink">Súgó részletes Cikkadmin-fejezete</a>
-      lépésről lépésre végigvezet a Google-belépésen, draftkezelésen, WYSIWYG-en, képeken, iframe-eken, statikus oldalakon és a tipikus hibaüzenetek elhárításán.
+      lépésről lépésre végigvezet a Google-belépésen, draftkezelésen, WYSIWYG-en, képeken, iframe-eken, felső/alsó indexen, különleges karaktereken, HTML-entitásokon, keresésen, statikus oldalakon és a tipikus hibaüzenetek elhárításán.
     </div>
   </div>
 
@@ -758,7 +760,7 @@ A következő cikk rövid ajánlója.</pre>
 <section id="rbtools-tab-help" class="tab">
   <div class="panel help-admin-guide" id="rbtools-help-cikkadmin">
     <h2>Cikkadmin – teljes, lépésről lépésre használati útmutató</h2>
-    <p><strong>Ha most használod először az RBToolst, ezt a fejezetet érdemes végigolvasni.</strong> A Cikkadmin a RegionalBahn teljes vizuális szerkesztője: új anyagot tudsz benne írni, meglévő Blogger-piszkozatot megnyitni, ugyanabba visszamenteni, képeket és iframe-eket kezelni, valamint cikk-, #nyúz-, podcast-, InnoTrans- és statikusoldal-sablonból indulni. A szerkesztés közben a Blogger-kompatibilis HTML folyamatosan újragenerálódik.</p>
+    <p><strong>Ha most használod először az RBToolst, ezt a fejezetet érdemes végigolvasni.</strong> A Cikkadmin a RegionalBahn teljes vizuális szerkesztője: új anyagot tudsz benne írni, meglévő Blogger-piszkozatot megnyitni, ugyanabba visszamenteni, képeket és iframe-eket kezelni, felső/alsó indexet és listákat formázni, Unicode-karaktereket, emojit és HTML-entitásokat beszúrni, a cikkben keresni, valamint cikk-, #nyúz-, podcast-, InnoTrans- és statikusoldal-sablonból indulni. A szerkesztés közben a Blogger-kompatibilis HTML folyamatosan újragenerálódik.</p>
 
     <div class="admin-help-warning"><strong>Fontos:</strong> a Blogger-kapcsolat nem közös Google-fiókot használ. Minden szerkesztő a saját Google-fiókjával lép be, és az RBTools pontosan annyi Blogger-jogot kap, amennyit az adott fiók a Bloggerben eleve birtokol. Jelszót és Google Client Secretet az RBToolsba soha nem kell beírni.</div>
 
@@ -833,10 +835,40 @@ A következő cikk rövid ajánlója.</pre>
     <p>Ha a külső szolgáltató biztonsági szabályai miatt az iframe az RBTools előnézetében nem renderelődik, attól még a kód bekerülhet a Blogger HTML-be. Ilyenkor a végleges Blogger-előnézetet is ellenőrizd.</p>
 
     <h3>16. Különleges karakterek, emoji, felső/alsó index, HTML-entitások és keresés</h3>
-    <p>A WYSIWYG formázósora alatt nyitható a <strong>Ω Különleges karakterek…</strong> panel. A karaktergombok a kurzor helyére szúrják be a jelet; ha előtte kijelöltél szöveget, a kijelölést lecserélik. A tipográfiai készletben szerepelnek többek között a magyar idézőjelek, belső idézőjelek, nagykötőjel, mínuszjel, három pont, prime/double-prime, fok-, paragrafus-, védjegy- és pénznemjelek, valamint nyilak és közlekedési szerkesztésnél gyakori jelölések.</p>
-    <p>A <strong>x²</strong> és <strong>x₂</strong> gomb valódi HTML <code>&lt;sup&gt;</code> illetve <code>&lt;sub&gt;</code> formázást készít a kijelölt szövegből. Emellett külön Unicode felsőindex-számok (<code>⁰¹²³⁴⁵⁶⁷⁸⁹</code>) szúrhatók be, vagy a kijelölt normál számjegyek egy gombbal Unicode felső/alsó indexre alakíthatók.</p>
-    <p>A <strong>HTML-entitások</strong> gombsor több gyakori entitást kínál, például <code>&amp;nbsp;</code>, <code>&amp;ndash;</code>, <code>&amp;hellip;</code>, <code>&amp;deg;</code>, <code>&amp;copy;</code>. Az egyedi mezőbe tetszőleges szabályos named, decimális vagy hexadecimális entitás írható. Az innen beszúrt entitás az editorban színes szerkesztői jelölést kap. A nem törhető szóköz külön <strong>rózsaszín</strong> jelöléssel látszik, hogy ne keveredjen össze normál szóközzel; a Blogger HTML generálásakor a jelölőspan eltűnik, és maga az entitás marad.</p>
-    <p>A <strong>Keresés a cikkben</strong> mező gépelés közben megszámolja és sárgával kiemeli az aktuális WYSIWYG-cikkben előforduló találatokat. A kiemelés csak szerkesztői segédlet, nem kerül bele a Blogger HTML-be. A <strong>Kiemelés törlése</strong> gomb üríti a keresést.</p>
+    <p>Ez a rész akkor hasznos, amikor olyan jelet szeretnél beszúrni, amely nincs kéznél a billentyűzeten, tipográfiailag pontos karakter kell, felső/alsó indexet írsz, vagy egy nem látható HTML-karaktert akarsz biztosan kontrollálni. A funkciók a <strong>Vizuális cikkszerkesztő</strong> formázósora alatt találhatók.</p>
+
+    <h4>16.1. Először mindig döntsd el: beszúrás vagy csere?</h4>
+    <p>Ha csak a kurzor áll egy szerkeszthető szövegben, a karakter, emoji vagy entitás <strong>a kurzor helyére kerül</strong>. Ha előtte kijelölsz egy szót, számot vagy mondatrészt, a beszúrás <strong>lecseréli a teljes kijelölést</strong>. Ez tudatos működés, így például egy sima kötőjelet egy kattintással lecserélhetsz valódi mínuszjelre vagy nagykötőjelre.</p>
+    <p>Ha a program azt jelzi, hogy előbb kattints szerkeszthető szövegrészbe, kattints vissza a címbe, leadbe, bekezdésbe, keretesbe vagy képaláírásba, állítsd oda a kurzort, illetve jelöld ki újra a cserélendő szöveget, majd használd a beszúrót.</p>
+
+    <h4>16.2. HTML felső index és alsó index: x² / x₂</h4>
+    <p>A formázósor <strong>x²</strong> gombja a kijelölt szöveget HTML <code>&lt;sup&gt;…&lt;/sup&gt;</code> elembe teszi, az <strong>x₂</strong> pedig <code>&lt;sub&gt;…&lt;/sub&gt;</code> elembe. Ez valódi formázás, tehát például a kijelölt <code>2</code> a végleges HTML-ben <code>&lt;sup&gt;2&lt;/sup&gt;</code> lesz. Ezt használd akkor, ha nem csak számjegyre van szükség, hanem teljes szó, rövidítés, mértékegység vagy vegyes karaktersor kerül indexbe.</p>
+    <p><strong>Fontos különbség:</strong> a HTML <code>&lt;sup&gt;</code>/<code>&lt;sub&gt;</code> és a Unicode felső/alsó index <strong>nem ugyanaz</strong>. A HTML-tag vizuális formázás; a Unicode-változat önálló karakter, például <code>²</code> vagy <code>₅</code>.</p>
+
+    <h4>16.3. Unicode felső és alsó index</h4>
+    <p>Az <strong>Ω Különleges karakterek…</strong> panelben külön gombsor található a Unicode felsőindex-számokhoz. Egy-egy gomb közvetlenül beszúrja például a <code>⁰ ¹ ² ³ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹</code> karaktereket. A <strong>Kijelölt szám → ⁰¹²³</strong> gomb a kijelölt normál számjegyeket Unicode felső indexre, a másik gomb alsó indexre alakítja.</p>
+    <p>Az átalakítás a támogatott karaktereket cseréli le, a többit változatlanul hagyja. Ezért például a kijelölt <code>120</code> eredménye <code>¹²⁰</code>. Ha typográfiai indexelésre van szükséged teljes szöveggel, inkább az x²/x₂ HTML-gombokat használd.</p>
+
+    <h4>16.4. Tipográfiai és szerkesztőségi karakterek</h4>
+    <p>A karakterpaletta a RegionalBahn-szövegeknél gyakran szükséges jeleket teszi egy kattintásra elérhetővé: magyar idézőjelek <code>„ ”</code>, belső idézőjelek <code>» «</code>, aposztróf <code>’</code>, prime és double-prime <code>′ ″</code>, nagykötőjel <code>–</code>, valódi mínuszjel <code>−</code>, három pont <code>…</code>, középső pont <code>·</code>, paragrafusjel <code>§</code>, fokjel <code>°</code>, plusz-mínusz <code>±</code>, szorzás <code>×</code>, osztás <code>÷</code>, ezrelék <code>‰</code>, copyright/védjegyjelek, pénznemek és különböző nyilak.</p>
+    <p>Ha a palettában nincs benne, amit keresel, az <strong>Egyedi Unicode-karakter vagy szöveg</strong> mezőbe közvetlenül bemásolhatod, majd a <strong>Beszúrás / kijelölés cseréje</strong> gombbal használhatod.</p>
+
+    <h4>16.5. Emoji</h4>
+    <p>A <strong>Szabványos Unicode emoji</strong> rész közlekedési, szerkesztőségi és általános jelekből ad gyorsválogatást. Ezek nem képek és nem Blogger-specifikus kódok, hanem Unicode-karakterek. A kiválasztott emoji ugyanúgy a kurzorhoz kerül vagy lecseréli a kijelölést, mint bármely más különleges karakter.</p>
+    <p>Az emoji tényleges kinézete operációs rendszerenként és böngészőnként eltérhet. A Bloggerbe a Unicode-karakter kerül, nem az RBToolsban látott konkrét grafikai rajz.</p>
+
+    <h4>16.6. HTML-entitások, különösen az &amp;nbsp;</h4>
+    <p>A <strong>HTML-entitások</strong> gombsor gyakori kódokat kínál, például <code>&amp;nbsp;</code>, <code>&amp;ndash;</code>, <code>&amp;hellip;</code>, <code>&amp;deg;</code>, <code>&amp;copy;</code>, <code>&amp;amp;</code>, <code>&amp;lt;</code> és <code>&amp;gt;</code>. Az <strong>Egyedi HTML-entitás</strong> mező named, decimális és hexadecimális alakot is elfogad, például <code>&amp;nbsp;</code>, <code>&amp;#160;</code> vagy <code>&amp;#x202F;</code>.</p>
+    <p>A beszúrt entitások a WYSIWYG-ben <strong>szerkesztői segédjelölést</strong> kapnak, hogy a láthatatlan vagy nehezen megkülönböztethető karakterek felismerhetők legyenek. A <code>&amp;nbsp;</code> külön <strong>rózsaszín</strong> jelölést kap; a többi innen beszúrt entitás lilás jelölést. Ezek a színek <strong>nem részei a cikknek</strong>: a végleges Blogger HTML generálásakor a jelölő elem eltűnik, és az eredeti entitás marad.</p>
+    <p>A <code>&amp;nbsp;</code> nem törhető szóköz. Akkor használd, ha két elem között nem szeretnél sortörést, például egy szám és a hozzá tartozó mértékegység vagy más szorosan összetartozó elemek között. Ne használd normál szóköz általános helyettesítésére.</p>
+
+    <h4>16.7. Mi történik, ha hibás entitást írsz?</h4>
+    <p>Az egyedi mező csak szabályos <code>&amp;…;</code>, <code>&amp;#…;</code> vagy <code>&amp;#x…;</code> formát fogad el. Ha a kód szintaktikailag hibás vagy a böngésző nem tudja értelmezni, az RBTools nem szúrja be, hanem hibaüzenetet ír az állapotsávba. Ilyenkor ellenőrizd különösen a kezdő <code>&amp;</code> és a záró pontosvessző jelenlétét.</p>
+
+    <h4>16.8. Keresés az aktuális WYSIWYG-cikkben</h4>
+    <p>A <strong>Keresés a cikkben</strong> mezőbe írj be egy szót vagy mondatrészt. A keresés gépelés közben lefut, a találatok száma a mező mellett jelenik meg, az előfordulások pedig <strong>sárga kiemelést</strong> kapnak a jelenleg megjelenített szerkeszthető WYSIWYG-tartalomban. A keresés kis- és nagybetűtől független.</p>
+    <p>A keresési sárga kiemelés kizárólag vizuális szerkesztői réteg. <strong>Nem kerül bele a végleges Blogger HTML-be</strong>, és nem alakítja át a cikk szövegét. A <strong>Kiemelés törlése</strong> gomb üríti a keresőmezőt és eltávolítja a találatjelöléseket.</p>
+    <p>Ha közben szerkeszteni kezded a szöveget, a program szükség esetén újraszámolja vagy eltávolítja a segédkiemelést, hogy a találatjelző ne váljon a tényleges HTML részévé. A keresés a WYSIWYG felületre szolgál; a külön forrás- vagy végleges HTML-textareákban a böngésző saját keresése használható.</p>
 
     <h3>17. Képtár és főkép</h3>
     <p>A <strong>Képtár</strong> minden beolvasott képhez külön kártyát ad. A képaláírás és a kredit közvetlenül szerkeszthető. A <strong>☆ Főkép</strong> gombbal kijelölt kép a cikk elején, a lead mellett jelenik meg. A normál képet a <strong>＋ Cikk végére</strong> gombbal vagy drag-and-drop módszerrel helyezd el.</p>
@@ -1211,7 +1243,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v18";
+const RBTOOLS_VERSION="pages-v19";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
