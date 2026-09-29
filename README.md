@@ -69,6 +69,8 @@ Az **egyéni permalink** nincs dokumentáltan írható Blogger API-mezőként, e
 - félkövér, dőlt, aláhúzott, áthúzott és link formázás;
 - bekezdések és alcímek;
 - RegionalBahn keretes blokkok;
+- bekezdés-, alcím-, keretes- és iframe-blokkok balra, középre, jobbra vagy sorkizártra igazítása;
+- iframe embedek beszúrása, meglévő iframe-ek visszaolvasása, élő előnézete és több soros kódszerkesztése;
 - képtár és főkép;
 - képek húzása konkrét bekezdések közé;
 - kép húzása keretes blokkba;
