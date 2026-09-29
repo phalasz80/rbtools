@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RBTools – RegionalBahn szerkesztői konverter</title>
+<title>RegionalBahn Tools</title>
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
 <meta name="googlebot" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
 <meta name="bingbot" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
@@ -19,7 +19,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
   <div class="header-inner">
     <div class="header-top">
       <div class="header-copy">
-        <h1>RegionalBahn mindentudó szerkesztői konverter</h1>
+        <h1>RegionalBahn Tools</h1>
         <p class="subtitle">WYSIWYG Cikkadmin + Markdown / plain text / DOCX → Blogger HTML, keretes- és táblázatkonverter, HTML-ellenőrző, gyűjtőoldal-építő, képkód-normalizáló és Unicode műhely. <span id="rbtools-rbtoolsRuntime" class="rbtools-runtime">JS: indul…</span></p>
       </div>
     </div>
@@ -28,7 +28,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
     </div>
     <nav class="tabs" aria-label="Eszközök">
       <button class="tabbtn active" data-tab="admin">Cikkadmin</button>
-      <button class="tabbtn" data-tab="article">Cikk → Blogger</button>
+      <button class="tabbtn" data-tab="article">Szöveg → Blogger konverter</button>
       <button class="tabbtn" data-tab="boxed">Keretes</button>
       <button class="tabbtn" data-tab="collections">Gyűjtőoldalak</button>
       <button class="tabbtn" data-tab="tables">Táblázatok</button>
@@ -55,6 +55,24 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
       <button id="rbtools-adminClear">× Új cikk</button>
       <span id="rbtools-adminStatus" class="status">Készen áll.</span>
     </div>
+  </div>
+
+  <div class="panel admin-quickguide">
+    <div class="admin-section-head">
+      <div>
+        <h2 style="margin:0">Gyors munkamenet a kollégáknak</h2>
+        <p class="small" style="margin:3px 0 0">Bloggerben csak a képek előkészítése szükséges; a cikk összeállítása az RBToolsban történik.</p>
+      </div>
+      <span class="badge">Blogger → RBTools → Blogger</span>
+    </div>
+    <ol class="admin-quicksteps">
+      <li><strong>Blogger:</strong> nyiss egy új piszkozatot, és töltsd fel az összes szükséges képet.</li>
+      <li>Válts <strong>HTML-nézetre</strong>, majd másold ki a képek által generált HTML-kódot.</li>
+      <li><strong>RBTools:</strong> töltsd be vagy illeszd be a cikkszöveget, a képkódot pedig a jobb oldali mezőbe.</li>
+      <li>A <strong>Cikkadminban</strong> állítsd be a főképét, a képaláírásokat, a sorrendet, a formázást és a kereteseket.</li>
+      <li>A végén másold ki külön a <strong>Blogger-címet</strong> és a <strong>Végleges HTML-t</strong>.</li>
+      <li><strong>Blogger:</strong> a címet a címmezőbe, a kész HTML-t az HTML-nézetbe illeszd, majd ellenőrzés után mentsd vagy publikáld.</li>
+    </ol>
   </div>
 
   <div class="grid2 admin-import-grid">
@@ -130,7 +148,7 @@ További szöveg..."></textarea>
     <div class="admin-section-head">
       <div>
         <h2 style="margin:0">4. Vizuális cikkszerkesztő</h2>
-        <p class="small" style="margin:3px 0 0">Szöveg, kép és keretes blokk egyaránt mozgatható. A kék sávokra képet vagy már létező blokkot is dobhatsz.</p>
+        <p class="small" style="margin:3px 0 0">Szöveg, kép és keretes blokk egyaránt mozgatható. A kék sávokra képet vagy már létező blokkot is dobhatsz. A szerkesztő függőlegesen átméretezhető az alsó pereménél.</p>
       </div>
       <div class="toolbar" style="margin:0">
         <button id="rbtools-adminAddParagraph">＋ Bekezdés</button>
@@ -716,6 +734,10 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-hero{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;flex-wrap:wrap}
 #rbtools-app .admin-hero>div:first-child{flex:1;min-width:280px}
 #rbtools-app .admin-cardpad{padding:10px}
+#rbtools-app .admin-quickguide{padding:14px 16px}
+#rbtools-app .admin-quicksteps{margin:12px 0 0;padding-left:24px;display:grid;gap:7px}
+#rbtools-app .admin-quicksteps li{padding-left:3px}
+#rbtools-app .admin-quicksteps strong{font-weight:750}
 #rbtools-app .admin-source{min-height:260px}
 #rbtools-app .admin-existing-source{min-height:220px;margin-top:8px;border:1px solid var(--line);border-radius:9px}
 #rbtools-app .admin-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -735,7 +757,7 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-editor-panel{padding:14px}
 #rbtools-app .admin-formatbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0 0;padding:8px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
 #rbtools-app .admin-formatbar button{min-width:36px;padding:6px 9px}
-#rbtools-app .admin-canvas{margin-top:12px;background:#fff;color:#111;border:1px solid var(--line);border-radius:11px;padding:20px;min-height:420px}
+#rbtools-app .admin-canvas{margin-top:12px;background:#fff;color:#111;border:1px solid var(--line);border-radius:11px;padding:20px;min-height:620px;height:70vh;resize:vertical;overflow:auto}
 #rbtools-app .admin-paper-title{font:700 27px/1.2 Arial,Helvetica,sans-serif;margin:0 0 14px;padding:7px 9px;border:1px dashed transparent;border-radius:7px;outline:none}
 #rbtools-app .admin-paper-title:focus{border-color:#a1a1aa}
 #rbtools-app .admin-lead-shell{overflow:auto;margin-bottom:14px}
@@ -777,7 +799,7 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-empty{padding:26px;text-align:center;color:var(--muted);border:2px dashed var(--line);border-radius:9px}
 #rbtools-app .admin-output-card{margin-top:15px}
 #rbtools-app .admin-output-card textarea{min-height:380px}
-@media(max-width:800px){#rbtools-app .admin-canvas{padding:12px}#rbtools-app .admin-block{padding-right:38px}#rbtools-app .admin-image-library{grid-template-columns:1fr}}#rbtools-app .admin-block{padding-right:38px}#rbtools-app .admin-image-library{grid-template-columns:1fr}}
+@media(max-width:800px){#rbtools-app .admin-canvas{padding:12px;min-height:460px;height:65vh}#rbtools-app .admin-block{padding-right:38px}#rbtools-app .admin-image-library{grid-template-columns:1fr}}#rbtools-app .admin-block{padding-right:38px}#rbtools-app .admin-image-library{grid-template-columns:1fr}}
 @media(max-width:700px){#rbtools-app .image-url-grid{grid-template-columns:1fr}}
 
 #rbtools-app .unicode-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -818,7 +840,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v4";
+const RBTOOLS_VERSION="pages-v5";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
