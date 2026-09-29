@@ -82,6 +82,8 @@ A Cikkadminban külön tartalomtípus választható: **Cikk**, **#nyúz / Hétv�
 - képaláírás és kredit;
 - blokkok drag-and-drop rendezése;
 - meglévő RegionalBahn Blogger HTML visszatöltése szerkesztésre;
+- haladó forráskonverzió a Cikkadminon belül: Markdown/plain text/DOCX/Google Dokumentum, profilok, presetek, RB-jelölések, közvetlen HTML-kimenet és előnézet;
+- a haladó konverter kimenetének visszatöltése a WYSIWYG Cikkadminba;
 - folyamatosan generált végleges Blogger HTML;
 - széles, színkódolt állapotsáv a betöltési, mentési, siker-, figyelmeztetési és hibaállapotokhoz.
 
@@ -96,7 +98,9 @@ Ha a Blogger API-kapcsolat éppen nem használható, a régi kézi módszer tov�
 
 ## További eszközök
 
-A korábbi **Cikk → Blogger** eszköz neve **Szöveg → Blogger konverter**. A keretes-, táblázat-, képkód-, HTML-ellenőrző, gyűjtőoldal- és Unicode-eszközök továbbra is elérhetők a felső menüben.
+A korábbi külön **Szöveg → Blogger konverter** fül megszűnt: teljes funkcionalitása a **Cikkadmin** lenyitható **Haladó forráskonverzió, Google Docs és RB-jelölések** részébe került. Így minden cikkes munkafolyamat egyetlen fülön érhető el.
+
+A **Keretes**, **Gyűjtőoldalak**, **Táblázatok**, **Képkódok**, **HTML ellenőrző**, **Unicode stílusok** és **Súgó** külön eszközfülként továbbra is megmaradt.
 
 ## Technikai háttér
 
