@@ -113,7 +113,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
       <li><strong>Válassz tartalomtípust:</strong> cikk, #nyúz, podcast shownotes, InnoTrans vagy statikus oldal; igény szerint töltsd be a hozzá tartozó sablont.</li>
       <li><strong>Új anyag:</strong> írj közvetlenül a WYSIWYG-ben, vagy importálj Markdown/TXT/DOCX szöveget. Képes cikknél Bloggerben előbb töltsd fel a képeket egy draftba, majd nyisd meg azt itt.</li>
       <li><strong>Meglévő draft:</strong> kapcsolódj a Bloggerhez, válaszd ki a piszkozatot, majd <strong>Piszkozat megnyitása</strong>. A cím, címkék, szöveg, képek és iframe-ek betöltődnek.</li>
-      <li><strong>Szerkesztés:</strong> formázás, link, felsorolás, igazítás, keretes, kép, iframe, blokkmozgatás és képaláírás közvetlenül a vizuális szerkesztőben.</li>
+      <li><strong>Szerkesztés:</strong> formázás, link, felső/alsó index, felsorolás, igazítás, különleges karakter/emoji/HTML-entitás, keresés, keretes, kép, iframe és blokkmozgatás közvetlenül a vizuális szerkesztőben.</li>
       <li><strong>Mentés:</strong> a <strong>Mentés Blogger-piszkozatba</strong> új draftot készít vagy ugyanazt a post ID-t frissíti. Az időzítés külön gombbal kérhető; azonnali publikálás nincs.</li>
       <li><strong>Statikus oldal:</strong> a kész HTML-t másold a Blogger oldal HTML-nézetébe. Választható évválasztó gombsoros vagy egyszerű, ömlesztett sablon.</li>
       <li>A széles <strong>állapotsáv</strong> mindig jelzi, hogy éppen betöltés, mentés, sikeres művelet, figyelmeztetés vagy hiba történt.</li>
@@ -268,6 +268,8 @@ További szöveg..."></textarea>
       <button id="rbtools-adminFmtStrike" type="button" title="Áthúzott"><s>S</s></button>
       <button id="rbtools-adminFmtLink" type="button" title="Link hozzáadása">🔗 Link</button>
       <button id="rbtools-adminFmtUnlink" type="button" title="Link eltávolítása">⛓ Link törlése</button>
+      <button id="rbtools-adminFmtSup" type="button" title="Kijelölt szöveg felső indexbe: &lt;sup&gt;">x<sup>2</sup></button>
+      <button id="rbtools-adminFmtSub" type="button" title="Kijelölt szöveg alsó indexbe: &lt;sub&gt;">x<sub>2</sub></button>
       <button id="rbtools-adminFmtBox" type="button" title="Az aktuális szövegblokk keretessé alakítása">▣ Keretes</button>
       <span class="admin-format-sep" aria-hidden="true"></span>
       <span class="small">Felsorolás:</span>
@@ -282,6 +284,57 @@ További szöveg..."></textarea>
       <button id="rbtools-adminAlignRight" type="button" title="Jobbra zárt">→≡</button>
       <button id="rbtools-adminAlignJustify" type="button" title="Sorkizárt">☰</button>
     </div>
+
+    <div class="admin-findbar" role="search" aria-label="Keresés a WYSIWYG cikkben">
+      <label for="rbtools-adminFind"><strong>Keresés a cikkben</strong></label>
+      <input id="rbtools-adminFind" type="search" autocomplete="off" placeholder="Szó vagy mondatrész…">
+      <button id="rbtools-adminFindClear" type="button">× Kiemelés törlése</button>
+      <span id="rbtools-adminFindCount" class="badge">0 találat</span>
+    </div>
+
+    <details class="admin-char-tools" id="rbtools-adminCharTools">
+      <summary>Ω Különleges karakterek, emoji, felső/alsó index és HTML-entitások</summary>
+      <p class="small">Kattints a kívánt jelre: a kurzor helyére kerül, kijelölés esetén pedig lecseréli a kijelölt szöveget. A <code>&amp;nbsp;</code> és az innen beszúrt HTML-entitások az editorban színes jelölést kapnak, de a kész Blogger HTML-ben tiszta entitásként jelennek meg.</p>
+
+      <div class="admin-char-section">
+        <strong>Tipográfia és szerkesztőségi jelek</strong>
+        <div id="rbtools-adminCharTypography" class="admin-char-grid"></div>
+      </div>
+
+      <div class="admin-char-section">
+        <strong>Felső index Unicode-számok</strong>
+        <div id="rbtools-adminCharSuperscript" class="admin-char-grid"></div>
+        <div class="toolbar" style="margin:6px 0 0">
+          <button id="rbtools-adminSupConvert" type="button">Kijelölt szám → ⁰¹²³</button>
+          <button id="rbtools-adminSubConvert" type="button">Kijelölt szám → ₀₁₂₃</button>
+        </div>
+      </div>
+
+      <div class="admin-char-section">
+        <strong>Szabványos Unicode emoji</strong>
+        <div id="rbtools-adminCharEmoji" class="admin-char-grid admin-emoji-grid"></div>
+      </div>
+
+      <div class="admin-char-section">
+        <strong>HTML-entitások</strong>
+        <div id="rbtools-adminCharEntities" class="admin-char-grid admin-entity-grid"></div>
+        <div class="admin-custom-insert">
+          <label for="rbtools-adminEntityCustom">Egyedi HTML-entitás</label>
+          <input id="rbtools-adminEntityCustom" type="text" spellcheck="false" placeholder="&amp;nbsp; vagy &amp;#160; vagy &amp;#x202F;">
+          <button id="rbtools-adminEntityInsert" type="button">Entitás beszúrása / kijelölés cseréje</button>
+        </div>
+      </div>
+
+      <div class="admin-char-section">
+        <strong>Egyedi Unicode-karakter vagy szöveg</strong>
+        <div class="admin-custom-insert">
+          <label for="rbtools-adminUnicodeCustom">Beszúrandó karakter/szöveg</label>
+          <input id="rbtools-adminUnicodeCustom" type="text" placeholder="pl. ↔, №, ‰, 🚆">
+          <button id="rbtools-adminUnicodeInsert" type="button">Beszúrás / kijelölés cseréje</button>
+        </div>
+      </div>
+    </details>
+
     <div class="admin-embedbar">
       <label for="rbtools-adminIframeInput"><strong>iframe beszúrása</strong><span class="small"> Illeszd be az iframe kódját. Több soros kód is szerkeszthető.</span></label>
       <textarea id="rbtools-adminIframeInput" rows="4" spellcheck="false" placeholder="&lt;iframe src=&quot;…&quot; width=&quot;600&quot; height=&quot;400&quot; …&gt;&lt;/iframe&gt;"></textarea>
@@ -779,38 +832,44 @@ A következő cikk rövid ajánlója.</pre>
     <p>Az iframe-mezőbe illeszd be a teljes <code>&lt;iframe …&gt;&lt;/iframe&gt;</code> kódot, majd kattints az <strong>iframe beszúrása</strong> gombra. A blokkban külön előnézet és több soros kódszerkesztő jelenik meg. A kód szerkesztése után az előnézet külön frissíthető. Meglévő draftnál például Facebook- vagy Spotify-embedet az RBTools külön iframe-blokként próbál felismerni.</p>
     <p>Ha a külső szolgáltató biztonsági szabályai miatt az iframe az RBTools előnézetében nem renderelődik, attól még a kód bekerülhet a Blogger HTML-be. Ilyenkor a végleges Blogger-előnézetet is ellenőrizd.</p>
 
-    <h3>16. Képtár és főkép</h3>
+    <h3>16. Különleges karakterek, emoji, felső/alsó index, HTML-entitások és keresés</h3>
+    <p>A WYSIWYG formázósora alatt nyitható a <strong>Ω Különleges karakterek…</strong> panel. A karaktergombok a kurzor helyére szúrják be a jelet; ha előtte kijelöltél szöveget, a kijelölést lecserélik. A tipográfiai készletben szerepelnek többek között a magyar idézőjelek, belső idézőjelek, nagykötőjel, mínuszjel, három pont, prime/double-prime, fok-, paragrafus-, védjegy- és pénznemjelek, valamint nyilak és közlekedési szerkesztésnél gyakori jelölések.</p>
+    <p>A <strong>x²</strong> és <strong>x₂</strong> gomb valódi HTML <code>&lt;sup&gt;</code> illetve <code>&lt;sub&gt;</code> formázást készít a kijelölt szövegből. Emellett külön Unicode felsőindex-számok (<code>⁰¹²³⁴⁵⁶⁷⁸⁹</code>) szúrhatók be, vagy a kijelölt normál számjegyek egy gombbal Unicode felső/alsó indexre alakíthatók.</p>
+    <p>A <strong>HTML-entitások</strong> gombsor több gyakori entitást kínál, például <code>&amp;nbsp;</code>, <code>&amp;ndash;</code>, <code>&amp;hellip;</code>, <code>&amp;deg;</code>, <code>&amp;copy;</code>. Az egyedi mezőbe tetszőleges szabályos named, decimális vagy hexadecimális entitás írható. Az innen beszúrt entitás az editorban színes szerkesztői jelölést kap. A nem törhető szóköz külön <strong>rózsaszín</strong> jelöléssel látszik, hogy ne keveredjen össze normál szóközzel; a Blogger HTML generálásakor a jelölőspan eltűnik, és maga az entitás marad.</p>
+    <p>A <strong>Keresés a cikkben</strong> mező gépelés közben megszámolja és sárgával kiemeli az aktuális WYSIWYG-cikkben előforduló találatokat. A kiemelés csak szerkesztői segédlet, nem kerül bele a Blogger HTML-be. A <strong>Kiemelés törlése</strong> gomb üríti a keresést.</p>
+
+    <h3>17. Képtár és főkép</h3>
     <p>A <strong>Képtár</strong> minden beolvasott képhez külön kártyát ad. A képaláírás és a kredit közvetlenül szerkeszthető. A <strong>☆ Főkép</strong> gombbal kijelölt kép a cikk elején, a lead mellett jelenik meg. A normál képet a <strong>＋ Cikk végére</strong> gombbal vagy drag-and-drop módszerrel helyezd el.</p>
     <p>Ha egy kép a Blogger-draftban benne van, de a WYSIWYG-ben nem ott jelenik meg, ahol szeretnéd, ez nem igényel újrafeltöltést: a képtárból húzd át a kívánt helyre.</p>
 
-    <h3>17. Blogger-címkék, cím, szerző és footer</h3>
+    <h3>18. Blogger-címkék, cím, szerző és footer</h3>
     <p>A <strong>Blogger-cím</strong> a post címe. A <strong>Címkék / labels</strong> mezőbe vesszővel, pontosvesszővel vagy új sorral elválasztott címkék írhatók. A <strong>Szerző</strong> mező a RegionalBahn HTML-footerhez használható; nem változtatja meg a Blogger-fiók tényleges szerzőségét. A <strong>Footer</strong> kapcsolóval a szerzői zárás kikapcsolható.</p>
 
-    <h3>18. Mentés Blogger-piszkozatba</h3>
+    <h3>19. Mentés Blogger-piszkozatba</h3>
     <p>Ha az anyag új és még nincs Blogger post ID-ja, a <strong>Mentés Blogger-piszkozatba</strong> új Blogger draftot hoz létre. Ha meglévő draftot nyitottál meg, ugyanazt a post ID-t frissíti. Mentés után figyeld a széles státuszsávot: zöld sikerüzenet esetén a Blogger API elfogadta a mentést.</p>
     <p>Ha bizonytalan vagy, mentés után nyisd meg vagy frissítsd a Blogger szerkesztőt is. Nagyobb átalakítás előtt jó gyakorlat egy külön tesztdrafton kipróbálni az új funkciót.</p>
 
-    <h3>19. Időzítés és visszaállítás piszkozatba</h3>
+    <h3>20. Időzítés és visszaállítás piszkozatba</h3>
     <p>Az <strong>Időzített publikálás</strong> mezőben válassz jövőbeli időpontot, majd <strong>Piszkozat időzítése</strong>. A program megerősítést kér. Ha a bejegyzés még nincs elmentve, előbb draftként menti. A <strong>Vissza piszkozatba</strong> gomb támogatott scheduled/live állapotból draftba állít vissza.</p>
     <p><strong>Azonnali Publish gomb nincs.</strong> Ez szándékos biztonsági döntés: az éles azonnali publikálás a Bloggerben marad. Az egyéni permalinket szintén a Blogger felületén kell beállítani.</p>
 
-    <h3>20. Statikus oldalak</h3>
+    <h3>21. Statikus oldalak</h3>
     <p>Statikus módot akkor válassz, ha nem bejegyzést, hanem Blogger <strong>Oldalt</strong> szerkesztesz. Három induló forma van: <strong>évválasztó gombsor + Összes</strong>, <strong>évválasztó gombsor</strong>, illetve <strong>ömlesztett / egyszerű</strong>. A gombsoros sablon évszekciókat és kliensoldali szűrőlogikát készít; az egyszerű változat hosszú, folyamatos oldalhoz való.</p>
     <p>Statikus módban a Blogger-post mentés szándékosan le van tiltva, mert a Blogger API-s post és a Blogger „Oldalak” szerkesztése nem ugyanaz a munkamenet. A kész HTML-t másold a Blogger <strong>Oldalak</strong> megfelelő oldalának HTML-nézetébe.</p>
 
-    <h3>21. A széles állapotsáv olvasása</h3>
+    <h3>22. A széles állapotsáv olvasása</h3>
     <p>A fejlécben a nagy állapotsáv mindig a legutóbbi lényeges admin- vagy Blogger-műveletet mutatja. <strong>Kék:</strong> információ. <strong>Zöld:</strong> sikeres művelet. <strong>Sárga:</strong> figyelmeztetés vagy teendő. <strong>Piros:</strong> hiba. <strong>Szürke:</strong> folyamatban lévő művelet. Ha valami „nem történik”, először ezt a sávot olvasd el, mert a legtöbb esetben ott van a következő szükséges lépés.</p>
 
-    <h3>22. Mi marad meg és mi veszhet el?</h3>
+    <h3>23. Mi marad meg és mi veszhet el?</h3>
     <p>A Bloggerbe sikeresen elmentett draft a Bloggerben megmarad. A WYSIWYG aktuális, még el nem mentett állapota viszont böngészőoldali munkamenet: egy véletlen oldalfrissítésnél elveszhet. Hosszabb szerkesztésnél ezért időnként ments Blogger-piszkozatba. Az OAuth token elvesztése nem törli a cikket, csak új Google-kapcsolódást igényel.</p>
 
-    <h3>23. Kézi tartalék munkamenet, ha az API éppen nem működik</h3>
+    <h3>24. Kézi tartalék munkamenet, ha az API éppen nem működik</h3>
     <p>Az RBTools API nélkül is használható. Szerkeszd meg a cikket, majd használd a <strong>Cím másolása</strong> és <strong>Végleges HTML másolása</strong> gombokat. Bloggerben nyisd meg a megfelelő draftot, a címet illeszd a címmezőbe, a HTML-t pedig a Blogger HTML-nézetébe. Ez teljes értékű vészút, tehát egy átmeneti Google API-hiba nem zárja el a szerkesztést.</p>
 
-    <h3>24. Gyors hibakeresési sorrend</h3>
+    <h3>25. Gyors hibakeresési sorrend</h3>
     <p>Ha valami nem működik, ebben a sorrendben haladj: <strong>1.</strong> olvasd el a széles állapotsávot; <strong>2.</strong> ellenőrizd a <code>pages-v…</code> verziót; <strong>3.</strong> Ctrl+F5; <strong>4.</strong> Blogger-kapcsolat bontása és újrakapcsolás; <strong>5.</strong> jó Google-fiók és jó blog ellenőrzése; <strong>6.</strong> blog-/draftlista frissítése; <strong>7.</strong> popup, követésvédelem és blokkoló bővítmények ellenőrzése; <strong>8.</strong> ha OAuth-hiba van, ugyanazzal a fiókkal próba másik böngészőben; <strong>9.</strong> ha az API továbbra sem működik, használd a kézi cím+HTML munkamenetet és jelezd a pontos hibaüzenetet.</p>
 
-    <h3>25. Amit soha ne adj meg</h3>
+    <h3>26. Amit soha ne adj meg</h3>
     <p>Az RBTools <strong>nem kér Google-jelszót</strong>, és nem kér <strong>OAuth Client Secretet</strong>. Ha ilyen adat beírását kérné valami, az nem a normál RBTools-munkamenet. A beépített OAuth Client ID önmagában nyilvános alkalmazásazonosító; a tényleges hozzáférést a Google által kiadott rövid életű token adja.</p>
   </div>
 
@@ -1038,6 +1097,25 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-editor-panel{padding:14px}
 #rbtools-app .admin-formatbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0 0;padding:8px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
 #rbtools-app .admin-formatbar button{min-width:36px;padding:6px 9px}
+#rbtools-app .admin-findbar{display:grid;grid-template-columns:auto minmax(180px,1fr) auto auto;gap:8px;align-items:center;margin-top:8px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
+#rbtools-app .admin-findbar input{min-width:0;width:100%}
+#rbtools-app .admin-char-tools{margin-top:8px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
+#rbtools-app .admin-char-tools>summary{font-weight:800}
+#rbtools-app .admin-char-section{margin-top:12px}
+#rbtools-app .admin-char-grid{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+#rbtools-app .admin-char-grid button{min-width:38px;padding:6px 8px;background:var(--panel);font:16px/1.2 Arial,Helvetica,sans-serif}
+#rbtools-app .admin-char-grid button:hover{background:var(--soft)}
+#rbtools-app .admin-char-grid button small{display:block;font-size:9px;color:var(--muted);font-weight:400}
+#rbtools-app .admin-emoji-grid button{font-size:21px}
+#rbtools-app .admin-entity-grid button{min-width:auto;font:12px/1.25 Consolas,"Courier New",monospace}
+#rbtools-app .admin-custom-insert{display:grid;grid-template-columns:auto minmax(180px,1fr) auto;gap:8px;align-items:center;margin-top:8px}
+#rbtools-app .admin-custom-insert input{width:100%;min-width:0}
+#rbtools-app .rb-special-entity{display:inline-block;min-width:.55em;border-radius:3px;padding:0 1px;background:#e8d7ff;outline:1px solid #b795e8;cursor:help}
+#rbtools-app .rb-special-entity.rb-entity-nbsp{background:#ffb6d5;outline-color:#e879a7}
+#rbtools-app .rb-special-entity.rb-entity-nbsp:empty:before{content:" "}
+#rbtools-app .rb-find-fallback{background:#ffeb3b!important;color:#111!important;border-radius:2px}
+#rbtools-app ::highlight(rbtools-find){background:#ffeb3b;color:#111}
+@media(max-width:850px){#rbtools-app .admin-findbar{grid-template-columns:1fr}#rbtools-app .admin-custom-insert{grid-template-columns:1fr}}
 #rbtools-app .admin-format-sep{width:1px;height:26px;background:var(--line);margin:0 3px}
 #rbtools-app .admin-embedbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 10px;align-items:end;margin-top:8px;padding:9px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
 #rbtools-app .admin-embedbar label{grid-column:1/-1}
@@ -1133,7 +1211,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v17";
+const RBTOOLS_VERSION="pages-v18";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -2200,13 +2278,135 @@ function adminApplyTemplate(){
   rbGet("adminStatus").textContent="A(z) „"+rbGet("adminContentType").selectedOptions[0].textContent+"” sablon betöltve: "+adminBlocks.length+" szerkeszthető blokk.";
 }
 
+function adminDecodeEntity(entity){
+  const ta=document.createElement("textarea");ta.innerHTML=String(entity||"");return ta.value;
+}
+function adminEntityToken(entity,index){return "RBENTTOKEN"+index+"ZXQ";}
 function adminNormalizeInlineHtml(html){
   const t=document.createElement("template");t.innerHTML=String(html||"");
+  const entityCodes=[];
+  t.content.querySelectorAll(".rb-special-entity[data-rb-entity]").forEach(el=>{
+    const entity=el.getAttribute("data-rb-entity")||"";
+    const token=adminEntityToken(entity,entityCodes.length);entityCodes.push(entity);
+    el.replaceWith(document.createTextNode(token));
+  });
+  t.content.querySelectorAll(".rb-find-fallback").forEach(el=>el.replaceWith(document.createTextNode(el.textContent||"")));
   t.content.querySelectorAll("b").forEach(el=>{const n=document.createElement("strong");n.innerHTML=el.innerHTML;el.replaceWith(n);});
   t.content.querySelectorAll("i").forEach(el=>{const n=document.createElement("em");n.innerHTML=el.innerHTML;el.replaceWith(n);});
   t.content.querySelectorAll("*").forEach(el=>Array.from(el.attributes).forEach(a=>{if(/^on/i.test(a.name))el.removeAttribute(a.name);}));
-  return t.innerHTML.trim();
+  let out=t.innerHTML.trim();
+  entityCodes.forEach((entity,i)=>{out=out.split(adminEntityToken(entity,i)).join(entity);});
+  return out;
 }
+function adminVisualizeSpecials(html){
+  const t=document.createElement("template");t.innerHTML=String(html||"");
+  const walker=document.createTreeWalker(t.content,NodeFilter.SHOW_TEXT);
+  const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+  for(const node of nodes){
+    if(node.parentElement?.closest(".rb-special-entity"))continue;
+    const text=node.nodeValue||"";if(!text.includes("\u00a0"))continue;
+    const frag=document.createDocumentFragment(),parts=text.split("\u00a0");
+    parts.forEach((part,i)=>{
+      if(part)frag.appendChild(document.createTextNode(part));
+      if(i<parts.length-1){
+        const s=document.createElement("span");s.className="rb-special-entity rb-entity-nbsp";s.setAttribute("data-rb-entity","&nbsp;");s.title="Nem törhető szóköz (&nbsp;)";s.textContent="\u00a0";frag.appendChild(s);
+      }
+    });
+    node.replaceWith(frag);
+  }
+  return t.innerHTML;
+}
+function adminInsertNodeAtSelection(node){
+  if(!adminRestoreRange()){rbGet("adminStatus").textContent="Kattints előbb egy szerkeszthető szövegrészbe.";return false;}
+  const sel=window.getSelection(),r=sel.getRangeAt(0);r.deleteContents();r.insertNode(node);
+  r.setStartAfter(node);r.collapse(true);sel.removeAllRanges();sel.addRange(r);adminSavedRange=r.cloneRange();adminSyncActiveEditable();return true;
+}
+function adminInsertText(text){
+  text=String(text??"");if(!text)return;
+  adminInsertNodeAtSelection(document.createTextNode(text));
+}
+function adminInsertEntity(entity){
+  entity=String(entity||"").trim();
+  if(!/^&(?:#\d+|#x[0-9a-f]+|[a-z][a-z0-9]+);$/i.test(entity)){rbGet("adminStatus").textContent="Érvénytelen HTML-entitás. Példa: &nbsp;, &#160; vagy &#x202F;.";return;}
+  const decoded=adminDecodeEntity(entity);
+  if(!decoded||decoded===entity){rbGet("adminStatus").textContent="Az entitást a böngésző nem ismeri fel: "+entity;return;}
+  const s=document.createElement("span");s.className="rb-special-entity"+(/^(?:&nbsp;|&#160;|&#x0*a0;)$/i.test(entity)?" rb-entity-nbsp":"");s.setAttribute("data-rb-entity",entity);s.title=entity;s.textContent=decoded;
+  if(adminInsertNodeAtSelection(s))rbGet("adminStatus").textContent=entity+" beszúrva; a WYSIWYG-ben színes jelöléssel látszik.";
+}
+function adminReplaceSelectionMapped(map){
+  if(!adminRestoreRange()){rbGet("adminStatus").textContent="Jelölj ki számot vagy helyezd a kurzort a szerkesztőbe.";return;}
+  const sel=window.getSelection(),r=sel.getRangeAt(0);
+  if(r.collapsed){rbGet("adminStatus").textContent="A Unicode felső/alsó index átalakításhoz jelölj ki számot.";return;}
+  const src=r.toString(),dst=Array.from(src).map(ch=>map[ch]??ch).join("");
+  r.deleteContents();const n=document.createTextNode(dst);r.insertNode(n);r.setStartAfter(n);r.collapse(true);sel.removeAllRanges();sel.addRange(r);adminSavedRange=r.cloneRange();adminSyncActiveEditable();
+}
+const ADMIN_SUP_MAP={"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","+":"⁺","-":"⁻","=":"⁼","(":"⁽",")":"⁾","n":"ⁿ"};
+const ADMIN_SUB_MAP={"0":"₀","1":"₁","2":"₂","3":"₃","4":"₄","5":"₅","6":"₆","7":"₇","8":"₈","9":"₉","+":"₊","-":"₋","=":"₌","(":"₍",")":"₎"};
+const ADMIN_TYPO_CHARS=[
+  ["„","magyar kezdő idézőjel"],["”","magyar záró idézőjel"],["»","belső nyitó idézőjel"],["«","belső záró idézőjel"],["’","aposztróf"],["′","perc / prime"],["″","másodperc / double prime"],
+  ["–","nagykötőjel"],["−","mínusz"],["…","három pont"],["·","középső pont"],["•","felsoroláspont"],["§","paragrafusjel"],["¶","bekezdésjel"],["†","kereszt"],["‡","kettőskereszt"],
+  ["©","copyright"],["®","bejegyzett védjegy"],["™","védjegy"],["±","plusz-mínusz"],["°","fokjel"],["×","szorzás"],["÷","osztás"],["√","gyökjel"],["‰","ezrelék"],
+  ["€","euró"],["£","font"],["¥","jen"],["¢","cent"],["№","számjel"],["→","jobbra nyíl"],["←","balra nyíl"],["↔","kétirányú nyíl"],["▲","felfelé háromszög"],["▼","lefelé háromszög"],["►","jobbra háromszög"],["◄","balra háromszög"]
+];
+const ADMIN_EMOJI=["🚆","🚄","🚅","🚉","🚇","🚋","🚊","🚎","🚌","🚍","🚏","🚦","🚧","🛤️","🚂","🚃","🚞","🚝","🚈","✈️","🛫","🛬","🛩️","🚁","🚢","⛴️","🚲","🚶","📸","🎙️","🎧","📻","📍","🗺️","📰","⚠️","ℹ️","✅","❌","🕒","🔗","📅","📌","💬"];
+const ADMIN_ENTITIES=[
+  ["&nbsp;","nem törhető szóköz"],["&#8239;","keskeny nem törhető szóköz"],["&#8209;","nem törhető kötőjel"],["&shy;","feltételes elválasztójel"],
+  ["&bdquo;","„"],["&rdquo;","”"],["&raquo;","»"],["&laquo;","«"],["&rsquo;","’"],["&prime;","′"],["&Prime;","″"],["&ndash;","–"],["&mdash;","—"],["&minus;","−"],["&hellip;","…"],
+  ["&deg;","°"],["&times;","×"],["&divide;","÷"],["&plusmn;","±"],["&permil;","‰"],["&sect;","§"],["&para;","¶"],["&dagger;","†"],["&Dagger;","‡"],
+  ["&copy;","©"],["&reg;","®"],["&trade;","™"],["&euro;","€"],["&pound;","£"],["&yen;","¥"],["&cent;","¢"],["&amp;","&"],["&lt;","<"],["&gt;",">"]
+];
+function adminMakeCharButton(text,title,handler,html=false){
+  const b=document.createElement("button");b.type="button";b.title=title||text;
+  if(html)b.innerHTML=text;else b.textContent=text;
+  b.addEventListener("mousedown",e=>e.preventDefault());b.addEventListener("click",handler);return b;
+}
+function adminInitCharTools(){
+  const typo=rbGet("adminCharTypography"),sup=rbGet("adminCharSuperscript"),emoji=rbGet("adminCharEmoji"),entities=rbGet("adminCharEntities");
+  ADMIN_TYPO_CHARS.forEach(([ch,label])=>typo.appendChild(adminMakeCharButton(ch,label,()=>adminInsertText(ch))));
+  Object.values(ADMIN_SUP_MAP).forEach(ch=>sup.appendChild(adminMakeCharButton(ch,"Unicode felső index: "+ch,()=>adminInsertText(ch))));
+  ADMIN_EMOJI.forEach(ch=>emoji.appendChild(adminMakeCharButton(ch,"Emoji "+ch,()=>adminInsertText(ch))));
+  ADMIN_ENTITIES.forEach(([entity,label])=>{
+    const b=adminMakeCharButton(entity+" "+label,entity+" → "+label,()=>adminInsertEntity(entity));entities.appendChild(b);
+  });
+}
+let adminSearchFallbackMarks=[];
+function adminClearSearchHighlights(resetInput=false){
+  if(window.CSS?.highlights)CSS.highlights.delete("rbtools-find");
+  adminSearchFallbackMarks.forEach(mark=>{const p=mark.parentNode;if(!p)return;p.replaceChild(document.createTextNode(mark.textContent||""),mark);p.normalize();});
+  adminSearchFallbackMarks=[];
+  if(resetInput)rbGet("adminFind").value="";
+  rbGet("adminFindCount").textContent="0 találat";
+}
+function adminSearchText(){
+  const q=rbGet("adminFind").value;
+  adminClearSearchHighlights(false);
+  if(!q){return;}
+  const roots=Array.from(rbGet("adminCanvas").querySelectorAll('[contenteditable="true"]'));
+  const ranges=[];
+  for(const root of roots){
+    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+    while(walker.nextNode()){
+      const n=walker.currentNode,text=n.nodeValue||"",hay=text.toLocaleLowerCase("hu-HU"),needle=q.toLocaleLowerCase("hu-HU");
+      let pos=0,idx;
+      while((idx=hay.indexOf(needle,pos))>=0){const r=document.createRange();r.setStart(n,idx);r.setEnd(n,idx+q.length);ranges.push(r);pos=idx+Math.max(q.length,1);}
+    }
+  }
+  if(window.CSS?.highlights&&typeof Highlight!=="undefined"){
+    CSS.highlights.set("rbtools-find",new Highlight(...ranges));
+  }else{
+    const byNode=new Map();
+    ranges.forEach(r=>{const n=r.startContainer;if(!byNode.has(n))byNode.set(n,[]);byNode.get(n).push([r.startOffset,r.endOffset]);});
+    for(const [node,parts] of byNode){
+      parts.sort((a,b)=>b[0]-a[0]);
+      for(const [start,end] of parts){
+        const after=node.splitText(end),match=node.splitText(start),mark=document.createElement("mark");mark.className="rb-find-fallback";match.replaceWith(mark);mark.appendChild(match);adminSearchFallbackMarks.push(mark);
+      }
+    }
+  }
+  rbGet("adminFindCount").textContent=ranges.length+" találat";
+  rbGet("adminStatus").textContent=ranges.length?"Keresés: "+ranges.length+" találat – „"+q+"”":"Keresés: nincs találat – „"+q+"”";
+}
+
 function adminImageAttrs(img){
   const attrs=[];
   for(const a of Array.from(img?.attributes||[])){
@@ -2399,11 +2599,11 @@ function adminBlockControls(block){
 function adminTrackEditable(el,onInput){
   el.addEventListener("focus",()=>{adminActiveEditable=el;adminRememberRange();});
   el.addEventListener("mouseup",adminRememberRange);el.addEventListener("keyup",adminRememberRange);
-  el.addEventListener("input",()=>{onInput();adminRememberRange();adminGenerateHtml(false);});
+  el.addEventListener("input",()=>{if(adminSearchFallbackMarks.length)adminClearSearchHighlights(false);onInput();adminRememberRange();adminGenerateHtml(false);});
   el.addEventListener("blur",()=>adminGenerateHtml());
 }
 function adminTextBlockElement(block,cls){
-  const e=document.createElement("div");e.className="admin-editable "+cls;e.contentEditable="true";e.spellcheck=true;e.innerHTML=block.html||"";e.dataset.adminBlockId=block.id;e.dataset.adminAlignTarget="block";e.style.textAlign=adminValidAlign(block.align,adminDefaultAlign(block.type));
+  const e=document.createElement("div");e.className="admin-editable "+cls;e.contentEditable="true";e.spellcheck=true;e.innerHTML=adminVisualizeSpecials(block.html||"");e.dataset.adminBlockId=block.id;e.dataset.adminAlignTarget="block";e.style.textAlign=adminValidAlign(block.align,adminDefaultAlign(block.type));
   adminTrackEditable(e,()=>{block.html=e.innerHTML;});return e;
 }
 function adminRawElement(block){
@@ -2463,9 +2663,9 @@ function adminImageDropOnBox(e,block){
 }
 function adminBoxElement(block){
   const wrap=document.createElement("div");wrap.className="admin-box";
-  const title=document.createElement("div");title.className="admin-box-title admin-editable";title.contentEditable="true";title.spellcheck=true;title.innerHTML=block.title||"Keretes cím";title.dataset.adminBlockId=block.id;title.dataset.adminAlignTarget="boxTitle";title.style.textAlign=adminValidAlign(block.titleAlign,"center");
+  const title=document.createElement("div");title.className="admin-box-title admin-editable";title.contentEditable="true";title.spellcheck=true;title.innerHTML=adminVisualizeSpecials(block.title||"Keretes cím");title.dataset.adminBlockId=block.id;title.dataset.adminAlignTarget="boxTitle";title.style.textAlign=adminValidAlign(block.titleAlign,"center");
   adminTrackEditable(title,()=>{block.title=title.innerHTML;});wrap.appendChild(title);
-  const body=document.createElement("div");body.className="admin-box-body admin-editable";body.contentEditable="true";body.spellcheck=true;body.innerHTML=block.html||"Keretes szöveg.";body.dataset.adminBlockId=block.id;body.dataset.adminAlignTarget="boxBody";body.style.textAlign=adminValidAlign(block.bodyAlign,"justify");
+  const body=document.createElement("div");body.className="admin-box-body admin-editable";body.contentEditable="true";body.spellcheck=true;body.innerHTML=adminVisualizeSpecials(block.html||"Keretes szöveg.");body.dataset.adminBlockId=block.id;body.dataset.adminAlignTarget="boxBody";body.style.textAlign=adminValidAlign(block.bodyAlign,"justify");
   adminTrackEditable(body,()=>{block.html=body.innerHTML;});wrap.appendChild(body);
   const img=adminFindImage(block.imageId);
   if(img){
@@ -2510,11 +2710,12 @@ function adminDropZone(index){
 function adminRenderCanvas(){
   const host=rbGet("adminCanvas");host.textContent="";
   const title=document.createElement("h1");title.className="admin-paper-title";title.contentEditable="true";title.spellcheck=true;title.textContent=rbGet("adminTitle").value||"Cikk címe";
-  title.addEventListener("input",()=>{rbGet("adminTitle").value=title.innerText;adminGenerateHtml(false);});title.addEventListener("blur",()=>adminGenerateHtml());host.appendChild(title);
+  title.addEventListener("focus",()=>{adminActiveEditable=title;adminRememberRange();});title.addEventListener("mouseup",adminRememberRange);title.addEventListener("keyup",adminRememberRange);
+  title.addEventListener("input",()=>{rbGet("adminTitle").value=title.innerText;adminRememberRange();adminGenerateHtml(false);});title.addEventListener("blur",()=>adminGenerateHtml());host.appendChild(title);
 
   const leadShell=document.createElement("div");leadShell.className="admin-lead-shell";const main=adminFindImage(adminMainImageId);
   if(main){const a=document.createElement("a");a.className="admin-main-thumb";a.href=main.full||main.display||"#";a.target="_blank";a.rel="noopener";const im=document.createElement("img");im.src=main.display||"";im.alt="";a.appendChild(im);leadShell.appendChild(a);}
-  const lead=document.createElement("div");lead.className="admin-lead admin-editable";lead.contentEditable="true";lead.spellcheck=true;lead.innerHTML=adminLeadHtml||inlineMd(rbGet("adminTitle").value||"Lead / bevezető");lead.dataset.adminSpecial="lead";lead.style.textAlign=adminValidAlign(adminLeadAlign,"justify");
+  const lead=document.createElement("div");lead.className="admin-lead admin-editable";lead.contentEditable="true";lead.spellcheck=true;lead.innerHTML=adminVisualizeSpecials(adminLeadHtml||inlineMd(rbGet("adminTitle").value||"Lead / bevezető"));lead.dataset.adminSpecial="lead";lead.style.textAlign=adminValidAlign(adminLeadAlign,"justify");
   adminTrackEditable(lead,()=>{adminLeadHtml=lead.innerHTML;});leadShell.appendChild(lead);host.appendChild(leadShell);
   const more=document.createElement("div");more.className="admin-more";host.appendChild(more);
 
@@ -2534,6 +2735,7 @@ function adminRenderCanvas(){
     else if(block.type==="raw")shell.appendChild(adminRawElement(block));
     shell.appendChild(adminBlockControls(block));host.appendChild(shell);host.appendChild(adminDropZone(index+1));
   });
+  if(rbGet("adminFind")?.value)requestAnimationFrame(adminSearchText);
 }
 function adminRenderImageLibrary(){
   const host=rbGet("adminImageLibrary");host.textContent="";rbGet("adminImageCount").textContent=adminImages.length+" kép";
@@ -2685,6 +2887,7 @@ function adminInsertAllImages(){
   adminRenderCanvas();adminGenerateHtml();rbGet("adminStatus").textContent="A még be nem szúrt képek a cikk végére kerültek; húzással rendezhetők.";
 }
 function adminClear(){
+  adminClearSearchHighlights(true);
   adminBlocks=[];adminImages=[];adminSourcesHtml="";adminLeadHtml="";adminLeadAlign="justify";adminMainImageId=null;adminActiveEditable=null;adminSavedRange=null;
   adminBlocks.push({id:adminUid("b"),type:"p",html:"",align:"justify"});
   ["adminSource","adminImageSource","adminExistingHtml","adminTitle","adminOutput"].forEach(id=>rbGet(id).value="");
@@ -2714,13 +2917,15 @@ rbGet("adminAddIframe").addEventListener("click",()=>{rbGet("adminIframeInput").
 rbGet("adminInsertIframe").addEventListener("click",adminInsertIframeFromInput);
 rbGet("adminClearIframeInput").addEventListener("click",()=>{rbGet("adminIframeInput").value="";rbGet("adminIframeInput").focus();});
 rbGet("adminAddRule").addEventListener("click",()=>{adminBlocks.push({id:adminUid("b"),type:"hr"});adminRenderCanvas();adminGenerateHtml();});
-for(const id of ["adminFmtBold","adminFmtItalic","adminFmtUnderline","adminFmtStrike","adminFmtLink","adminFmtUnlink","adminFmtBox","adminFmtUl","adminFmtOl","adminFmtIndent","adminFmtOutdent","adminAlignLeft","adminAlignCenter","adminAlignRight","adminAlignJustify"])rbGet(id).addEventListener("mousedown",e=>e.preventDefault());
+for(const id of ["adminFmtBold","adminFmtItalic","adminFmtUnderline","adminFmtStrike","adminFmtLink","adminFmtUnlink","adminFmtSup","adminFmtSub","adminFmtBox","adminFmtUl","adminFmtOl","adminFmtIndent","adminFmtOutdent","adminAlignLeft","adminAlignCenter","adminAlignRight","adminAlignJustify"])rbGet(id).addEventListener("mousedown",e=>e.preventDefault());
 rbGet("adminFmtBold").addEventListener("click",()=>adminExec("bold"));
 rbGet("adminFmtItalic").addEventListener("click",()=>adminExec("italic"));
 rbGet("adminFmtUnderline").addEventListener("click",()=>adminExec("underline"));
 rbGet("adminFmtStrike").addEventListener("click",()=>adminExec("strikeThrough"));
 rbGet("adminFmtLink").addEventListener("click",adminLink);
 rbGet("adminFmtUnlink").addEventListener("click",()=>adminExec("unlink"));
+rbGet("adminFmtSup").addEventListener("click",()=>adminExec("superscript"));
+rbGet("adminFmtSub").addEventListener("click",()=>adminExec("subscript"));
 rbGet("adminFmtBox").addEventListener("click",adminQuickBox);
 rbGet("adminFmtUl").addEventListener("click",()=>adminExec("insertUnorderedList"));
 rbGet("adminFmtOl").addEventListener("click",()=>adminExec("insertOrderedList"));
@@ -2734,6 +2939,15 @@ rbGet("adminAlignJustify").addEventListener("click",()=>adminSetAlignment("justi
 ["adminTopTextMode","adminFooter"].forEach(id=>rbGet(id).addEventListener("change",()=>{adminRenderCanvas();adminGenerateHtml();}));
 rbGet("adminSource").addEventListener("input",()=>{if(adminBlocks.length)rbGet("adminStatus").textContent="A forrásszöveg módosult. A WYSIWYG változat újrafelépítéséhez kattints a „Cikk felépítése” gombra.";});
 rbGet("adminImageSource").addEventListener("input",()=>{if(adminImages.length)rbGet("adminStatus").textContent="A képkód módosult. A képtár újraolvasásához kattints a „Képek beolvasása” gombra.";});
+rbGet("adminSupConvert").addEventListener("mousedown",e=>e.preventDefault());
+rbGet("adminSubConvert").addEventListener("mousedown",e=>e.preventDefault());
+rbGet("adminSupConvert").addEventListener("click",()=>adminReplaceSelectionMapped(ADMIN_SUP_MAP));
+rbGet("adminSubConvert").addEventListener("click",()=>adminReplaceSelectionMapped(ADMIN_SUB_MAP));
+rbGet("adminEntityInsert").addEventListener("click",()=>adminInsertEntity(rbGet("adminEntityCustom").value));
+rbGet("adminUnicodeInsert").addEventListener("click",()=>adminInsertText(rbGet("adminUnicodeCustom").value));
+rbGet("adminFind").addEventListener("input",adminSearchText);
+rbGet("adminFindClear").addEventListener("click",()=>adminClearSearchHighlights(true));
+adminInitCharTools();
 document.addEventListener("selectionchange",()=>{if(adminActiveEditable)adminRememberRange();});
 adminRenderImageLibrary();adminRenderCanvas();
 
