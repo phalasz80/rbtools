@@ -65,19 +65,23 @@ Az **egyéni permalink** nincs dokumentáltan írható Blogger API-mezőként, e
 
 ## WYSIWYG szerkesztő
 
+A Cikkadminban külön tartalomtípus választható: **Cikk**, **#nyúz / Hétvégi gyors**, **Podcast shownotes**, **InnoTrans cikk** és **Statikus oldal**. Mindegyikhez szerkeszthető induló sablon tartozik. A statikus oldalhoz évválasztó gombsoros (opcionális „Összes” gombbal) és egyszerű, ömlesztett sablon is választható.
+
 - közvetlen új cikkírás;
 - félkövér, dőlt, aláhúzott, áthúzott és link formázás;
 - bekezdések és alcímek;
 - RegionalBahn keretes blokkok;
 - bekezdés-, alcím-, keretes- és iframe-blokkok balra, középre, jobbra vagy sorkizártra igazítása;
 - iframe embedek beszúrása, meglévő iframe-ek visszaolvasása, élő előnézete és több soros kódszerkesztése;
+- rendezetlen és számozott listák, valamint lista-behúzás és -kihúzás;
 - képtár és főkép;
 - képek húzása konkrét bekezdések közé;
 - kép húzása keretes blokkba;
 - képaláírás és kredit;
 - blokkok drag-and-drop rendezése;
 - meglévő RegionalBahn Blogger HTML visszatöltése szerkesztésre;
-- folyamatosan generált végleges Blogger HTML.
+- folyamatosan generált végleges Blogger HTML;
+- széles, színkódolt állapotsáv a betöltési, mentési, siker-, figyelmeztetési és hibaállapotokhoz.
 
 ## Kézi tartalék munkamenet
 
