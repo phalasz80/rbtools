@@ -21,7 +21,16 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
     <div class="header-top">
       <div class="header-copy">
         <h1>RegionalBahn Tools</h1>
-        <p class="subtitle">WYSIWYG Cikkadmin + Markdown / plain text / DOCX → Blogger HTML, keretes- és táblázatkonverter, HTML-ellenőrző, gyűjtőoldal-építő, képkód-normalizáló és Unicode műhely. <span id="rbtools-rbtoolsRuntime" class="rbtools-runtime">JS: indul…</span></p>
+        <div class="header-status-row">
+          <div id="rbtools-mainStatus" class="admin-statusbar info header-main-status" role="status" aria-live="polite" aria-atomic="true">
+            <div class="admin-statusbar-icon" id="rbtools-mainStatusIcon">ℹ</div>
+            <div class="admin-statusbar-copy">
+              <strong id="rbtools-mainStatusSource">Cikkadmin</strong>
+              <div id="rbtools-mainStatusText">Készen áll. Válassz tartalomtípust, nyiss meg egy Blogger-piszkozatot, vagy kezdj új anyagot.</div>
+            </div>
+          </div>
+          <div id="rbtools-rbtoolsRuntime" class="rbtools-runtime rbtools-runtime-panel">JS: indul…</div>
+        </div>
       </div>
     </div>
     <div class="theme-row">
@@ -55,14 +64,6 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
       <button id="rbtools-adminDownload">⇩ HTML mentése</button>
       <button id="rbtools-adminClear">✎ Új cikk</button>
       <span id="rbtools-adminStatus" class="status">Készen áll.</span>
-    </div>
-  </div>
-
-  <div id="rbtools-mainStatus" class="admin-statusbar info" role="status" aria-live="polite" aria-atomic="true">
-    <div class="admin-statusbar-icon" id="rbtools-mainStatusIcon">ℹ</div>
-    <div class="admin-statusbar-copy">
-      <strong id="rbtools-mainStatusSource">Cikkadmin</strong>
-      <div id="rbtools-mainStatusText">Készen áll. Válassz tartalomtípust, nyiss meg egy Blogger-piszkozatot, vagy kezdj új anyagot.</div>
     </div>
   </div>
 
@@ -798,7 +799,7 @@ A következő cikk rövid ajánlója.</pre>
     <p>Statikus módban a Blogger-post mentés szándékosan le van tiltva, mert a Blogger API-s post és a Blogger „Oldalak” szerkesztése nem ugyanaz a munkamenet. A kész HTML-t másold a Blogger <strong>Oldalak</strong> megfelelő oldalának HTML-nézetébe.</p>
 
     <h3>21. A széles állapotsáv olvasása</h3>
-    <p>A Cikkadmin tetején a nagy állapotsáv mindig a legutóbbi lényeges admin- vagy Blogger-műveletet mutatja. <strong>Kék:</strong> információ. <strong>Zöld:</strong> sikeres művelet. <strong>Sárga:</strong> figyelmeztetés vagy teendő. <strong>Piros:</strong> hiba. <strong>Szürke:</strong> folyamatban lévő művelet. Ha valami „nem történik”, először ezt a sávot olvasd el, mert a legtöbb esetben ott van a következő szükséges lépés.</p>
+    <p>A fejlécben a nagy állapotsáv mindig a legutóbbi lényeges admin- vagy Blogger-műveletet mutatja. <strong>Kék:</strong> információ. <strong>Zöld:</strong> sikeres művelet. <strong>Sárga:</strong> figyelmeztetés vagy teendő. <strong>Piros:</strong> hiba. <strong>Szürke:</strong> folyamatban lévő művelet. Ha valami „nem történik”, először ezt a sávot olvasd el, mert a legtöbb esetben ott van a következő szükséges lépés.</p>
 
     <h3>22. Mi marad meg és mi veszhet el?</h3>
     <p>A Bloggerbe sikeresen elmentett draft a Bloggerben megmarad. A WYSIWYG aktuális, még el nem mentett állapota viszont böngészőoldali munkamenet: egy véletlen oldalfrissítésnél elveszhet. Hosszabb szerkesztésnél ezért időnként ments Blogger-piszkozatba. Az OAuth token elvesztése nem törli a cikket, csak új Google-kapcsolódást igényel.</p>
@@ -901,6 +902,9 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .header-inner{max-width:1600px;margin:auto;padding:18px 22px 12px}
 #rbtools-app .header-top{display:flex;align-items:flex-start;gap:16px}
 #rbtools-app .header-copy{min-width:0;flex:1}
+#rbtools-app .header-status-row{display:flex;align-items:stretch;gap:10px;width:100%;margin-top:8px}
+#rbtools-app .header-main-status{flex:1 1 auto;min-width:0;margin:0}
+#rbtools-app .rbtools-runtime-panel{flex:0 0 15%;max-width:15%;min-width:150px;min-height:58px;margin:0!important;border:1px solid var(--line);border-radius:11px;padding:10px 12px!important;display:flex!important;align-items:center;justify-content:center;text-align:center;white-space:normal;overflow-wrap:anywhere;font:700 12px/1.35 Arial,Helvetica,sans-serif!important;background:var(--panel2)!important}
 #rbtools-app .theme-row{display:flex;justify-content:flex-end;align-items:center;min-height:42px;margin-top:10px}
 #rbtools-app .theme-toggle{white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:650;width:132px;min-width:132px}
 #rbtools-app h1{font-size:25px;margin:0 0 4px}
@@ -921,7 +925,7 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .intro,#rbtools-app .note{color:var(--muted);margin:0 0 10px}
 #rbtools-app .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
 #rbtools-app .status{margin-left:auto;color:var(--muted);font-size:13px}
-#rbtools-app .admin-statusbar{display:flex;gap:12px;align-items:flex-start;width:100%;min-height:58px;margin:-3px 0 15px;padding:12px 15px;border:1px solid transparent;border-radius:11px;font:14px/1.45 Arial,Helvetica,sans-serif;white-space:normal;overflow-wrap:anywhere}
+#rbtools-app .admin-statusbar{display:flex;gap:12px;align-items:flex-start;width:100%;min-height:58px;margin:0;padding:12px 15px;border:1px solid transparent;border-radius:11px;font:14px/1.45 Arial,Helvetica,sans-serif;white-space:normal;overflow-wrap:anywhere}
 #rbtools-app .admin-statusbar-icon{flex:0 0 auto;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800}
 #rbtools-app .admin-statusbar-copy{min-width:0;flex:1}
 #rbtools-app .admin-statusbar-copy strong{display:block;margin-bottom:2px}
@@ -1112,12 +1116,15 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .checks{display:flex;gap:16px;flex-wrap:wrap;align-items:center}#rbtools-app .checks label{display:inline-flex;gap:6px;align-items:center}
 #rbtools-app hr.sep{border:0;border-top:1px solid var(--line);margin:16px 0}
 @media (max-width:1000px){#rbtools-app .grid2,#rbtools-app .grid3,#rbtools-app .grid4{grid-template-columns:1fr}#rbtools-app .status{width:100%;margin-left:0}#rbtools-app .preview{height:400px}}
+@media (max-width:900px){#rbtools-app .header-status-row{flex-direction:column}#rbtools-app .rbtools-runtime-panel{flex:0 0 auto;max-width:none;width:100%;min-width:0;min-height:44px}}
 @media (max-width:700px){#rbtools-app .header-top{flex-direction:column}#rbtools-app .theme-row{justify-content:flex-start}#rbtools-app .theme-toggle{align-self:auto}}
 
 #rbtools-app{width:100%;max-width:none;margin:0;padding:0;background:var(--bg);color:var(--ink);font:14px/1.5 Arial,Helvetica,sans-serif;border-radius:12px;overflow:visible;isolation:isolate}
-#rbtools-app .rbtools-runtime{display:inline-flex;align-items:center;gap:6px;margin-left:8px;padding:2px 7px;border-radius:999px;background:var(--soft);color:var(--muted);font-size:11px;vertical-align:middle}
-#rbtools-app .rbtools-runtime.ok{color:var(--ok)}
-#rbtools-app .rbtools-runtime.err{color:#b91c1c}
+#rbtools-app .rbtools-runtime{color:var(--muted)}
+#rbtools-app .rbtools-runtime.ok{color:#14532d;background:#e8f7ee!important;border-color:#a7ddb9!important}
+#rbtools-app .rbtools-runtime.err{color:#7f1d1d;background:#fdecec!important;border-color:#efb0b0!important}
+#rbtools-app[data-theme="dark"] .rbtools-runtime.ok{color:#b9f6ca;background:#183524!important;border-color:#2e7044!important}
+#rbtools-app[data-theme="dark"] .rbtools-runtime.err{color:#fecaca;background:#3b1d1d!important;border-color:#7f3030!important}
 
 #rbtools-app .rbtools-shell-header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(9px);border-bottom:1px solid var(--line);position:relative;top:auto}
 #rbtools-app .rbtools-shell-main{max-width:1600px;margin:auto;padding:20px 22px 60px}
@@ -1126,7 +1133,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v16";
+const RBTOOLS_VERSION="pages-v17";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
