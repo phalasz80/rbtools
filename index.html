@@ -1039,7 +1039,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v14";
+const RBTOOLS_VERSION="pages-v15";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -1119,6 +1119,32 @@ function slugify(s){
   return (s||"regionalbahn-cikk").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
     .replace(/[^a-zA-Z0-9]+/g,"-").replace(/^-+|-+$/g,"").toLowerCase()||"regionalbahn-cikk";
 }
+
+/* ---------- Cikkadmin fő állapotsáv ---------- */
+function rbStatusKind(msg){
+  const s=String(msg||"");
+  if(/hiba|error|sikertelen|érvénytelen|nem talál|not found|lejárt|megtagad|denied/i.test(s))return "error";
+  if(/lekérés|betöltés|megnyitása|mentés|feldolgozás|kapcsolódás|frissítése|engedélykérés|…|\.\.\./i.test(s))return "working";
+  if(/figyelem|előbb|nincs |nem kell|módosult|kattints|csak |marad|nem támogat/i.test(s))return "warning";
+  if(/betöltve|elmentve|frissítve|létrehozva|megnyitva|kapcsolódva|beolvasva|időzítve|visszaállt|kész|felépítve|beszúrva|másolva|kerültek|aktív/i.test(s))return "success";
+  return "info";
+}
+function rbMainStatus(msg,source="Cikkadmin",kind=null){
+  const bar=rbGet("mainStatus"),text=rbGet("mainStatusText"),src=rbGet("mainStatusSource"),icon=rbGet("mainStatusIcon");
+  if(!bar||!text||!src||!icon)return;
+  kind=kind||rbStatusKind(msg);
+  bar.className="admin-statusbar "+kind;
+  src.textContent=source;text.textContent=String(msg||"Készen áll.");
+  icon.textContent={info:"ℹ",success:"✓",warning:"!",error:"×",working:"↻"}[kind]||"ℹ";
+}
+function rbWatchStatus(id,source){
+  const el=rbGet(id);if(!el)return;
+  const sync=()=>{const msg=(el.textContent||"").trim();if(msg)rbMainStatus(msg,source);};
+  new MutationObserver(sync).observe(el,{childList:true,subtree:true,characterData:true});
+}
+rbWatchStatus("adminStatus","Cikkadmin");
+rbWatchStatus("bloggerStatus","Blogger");
+rbMainStatus("Készen áll. Válassz tartalomtípust, nyiss meg egy Blogger-piszkozatot, vagy kezdj új anyagot.","Cikkadmin","info");
 
 /* ---------- Markdown / Blogger ---------- */
 function esc(s,attr=false){
@@ -1678,9 +1704,10 @@ function bloggerSetUi(){
   rbGet("bloggerRefreshDrafts").disabled=!connected||!rbGet("bloggerBlogSelect").value;
   rbGet("bloggerDraftSelect").disabled=!connected||!bloggerDrafts.length;
   rbGet("bloggerOpenDraft").disabled=!connected||!rbGet("bloggerDraftSelect").value;
-  rbGet("bloggerSaveDraft").disabled=!connected||!rbGet("bloggerBlogSelect").value;
-  rbGet("bloggerSchedulePost").disabled=!connected||!rbGet("bloggerBlogSelect").value;
-  rbGet("bloggerRevertPost").disabled=!connected||!bloggerCurrentPost||!["scheduled","live"].includes(String(bloggerCurrentPost.status||"").toLowerCase());
+  const staticMode=rbGet("adminContentType")?.value==="static";
+  rbGet("bloggerSaveDraft").disabled=staticMode||!connected||!rbGet("bloggerBlogSelect").value;
+  rbGet("bloggerSchedulePost").disabled=staticMode||!connected||!rbGet("bloggerBlogSelect").value;
+  rbGet("bloggerRevertPost").disabled=staticMode||!connected||!bloggerCurrentPost||!["scheduled","live"].includes(String(bloggerCurrentPost.status||"").toLowerCase());
   rbGet("bloggerConnectionBadge").closest(".admin-blogger-panel")?.classList.toggle("connected",connected);
 }
 function bloggerClientId(){
@@ -1781,6 +1808,7 @@ function bloggerParseLabels(){
   return [...new Set(rbGet("bloggerLabels").value.split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean))];
 }
 async function bloggerOpenDraft(){
+  if(rbGet("adminContentType")?.value==="static"){rbGet("adminContentType").value="article";adminContentTypeChanged(false);}
   const blogId=rbGet("bloggerBlogSelect").value,postId=rbGet("bloggerDraftSelect").value;
   if(!blogId||!postId)return;
   bloggerStatus("Piszkozat megnyitása…");
@@ -1949,6 +1977,129 @@ function adminInsertIframeFromInput(){
   adminRenderCanvas();adminGenerateHtml();
   rbGet("adminStatus").textContent="iframe blokk beszúrva. A kód közvetlenül szerkeszthető a blokkban.";
 }
+const ADMIN_TEMPLATE_HINTS={
+  article:"Általános RegionalBahn-cikk: lead, törzsszöveg, dőlt kiemelés, keretes blokk és szerzői footer.",
+  news:"#nyúz / Hétvégi gyors: lead + „Még kell” lista, egymást elválasztó hírblokkok és összeállítói footer.",
+  podcast:"Podcast shownotes: felvezető, szerkeszthető Spotify iframe, időkódlista és közreműködői lista.",
+  innotrans:"InnoTrans cikk: felvezető, gyártói szekciók, rövid hírek és helyszíni tudósítói zárás.",
+  static:"Statikus Blogger-oldal: évválasztó gombsoros vagy egyszerű, ömlesztett szerkezet; nincs <!--more--> és cikkfooter."
+};
+function adminContentTypeChanged(announce=true){
+  const type=rbGet("adminContentType").value;
+  rbGet("adminStaticLayoutField").hidden=type!=="static";
+  rbGet("adminTemplateHint").textContent=ADMIN_TEMPLATE_HINTS[type]||"";
+  bloggerSetUi();
+  if(announce){
+    if(type==="static")rbMainStatus("Statikus oldal mód: válassz gombsoros vagy ömlesztett sablont. A Blogger-post mentés ebben a módban le van tiltva.","Cikkadmin","warning");
+    else rbMainStatus("Tartalomtípus kiválasztva: "+rbGet("adminContentType").selectedOptions[0].textContent+". A sablon betöltése lecseréli a szerkesztő blokkjait.","Cikkadmin","info");
+  }
+}
+function adminHasMeaningfulContent(){
+  const title=rbGet("adminTitle").value.trim();
+  const nonempty=adminBlocks.some(b=>{
+    if(["image","iframe","box","raw","hr"].includes(b.type))return true;
+    return String(b.html||"").replace(/<[^>]*>/g,"").trim().length>0;
+  });
+  return !!title||nonempty;
+}
+function adminStaticSwitcherHtml(withAll){
+  const allButton=withAll?'<button type="button" data-rb-target="all" style="margin:3px;padding:7px 11px;">Összes</button>':"";
+  return '<div id="rb-static-page-nav" style="margin:0 0 18px;text-align:center;">'
+    +'<button type="button" data-rb-target="2026" style="margin:3px;padding:7px 11px;">2026</button>'
+    +'<button type="button" data-rb-target="2025" style="margin:3px;padding:7px 11px;">2025</button>'
+    +'<button type="button" data-rb-target="2024" style="margin:3px;padding:7px 11px;">2024</button>'
+    +allButton+'</div>'
+    +'<script>(function(){var n=document.getElementById("rb-static-page-nav");if(!n)return;var s=Array.from(document.querySelectorAll("[data-rb-static-section]"));'
+    +'function sh(k){s.forEach(function(x){x.style.display=(k==="all"||x.getAttribute("data-rb-static-section")===k)?"":"none";});'
+    +'Array.from(n.querySelectorAll("button")).forEach(function(b){b.style.fontWeight=b.getAttribute("data-rb-target")===k?"700":"400";});}'
+    +'n.addEventListener("click",function(e){var b=e.target.closest("button[data-rb-target]");if(b)sh(b.getAttribute("data-rb-target"));});sh("2026");})();<\/script>';
+}
+function adminStaticYearSection(year){
+  return '<div data-rb-static-section="'+year+'"><h3 style="text-align:center;">'+year+'</h3>'
+    +'<p><strong>Tétel / cikk címe</strong></p><p>Rövid leírás vagy bevezető. <a href="#">Tovább »</a></p>'
+    +'<hr /></div>';
+}
+function adminTemplateBlocks(type,staticLayout){
+  const p=(html,align="justify")=>({id:adminUid("b"),type:"p",html,align});
+  const h=(html)=>({id:adminUid("b"),type:"h3",html,align:"center"});
+  const hr=()=>({id:adminUid("b"),type:"hr"});
+  const raw=(html,noBreak=false)=>({id:adminUid("b"),type:"raw",html,noBreak});
+  if(type==="article"){
+    return [
+      p("SZÖVEG"),
+      p("<em>SZÖVEG DŐLT</em>"),
+      p("SZÖVEG"),
+      p("SZÖVEG"),
+      {id:adminUid("b"),type:"box",title:"KERETES CÍM",html:"KERETES SZÖVEG",imageId:null,titleAlign:"center",bodyAlign:"justify"}
+    ];
+  }
+  if(type==="news"){
+    const out=[p('<strong>Még kell:<ul><li>Hír X (by MM)</li><li>Hír X (by MM)</li></ul></strong>')];
+    for(let i=0;i<10;i++){out.push(h("Hír cím"),p("<strong>Város | Ország</strong> – Hír szövege"),hr());}
+    return out;
+  }
+  if(type==="podcast"){
+    return [
+      p("SZÖVEG"),
+      adminMakeIframeBlock('<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/episode/1L7ioCH2uXXKM8v41mMO1m" width="100%" height="152" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',"center"),
+      p('<ul><li><strong>00:00</strong>&nbsp;–&nbsp;Időkód 1</li><li><strong>00:00</strong>&nbsp;–&nbsp;Időkód 2</li><li><strong>00:00</strong>&nbsp;–&nbsp;Időkód 3</li><li><strong>00:00</strong>&nbsp;–&nbsp;Időkód 4</li></ul>'),
+      p('<ul><li>Közreműködött: Halász Péter, Mellár Marcell.</li><li>Station Voice: Pongrácz Dániel.</li><li>Zene: Silent Partner – Winter Embrace.</li></ul>'),
+      hr()
+    ];
+  }
+  if(type==="innotrans"){
+    const out=[p("Rövid hír szöveg vagy felvezető az adott naphoz.")];
+    for(let i=0;i<12;i++){out.push(hr(),h("<strong>GYÁRTÓ NEVE</strong>"),p("SZÖVEG"));}
+    out.push(hr(),h("<strong>Rövid hírek a vásárvárosból</strong>"));
+    for(let i=0;i<5;i++)out.push(p("<strong>GYÁRTÓ NEVE</strong> — SZÖVEG"));
+    out.push(p('<em>Az InnoTrans 2026 kiállításról, a Messe Berlin vásárközpontból<br /><strong>Adorján Péter</strong>, <strong>Halász Péter</strong>, <strong>Magyarics Zoltán</strong> és <strong>Óvári Péter</strong><br />tudósította a RegionalBahn olvasóit.</em>',"right"));
+    return out;
+  }
+  if(type==="static"){
+    if(staticLayout==="simple"){
+      return [
+        h("Oldalcím / fejezetcím"),
+        p("Bevezető szöveg."),
+        hr(),
+        h("Első fejezet"),
+        p("SZÖVEG"),
+        p('<ul><li>Első hivatkozás vagy tétel</li><li>Második hivatkozás vagy tétel</li><li>Harmadik hivatkozás vagy tétel</li></ul>'),
+        hr(),
+        h("Második fejezet"),
+        p("SZÖVEG")
+      ];
+    }
+    const withAll=staticLayout==="buttons-all";
+    return [
+      raw(adminStaticSwitcherHtml(withAll),true),
+      raw(adminStaticYearSection("2026"),true),
+      raw(adminStaticYearSection("2025"),true),
+      raw(adminStaticYearSection("2024"),true)
+    ];
+  }
+  return [p("")];
+}
+function adminApplyTemplate(){
+  const type=rbGet("adminContentType").value,staticLayout=rbGet("adminStaticLayout").value;
+  if(adminHasMeaningfulContent()&&!window.confirm("A sablon lecseréli a jelenlegi címet, leadet és tartalmi blokkokat. A képtár és a Blogger-bejegyzés hozzárendelése megmarad. Folytatod?"))return;
+  adminSourcesHtml="";adminLeadAlign="justify";adminActiveEditable=null;adminSavedRange=null;
+  rbGet("adminExistingHtml").value="";rbGet("adminSource").value="";
+  if(type==="article"){
+    rbGet("adminTitle").value="Cikk címe";adminLeadHtml="Lead / bevezető.";rbGet("adminTopTextMode").value="lead";rbGet("adminFooter").value="author";
+  }else if(type==="news"){
+    rbGet("adminTitle").value="Hétvégi gyors – ";adminLeadHtml="Lead szövege.";rbGet("adminTopTextMode").value="lead";rbGet("adminAuthor").value="Összeállította: Adorján Péter";rbGet("adminFooter").value="author";
+  }else if(type==="podcast"){
+    rbGet("adminTitle").value="Podcast címe";adminLeadHtml="Podcast címe";rbGet("adminTopTextMode").value="title";rbGet("adminAuthor").value="RegionalBahn szerkesztőség";rbGet("adminFooter").value="author";
+  }else if(type==="innotrans"){
+    rbGet("adminTitle").value="InnoTrans 2026 – ";adminLeadHtml="InnoTrans 2026";rbGet("adminTopTextMode").value="title";rbGet("adminFooter").value="none";
+  }else{
+    rbGet("adminTitle").value="Statikus oldal";adminLeadHtml="";rbGet("adminTopTextMode").value="title";rbGet("adminFooter").value="none";
+  }
+  adminBlocks=adminTemplateBlocks(type,staticLayout).filter(Boolean);
+  adminRenderCanvas();adminGenerateHtml(false);bloggerSetUi();
+  rbGet("adminStatus").textContent="A(z) „"+rbGet("adminContentType").selectedOptions[0].textContent+"” sablon betöltve: "+adminBlocks.length+" szerkeszthető blokk.";
+}
+
 function adminNormalizeInlineHtml(html){
   const t=document.createElement("template");t.innerHTML=String(html||"");
   t.content.querySelectorAll("b").forEach(el=>{const n=document.createElement("strong");n.innerHTML=el.innerHTML;el.replaceWith(n);});
@@ -2033,6 +2184,7 @@ function adminHtmlToBlocks(html){
       const ib=adminMakeIframeBlock(node.innerHTML,adminAlignFromNode(node,"justify"));if(ib)blocks.push(ib);else blocks.push({id:adminUid("b"),type:"raw",html:node.outerHTML});continue;
     }
     if(tag==="iframe"){const ib=adminMakeIframeBlock(node.outerHTML,"justify");if(ib)blocks.push(ib);continue;}
+    if(tag==="ul"||tag==="ol"){blocks.push({id:adminUid("b"),type:"p",html:node.outerHTML,align:"justify"});continue;}
     if(tag==="div"){blocks.push({id:adminUid("b"),type:"p",html:node.innerHTML,align:adminAlignFromNode(node,"justify")});continue;}
     blocks.push({id:adminUid("b"),type:"raw",html:node.outerHTML});
   }
@@ -2112,19 +2264,25 @@ function adminBlockHtml(b){
   if(b.type==="image"){const img=adminFindImage(b.imageId);return img?adminImageBodyHtml(img):"";}
   if(b.type==="box")return adminBoxHtml(b);
   if(b.type==="iframe"){const html=adminNormalizeIframeHtml(b.html);return html?'<div style="text-align: '+adminValidAlign(b.align,"justify")+';">'+html+'</div>\n<br />':"";}
-  if(b.type==="raw")return String(b.html||"")+"\n<br />";
+  if(b.type==="raw")return String(b.html||"")+(b.noBreak?"\n":"\n<br />");
   return "";
 }
 function adminGenerateHtml(setStatus=true){
   const title=rbGet("adminTitle").value.trim(),author=rbGet("adminAuthor").value.trim(),topMode=rbGet("adminTopTextMode").value;
-  const topHtml=topMode==="title"?inlineMd(title):adminNormalizeInlineHtml(adminLeadHtml)||inlineMd(title);
-  const main=adminFindImage(adminMainImageId);
-  let out='<div style="text-align: '+adminValidAlign(adminLeadAlign,"justify")+';">\n'+adminMainImageHtml(main)+'<strong>'+topHtml+'</strong></div>\n<br />\n<!--more-->\n<br />\n';
-  out+=adminBlocks.map(adminBlockHtml).filter(Boolean).join("\n");
-  if(adminSourcesHtml)out+="\n"+adminSourcesHtml;
-  if(rbGet("adminFooter").value==="author"&&author)out+='\n<hr />\n<div style="text-align: right;"><span style="font-size: 85%;"><em>'+esc(author)+'</em></span></div>';
+  const contentType=rbGet("adminContentType")?.value||"article";
+  let out="";
+  if(contentType==="static"){
+    out=adminBlocks.map(adminBlockHtml).filter(Boolean).join("\n");
+  }else{
+    const topHtml=topMode==="title"?inlineMd(title):adminNormalizeInlineHtml(adminLeadHtml)||inlineMd(title);
+    const main=adminFindImage(adminMainImageId);
+    out='<div style="text-align: '+adminValidAlign(adminLeadAlign,"justify")+';">\n'+adminMainImageHtml(main)+'<strong>'+topHtml+'</strong></div>\n<br />\n<!--more-->\n<br />\n';
+    out+=adminBlocks.map(adminBlockHtml).filter(Boolean).join("\n");
+    if(adminSourcesHtml)out+="\n"+adminSourcesHtml;
+    if(rbGet("adminFooter").value==="author"&&author)out+='\n<hr />\n<div style="text-align: right;"><span style="font-size: 85%;"><em>'+esc(author)+'</em></span></div>';
+  }
   rbGet("adminOutput").value=out;
-  if(setStatus)rbGet("adminStatus").textContent="Végleges HTML frissítve.";
+  if(setStatus)rbGet("adminStatus").textContent=contentType==="static"?"Statikus oldal HTML-je frissítve.":"Végleges HTML frissítve.";
 }
 function adminMoveBlock(id,delta){
   const i=adminBlocks.findIndex(x=>x.id===id);if(i<0)return;
@@ -2147,6 +2305,24 @@ function adminTrackEditable(el,onInput){
 function adminTextBlockElement(block,cls){
   const e=document.createElement("div");e.className="admin-editable "+cls;e.contentEditable="true";e.spellcheck=true;e.innerHTML=block.html||"";e.dataset.adminBlockId=block.id;e.dataset.adminAlignTarget="block";e.style.textAlign=adminValidAlign(block.align,adminDefaultAlign(block.type));
   adminTrackEditable(e,()=>{block.html=e.innerHTML;});return e;
+}
+function adminRawElement(block){
+  const wrap=document.createElement("div");wrap.className="admin-iframe-block admin-raw-editor";
+  const preview=document.createElement("div");preview.className="admin-iframe-preview";
+  const refresh=()=>{preview.innerHTML=block.html||'<span class="admin-iframe-note">Üres HTML-blokk.</span>';};
+  refresh();wrap.appendChild(preview);
+  const note=document.createElement("div");note.className="admin-iframe-note";note.textContent="Speciális HTML-blokk — a kód közvetlenül szerkeszthető. A script-elemek az editor előnézetében nem futnak, a Blogger-kimenetben megmaradnak.";
+  wrap.appendChild(note);
+  const code=document.createElement("textarea");code.className="admin-iframe-code";code.rows=8;code.spellcheck=false;code.value=block.html||"";code.dataset.adminBlockId=block.id;
+  code.addEventListener("focus",()=>{adminActiveEditable=code;});
+  code.addEventListener("input",()=>{block.html=code.value;adminGenerateHtml(false);});
+  code.addEventListener("change",()=>{block.html=code.value;refresh();adminGenerateHtml();});
+  code.addEventListener("blur",()=>{block.html=code.value;refresh();adminGenerateHtml();});
+  wrap.appendChild(code);
+  const buttons=document.createElement("div");buttons.className="toolbar";buttons.style.margin="0";
+  const upd=document.createElement("button");upd.type="button";upd.textContent="↻ HTML előnézet frissítése";upd.addEventListener("click",()=>{block.html=code.value;refresh();adminGenerateHtml();});
+  buttons.appendChild(upd);wrap.appendChild(buttons);
+  return wrap;
 }
 function adminIframeElement(block){
   const wrap=document.createElement("div");wrap.className="admin-iframe-block";
@@ -2255,7 +2431,7 @@ function adminRenderCanvas(){
     else if(block.type==="image")shell.appendChild(adminImageBlockElement(block));
     else if(block.type==="box")shell.appendChild(adminBoxElement(block));
     else if(block.type==="iframe")shell.appendChild(adminIframeElement(block));
-    else if(block.type==="raw"){const raw=document.createElement("div");raw.className="admin-raw-block";raw.innerHTML=block.html||"";shell.appendChild(raw);}
+    else if(block.type==="raw")shell.appendChild(adminRawElement(block));
     shell.appendChild(adminBlockControls(block));host.appendChild(shell);host.appendChild(adminDropZone(index+1));
   });
 }
@@ -2385,6 +2561,7 @@ function adminLoadExistingHtml(raw){
       const ib=adminMakeIframeBlock(n.innerHTML,adminAlignFromNode(n,"justify"));if(ib)adminBlocks.push(ib);else adminBlocks.push({id:adminUid("b"),type:"raw",html:n.outerHTML});continue;
     }
     if(tag==="iframe"){const ib=adminMakeIframeBlock(n.outerHTML,"justify");if(ib)adminBlocks.push(ib);continue;}
+    if(tag==="ul"||tag==="ol"){adminBlocks.push({id:adminUid("b"),type:"p",html:n.outerHTML,align:"justify"});continue;}
     if(tag==="div"){adminBlocks.push({id:adminUid("b"),type:"p",html:n.innerHTML,align:adminAlignFromNode(n,"justify")});continue;}
     adminBlocks.push({id:adminUid("b"),type:"raw",html:n.outerHTML});
   }
@@ -2415,6 +2592,10 @@ function adminClear(){
   bloggerCurrentPost=null;bloggerPostMeta();
   adminRenderImageLibrary();adminRenderCanvas();adminGenerateHtml(false);rbGet("adminStatus").textContent="Új, üres cikk. Írhatsz közvetlenül a WYSIWYG szerkesztőben.";
 }
+rbGet("adminContentType").addEventListener("change",()=>adminContentTypeChanged(true));
+rbGet("adminStaticLayout").addEventListener("change",()=>{rbGet("adminTemplateHint").textContent=ADMIN_TEMPLATE_HINTS.static+" Kiválasztott forma: "+rbGet("adminStaticLayout").selectedOptions[0].textContent+".";});
+rbGet("adminLoadTemplate").addEventListener("click",adminApplyTemplate);
+adminContentTypeChanged(false);
 rbGet("adminBuild").addEventListener("click",adminBuildFromSource);
 rbGet("adminParseImages").addEventListener("click",()=>adminParseImages(rbGet("adminImageSource").value));
 rbGet("adminInsertAllImages").addEventListener("click",adminInsertAllImages);
@@ -2433,7 +2614,7 @@ rbGet("adminAddIframe").addEventListener("click",()=>{rbGet("adminIframeInput").
 rbGet("adminInsertIframe").addEventListener("click",adminInsertIframeFromInput);
 rbGet("adminClearIframeInput").addEventListener("click",()=>{rbGet("adminIframeInput").value="";rbGet("adminIframeInput").focus();});
 rbGet("adminAddRule").addEventListener("click",()=>{adminBlocks.push({id:adminUid("b"),type:"hr"});adminRenderCanvas();adminGenerateHtml();});
-for(const id of ["adminFmtBold","adminFmtItalic","adminFmtUnderline","adminFmtStrike","adminFmtLink","adminFmtUnlink","adminFmtBox","adminAlignLeft","adminAlignCenter","adminAlignRight","adminAlignJustify"])rbGet(id).addEventListener("mousedown",e=>e.preventDefault());
+for(const id of ["adminFmtBold","adminFmtItalic","adminFmtUnderline","adminFmtStrike","adminFmtLink","adminFmtUnlink","adminFmtBox","adminFmtUl","adminFmtOl","adminFmtIndent","adminFmtOutdent","adminAlignLeft","adminAlignCenter","adminAlignRight","adminAlignJustify"])rbGet(id).addEventListener("mousedown",e=>e.preventDefault());
 rbGet("adminFmtBold").addEventListener("click",()=>adminExec("bold"));
 rbGet("adminFmtItalic").addEventListener("click",()=>adminExec("italic"));
 rbGet("adminFmtUnderline").addEventListener("click",()=>adminExec("underline"));
@@ -2441,6 +2622,10 @@ rbGet("adminFmtStrike").addEventListener("click",()=>adminExec("strikeThrough"))
 rbGet("adminFmtLink").addEventListener("click",adminLink);
 rbGet("adminFmtUnlink").addEventListener("click",()=>adminExec("unlink"));
 rbGet("adminFmtBox").addEventListener("click",adminQuickBox);
+rbGet("adminFmtUl").addEventListener("click",()=>adminExec("insertUnorderedList"));
+rbGet("adminFmtOl").addEventListener("click",()=>adminExec("insertOrderedList"));
+rbGet("adminFmtIndent").addEventListener("click",()=>adminExec("indent"));
+rbGet("adminFmtOutdent").addEventListener("click",()=>adminExec("outdent"));
 rbGet("adminAlignLeft").addEventListener("click",()=>adminSetAlignment("left"));
 rbGet("adminAlignCenter").addEventListener("click",()=>adminSetAlignment("center"));
 rbGet("adminAlignRight").addEventListener("click",()=>adminSetAlignment("right"));
