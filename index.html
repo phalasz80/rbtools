@@ -54,7 +54,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
   <div class="panel admin-hero">
     <div>
       <h2>RBTools Cikkadmin</h2>
-      <p class="intro">A RegionalBahn egységes cikkműhelye. A vizuális szerkesztés mellett itt érhető el a korábbi Szöveg → Blogger konverter teljes tudása is: Markdown/plain text/DOCX/Google Dokumentum import, RB-jelölések, profilok, presetek, HTML-előnézet, Blogger-draftkezelés, képek, keretesek és iframe-ek.</p>
+      <p class="intro">A RegionalBahn egységes cikkműhelye. A vizuális szerkesztés mellett itt érhető el a korábbi Szöveg → Blogger konverter teljes tudása is: Markdown/plain text/DOCX/ODT/RTF/Google Dokumentum import, RB-jelölések, profilok, presetek, HTML-előnézet, Blogger-draftkezelés, képek, keretesek és iframe-ek.</p>
     </div>
     <div class="toolbar">
       <button id="rbtools-adminBuild" class="primary">⚙ Cikk felépítése</button>
@@ -110,7 +110,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
     </div>
     <ol class="admin-quicksteps">
       <li><strong>Válassz tartalomtípust:</strong> cikk, #nyúz, podcast shownotes, InnoTrans vagy statikus oldal; igény szerint töltsd be a hozzá tartozó sablont.</li>
-      <li><strong>Új anyag:</strong> a legtöbb munkához írj közvetlenül a WYSIWYG-ben, vagy importálj Markdown/TXT/DOCX szöveget. Képes cikknél Bloggerben előbb töltsd fel a képeket egy draftba, majd nyisd meg azt itt.</li>
+      <li><strong>Új anyag:</strong> a legtöbb munkához írj közvetlenül a WYSIWYG-ben, vagy importálj Markdown/TXT/DOCX/ODT/RTF szöveget. Képes cikknél Bloggerben előbb töltsd fel a képeket egy draftba, majd nyisd meg azt itt.</li>
       <li><strong>Haladó forráskonverzió:</strong> ha Google Dokumentumból dolgozol, régi RB-jelöléseket (<code>RB:IMAGE</code>, <code>RB:BOX</code>, <code>RB:SOURCES</code> stb.) használsz, profil/preset kell, vagy külön HTML-előnézetet szeretnél, nyisd le a Cikkadmin alján a <strong>Haladó forráskonverzió, Google Docs és RB-jelölések</strong> részt. A létrejött HTML egy gombbal visszatölthető a WYSIWYG-be.</li>
       <li><strong>Meglévő draft:</strong> kapcsolódj a Bloggerhez, válaszd ki a piszkozatot, majd <strong>Piszkozat megnyitása</strong>. A cím, címkék, szöveg, képek és iframe-ek betöltődnek.</li>
       <li><strong>Szerkesztés:</strong> a WYSIWYG-ben közvetlenül használható a formázás, link, felsorolás, igazítás, keretes, kép, iframe és blokkmozgatás. Az <strong>x² / x₂</strong> gomb HTML <code>&lt;sup&gt;</code>/<code>&lt;sub&gt;</code> formázást készít a kijelölt szövegből.</li>
@@ -123,7 +123,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
     <div class="admin-help-callout">
       <strong>Első használat vagy hiba esetén:</strong>
       a <a href="#rbtools-help-cikkadmin" id="rbtools-adminHelpLink">Súgó részletes Cikkadmin-fejezete</a>
-      lépésről lépésre végigvezet a Google-belépésen, draftkezelésen, WYSIWYG-en, a beépített haladó forráskonverteren, Google Docs/DOCX importon, RB-jelöléseken, képeken, iframe-eken, felső/alsó indexen, különleges karaktereken, HTML-entitásokon, keresésen, statikus oldalakon és a tipikus hibaüzenetek elhárításán.
+      lépésről lépésre végigvezet a Google-belépésen, draftkezelésen, WYSIWYG-en, a beépített haladó forráskonverteren, Google Docs/DOCX/ODT/RTF importon, RB-jelöléseken, képeken, iframe-eken, felső/alsó indexen, különleges karaktereken, HTML-entitásokon, keresésen, statikus oldalakon és a tipikus hibaüzenetek elhárításán.
     </div>
   </div>
 
@@ -184,8 +184,8 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
       <div class="cardhead">1. Cikkszöveg</div>
       <div class="admin-cardpad">
         <div class="toolbar" style="margin-top:0">
-          <label class="filelabel" for="rbtools-adminTextFile">📂 .md / .txt / .docx</label>
-          <input id="rbtools-adminTextFile" type="file" accept=".md,.markdown,.txt,.docx,text/markdown,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+          <label class="filelabel" for="rbtools-adminTextFile">📂 .md / .txt / .docx / .odt / .rtf</label>
+          <input id="rbtools-adminTextFile" type="file" accept=".md,.markdown,.txt,.docx,.odt,.rtf,text/markdown,text/plain,text/rtf,application/rtf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.oasis.opendocument.text" hidden>
           <select id="rbtools-adminSourceMode" aria-label="Szöveg értelmezése">
             <option value="auto">Automatikus</option>
             <option value="markdown">Markdown</option>
@@ -360,7 +360,7 @@ További szöveg..."></textarea>
     <summary><strong>Haladó forráskonverzió, Google Docs és RB-jelölések</strong> <span class="small">A korábbi külön konverter összes funkciója</span></summary>
     <div class="admin-integrated-converter-body">
 <div class="panel">
-    <h2>Haladó forráskonverzió és kimeneti szerkezet</h2><p class="intro">A korábbi Szöveg → Blogger konverter teljes tudása itt, a Cikkadmin részeként érhető el: profilok, presetek, Markdown/plain text/DOCX/Google Dokumentum, RB-jelölések, közvetlen HTML-kimenet és előnézet.</p>
+    <h2>Haladó forráskonverzió és kimeneti szerkezet</h2><p class="intro">A korábbi Szöveg → Blogger konverter teljes tudása itt, a Cikkadmin részeként érhető el: profilok, presetek, Markdown/plain text/DOCX/ODT/RTF/Google Dokumentum, RB-jelölések, közvetlen HTML-kimenet és előnézet.</p>
     <div class="grid4">
       <div class="field"><label>Cikkprofil</label>
         <select id="rbtools-profile">
@@ -397,8 +397,8 @@ További szöveg..."></textarea>
 
   <div class="panel">
     <div class="toolbar">
-      <label class="filelabel" for="rbtools-mdFile">📂 .md / .txt / .docx megnyitása</label>
-      <input id="rbtools-mdFile" type="file" accept=".md,.markdown,.txt,.docx,text/markdown,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+      <label class="filelabel" for="rbtools-mdFile">📂 .md / .txt / .docx / .odt / .rtf megnyitása</label>
+      <input id="rbtools-mdFile" type="file" accept=".md,.markdown,.txt,.docx,.odt,.rtf,text/markdown,text/plain,text/rtf,application/rtf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.oasis.opendocument.text" hidden>
       <button id="rbtools-convertArticle" class="primary">⚙ Konvertálás</button>
       <button id="rbtools-useArticleInAdmin" type="button">↪ Kimenet megnyitása a WYSIWYG-ben</button>
       <button id="rbtools-copyTitle">▣ Cím másolása</button>
@@ -408,7 +408,7 @@ További szöveg..."></textarea>
       <button id="rbtools-clearArticle">× Törlés</button>
       <span id="rbtools-articleStatus" class="status">Készen áll.</span>
     </div>
-    <div id="rbtools-mdDrop" class="drop">Húzd ide a <strong>.md</strong>, <strong>.txt</strong> vagy <strong>.docx</strong> fájlt, vagy válaszd ki a fenti gombbal.</div>
+    <div id="rbtools-mdDrop" class="drop">Húzd ide a <strong>.md</strong>, <strong>.txt</strong>, <strong>.docx</strong>, <strong>.odt</strong> vagy <strong>.rtf</strong> fájlt, vagy válaszd ki a fenti gombbal.</div>
     <div class="grid3" style="margin-top:10px">
       <div class="field"><label>Szöveges bemenet értelmezése</label><select id="rbtools-sourceMode"><option value="auto">Automatikus</option><option value="markdown">Markdown</option><option value="plain">Plain text</option></select></div>
       <div class="field"><label>Google Dokumentum megosztható linkje</label><input id="rbtools-googleDocUrl" type="url" placeholder="https://docs.google.com/document/d/…/edit"></div>
@@ -417,7 +417,7 @@ További szöveg..."></textarea>
         <button id="rbtools-openGoogleDocExport">⇩ DOCX export megnyitása</button>
       </div>
     </div>
-    <p class="small" style="margin:8px 0 0">A DOCX-feldolgozás teljesen helyben történik. A <strong>Plain text</strong> mód a bekezdéseket Blogger-kompatibilis <code>&lt;div&gt;</code> + <code>&lt;br /&gt;</code> szerkezetté alakítja, Markdown-formázás nélkül. Google Dokumentumnál a konverter először DOCX-, majd egyszerű szöveges exporttal próbálkozik; ha a Google böngészős CORS-védelme mindkettőt blokkolja, a DOCX export megnyitható és a letöltött fájl behúzható.</p>
+    <p class="small" style="margin:8px 0 0">A DOCX/ODT/RTF-feldolgozás teljesen helyben történik. A <strong>Plain text</strong> mód a bekezdéseket Blogger-kompatibilis <code>&lt;div&gt;</code> + <code>&lt;br /&gt;</code> szerkezetté alakítja, Markdown-formázás nélkül. Google Dokumentumnál a konverter először DOCX-, majd egyszerű szöveges exporttal próbálkozik; ha a Google böngészős CORS-védelme mindkettőt blokkolja, a DOCX export megnyitható és a letöltött fájl behúzható.</p>
   </div>
 
   <div class="panel">
@@ -497,8 +497,8 @@ Források:
     <h2>Keretes szöveg → Blogger HTML</h2>
     <p class="intro">Önálló keretesblokk-konverter a RegionalBahn szürke dobozos sablonjához. A cím, a bekezdések és az opcionális kép egyetlen, közvetlenül a Blogger HTML-nézetébe másolható blokká állnak össze.</p>
     <div class="toolbar">
-      <label class="filelabel" for="rbtools-boxFile">📂 .md / .txt / .docx megnyitása</label>
-      <input id="rbtools-boxFile" type="file" accept=".md,.markdown,.txt,.docx,text/markdown,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+      <label class="filelabel" for="rbtools-boxFile">📂 .md / .txt / .docx / .odt / .rtf megnyitása</label>
+      <input id="rbtools-boxFile" type="file" accept=".md,.markdown,.txt,.docx,.odt,.rtf,text/markdown,text/plain,text/rtf,application/rtf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.oasis.opendocument.text" hidden>
       <button id="rbtools-convertBox" class="primary">⚙ Keretes konvertálása</button>
       <button id="rbtools-refreshBoxHtml" title="A módosított forrásszövegből újragenerálja a keretes HTML-t">↻ HTML frissítése</button>
       <button id="rbtools-copyBoxHtml">⧉ HTML másolása</button>
@@ -507,7 +507,7 @@ Források:
       <button id="rbtools-clearBox">× Törlés</button>
       <span id="rbtools-boxStatus" class="status">Készen áll.</span>
     </div>
-    <div id="rbtools-boxDrop" class="drop">Húzd ide a <strong>.md</strong>, <strong>.txt</strong> vagy <strong>.docx</strong> fájlt, vagy illeszd be lent a keretes szövegét.</div>
+    <div id="rbtools-boxDrop" class="drop">Húzd ide a <strong>.md</strong>, <strong>.txt</strong>, <strong>.docx</strong>, <strong>.odt</strong> vagy <strong>.rtf</strong> fájlt, vagy illeszd be lent a keretes szövegét.</div>
     <div class="grid3" style="margin-top:10px">
       <div class="field"><label>Keretes cím</label><input id="rbtools-boxTitle" placeholder="KERETES CÍM"></div>
       <div class="field"><label>Szöveg értelmezése</label><select id="rbtools-boxSourceMode"><option value="auto">Automatikus</option><option value="markdown">Markdown</option><option value="plain">Plain text</option></select></div>
@@ -774,7 +774,7 @@ A következő cikk rövid ajánlója.</pre>
       <li>Unicode-karakterek, emoji és HTML-entitások beszúrása;</li>
       <li>keresés az aktuális WYSIWYG-cikkben;</li>
       <li>cikk-, #nyúz-, podcast-, InnoTrans- és statikusoldal-sablonok használata;</li>
-      <li>haladó Markdown/plain text/DOCX/Google Dokumentum konverzió profilokkal és presetekkel;</li>
+      <li>haladó Markdown/plain text/DOCX/ODT/RTF/Google Dokumentum konverzió profilokkal és presetekkel;</li>
       <li>RB:MAIN_IMAGE, RB:LEAD, RB:IMAGE, RB:ITALIC, RB:BOX, RB:SOURCES és RB:AUTHOR jelölések feldolgozása;</li>
       <li>külön HTML-előnézet és a haladó konverter kimenetének visszatöltése a WYSIWYG-be.</li>
     </ul>
@@ -858,7 +858,7 @@ A következő cikk rövid ajánlója.</pre>
     <ul>
       <li><strong>Profil:</strong> általános RegionalBahn-cikk, szekciós/gyártói szemle vagy #nyúz/heti hírösszefoglaló.</li>
       <li><strong>Preset:</strong> #nyúz, InnoTrans 2026 vagy általános helyszíni tudósítás.</li>
-      <li><strong>Forrás:</strong> Markdown, plain text, DOCX vagy Google Dokumentum.</li>
+      <li><strong>Forrás:</strong> Markdown, plain text, DOCX, ODT, RTF vagy Google Dokumentum.</li>
       <li><strong>RB-jelölések:</strong> használható az <code>RB:MAIN_IMAGE</code>, <code>RB:LEAD</code>, <code>RB:IMAGE</code>, <code>RB:ITALIC</code>, <code>RB:BOX</code>, <code>RB:SOURCES</code> és <code>RB:AUTHOR</code>.</li>
       <li><strong>Speciális footer:</strong> szerző, „Összeállította”, több tudósítós footer vagy footer nélküli kimenet.</li>
       <li><strong>Előnézet:</strong> a generált Blogger HTML külön iframe-ben ellenőrizhető.</li>
@@ -1073,11 +1073,13 @@ A következő cikk rövid ajánlója.</pre>
   </div>
 
   <div class="panel">
-    <h2>Cikkadmin: Word és Google Dokumentum import</h2>
+    <h2>Cikkadmin: DOCX, ODT, RTF és Google Dokumentum import</h2>
     <ul>
-      <li><strong>.docx:</strong> a fájlt közvetlenül megnyithatod vagy behúzhatod. A konverter a DOCX-et helyben bontja ki, és a Word félkövér, dőlt, aláhúzott, áthúzott, hiperlinkes, címsoros és listás formázásából Markdownot készít.</li>
+      <li><strong>.docx:</strong> a fájlt közvetlenül megnyithatod vagy behúzhatod. A Cikkadmin helyben bontja ki, és a Word félkövér, dőlt, aláhúzott, áthúzott, hiperlinkes, címsoros, listás és táblázatos formázásából Markdownot készít.</li>
+      <li><strong>.odt:</strong> az OpenDocument Text fájl teljesen a böngészőben kerül kibontásra. A Cikkadmin átveszi a bekezdéseket, címsorokat, alapvető karakterformázást, linkeket, listákat és táblázatokat. A beágyazott képek helyén <code>[KÉP AZ ODT-DOKUMENTUMBAN]</code> jelölés marad.</li>
+      <li><strong>.rtf:</strong> a Rich Text Format importáló a normál szöveget, bekezdéseket, sortöréseket, félkövér/dőlt/aláhúzott/áthúzott formázást, valamint felső és alsó indexet alakítja szerkeszthető formára. Az RTF sok gyártóspecifikus kiterjesztést enged, ezért különösen régi vagy egzotikus RTF-nél érdemes az importált eredményt átnézni.</li>
       <li><strong>Google Dokumentum:</strong> illeszd be a normál <code>docs.google.com/document/d/…</code> megosztható linket. A program először a DOCX-exportot, majd tartalék megoldásként a plain-text exportot próbálja közvetlenül beolvasni. Ha ezt a Google böngészős CORS-védelme blokkolja, használd a <strong>DOCX export megnyitása</strong> gombot, majd húzd be a letöltött fájlt.</li>
-      <li><strong>Wordbe ágyazott képek:</strong> nem tölthetők fel automatikusan a Bloggerre, ezért az import a helyükön <code>[KÉP A WORD-DOKUMENTUMBAN]</code> jelölést hagy. A képet ezután a Bloggerbe kell feltölteni, és a <strong>Képkódok</strong> füllel RegionalBahn-formára alakítható.</li>
+      <li><strong>Dokumentumba ágyazott képek:</strong> a DOCX/ODT képei nem tölthetők fel automatikusan a Bloggerre, ezért az import helyőrzőt hagy. A tényleges képet ezután a Bloggerbe kell feltölteni, és a Cikkadmin képtárával elhelyezni.</li>
     </ul>
   </div>
   <div class="panel">
@@ -1098,7 +1100,7 @@ A következő cikk rövid ajánlója.</pre>
   <div class="panel">
     <h2>Önálló keretes konverter</h2>
     <p>A <strong>Keretes</strong> fül közvetlenül Blogger HTML-t készít a szürke információs dobozhoz. A címet külön mezőben, a törzsszöveget Markdownként vagy plain textként lehet megadni; a bekezdéseket üres sor választja el.</p>
-    <p>Opcionálisan megadható nagy és megjelenített kép-URL, kredit és képaláírás. Ha csak egy kép-URL van kitöltve, azt használja mindkét helyen. A Word-import a DOCX szövegét Markdownná alakítja, majd keretes blokkba rendezi.</p>
+    <p>Opcionálisan megadható nagy és megjelenített kép-URL, kredit és képaláírás. Ha csak egy kép-URL van kitöltve, azt használja mindkét helyen. A dokumentumimport a DOCX/ODT/RTF szövegét Markdownná alakítja, majd keretes blokkba rendezi.</p>
     <p>A Cikkadmin haladó forráskonverziójában továbbra is használható az <code>RB:BOX</code> jelölés; a külön <strong>Keretes</strong> fül ettől függetlenül gyorseszközként továbbra is megmarad.</p>
   </div>
   <div class="panel">
@@ -1402,7 +1404,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v23";
+const RBTOOLS_VERSION="pages-v24";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -2013,6 +2015,248 @@ async function docxToMarkdown(buffer,sourceName="dokumentum.docx"){
   }
   return {md,images:ctx.images,tables:ctx.tables};
 }
+
+/* ---------- ODT / RTF dokumentumimport ---------- */
+function odtAttr(el,name){
+  if(!el)return "";
+  for(const a of Array.from(el.attributes||[]))if(a.localName===name)return a.value;
+  return "";
+}
+function odtStyleProps(xmlTexts){
+  const map=new Map();
+  for(const xml of xmlTexts.filter(Boolean)){
+    const x=parseXml(xml,"ODT stílus XML");
+    for(const st of Array.from(x.getElementsByTagNameNS("*","style"))){
+      const name=odtAttr(st,"name");if(!name)continue;
+      const parent=odtAttr(st,"parent-style-name");
+      const tp=Array.from(st.childNodes||[]).find(n=>n.nodeType===1&&n.localName==="text-properties");
+      const props={parent};
+      if(tp){
+        const fw=odtAttr(tp,"font-weight"),fs=odtAttr(tp,"font-style"),ul=odtAttr(tp,"text-underline-style"),strike=odtAttr(tp,"text-line-through-style"),pos=odtAttr(tp,"text-position");
+        if(fw==="bold"||Number(fw)>=600)props.bold=true;
+        if(fs==="italic"||fs==="oblique")props.italic=true;
+        if(ul&&ul!=="none")props.underline=true;
+        if(strike&&strike!=="none")props.strike=true;
+        if(/super/i.test(pos))props.sup=true;
+        if(/sub/i.test(pos))props.sub=true;
+      }
+      map.set(name,props);
+    }
+  }
+  const resolved=new Map();
+  function get(name,seen=new Set()){
+    if(!name||seen.has(name))return {};
+    if(resolved.has(name))return resolved.get(name);
+    seen.add(name);const own=map.get(name)||{},base=get(own.parent,seen);
+    const out={...base,...own};delete out.parent;resolved.set(name,out);return out;
+  }
+  for(const name of map.keys())get(name);
+  return resolved;
+}
+function odtListKinds(xmlTexts){
+  const map=new Map();
+  for(const xml of xmlTexts.filter(Boolean)){
+    const x=parseXml(xml,"ODT lista XML");
+    for(const ls of Array.from(x.getElementsByTagNameNS("*","list-style"))){
+      const name=odtAttr(ls,"name");if(!name)continue;
+      const children=Array.from(ls.childNodes||[]).filter(n=>n.nodeType===1);
+      map.set(name,children.some(n=>n.localName==="list-level-style-number")?"number":"bullet");
+    }
+  }
+  return map;
+}
+function odtWrap(text,props){
+  if(!text)return "";let t=text;
+  if(props?.sup)t="<sup>"+t+"</sup>";
+  else if(props?.sub)t="<sub>"+t+"</sub>";
+  if(props?.strike)t="~~"+t+"~~";
+  if(props?.underline)t="++"+t+"++";
+  if(props?.bold&&props?.italic)t="***"+t+"***";
+  else if(props?.bold)t="**"+t+"**";
+  else if(props?.italic)t="*"+t+"*";
+  return t;
+}
+function odtInlineMd(node,ctx,inherit={}){
+  let out="";
+  for(const n of Array.from(node?.childNodes||[])){
+    if(n.nodeType===3){out+=n.nodeValue||"";continue;}
+    if(n.nodeType!==1)continue;
+    const name=n.localName;
+    if(name==="span"){
+      const props={...inherit,...(ctx.styles.get(odtAttr(n,"style-name"))||{})};
+      out+=odtWrap(odtInlineMd(n,ctx,props),props);
+    }else if(name==="a"){
+      const label=odtInlineMd(n,ctx,inherit),href=odtAttr(n,"href");
+      out+=href?"["+label+"]("+href+")":label;
+    }else if(name==="s"){
+      const count=Math.max(1,Number(odtAttr(n,"c")||1));out+=" ".repeat(count);
+    }else if(name==="tab")out+="    ";
+    else if(name==="line-break")out+="  \n";
+    else if(name==="soft-page-break")continue;
+    else if(name==="frame"){
+      const imgs=Array.from(n.getElementsByTagNameNS("*","image")).length||1;
+      ctx.images+=imgs;out+=(out?"\n":"")+Array.from({length:imgs},()=>"[KÉP AZ ODT-DOKUMENTUMBAN]").join("\n");
+    }else out+=odtInlineMd(n,ctx,inherit);
+  }
+  return out;
+}
+function odtParagraphMd(el,ctx){
+  const text=odtInlineMd(el,ctx,{}).trimEnd();if(!text.trim())return "";
+  if(el.localName==="h"){
+    const level=Math.min(3,Math.max(1,Number(odtAttr(el,"outline-level")||1)));
+    return "#".repeat(level)+" "+text.trim();
+  }
+  return text.trim();
+}
+function odtListMd(list,ctx,depth=0){
+  const kind=ctx.listKinds.get(odtAttr(list,"style-name"))||"bullet",lines=[];
+  for(const item of Array.from(list.childNodes||[]).filter(n=>n.nodeType===1&&n.localName==="list-item")){
+    let head="",nested=[];
+    for(const ch of Array.from(item.childNodes||[]).filter(n=>n.nodeType===1)){
+      if(ch.localName==="p"||ch.localName==="h"){
+        const p=odtParagraphMd(ch,ctx);if(p)head+=(head?" ":"")+p.replace(/^#{1,3}\s+/,"");
+      }else if(ch.localName==="list"){
+        const l=odtListMd(ch,ctx,depth+1);if(l)nested.push(l);
+      }
+    }
+    if(head)lines.push("  ".repeat(depth)+(kind==="number"?"1. ":"- ")+head.trim());
+    lines.push(...nested);
+  }
+  return lines.join("\n");
+}
+function odtTableMd(tbl,ctx){
+  ctx.tables++;const rows=[];
+  for(const row of Array.from(tbl.childNodes||[]).filter(n=>n.nodeType===1&&n.localName==="table-row")){
+    const cells=[];
+    for(const cell of Array.from(row.childNodes||[]).filter(n=>n.nodeType===1&&(n.localName==="table-cell"||n.localName==="covered-table-cell"))){
+      const paras=[];
+      for(const ch of Array.from(cell.childNodes||[]).filter(n=>n.nodeType===1)){
+        if(ch.localName==="p"||ch.localName==="h"){
+          const p=odtParagraphMd(ch,ctx);if(p)paras.push(p.replace(/^#{1,3}\s+/,""));
+        }else if(ch.localName==="list"){
+          const l=odtListMd(ch,ctx,0);if(l)paras.push(l.replace(/\n/g," "));
+        }
+      }
+      const repeat=Math.max(1,Number(odtAttr(cell,"number-columns-repeated")||1));
+      for(let i=0;i<repeat;i++)cells.push(paras.join(" ").replace(/\|/g,"\\|"));
+    }
+    const rr=Math.max(1,Number(odtAttr(row,"number-rows-repeated")||1));
+    for(let i=0;i<rr;i++)rows.push(cells.slice());
+  }
+  if(!rows.length)return "";
+  const cols=Math.max(...rows.map(r=>r.length),1);for(const r of rows)while(r.length<cols)r.push("");
+  const line=r=>"| "+r.join(" | ")+" |";
+  return [line(rows[0]),line(Array(cols).fill("---")),...rows.slice(1).map(line)].join("\n");
+}
+async function odtToMarkdown(buffer,sourceName="dokumentum.odt"){
+  const entries=zipEntries(buffer);
+  const [contentXml,stylesXml]=await Promise.all([docxTextFile(buffer,entries,"content.xml"),docxTextFile(buffer,entries,"styles.xml")]);
+  if(!contentXml)throw new Error("Az ODT-ből hiányzik a content.xml.");
+  const x=parseXml(contentXml,"ODT content.xml");
+  const officeText=Array.from(x.getElementsByTagNameNS("*","text")).find(n=>n.parentElement?.localName==="body")||Array.from(x.getElementsByTagNameNS("*","text"))[0];
+  if(!officeText)throw new Error("Az ODT dokumentumtörzse nem található.");
+  const ctx={styles:odtStyleProps([contentXml,stylesXml]),listKinds:odtListKinds([contentXml,stylesXml]),images:0,tables:0},blocks=[];
+  const consume=(n)=>{
+    if(n.nodeType!==1)return "";
+    if(n.localName==="p"||n.localName==="h")return odtParagraphMd(n,ctx);
+    if(n.localName==="list")return odtListMd(n,ctx,0);
+    if(n.localName==="table")return odtTableMd(n,ctx);
+    if(n.localName==="section")return Array.from(n.childNodes||[]).map(consume).filter(Boolean).join("\n\n");
+    return "";
+  };
+  for(const n of Array.from(officeText.childNodes||[])){const md=consume(n);if(md)blocks.push(md);}
+  const md=blocks.join("\n\n").replace(/\n{3,}/g,"\n\n").trim();
+  return {md,images:ctx.images,tables:ctx.tables,format:"ODT",sourceName};
+}
+function rtfDecodeHexByte(hex,encoding){
+  try{return new TextDecoder(encoding||"windows-1252").decode(Uint8Array.from([parseInt(hex,16)]));}
+  catch{return String.fromCharCode(parseInt(hex,16));}
+}
+function rtfToMarkdown(text,sourceName="dokumentum.rtf"){
+  text=String(text||"");
+  const cp=(text.match(/\\ansicpg(\d+)/i)||[])[1];
+  const encoding=cp==="1250"?"windows-1250":cp==="1251"?"windows-1251":"windows-1252";
+  const stack=[],out=[];let state={bold:false,italic:false,underline:false,strike:false,sup:false,sub:false,skip:false,uc:1},i=0,pendingSkip=0;
+  const clone=s=>({...s});
+  const emit=raw=>{
+    if(state.skip||!raw)return;
+    if(pendingSkip>0){
+      const chars=Array.from(raw),cut=Math.min(pendingSkip,chars.length);
+      raw=chars.slice(cut).join("");pendingSkip-=cut;if(!raw)return;
+    }
+    let t=raw;
+    if(state.sup)t="<sup>"+t+"</sup>";else if(state.sub)t="<sub>"+t+"</sub>";
+    if(state.strike)t="~~"+t+"~~";if(state.underline)t="++"+t+"++";
+    if(state.bold&&state.italic)t="***"+t+"***";else if(state.bold)t="**"+t+"**";else if(state.italic)t="*"+t+"*";
+    out.push(t);
+  };
+  const skipDest=new Set(["fonttbl","colortbl","stylesheet","info","pict","object","header","footer","headerl","headerr","footerl","footerr","listtable","listoverridetable","generator","xmlopen","xmlclose","datastore","themedata","colorschememapping"]);
+  while(i<text.length){
+    const ch=text[i];
+    if(ch==="{"){stack.push(clone(state));i++;continue;}
+    if(ch==="}"){state=stack.pop()||state;i++;continue;}
+    if(ch!=="\\"){
+      let j=i;while(j<text.length&&!["\\","{","}"].includes(text[j]))j++;
+      emit(text.slice(i,j));i=j;continue;
+    }
+    i++;if(i>=text.length)break;
+    const sym=text[i];
+    if(sym==="'"&&/^[0-9a-fA-F]{2}$/.test(text.slice(i+1,i+3))){
+      emit(rtfDecodeHexByte(text.slice(i+1,i+3),encoding));i+=3;continue;
+    }
+    if(sym==="~"){emit("\u00a0");i++;continue;}
+    if(sym==="-"){emit("\u00ad");i++;continue;}
+    if(sym==="_"){emit("\u2011");i++;continue;}
+    if(sym==="{"){emit("{");i++;continue;}
+    if(sym==="}"){emit("}");i++;continue;}
+    if(sym==="\\"){emit("\\");i++;continue;}
+    if(sym==="*"){state.skip=true;i++;continue;}
+    if(!/[A-Za-z]/.test(sym)){i++;continue;}
+    let j=i;while(j<text.length&&/[A-Za-z]/.test(text[j]))j++;
+    const word=text.slice(i,j).toLowerCase();let sign=1,num=null;
+    if(text[j]==="-"){sign=-1;j++;}
+    const nstart=j;while(j<text.length&&/\d/.test(text[j]))j++;
+    if(j>nstart)num=sign*Number(text.slice(nstart,j));
+    if(text[j]===" ")j++;i=j;
+    if(skipDest.has(word)){state.skip=true;continue;}
+    if(word==="b")state.bold=num!==0;
+    else if(word==="i")state.italic=num!==0;
+    else if(word==="ul")state.underline=num!==0;
+    else if(word==="ulnone")state.underline=false;
+    else if(word==="strike")state.strike=num!==0;
+    else if(word==="super"){state.sup=true;state.sub=false;}
+    else if(word==="sub"){state.sub=true;state.sup=false;}
+    else if(word==="nosupersub"){state.sup=false;state.sub=false;}
+    else if(word==="plain"){state.bold=false;state.italic=false;state.underline=false;state.strike=false;state.sup=false;state.sub=false;}
+    else if(word==="par")out.push("\n\n");
+    else if(word==="line")out.push("  \n");
+    else if(word==="tab")out.push("    ");
+    else if(word==="bullet")emit("•");
+    else if(word==="emdash")emit("—");
+    else if(word==="endash")emit("–");
+    else if(word==="lquote")emit("‘");
+    else if(word==="rquote")emit("’");
+    else if(word==="ldblquote")emit("“");
+    else if(word==="rdblquote")emit("”");
+    else if(word==="uc"&&num!=null)state.uc=Math.max(0,num);
+    else if(word==="u"&&num!=null){emit(String.fromCodePoint(num<0?num+65536:num));pendingSkip=state.uc||0;}
+  }
+  const md=out.join("").replace(/\r/g,"").replace(/[ \t]+\n/g,"\n").replace(/\n{3,}/g,"\n\n").trim();
+  return {md,images:0,tables:0,format:"RTF",sourceName};
+}
+async function fileToMarkdown(file){
+  if(!file)throw new Error("Nincs fájl.");
+  const name=(file.name||"").toLowerCase(),type=(file.type||"").toLowerCase();
+  if(name.endsWith(".docx")||type==="application/vnd.openxmlformats-officedocument.wordprocessingml.document"){
+    const r=await docxToMarkdown(await file.arrayBuffer(),file.name);return {...r,format:"DOCX"};
+  }
+  if(name.endsWith(".odt")||type==="application/vnd.oasis.opendocument.text")return odtToMarkdown(await file.arrayBuffer(),file.name);
+  if(name.endsWith(".rtf")||type==="application/rtf"||type==="text/rtf"){
+    const raw=new TextDecoder("windows-1252").decode(await file.arrayBuffer());return rtfToMarkdown(raw,file.name);
+  }
+  const text=await file.text();
+  return {md:text,images:0,tables:0,format:name.endsWith(".txt")?"TXT":"Markdown",plain:name.endsWith(".txt")};
+}
 async function importDocxBuffer(buffer,name="dokumentum.docx"){
   rbGet("articleStatus").textContent="DOCX feldolgozása…";
   const result=await docxToMarkdown(buffer,name);rbGet("mdInput").value=result.md;doConvertArticle();
@@ -2020,10 +2264,13 @@ async function importDocxBuffer(buffer,name="dokumentum.docx"){
   rbGet("articleStatus").textContent=`${name} betöltve és Markdownná alakítva${extras.length?" ("+extras.join(", ")+")":""}.`;
 }
 async function loadArticleFile(file){
-  if(!file)return;const name=(file.name||"").toLowerCase();
+  if(!file)return;
   try{
-    if(name.endsWith(".docx")||file.type==="application/vnd.openxmlformats-officedocument.wordprocessingml.document"){rbGet("sourceMode").value="markdown";await importDocxBuffer(await file.arrayBuffer(),file.name);}
-    else{const text=await file.text();rbGet("sourceMode").value=name.endsWith(".txt")?"plain":"markdown";rbGet("mdInput").value=text;doConvertArticle();rbGet("articleStatus").textContent=file.name+" betöltve és konvertálva.";}
+    rbGet("articleStatus").textContent=file.name+" feldolgozása…";
+    const result=await fileToMarkdown(file);
+    rbGet("sourceMode").value=result.plain?"plain":"markdown";rbGet("mdInput").value=result.md;doConvertArticle();
+    const extras=[];if(result.images)extras.push(result.images+" kép helyőrzővel");if(result.tables)extras.push(result.tables+" táblázat");
+    rbGet("articleStatus").textContent=file.name+" ("+result.format+") betöltve és konvertálva"+(extras.length?" ("+extras.join(", ")+")":"")+".";
   }catch(e){console.error(e);rbGet("articleStatus").textContent="Importhiba: "+e.message;}
 }
 function googleDocInfo(raw){
@@ -3088,13 +3335,16 @@ function adminLoadExistingHtml(raw){
   rbGet("adminStatus").textContent="Meglévő HTML visszatöltve: "+adminBlocks.length+" blokk, "+adminImages.length+" kép.";
 }
 async function adminLoadTextFile(file){
-  if(!file)return;const n=(file.name||"").toLowerCase();
+  if(!file)return;
   try{
-    if(n.endsWith(".docx")||file.type==="application/vnd.openxmlformats-officedocument.wordprocessingml.document"){
-      const r=await docxToMarkdown(await file.arrayBuffer(),file.name);rbGet("adminSource").value=r.md;rbGet("adminSourceMode").value="markdown";
-      if(!rbGet("adminTitle").value.trim()){const base=file.name.replace(/\.docx$/i,"").replace(/[_-]+/g," ").trim();rbGet("adminTitle").value=base;}
-    }else{rbGet("adminSource").value=await file.text();rbGet("adminSourceMode").value=n.endsWith(".txt")?"plain":"markdown";}
-    adminBuildFromSource();rbGet("adminStatus").textContent=file.name+" betöltve és felépítve.";
+    rbGet("adminStatus").textContent=file.name+" feldolgozása…";
+    const r=await fileToMarkdown(file);rbGet("adminSource").value=r.md;rbGet("adminSourceMode").value=r.plain?"plain":"markdown";
+    if(!rbGet("adminTitle").value.trim()){
+      const base=file.name.replace(/\.(?:docx|odt|rtf|md|markdown|txt)$/i,"").replace(/[_-]+/g," ").trim();if(base)rbGet("adminTitle").value=base;
+    }
+    adminBuildFromSource();
+    const extras=[];if(r.images)extras.push(r.images+" kép helyőrzővel");if(r.tables)extras.push(r.tables+" táblázat");
+    rbGet("adminStatus").textContent=file.name+" ("+r.format+") betöltve és felépítve"+(extras.length?" ("+extras.join(", ")+")":"")+".";
   }catch(e){console.error(e);rbGet("adminStatus").textContent="Importhiba: "+e.message;}
 }
 function adminInsertAllImages(){
@@ -3185,14 +3435,10 @@ function doConvertBox(){
   catch(e){console.error(e);rbGet("boxStatus").textContent="Hiba: "+e.message;}
 }
 async function loadBoxFile(file){
-  if(!file)return;const name=(file.name||"").toLowerCase();rbGet("boxStatus").textContent="Feldolgozás…";
+  if(!file)return;rbGet("boxStatus").textContent="Feldolgozás…";
   try{
-    if(name.endsWith(".docx")||file.type==="application/vnd.openxmlformats-officedocument.wordprocessingml.document"){
-      const result=await docxToMarkdown(await file.arrayBuffer(),file.name);rbGet("boxInput").value=result.md;rbGet("boxSourceMode").value="markdown";
-    }else{
-      rbGet("boxInput").value=await file.text();rbGet("boxSourceMode").value=name.endsWith(".txt")?"plain":"markdown";
-    }
-    doConvertBox();rbGet("boxStatus").textContent=file.name+" betöltve és konvertálva.";
+    const result=await fileToMarkdown(file);rbGet("boxInput").value=result.md;rbGet("boxSourceMode").value=result.plain?"plain":"markdown";
+    doConvertBox();rbGet("boxStatus").textContent=file.name+" ("+result.format+") betöltve és konvertálva.";
   }catch(e){console.error(e);rbGet("boxStatus").textContent="Importhiba: "+e.message;}
 }
 rbGet("boxFile").addEventListener("change",e=>loadBoxFile(e.target.files[0]));
