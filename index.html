@@ -923,7 +923,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v12";
+const RBTOOLS_VERSION="pages-v13";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -1611,9 +1611,9 @@ async function bloggerConnect(){
       bloggerSetUi();bloggerStatus("Kapcsolódva. Blogok lekérése…");
       try{await bloggerLoadBlogs();}catch(e){bloggerStatus("Blogger API hiba: "+e.message);}
     },
-    error_callback:e=>bloggerStatus("Google OAuth ablak hiba: "+(e?.type||"ismeretlen hiba"))
+    error_callback:e=>{const t=e?.type||"ismeretlen hiba";const ff=/Firefox/i.test(navigator.userAgent);bloggerStatus("Google OAuth ablak hiba: "+t+(ff?" — Firefox esetén ellenőrizd a követésvédelmet; az RBTools nem kényszeríti újra a hozzájárulási képernyőt.":""));}
   });
-  bloggerTokenClient.requestAccessToken({prompt:"consent"});
+  bloggerTokenClient.requestAccessToken();
 }
 async function bloggerLoadBlogs(){
   const data=await bloggerApi("/users/self/blogs");
