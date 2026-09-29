@@ -899,7 +899,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v8";
+const RBTOOLS_VERSION="pages-v9";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -1589,7 +1589,7 @@ async function bloggerConnect(){
     },
     error_callback:e=>bloggerStatus("Google OAuth ablak hiba: "+(e?.type||"ismeretlen hiba"))
   });
-  bloggerTokenClient.requestAccessToken({prompt:""});
+  bloggerTokenClient.requestAccessToken({prompt:"consent"});
 }
 async function bloggerLoadBlogs(){
   const data=await bloggerApi("/users/self/blogs?view=ADMIN");
