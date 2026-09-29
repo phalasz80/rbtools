@@ -80,13 +80,13 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
     <div class="admin-section-head">
       <div>
         <h2 style="margin:0">Blogger-kapcsolat</h2>
-        <p class="small" style="margin:3px 0 0">Google OAuth + Blogger API. Az access token nem kerül tartós tárolásra; oldalfrissítés után újra kapcsolódni kell.</p>
+        <p class="small" style="margin:3px 0 0">Google OAuth + Blogger API. Az RBTools Client ID-ja már be van állítva; az access token nem kerül tartós tárolásra, oldalfrissítés után újra kapcsolódni kell.</p>
       </div>
       <span id="rbtools-bloggerConnectionBadge" class="badge">Nincs kapcsolat</span>
     </div>
 
     <details id="rbtools-bloggerSetupDetails" class="admin-blogger-setup">
-      <summary>Egyszeri Google API / OAuth beállítás</summary>
+      <summary>Google API / OAuth beállítások (általában nem kell módosítani)</summary>
       <div class="grid2" style="margin-top:10px">
         <div class="field"><label>Google OAuth Web Client ID</label><input id="rbtools-bloggerClientId" placeholder="1234567890-….apps.googleusercontent.com"></div>
         <div class="toolbar" style="margin:0">
@@ -899,7 +899,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v7";
+const RBTOOLS_VERSION="pages-v8";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -1515,6 +1515,7 @@ updateReporterFields();
 const BLOGGER_API="https://www.googleapis.com/blogger/v3";
 const BLOGGER_SCOPE="https://www.googleapis.com/auth/blogger";
 const BLOGGER_CLIENT_ID_KEY="rbtools-blogger-client-id";
+const BLOGGER_DEFAULT_CLIENT_ID="952008380024-a1bn243ro84imb878fmosam6efbt4hfr.apps.googleusercontent.com";
 let bloggerAccessToken="";
 let bloggerTokenExpiresAt=0;
 let bloggerTokenClient=null;
@@ -1550,7 +1551,7 @@ function bloggerSaveClientId(){
 }
 function bloggerForgetClientId(){
   try{localStorage.removeItem(BLOGGER_CLIENT_ID_KEY);}catch{}
-  rbGet("bloggerClientId").value="";bloggerStatus("Client ID helyi mentése törölve.");
+  rbGet("bloggerClientId").value=BLOGGER_DEFAULT_CLIENT_ID;bloggerStatus("A helyi felülírás törölve; az RBTools alapértelmezett Client ID-ja aktív.");
 }
 function bloggerDisconnect(){
   bloggerAccessToken="";bloggerTokenExpiresAt=0;bloggerTokenClient=null;bloggerBlogs=[];bloggerDrafts=[];bloggerCurrentPost=null;
@@ -1704,7 +1705,7 @@ async function bloggerRevertPost(){
 function bloggerNewLocal(){
   rbGet("bloggerLabels").value="";rbGet("bloggerSchedule").value="";adminClear();bloggerStatus("Új helyi cikk. A Mentés Blogger-piszkozatba új draftot fog létrehozni.");
 }
-try{rbGet("bloggerClientId").value=localStorage.getItem(BLOGGER_CLIENT_ID_KEY)||"";}catch{}
+try{rbGet("bloggerClientId").value=localStorage.getItem(BLOGGER_CLIENT_ID_KEY)||BLOGGER_DEFAULT_CLIENT_ID;}catch{rbGet("bloggerClientId").value=BLOGGER_DEFAULT_CLIENT_ID;}
 rbGet("bloggerSaveClientId").addEventListener("click",bloggerSaveClientId);
 rbGet("bloggerForgetClientId").addEventListener("click",bloggerForgetClientId);
 rbGet("bloggerConnect").addEventListener("click",bloggerConnect);
