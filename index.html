@@ -371,10 +371,21 @@ A következő cikk rövid ajánlója.</pre>
       <span id="rbtools-imageStatus" class="status">Készen áll.</span>
     </div>
   </div>
-  <div class="grid2 image-area">
-    <section class="card"><div class="cardhead">Eredeti Blogger képkód</div><textarea id="rbtools-imageInput" spellcheck="false"></textarea></section>
-    <section class="card"><div class="cardhead">RegionalBahn képkód</div><textarea id="rbtools-imageOutput" spellcheck="false" readonly></textarea></section>
+  <div class="toolbar" style="margin-top:0">
+    <label class="filelabel" for="rbtools-imageHtmlFile">📂 HTML megnyitása</label>
+    <input id="rbtools-imageHtmlFile" type="file" accept=".html,.htm,text/html" hidden>
+    <span class="small">A vizuális szerkesztőben a képaláírás, a kredit és a kép URL-jei képenként módosíthatók; a kimeneti HTML azonnal frissül.</span>
   </div>
+  <div class="grid2 image-area">
+    <section class="card"><div class="cardhead">Eredeti Blogger képkód</div><textarea id="rbtools-imageInput" spellcheck="false" placeholder="Illeszd be ide a Blogger képkódot, vagy nyiss meg egy .html fájlt."></textarea></section>
+    <section class="card image-visual-card">
+      <div class="cardhead image-visual-head"><span>WYSIWYG kép- és képaláírás-szerkesztő</span><span id="rbtools-imageVisualCount" class="badge">0 kép</span></div>
+      <div id="rbtools-imageVisualEditor" class="image-visual-editor">
+        <div class="image-editor-empty">A képek az HTML beillesztése és a konvertálás után itt jelennek meg.</div>
+      </div>
+    </section>
+  </div>
+  <section class="card image-output-card"><div class="cardhead">RegionalBahn képkód</div><textarea id="rbtools-imageOutput" spellcheck="false" readonly></textarea></section>
 </section>
 
 <section id="rbtools-tab-htmlcheck" class="tab">
@@ -559,7 +570,31 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .hidden{display:none!important}
 #rbtools-app .preview{width:100%;height:520px;border:1px solid var(--line);border-radius:10px;background:white}
 #rbtools-app .badge{display:inline-block;padding:2px 7px;border-radius:999px;background:var(--soft);font-size:11px;color:var(--muted)}
+
 #rbtools-app .image-area textarea{min-height:330px}
+#rbtools-app .image-visual-card{display:flex;flex-direction:column;min-height:420px}
+#rbtools-app .image-visual-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+#rbtools-app .image-visual-editor{padding:12px;background:var(--panel2);display:grid;gap:12px;max-height:72vh;overflow:auto;flex:1}
+#rbtools-app .image-editor-empty{padding:28px 18px;text-align:center;color:var(--muted);border:2px dashed var(--line);border-radius:10px;background:var(--panel)}
+#rbtools-app .image-editor-item{border:1px solid var(--line);border-radius:11px;background:var(--panel);overflow:hidden}
+#rbtools-app .image-editor-toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;background:var(--panel2);border-bottom:1px solid var(--line)}
+#rbtools-app .image-editor-toolbar strong{font-size:13px}
+#rbtools-app .image-editor-actions{display:flex;gap:5px;flex-wrap:wrap}
+#rbtools-app .image-editor-actions button{padding:5px 8px;min-width:34px}
+#rbtools-app .image-editor-preview{padding:14px;text-align:center;background:#fff;color:#111}
+#rbtools-app .image-editor-preview img{display:block;max-width:100%;width:auto;height:auto;max-height:520px;margin:0 auto 10px}
+#rbtools-app .image-live-caption{min-height:34px;padding:7px 9px;border:1px dashed #a1a1aa;border-radius:7px;text-align:center;font:14px/1.5 Arial,Helvetica,sans-serif;outline:none;white-space:pre-wrap;overflow-wrap:anywhere}
+#rbtools-app .image-live-caption:focus{border-style:solid;border-color:#52525b;box-shadow:0 0 0 2px rgba(82,82,91,.12)}
+#rbtools-app .image-live-caption:empty:before{content:attr(data-placeholder);color:#888}
+#rbtools-app .image-editor-meta{padding:10px;display:grid;gap:8px}
+#rbtools-app .image-editor-meta label{display:grid;gap:4px;color:var(--muted);font-size:11px}
+#rbtools-app .image-editor-meta input{width:100%;font:13px/1.4 Arial,Helvetica,sans-serif;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);padding:7px 8px}
+#rbtools-app .image-editor-meta details{margin:0}
+#rbtools-app .image-url-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+#rbtools-app .image-output-card{margin-top:14px}
+#rbtools-app .image-output-card textarea{min-height:300px}
+@media(max-width:700px){#rbtools-app .image-url-grid{grid-template-columns:1fr}}
+
 #rbtools-app .unicode-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 #rbtools-app .unicode-controls input[type="search"]{min-width:250px;flex:1}
 #rbtools-app .ucats{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
@@ -598,7 +633,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v1";
+const RBTOOLS_VERSION="pages-v2";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -1526,58 +1561,196 @@ rbGet("collectionProfile").addEventListener("change",()=>{if(rbGet("collectionIn
 rbGet("collectionMoreText").addEventListener("input",()=>{if(rbGet("collectionInput").value.trim())doConvertCollection();});
 rbGet("collectionPreset").addEventListener("change",e=>{if(e.target.value)setCollectionExample(e.target.value);});
 
-/* ---------- Tömeges képkód ---------- */
+/* ---------- Tömeges képkód + WYSIWYG szerkesztő ---------- */
 function imageCredit(){
   const name=rbGet("imagePhotographer").value.trim()||"Halász Péter";
   const suffix=rbGet("imageCreditSuffix").value.trim();
-  return `fotó: © ${name}${suffix?" "+suffix:""}`;
+  return "fotó: © "+name+(suffix?" "+suffix:"");
 }
-function canonicalBloggerImage(separator,credit,caption){
-  const link=separator.querySelector("a[href]"),img=separator.querySelector("img");if(!link||!img)return null;
-  const attrs=[],preferred=["alt","width","height","data-original-height","data-original-width","src","srcset","sizes","loading"],seen=new Set();
-  for(const name of preferred){if(img.hasAttribute(name)){attrs.push(`${name}="${esc(img.getAttribute(name),true)}"`);seen.add(name);}}
+function imageDefaultCaption(){return rbGet("imageCaption").value||"KÉPaláírás";}
+let imageEditorItems=[];
+let imageInputTimer=null;
+
+function collectImageAttrs(img){
+  const attrs=[];
+  const preferred=["alt","width","height","data-original-height","data-original-width","src","srcset","sizes","loading"];
+  const seen=new Set();
+  for(const name of preferred){
+    if(img.hasAttribute(name)){attrs.push({name:name,value:img.getAttribute(name)});seen.add(name);}
+  }
   for(const attr of Array.from(img.attributes)){
-    const name=attr.name.toLowerCase();if(seen.has(name)||name==="border"||name==="style")continue;
-    attrs.push(`${attr.name}="${esc(attr.value,true)}"`);
+    const low=attr.name.toLowerCase();
+    if(seen.has(low)||low==="border"||low==="style")continue;
+    attrs.push({name:attr.name,value:attr.value});
   }
-  if(!img.hasAttribute("alt"))attrs.unshift('alt=""');
-  return `<div class="separator" style="clear: both; text-align: center;"><a href="${esc(link.getAttribute("href")||"",true)}" style="padding: 0px 1em;" title="${esc(credit,true)}"><img ${attrs.join(" ")} /></a></div>\n<div style="text-align: center;">${inlineMd(caption)}</div>\n<br />`;
+  if(!attrs.some(a=>a.name.toLowerCase()==="alt"))attrs.unshift({name:"alt",value:""});
+  return attrs;
 }
-const IMAGE_BATCH_SIZE=100;let imageRunId=0,imageTimer=null;
-const yieldBrowser=()=>new Promise(resolve=>requestAnimationFrame(resolve));
-async function convertBloggerImages(raw,runId){
-  raw=String(raw??"").trim();if(!raw)return {html:"",count:0,skipped:0,cancelled:false};
-  const tpl=document.createElement("template");tpl.innerHTML=raw;
-  const separators=Array.from(tpl.content.querySelectorAll("div.separator")),converted=new Array(separators.length);
-  const credit=imageCredit(),caption=rbGet("imageCaption").value||"KÉPaláírás";let count=0,skipped=0;
-  for(let i=0;i<separators.length;i++){
-    if(i>0&&i%IMAGE_BATCH_SIZE===0){
-      if(runId!==imageRunId)return {html:"",count:0,skipped:0,cancelled:true};
-      rbGet("imageStatus").textContent=`Feldolgozás: ${i}/${separators.length} kép…`;await yieldBrowser();
-    }
-    const block=canonicalBloggerImage(separators[i],credit,caption);
-    if(block){converted[i]=block;count++;}else{converted[i]="";skipped++;}
+function nearbyImageCaption(separator){
+  let n=separator.nextElementSibling;
+  if(!n)return "";
+  if(n.matches("div:not(.separator)") && /text-align\s*:\s*center/i.test(n.getAttribute("style")||"")){
+    return (n.textContent||"").trim();
   }
-  if(!separators.length){
-    const fake=document.createElement("div");fake.innerHTML=raw;const block=canonicalBloggerImage(fake,credit,caption);
-    if(block){converted.push(block);count=1;}
-  }
-  return {html:converted.filter(Boolean).join("\n"),count,skipped,cancelled:false};
+  return "";
 }
-async function doConvertImages(){
-  const raw=rbGet("imageInput").value,runId=++imageRunId;if(!raw.trim()){rbGet("imageOutput").value="";rbGet("imageStatus").textContent="Nincs képkód.";return;}
+function itemFromImageContainer(container,captionHint=""){
+  const link=container.querySelector("a[href]");
+  const img=container.querySelector("img");
+  if(!link||!img)return null;
+  const title=(link.getAttribute("title")||"").trim();
+  const detectedCaption=captionHint.trim();
+  return {
+    full:(link.getAttribute("href")||img.getAttribute("src")||"").trim(),
+    display:(img.getAttribute("src")||"").trim(),
+    attrs:collectImageAttrs(img),
+    credit:title||imageCredit(),
+    caption:detectedCaption||imageDefaultCaption(),
+    customCredit:!!title,
+    customCaption:!!detectedCaption
+  };
+}
+function parseImageSource(raw){
+  raw=String(raw||"").trim();
+  if(!raw){imageEditorItems=[];return 0;}
+  const tpl=document.createElement("template");
+  tpl.innerHTML=raw;
+  const separators=Array.from(tpl.content.querySelectorAll("div.separator"));
+  const items=[];
+  for(const sep of separators){
+    const item=itemFromImageContainer(sep,nearbyImageCaption(sep));
+    if(item)items.push(item);
+  }
+  if(!items.length){
+    const holder=document.createElement("div");
+    holder.innerHTML=raw;
+    const item=itemFromImageContainer(holder,"");
+    if(item)items.push(item);
+  }
+  imageEditorItems=items;
+  return items.length;
+}
+function imageItemHtml(item){
+  const attrs=[];
+  let hasSrc=false;
+  for(const a of item.attrs){
+    const low=a.name.toLowerCase();
+    if(low==="src"){attrs.push('src="'+esc(item.display,true)+'"');hasSrc=true;continue;}
+    attrs.push(a.name+'="'+esc(a.value,true)+'"');
+  }
+  if(!hasSrc)attrs.push('src="'+esc(item.display,true)+'"');
+  const full=item.full||item.display||"";
+  const title=item.credit?' title="'+esc(item.credit,true)+'"':"";
+  return '<div class="separator" style="clear: both; text-align: center;"><a href="'+esc(full,true)+'" style="padding: 0px 1em;"'+title+'><img '+attrs.join(" ")+' /></a></div>\n'
+    +'<div style="text-align: center;">'+inlineMd(item.caption||"")+'</div>\n<br />';
+}
+function renderImagesOutput(setStatus=true){
+  const html=imageEditorItems.map(imageItemHtml).join("\n");
+  rbGet("imageOutput").value=html;
+  const count=imageEditorItems.length;
+  rbGet("imageVisualCount").textContent=count+" kép";
+  if(setStatus)rbGet("imageStatus").textContent=count?count+" kép • a kimenet frissítve.":"Nem találtam átalakítható képkódot.";
+}
+function imageActionButton(label,title,onClick,disabled=false){
+  const b=document.createElement("button");
+  b.type="button";b.textContent=label;b.title=title;b.disabled=disabled;
+  b.addEventListener("click",onClick);
+  return b;
+}
+function imageMetaInput(labelText,value,onInput){
+  const label=document.createElement("label");
+  label.textContent=labelText;
+  const input=document.createElement("input");
+  input.type="text";input.value=value||"";
+  input.addEventListener("input",()=>onInput(input.value));
+  label.appendChild(input);
+  return {label:label,input:input};
+}
+function renderImageEditor(){
+  const host=rbGet("imageVisualEditor");
+  host.textContent="";
+  rbGet("imageVisualCount").textContent=imageEditorItems.length+" kép";
+  if(!imageEditorItems.length){
+    const empty=document.createElement("div");
+    empty.className="image-editor-empty";
+    empty.textContent="A képek az HTML beillesztése és a konvertálás után itt jelennek meg.";
+    host.appendChild(empty);return;
+  }
+  imageEditorItems.forEach((item,index)=>{
+    const card=document.createElement("article");card.className="image-editor-item";
+    const bar=document.createElement("div");bar.className="image-editor-toolbar";
+    const title=document.createElement("strong");title.textContent="Kép "+(index+1);
+    const actions=document.createElement("div");actions.className="image-editor-actions";
+    actions.appendChild(imageActionButton("↑","Feljebb",()=>{if(index>0){const x=imageEditorItems.splice(index,1)[0];imageEditorItems.splice(index-1,0,x);renderImageEditor();renderImagesOutput();}},index===0));
+    actions.appendChild(imageActionButton("↓","Lejjebb",()=>{if(index<imageEditorItems.length-1){const x=imageEditorItems.splice(index,1)[0];imageEditorItems.splice(index+1,0,x);renderImageEditor();renderImagesOutput();}},index===imageEditorItems.length-1));
+    actions.appendChild(imageActionButton("×","Kép eltávolítása a kimenetből",()=>{imageEditorItems.splice(index,1);renderImageEditor();renderImagesOutput();}));
+    bar.append(title,actions);
+
+    const preview=document.createElement("div");preview.className="image-editor-preview";
+    const a=document.createElement("a");a.href=item.full||item.display||"#";a.target="_blank";a.rel="noopener";
+    const img=document.createElement("img");img.src=item.display||"";img.alt="";img.loading="lazy";
+    a.appendChild(img);preview.appendChild(a);
+    const caption=document.createElement("div");
+    caption.className="image-live-caption";caption.contentEditable="true";caption.spellcheck=true;
+    caption.setAttribute("data-placeholder","Kattints ide és írd be a képaláírást…");
+    caption.textContent=item.caption||"";
+    caption.addEventListener("input",()=>{item.caption=caption.innerText.replace(/\r/g,"");item.customCaption=true;renderImagesOutput(false);});
+    caption.addEventListener("blur",()=>renderImagesOutput());
+    preview.appendChild(caption);
+
+    const meta=document.createElement("div");meta.className="image-editor-meta";
+    const credit=imageMetaInput("Kredit / title",item.credit,v=>{item.credit=v;item.customCredit=true;renderImagesOutput(false);});
+    credit.input.addEventListener("change",()=>renderImagesOutput());
+    meta.appendChild(credit.label);
+    const details=document.createElement("details");
+    const summary=document.createElement("summary");summary.textContent="Kép URL-ek szerkesztése";
+    const urls=document.createElement("div");urls.className="image-url-grid";
+    const display=imageMetaInput("Megjelenített kép URL",item.display,v=>{item.display=v;img.src=v;renderImagesOutput(false);});
+    const full=imageMetaInput("Nagy kép / link URL",item.full,v=>{item.full=v;a.href=v||item.display||"#";renderImagesOutput(false);});
+    urls.append(display.label,full.label);details.append(summary,urls);meta.appendChild(details);
+
+    card.append(bar,preview,meta);host.appendChild(card);
+  });
+}
+function parseAndRenderImages(){
+  const raw=rbGet("imageInput").value;
+  if(!raw.trim()){
+    imageEditorItems=[];rbGet("imageOutput").value="";renderImageEditor();rbGet("imageStatus").textContent="Nincs képkód.";return;
+  }
   try{
-    rbGet("imageStatus").textContent="Képkódok feldolgozása…";await yieldBrowser();const r=await convertBloggerImages(raw,runId);
-    if(r.cancelled||runId!==imageRunId)return;rbGet("imageOutput").value=r.html;
-    rbGet("imageStatus").textContent=r.count?`${r.count} kép átalakítva.${r.skipped?` ${r.skipped} blokk kihagyva.`:""}`:"Nem találtam átalakítható képkódot.";
-  }catch(e){if(runId===imageRunId){console.error(e);rbGet("imageStatus").textContent="Hiba: "+e.message;}}
+    const count=parseImageSource(raw);renderImageEditor();renderImagesOutput(false);
+    rbGet("imageStatus").textContent=count?count+" kép beolvasva; a WYSIWYG szerkesztő aktív.":"Nem találtam átalakítható képkódot.";
+  }catch(e){console.error(e);rbGet("imageStatus").textContent="Hiba: "+e.message;}
 }
-function scheduleImages(){clearTimeout(imageTimer);imageTimer=setTimeout(()=>{if(rbGet("imageInput").value.trim())doConvertImages();},300);}
-rbGet("convertImages").addEventListener("click",doConvertImages);
+function applyImageDefaults(){
+  if(!imageEditorItems.length){if(rbGet("imageInput").value.trim())parseAndRenderImages();return;}
+  const credit=imageCredit(),caption=imageDefaultCaption();
+  for(const item of imageEditorItems){
+    if(!item.customCredit)item.credit=credit;
+    if(!item.customCaption)item.caption=caption;
+  }
+  renderImageEditor();renderImagesOutput();
+}
+function scheduleImageSource(){
+  clearTimeout(imageInputTimer);
+  imageInputTimer=setTimeout(parseAndRenderImages,250);
+}
+rbGet("convertImages").addEventListener("click",parseAndRenderImages);
+rbGet("imageInput").addEventListener("input",scheduleImageSource);
+rbGet("imageHtmlFile").addEventListener("change",async e=>{
+  const file=e.target.files&&e.target.files[0];if(!file)return;
+  try{
+    rbGet("imageInput").value=await file.text();parseAndRenderImages();
+    rbGet("imageStatus").textContent=file.name+" betöltve • "+imageEditorItems.length+" kép.";
+  }catch(err){rbGet("imageStatus").textContent="HTML-fájl hiba: "+err.message;}
+  e.target.value="";
+});
 rbGet("copyImages").addEventListener("click",()=>copyToClipboard(rbGet("imageOutput").value,rbGet("imageStatus"),"Képkód vágólapra másolva."));
 rbGet("downloadImages").addEventListener("click",()=>{if(rbGet("imageOutput").value)downloadText("regionalbahn-kepkod.html",rbGet("imageOutput").value);});
-rbGet("clearImages").addEventListener("click",()=>{rbGet("imageInput").value="";rbGet("imageOutput").value="";rbGet("imageStatus").textContent="Törölve.";});
-["imagePhotographer","imageCreditSuffix","imageCaption"].forEach(id=>rbGet(id).addEventListener("input",scheduleImages));
+rbGet("clearImages").addEventListener("click",()=>{
+  rbGet("imageInput").value="";rbGet("imageOutput").value="";imageEditorItems=[];renderImageEditor();rbGet("imageStatus").textContent="Törölve.";
+});
+["imagePhotographer","imageCreditSuffix","imageCaption"].forEach(id=>rbGet(id).addEventListener("input",applyImageDefaults));
 
 /* ---------- HTML ellenőrző / javító ---------- */
 function htmlIssue(level,title,detail=""){return {level,title,detail};}
