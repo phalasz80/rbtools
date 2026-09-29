@@ -1,4 +1,4 @@
-# RBTools
+# RegionalBahn Tools
 
 A RegionalBahn belső szerkesztői eszköze: **https://tools.regionalbahn.hu**
 
@@ -38,7 +38,7 @@ A RegionalBahn belső szerkesztői eszköze: **https://tools.regionalbahn.hu**
 
 ## Meglévő cikk tovább szerkesztése
 
-A Cikkadmin **„Meglévő Blogger-cikk HTML-jének visszatöltése szerkesztésre”** részébe beilleszthető egy korábban elkészített RegionalBahn-cikk HTML-je. Az RBTools megpróbálja visszafejteni a leadet, a főképét, a normál képblokkokat, alcímeket, kereteseket és a szerzői footert, majd ezeket újra szerkeszthető blokkokká alakítja.
+A **Cikkadmin** „Meglévő Blogger-cikk HTML-jének visszatöltése szerkesztésre” részébe beilleszthető egy korábban elkészített RegionalBahn-cikk HTML-je. Az RBTools megpróbálja visszafejteni a leadet, a főképét, a normál képblokkokat, alcímeket, kereteseket és a szerzői footert, majd ezeket újra szerkeszthető blokkokká alakítja.
 
 A Blogger-cím nem része a bejegyzés HTML-törzsének, ezért azt szükség esetén külön kell megadni.
 
@@ -54,3 +54,8 @@ Később külön Google/Blogger OAuth-integrációval automatizálható lehet a 
 - Branch: `main`
 - Egyedi domain: `tools.regionalbahn.hu`
 - Az oldal `noindex` meta utasításokat tartalmaz, de a közvetlen URL nyilvánosan elérhető.
+
+
+## További eszközök
+
+A korábbi **Cikk → Blogger** eszköz neve most **Szöveg → Blogger konverter**. A többi külön konverter és segédeszköz továbbra is elérhető a felső menüben.
