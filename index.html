@@ -899,7 +899,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v9";
+const RBTOOLS_VERSION="pages-v10";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -1569,7 +1569,7 @@ async function bloggerApi(path,{method="GET",body=null}={}){
   const r=await fetch(BLOGGER_API+path,{method,headers,body:body===null?undefined:JSON.stringify(body)});
   let data=null;const txt=await r.text();if(txt){try{data=JSON.parse(txt);}catch{data={raw:txt};}}
   if(r.status===401){bloggerAccessToken="";bloggerTokenExpiresAt=0;bloggerSetUi();}
-  if(!r.ok)throw new Error(data?.error?.message||data?.error_description||("Blogger API HTTP "+r.status));
+  if(!r.ok){const msg=data?.error?.message||data?.error_description||("Blogger API HTTP "+r.status);const err=new Error(msg);err.status=r.status;err.path=path;console.error("Blogger API error",r.status,path,data);throw err;}
   return data||{};
 }
 async function bloggerConnect(){
@@ -1592,7 +1592,7 @@ async function bloggerConnect(){
   bloggerTokenClient.requestAccessToken({prompt:"consent"});
 }
 async function bloggerLoadBlogs(){
-  const data=await bloggerApi("/users/self/blogs?view=ADMIN");
+  const data=await bloggerApi("/users/self/blogs");
   bloggerBlogs=Array.isArray(data.items)?data.items:[];
   const sel=rbGet("bloggerBlogSelect");sel.textContent="";
   if(!bloggerBlogs.length){const o=document.createElement("option");o.value="";o.textContent="Nem található szerkeszthető blog";sel.appendChild(o);bloggerSetUi();bloggerStatus("A Google-fiókhoz nem találtam Blogger-blogot.");return;}
@@ -1619,7 +1619,7 @@ async function bloggerLoadDrafts(){
   bloggerStatus("Piszkozatok lekérése…");bloggerDrafts=[];
   let token="",guard=0;
   do{
-    const qs=new URLSearchParams({status:"draft",orderBy:"updated",fetchBodies:"false",fetchImages:"false",maxResults:"50",view:"ADMIN"});
+    const qs=new URLSearchParams({status:"draft",orderBy:"updated",fetchBodies:"false",fetchImages:"false",maxResults:"50"});
     if(token)qs.set("pageToken",token);
     const data=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts?"+qs.toString());
     if(Array.isArray(data.items))bloggerDrafts.push(...data.items);
@@ -1641,8 +1641,7 @@ async function bloggerOpenDraft(){
   const blogId=rbGet("bloggerBlogSelect").value,postId=rbGet("bloggerDraftSelect").value;
   if(!blogId||!postId)return;
   bloggerStatus("Piszkozat megnyitása…");
-  const qs=new URLSearchParams({view:"ADMIN",fetchBody:"true",fetchImages:"true"});
-  const post=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts/"+encodeURIComponent(postId)+"?"+qs.toString());
+  const post=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts/"+encodeURIComponent(postId));
   bloggerCurrentPost=post;
   rbGet("adminTitle").value=post.title||"";
   rbGet("bloggerLabels").value=Array.isArray(post.labels)?post.labels.join(", "):"";
