@@ -2,7 +2,7 @@
 
 A RegionalBahn belső szerkesztői eszköze: **https://tools.regionalbahn.hu**
 
-## Gyors munkamenet a kollégáknak
+## Gyorstalpaló
 
 ### 1. Blogger: csak a képek előkészítése
 
