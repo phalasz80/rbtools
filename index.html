@@ -117,6 +117,11 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
       <li><strong>Statikus oldal:</strong> a kész HTML-t másold a Blogger oldal HTML-nézetébe. Választható évválasztó gombsoros vagy egyszerű, ömlesztett sablon.</li>
       <li>A széles <strong>állapotsáv</strong> mindig jelzi, hogy éppen betöltés, mentés, sikeres művelet, figyelmeztetés vagy hiba történt.</li>
     </ol>
+    <div class="admin-help-callout">
+      <strong>Első használat vagy hiba esetén:</strong>
+      a <a href="#rbtools-help-cikkadmin" id="rbtools-adminHelpLink">Súgó részletes Cikkadmin-fejezete</a>
+      lépésről lépésre végigvezet a Google-belépésen, draftkezelésen, WYSIWYG-en, képeken, iframe-eken, statikus oldalakon és a tipikus hibaüzenetek elhárításán.
+    </div>
   </div>
 
   <div class="panel admin-blogger-panel">
@@ -697,43 +702,115 @@ A következő cikk rövid ajánlója.</pre>
 </section>
 
 <section id="rbtools-tab-help" class="tab">
-  <div class="panel help-admin-guide">
-    <h2>Cikkadmin – részletes használati útmutató</h2>
-    <p>A <strong>Cikkadmin</strong> a RegionalBahn teljes vizuális szerkesztője. Képes új anyagot üres lapról felépíteni, meglévő Blogger-piszkozatot megnyitni és ugyanabba visszamenteni, valamint régi Blogger HTML-t szerkeszthető blokkokra bontani. A szerkesztőben végzett változtatásokból folyamatosan újragenerálódik a Bloggerbe illeszthető végleges HTML.</p>
+  <div class="panel help-admin-guide" id="rbtools-help-cikkadmin">
+    <h2>Cikkadmin – teljes, lépésről lépésre használati útmutató</h2>
+    <p><strong>Ha most használod először az RBToolst, ezt a fejezetet érdemes végigolvasni.</strong> A Cikkadmin a RegionalBahn teljes vizuális szerkesztője: új anyagot tudsz benne írni, meglévő Blogger-piszkozatot megnyitni, ugyanabba visszamenteni, képeket és iframe-eket kezelni, valamint cikk-, #nyúz-, podcast-, InnoTrans- és statikusoldal-sablonból indulni. A szerkesztés közben a Blogger-kompatibilis HTML folyamatosan újragenerálódik.</p>
 
-    <h3>1. Tartalomtípus és sablon</h3>
-    <p>A <strong>Mit írunk?</strong> választóval előre beállítható az anyag szerkezete. A <strong>Cikk</strong> általános leades RegionalBahn-anyagot, a <strong>#nyúz</strong> egymást elválasztó híregységeket, a <strong>Podcast shownotes</strong> Spotify/egyéb iframe-et és időkódlistát, az <strong>InnoTrans cikk</strong> gyártói szekciókat és rövid híreket, a <strong>Statikus oldal</strong> pedig Blogger-oldalhoz való szerkezetet készít. A sablon betöltése lecseréli a szerkesztő tartalmi blokkjait, de a már beolvasott képtárat és a megnyitott Blogger-bejegyzés hozzárendelését megtartja.</p>
-    <p>Statikus oldalnál három induló forma van: <strong>évválasztó gombsor + Összes</strong>, <strong>évválasztó gombsor</strong>, illetve <strong>ömlesztett/egyszerű</strong>. A gombsoros sablon a Közvetlen Kocsi és InnoTrans gyűjtőoldalak logikáját követi; az ömlesztett változat hosszú, fejezetes oldalhoz való. Statikus módban a cikkes <code>&lt;!--more--&gt;</code> és szerzői cikkfooter nem készül el automatikusan.</p>
+    <div class="admin-help-warning"><strong>Fontos:</strong> a Blogger-kapcsolat nem közös Google-fiókot használ. Minden szerkesztő a saját Google-fiókjával lép be, és az RBTools pontosan annyi Blogger-jogot kap, amennyit az adott fiók a Bloggerben eleve birtokol. Jelszót és Google Client Secretet az RBToolsba soha nem kell beírni.</div>
 
-    <h3>2. Új cikk vagy meglévő Blogger-draft</h3>
-    <p><strong>Új cikk:</strong> az <strong>Új cikk</strong> gomb üres WYSIWYG-anyagot nyit. A címet a papír tetején, a leadet közvetlenül alatta, a törzsszöveget pedig a blokkokban lehet gépelni. Importálható <strong>.md, .txt és .docx</strong> is. <strong>Meglévő draft:</strong> a Blogger-kapcsolat után válaszd ki a blogot és a piszkozatot, majd nyisd meg; az RBTools ugyanahhoz a post ID-hoz köti a munkát.</p>
-    <p>Képes új cikknél a biztos munkamenet: Bloggerben hozz létre draftot, töltsd fel a képeket, majd nyisd meg a draftot az RBToolsban. A Blogger HTML-jében már szereplő képeket a program automatikusan képtárba gyűjti. A Blogger API nem ad külön, dokumentált képfeltöltési műveletet, ezért maga a fájlfeltöltés továbbra is a Blogger felületén történik.</p>
+    <h3>0. Mielőtt nekikezdesz</h3>
+    <p>A böngészőben nyisd meg a <strong>tools.regionalbahn.hu</strong> oldalt. Ha frissítés után furcsa a felület vagy hiányzik egy új funkció, először csinálj egy teljes újratöltést: Windows alatt általában <strong>Ctrl+F5</strong>. A fejlécben lévő <strong>JS: aktív • pages-v…</strong> jelzés mutatja a ténylegesen betöltött verziót.</p>
+    <p>A Bloggerhez kapcsolódó szerkesztő Google-fiókjának a RegionalBahn blogban Blogger-szerzői vagy adminjoggal kell rendelkeznie. Ha a Google OAuth alkalmazás még tesztállapotban van, a fióknak a Google Cloud projekt <strong>Test users</strong> listáján is szerepelnie kell. Ha egy kolléga mások piszkozatait is szerkesztené, a Blogger saját jogosultságai döntik el, hogy azok közül mit lát és mit módosíthat.</p>
 
-    <h3>3. Blogger-kapcsolat, mentés és időzítés</h3>
-    <p>A <strong>Kapcsolódás a Bloggerhez</strong> Google OAuth engedélyt kér. A kapcsolat csak az adott böngészőmunkamenetre szól. A draftlista kereshető és frissíthető. <strong>Mentés Blogger-piszkozatba</strong> új helyi cikknél új draftot hoz létre, megnyitott draftnál ugyanazt a bejegyzést frissíti. A cím és a Blogger-címkék is átmennek. Az <strong>Időzítés</strong> külön megerősítés után scheduled állapotba teszi a bejegyzést; a <strong>Vissza piszkozatba</strong> gomb a támogatott live/scheduled bejegyzést visszaállítja draftba.</p>
-    <p>Az <strong>egyéni permalink</strong> továbbra is a Blogger felületén állítandó. Az RBTools nem tartalmaz egykattintásos azonnali Publish gombot, így a végleges közzététel külön szerkesztői döntés marad.</p>
+    <h3>1. Google-belépés és Blogger-kapcsolat</h3>
+    <p>Az admin elején keresd a <strong>Blogger-kapcsolat</strong> panelt, majd kattints a <strong>Kapcsolódás a Bloggerhez</strong> gombra. A Google külön felugró ablakban vagy párbeszédpanelen kéri, hogy válassz Google-fiókot és engedélyezd a Blogger-hozzáférést. A RegionalBahnhoz tartozó Blogger-jogosultsággal rendelkező fiókot válaszd.</p>
+    <p>Sikeres belépés után a jobb felső jelző <strong>Kapcsolódva</strong> állapotba vált. Az RBTools lekéri azokat a blogokat, amelyekhez az adott fiók hozzáfér. A RegionalBahn normál esetben automatikusan kiválasztásra kerül; ha több blogod van, a <strong>Blog</strong> legördülőben válaszd ki a megfelelőt.</p>
+    <p>A kapcsolat <strong>nem tartós bejelentkezés</strong>: az access token csak az aktuális oldal munkamenetében él. Oldalfrissítés, böngészőbezárás vagy tokenlejárat után egyszerűen kattints újra a <strong>Kapcsolódás a Bloggerhez</strong> gombra. Ez szándékos, nem adatvesztés.</p>
 
-    <h3>4. WYSIWYG blokkok és mozgatás</h3>
-    <p>A törzsszöveg blokkokból áll. Van bekezdés, alcím, keretes, kép, iframe, elválasztó és speciális HTML-blokk. Minden blokk jobb oldalán található fel/le és törlés vezérlő; asztali böngészőben a blokk a kék beszúrási sávokra húzható. A képtár elemei ugyanígy behúzhatók a cikk tetszőleges pontjára vagy egy keretesbe.</p>
-    <p>A <strong>Bekezdés</strong>, <strong>Alcím</strong>, <strong>Keretes</strong>, <strong>iframe</strong> és <strong>Elválasztó</strong> gyorsgombok új blokkot adnak hozzá. A keretes RegionalBahn-szürke dobozzá alakítható az aktuális szövegblokk is.</p>
+    <h3>2. Mit láthatsz a Google belépésekor?</h3>
+    <p><strong>Normál eset:</strong> fiókválasztó, majd a Blogger-jogosultság engedélyezése. Ha a Google már megjegyezte a korábbi hozzájárulást, a folyamat rövidebb lehet, és nem feltétlenül kér minden alkalommal külön jóváhagyást.</p>
+    <p><strong>„Google hat diese App nicht überprüft” / az alkalmazás nincs ellenőrizve:</strong> ez tesztállapotú OAuth alkalmazásnál előfordulhat. Ha biztosan a RegionalBahn Tools nevű, általunk beállított alkalmazást látod, és a fiókod tesztfelhasználó, a Google által felkínált továbblépési lehetőséggel folytatható a bejelentkezés.</p>
+    <p><strong>Nincs felugró ablak:</strong> ellenőrizd, hogy a böngésző nem tiltja-e a felugró ablakokat a <code>tools.regionalbahn.hu</code> oldalon, illetve nem blokkolja-e valamelyik reklám-, script- vagy követésvédelmi bővítmény a Google Identity Services betöltését. Frissítsd az oldalt, majd próbáld újra.</p>
+    <p><strong>Firefox:</strong> a jelenlegi RBTools Google-belépése Firefox alatt is tesztelten működik. Ha mégis Google <em>unknownerror</em> oldal jelenik meg, először teljesen töltsd újra az RBToolst, majd próbáld újra. Ha továbbra is fennáll, ellenőrizd az oldalhoz tartozó követésvédelmet, popupengedélyt és blokkoló bővítményeket. Hasznos diagnosztika, ha ugyanazzal a fiókkal Chrome-ban is kipróbálod: ha ott működik, a Google Cloud konfiguráció nagy valószínűséggel rendben van, és böngészőoldali blokkolás marad a gyanúsított.</p>
 
-    <h3>5. Szövegformázás, igazítás és felsorolások</h3>
-    <p>Jelölj ki szöveget a WYSIWYG-ben, majd használhatod a félkövér, dőlt, aláhúzott, áthúzott, link és linktörlés gombokat. A <strong>• Lista</strong> rendezetlen, az <strong>1. Lista</strong> számozott listát készít; a <strong>Behúzás/Kihúzás</strong> gombok többszintű listát kezelnek. A négy igazítási gomb az aktuális bekezdést, alcímet, leadet, keretes címet/törzset vagy iframe-blokkot balra, középre, jobbra vagy sorkizártra állítja.</p>
+    <h3>3. Google- és Blogger-hibák: mit jelentenek és mit csinálj?</h3>
+    <div class="admin-help-table">
+      <div><strong>„Nincs Google-kapcsolat”</strong><span>Kattints a Kapcsolódás a Bloggerhez gombra. Oldalfrissítés után ez normális állapot.</span></div>
+      <div><strong>„A Google-hozzáférés lejárt”</strong><span>A token lejárt. Kapcsolódj újra; a cikked helyi szerkesztése ettől nem tűnik el.</span></div>
+      <div><strong>A RegionalBahn nem jelenik meg a Blog listában</strong><span>Ellenőrizd, hogy a megfelelő Google-fiókkal léptél-e be, és az a fiók tényleg szerző/admin-e a Bloggerben. Ezután Blogok frissítése. Ha továbbra sincs ott, bontsd a kapcsolatot és lépj be újra a jó fiókkal.</span></div>
+      <div><strong><code>origin_mismatch</code></strong><span>Google OAuth-konfigurációs hiba: az engedélyezett JavaScript originnek pontosan <code>https://tools.regionalbahn.hu</code>-nak kell lennie. Ezt szerkesztőként nem neked kell javítani; jelezd az RBTools karbantartójának.</span></div>
+      <div><strong><code>access_denied</code></strong><span>A hozzáférést a felhasználó megszakította, vagy a Google-fiók nem jogosult az OAuth app használatára. Próbáld újra a megfelelő tesztfelhasználóval/fiókkal.</span></div>
+      <div><strong>Google <code>unknownerror</code></strong><span>Először Ctrl+F5, majd új belépés. Ezután popup- és követésvédelem ellenőrzése. Ha csak egy böngészőben jelentkezik, próbáld ki másik támogatott böngészőben is, hogy elváljon a böngészőhiba az OAuth-konfigurációs hibától.</span></div>
+      <div><strong>„Request contains an invalid argument”</strong><span>Blogger API-kérés hibája. A jelenlegi RBToolsban a korábban előfordult hibás blog-/draftparaméterek javítva vannak. Ellenőrizd a betöltött verziót, frissíts Ctrl+F5-tel, majd próbáld újra.</span></div>
+      <div><strong>„Requested entity was not found”</strong><span>A kiválasztott post/blog az adott fiókkal vagy nézettel nem érhető el, vagy a lista elavult. Frissítsd a piszkozatokat, ellenőrizd a blogot és a Google-fiókot, majd nyisd meg újra. A jelenlegi RBTools a draftokat ADMIN/AUTHOR nézetben kezeli.</span></div>
+      <div><strong>A draft eltűnt a listából</strong><span>Nyomd meg a Piszkozatok frissítése gombot, és töröld a keresőmezőt. Ha közben publikálták vagy időzítették, már nem feltétlenül draftként szerepel.</span></div>
+    </div>
 
-    <h3>6. Képek</h3>
-    <p>A képtárban minden képhez külön megadható képaláírás és kredit, valamint kijelölhető a <strong>főkép</strong>. A főkép a cikk elején 200 pixeles megjelenítéssel kerül a lead mellé, a normál képek blokkban, középre zárva jelennek meg. A képtárból a képek húzással vagy a <strong>Cikk végére</strong> gombbal helyezhetők el. Keretesbe húzott kép a keretes saját szürke hátterű képsablonját kapja.</p>
+    <h3>4. Új anyag indítása: először válaszd ki, mit írsz</h3>
+    <p>A <strong>Mit írunk?</strong> legördülő öt munkamódot kínál: <strong>Cikk</strong>, <strong>#nyúz / Hétvégi gyors</strong>, <strong>Podcast shownotes</strong>, <strong>InnoTrans cikk</strong> és <strong>Statikus oldal</strong>. A <strong>Sablon betöltése</strong> gomb szerkeszthető induló blokkokat készít.</p>
+    <p>A sablon betöltése a címet, leadet és tartalmi blokkokat lecseréli. Ha már van érdemi tartalom a szerkesztőben, az RBTools megerősítést kér. A már beolvasott képtár és a Blogger-bejegyzés hozzárendelése megmarad, így egy draft képeivel is felépíthetsz másik szerkezetet.</p>
 
-    <h3>7. iframe és beágyazások</h3>
-    <p>Az <strong>iframe beszúrása</strong> mezőbe teljes, akár több soros <code>&lt;iframe&gt;</code> kód illeszthető. A beszúrt iframe külön blokk lesz, előnézettel és saját több soros kódszerkesztővel. Meglévő Blogger-draft megnyitásakor az iframe-eket a program megpróbálja külön blokkként felismerni, így például Facebook- vagy Spotify-embed közvetlenül módosítható.</p>
+    <h3>5. Az öt sablon röviden</h3>
+    <p><strong>Cikk:</strong> klasszikus RegionalBahn lead + törzsszöveg + opcionális dőlt bekezdés + keretes + szerzői footer. <strong>#nyúz:</strong> lead, „Még kell” lista, hírcímek és egymást elválasztó híregységek. <strong>Podcast:</strong> felvezető, Spotify vagy más iframe, időkódlista és közreműködői lista. <strong>InnoTrans:</strong> felvezető, gyártói szekciók, rövid hírek és helyszíni tudósítói zárás. <strong>Statikus oldal:</strong> nem cikk, ezért nincs automatikus <code>&lt;!--more--&gt;</code> és cikkfooter.</p>
 
-    <h3>8. Statikus oldalak</h3>
-    <p>Statikus módban a végleges kimenet nem cikk, ezért nincs automatikus lead, <code>&lt;!--more--&gt;</code> és cikkfooter. A gombsoros sablon évszekciókat és böngészőben működő szűrőgombokat hoz létre, az egyszerű sablon pedig fejezetes, folyamatos oldalt. A kész HTML-t a Blogger <strong>Oldalak</strong> szerkesztőjének HTML-nézetébe kell illeszteni. A statikus oldal közvetlen Blogger-post mentése szándékosan le van tiltva.</p>
+    <h3>6. Új cikk teljesen üres lapról</h3>
+    <p>Kattints az <strong>Új cikk</strong> gombra. A WYSIWYG tetején a <strong>Cikk címe</strong> helyére közvetlenül gépelhetsz. Alatta a lead szerkeszthető, majd az első üres bekezdésben kezdhető a törzsszöveg. Nem kötelező Markdown-, TXT- vagy Word-fájlt használni.</p>
+    <p>Ha forrásfájlból dolgozol, az <strong>1. Cikkszöveg</strong> részbe tölthetsz <strong>.md, .txt vagy .docx</strong> fájlt, vagy beillesztheted a szöveget. Ezután a <strong>Cikk felépítése</strong> a forrást szerkeszthető WYSIWYG-blokkokká alakítja.</p>
 
-    <h3>9. Állapotsáv és hibaellenőrzés</h3>
-    <p>A Cikkadmin tetején lévő széles állapotsáv több sorban mutatja a legutóbbi fontos műveletet. <strong>Kék</strong> az általános információ, <strong>zöld</strong> a siker, <strong>sárga</strong> a figyelmeztetés vagy teendő, <strong>piros</strong> a hiba, a feldolgozás pedig külön folyamatjelzést kap. Ha valami nem a vártnak megfelelően történik, először ezt a sávot érdemes elolvasni.</p>
+    <h3>7. Új cikk képekkel</h3>
+    <p>A képek fizikai feltöltését továbbra is a Blogger saját szerkesztőjében végezd. A legegyszerűbb munkamenet: Bloggerben új draft → képek feltöltése → mentés → RBToolsban kapcsolódás → Piszkozatok frissítése → draft megnyitása.</p>
+    <p>Megnyitáskor az RBTools a draft HTML-jében szereplő Blogger-képeket a <strong>Képtárba</strong> gyűjti. Ott szerkeszthető a képaláírás és kredit, kijelölhető a főkép, és a kép behúzható a kék beszúrási sávok egyikére. Ha csak a képkódot akarod átvenni, a <strong>Bloggerben feltöltött képek HTML-je</strong> mező is használható.</p>
 
-    <h3>10. Végleges HTML és tartalék kézi munkamenet</h3>
-    <p>A <strong>Végleges Blogger HTML</strong> mező a szerkesztés közben automatikusan frissül. A címet és a HTML-t külön gombbal is lehet másolni, illetve HTML-fájl menthető. Ha a Blogger API-kapcsolat átmenetileg nem használható, ez a kézi út teljes értékű tartalék: cím másolása, HTML másolása, Blogger HTML-nézetbe beillesztés.</p>
+    <h3>8. Meglévő Blogger-piszkozat megnyitása</h3>
+    <p>Kapcsolódás után válaszd ki a blogot. A <strong>Piszkozat keresése</strong> mező cím vagy post ID alapján szűr. A <strong>Piszkozat</strong> listából válassz, majd <strong>Piszkozat megnyitása</strong>. A program betölti a címet, HTML-t, Blogger-címkéket, képeket, iframe-eket és a felismerhető szerkezeti blokkokat.</p>
+    <p>A megnyitott bejegyzés post ID-ja megmarad. Ez a legfontosabb különbség a kézi HTML-importhoz képest: a későbbi <strong>Mentés Blogger-piszkozatba</strong> ugyanazt a draftot frissíti, nem készít új másolatot.</p>
+
+    <h3>9. Régi vagy kézzel kapott HTML visszatöltése</h3>
+    <p>Ha a cikk nincs az API-n keresztül megnyitva, a <strong>Meglévő Blogger-cikk HTML-jének visszatöltése szerkesztésre</strong> részbe teljes HTML-fragmentum illeszthető vagy <code>.html</code> fájl tölthető. A parser felismeri a tipikus RegionalBahn leadet, képeket, képaláírásokat, H3/H4 címeket, kereteseket, iframe-eket és néhány speciális blokkot. Nem általános célú tökéletes HTML round-trip szerkesztő, ezért különösen régi vagy szokatlan kézi HTML-nél mindig ellenőrizd a végleges kimenetet.</p>
+
+    <h3>10. A WYSIWYG szerkesztő felépítése</h3>
+    <p>A szerkesztő „papírján” a cím és a lead után következik a Blogger <code>&lt;!--more--&gt;</code> helye, majd a törzsszöveg blokkjai. A blokkok között kék beszúrási sávok vannak. A blokk jobb oldalán a <strong>↑</strong>, <strong>↓</strong> és <strong>×</strong> gombokkal mozgathatsz vagy törölhetsz; asztali böngészőben húzással is átrendezheted őket.</p>
+    <p>Gyorsgombbal hozzáadható <strong>Bekezdés</strong>, <strong>Alcím</strong>, <strong>Keretes</strong>, <strong>iframe</strong> és <strong>Elválasztó</strong>. A szövegblokkok közvetlenül gépelhetők, tehát nincs külön „szerkesztés” és „előnézet” mód.</p>
+
+    <h3>11. Félkövér, dőlt, aláhúzás, áthúzás és link</h3>
+    <p>Jelöld ki a formázandó szöveget a WYSIWYG-ben, és <em>a kijelölés után</em> kattints a megfelelő formázógombra. A link gomb URL-t kér. A <strong>Link törlése</strong> az aktuális linkformázást szedi le. Ha a státuszsáv azt írja, hogy előbb jelölj ki szöveget, a böngészőben megszűnt a szerkesztői kijelölés, ezért jelöld ki újra.</p>
+
+    <h3>12. Felsorolások</h3>
+    <p>A <strong>• Lista</strong> rendezetlen, az <strong>1. Lista</strong> számozott listát készít. A <strong>→ Behúzás</strong> és <strong>← Kihúzás</strong> többszintű listákhoz használható. Új lista készítésénél a kurzor legyen abban a szerkeszthető bekezdésben, amelyet listává akarsz alakítani. Már meglévő Blogger <code>&lt;ul&gt;</code>/<code>&lt;ol&gt;</code> elemeket az RBTools szerkeszthető szövegblokként próbál visszatölteni.</p>
+
+    <h3>13. Igazítás</h3>
+    <p>A négy igazítási gomb: <strong>balra</strong>, <strong>középre</strong>, <strong>jobbra</strong>, <strong>sorkizártra</strong>. Először kattints abba a blokkba, amelyet igazítani szeretnél. Az igazítás működik normál bekezdésen, alcímen, leaden, keretes címén/törzsén és iframe-blokkon. A gomb nem csak vizuális előnézetet változtat, hanem a generált Blogger HTML megfelelő <code>text-align</code> értékét is.</p>
+
+    <h3>14. Keretes blokkok</h3>
+    <p>A <strong>＋ Keretes</strong> új szürke RegionalBahn-dobozt hoz létre. A formázósor <strong>▣ Keretes</strong> gombja az aktuális szövegblokkot alakítja át keretessé. A keretes címe és törzse külön szerkeszthető, külön igazítható, és a képtárból kép húzható bele. A kép eltávolítható anélkül, hogy maga a keretes törlődne.</p>
+
+    <h3>15. iframe és beágyazások</h3>
+    <p>Az iframe-mezőbe illeszd be a teljes <code>&lt;iframe …&gt;&lt;/iframe&gt;</code> kódot, majd kattints az <strong>iframe beszúrása</strong> gombra. A blokkban külön előnézet és több soros kódszerkesztő jelenik meg. A kód szerkesztése után az előnézet külön frissíthető. Meglévő draftnál például Facebook- vagy Spotify-embedet az RBTools külön iframe-blokként próbál felismerni.</p>
+    <p>Ha a külső szolgáltató biztonsági szabályai miatt az iframe az RBTools előnézetében nem renderelődik, attól még a kód bekerülhet a Blogger HTML-be. Ilyenkor a végleges Blogger-előnézetet is ellenőrizd.</p>
+
+    <h3>16. Képtár és főkép</h3>
+    <p>A <strong>Képtár</strong> minden beolvasott képhez külön kártyát ad. A képaláírás és a kredit közvetlenül szerkeszthető. A <strong>☆ Főkép</strong> gombbal kijelölt kép a cikk elején, a lead mellett jelenik meg. A normál képet a <strong>＋ Cikk végére</strong> gombbal vagy drag-and-drop módszerrel helyezd el.</p>
+    <p>Ha egy kép a Blogger-draftban benne van, de a WYSIWYG-ben nem ott jelenik meg, ahol szeretnéd, ez nem igényel újrafeltöltést: a képtárból húzd át a kívánt helyre.</p>
+
+    <h3>17. Blogger-címkék, cím, szerző és footer</h3>
+    <p>A <strong>Blogger-cím</strong> a post címe. A <strong>Címkék / labels</strong> mezőbe vesszővel, pontosvesszővel vagy új sorral elválasztott címkék írhatók. A <strong>Szerző</strong> mező a RegionalBahn HTML-footerhez használható; nem változtatja meg a Blogger-fiók tényleges szerzőségét. A <strong>Footer</strong> kapcsolóval a szerzői zárás kikapcsolható.</p>
+
+    <h3>18. Mentés Blogger-piszkozatba</h3>
+    <p>Ha az anyag új és még nincs Blogger post ID-ja, a <strong>Mentés Blogger-piszkozatba</strong> új Blogger draftot hoz létre. Ha meglévő draftot nyitottál meg, ugyanazt a post ID-t frissíti. Mentés után figyeld a széles státuszsávot: zöld sikerüzenet esetén a Blogger API elfogadta a mentést.</p>
+    <p>Ha bizonytalan vagy, mentés után nyisd meg vagy frissítsd a Blogger szerkesztőt is. Nagyobb átalakítás előtt jó gyakorlat egy külön tesztdrafton kipróbálni az új funkciót.</p>
+
+    <h3>19. Időzítés és visszaállítás piszkozatba</h3>
+    <p>Az <strong>Időzített publikálás</strong> mezőben válassz jövőbeli időpontot, majd <strong>Piszkozat időzítése</strong>. A program megerősítést kér. Ha a bejegyzés még nincs elmentve, előbb draftként menti. A <strong>Vissza piszkozatba</strong> gomb támogatott scheduled/live állapotból draftba állít vissza.</p>
+    <p><strong>Azonnali Publish gomb nincs.</strong> Ez szándékos biztonsági döntés: az éles azonnali publikálás a Bloggerben marad. Az egyéni permalinket szintén a Blogger felületén kell beállítani.</p>
+
+    <h3>20. Statikus oldalak</h3>
+    <p>Statikus módot akkor válassz, ha nem bejegyzést, hanem Blogger <strong>Oldalt</strong> szerkesztesz. Három induló forma van: <strong>évválasztó gombsor + Összes</strong>, <strong>évválasztó gombsor</strong>, illetve <strong>ömlesztett / egyszerű</strong>. A gombsoros sablon évszekciókat és kliensoldali szűrőlogikát készít; az egyszerű változat hosszú, folyamatos oldalhoz való.</p>
+    <p>Statikus módban a Blogger-post mentés szándékosan le van tiltva, mert a Blogger API-s post és a Blogger „Oldalak” szerkesztése nem ugyanaz a munkamenet. A kész HTML-t másold a Blogger <strong>Oldalak</strong> megfelelő oldalának HTML-nézetébe.</p>
+
+    <h3>21. A széles állapotsáv olvasása</h3>
+    <p>A Cikkadmin tetején a nagy állapotsáv mindig a legutóbbi lényeges admin- vagy Blogger-műveletet mutatja. <strong>Kék:</strong> információ. <strong>Zöld:</strong> sikeres művelet. <strong>Sárga:</strong> figyelmeztetés vagy teendő. <strong>Piros:</strong> hiba. <strong>Szürke:</strong> folyamatban lévő művelet. Ha valami „nem történik”, először ezt a sávot olvasd el, mert a legtöbb esetben ott van a következő szükséges lépés.</p>
+
+    <h3>22. Mi marad meg és mi veszhet el?</h3>
+    <p>A Bloggerbe sikeresen elmentett draft a Bloggerben megmarad. A WYSIWYG aktuális, még el nem mentett állapota viszont böngészőoldali munkamenet: egy véletlen oldalfrissítésnél elveszhet. Hosszabb szerkesztésnél ezért időnként ments Blogger-piszkozatba. Az OAuth token elvesztése nem törli a cikket, csak új Google-kapcsolódást igényel.</p>
+
+    <h3>23. Kézi tartalék munkamenet, ha az API éppen nem működik</h3>
+    <p>Az RBTools API nélkül is használható. Szerkeszd meg a cikket, majd használd a <strong>Cím másolása</strong> és <strong>Végleges HTML másolása</strong> gombokat. Bloggerben nyisd meg a megfelelő draftot, a címet illeszd a címmezőbe, a HTML-t pedig a Blogger HTML-nézetébe. Ez teljes értékű vészút, tehát egy átmeneti Google API-hiba nem zárja el a szerkesztést.</p>
+
+    <h3>24. Gyors hibakeresési sorrend</h3>
+    <p>Ha valami nem működik, ebben a sorrendben haladj: <strong>1.</strong> olvasd el a széles állapotsávot; <strong>2.</strong> ellenőrizd a <code>pages-v…</code> verziót; <strong>3.</strong> Ctrl+F5; <strong>4.</strong> Blogger-kapcsolat bontása és újrakapcsolás; <strong>5.</strong> jó Google-fiók és jó blog ellenőrzése; <strong>6.</strong> blog-/draftlista frissítése; <strong>7.</strong> popup, követésvédelem és blokkoló bővítmények ellenőrzése; <strong>8.</strong> ha OAuth-hiba van, ugyanazzal a fiókkal próba másik böngészőben; <strong>9.</strong> ha az API továbbra sem működik, használd a kézi cím+HTML munkamenetet és jelezd a pontos hibaüzenetet.</p>
+
+    <h3>25. Amit soha ne adj meg</h3>
+    <p>Az RBTools <strong>nem kér Google-jelszót</strong>, és nem kér <strong>OAuth Client Secretet</strong>. Ha ilyen adat beírását kérné valami, az nem a normál RBTools-munkamenet. A beépített OAuth Client ID önmagában nyilvános alkalmazásazonosító; a tényleges hozzáférést a Google által kiadott rövid életű token adja.</p>
   </div>
 
   <div class="panel">
@@ -860,7 +937,17 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-statusbar.working .admin-statusbar-icon{background:#dfe4ea;color:#374151}
 #rbtools-app .admin-template-hint{margin:8px 0 0;color:var(--muted)}
 #rbtools-app .admin-template-grid .toolbar{display:flex;align-items:center}
-#rbtools-app .help-admin-guide h3{margin-top:18px}
+#rbtools-app .help-admin-guide h3{margin-top:22px}
+#rbtools-app .admin-help-callout{margin-top:12px;padding:11px 13px;border:1px solid #d4aa3d;border-radius:9px;background:#fff6d8;color:#5b4300}
+#rbtools-app .admin-help-callout a{color:#714d00;font-weight:800;text-decoration:underline}
+#rbtools-app[data-theme="dark"] .admin-help-callout{background:#3a3014;color:#ffe7a3;border-color:#796322}
+#rbtools-app[data-theme="dark"] .admin-help-callout a{color:#ffe08a}
+#rbtools-app .admin-help-warning{margin:12px 0 18px;padding:12px 14px;border-left:4px solid #d29b00;background:#fff7dc;color:#5b4300;border-radius:6px}
+#rbtools-app[data-theme="dark"] .admin-help-warning{background:#342c16;color:#ffe7a3;border-left-color:#e0b43e}
+#rbtools-app .admin-help-table{display:grid;gap:7px;margin:10px 0 18px}
+#rbtools-app .admin-help-table>div{display:grid;grid-template-columns:minmax(220px,.38fr) minmax(0,1fr);gap:12px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--panel2)}
+#rbtools-app .admin-help-table span{min-width:0}
+@media(max-width:760px){#rbtools-app .admin-help-table>div{grid-template-columns:1fr;gap:3px}}
 #rbtools-app .help-admin-guide p{max-width:1200px}
 #rbtools-app select{color-scheme:light;background:var(--panel);color:var(--ink)}
 #rbtools-app select option,#rbtools-app select optgroup{background:#fff;color:#111}
@@ -1039,7 +1126,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v15";
+const RBTOOLS_VERSION="pages-v16";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -1088,13 +1175,19 @@ if(window.matchMedia){
 }
 
 /* ---------- Általános UI ---------- */
+function rbActivateTab(name){
+  const btn=RBAPP.querySelector('.tabbtn[data-tab="'+name+'"]'),tab=rbGet("tab-"+name);
+  if(!btn||!tab)return;
+  RBAPP.querySelectorAll(".tabbtn").forEach(x=>x.classList.remove("active"));
+  RBAPP.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  btn.classList.add("active");tab.classList.add("active");
+}
 RBAPP.querySelectorAll(".tabbtn").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    RBAPP.querySelectorAll(".tabbtn").forEach(x=>x.classList.remove("active"));
-    RBAPP.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-    btn.classList.add("active");
-    rbGet("tab-"+btn.dataset.tab).classList.add("active");
-  });
+  btn.addEventListener("click",()=>rbActivateTab(btn.dataset.tab));
+});
+rbGet("adminHelpLink")?.addEventListener("click",e=>{
+  e.preventDefault();rbActivateTab("help");
+  requestAnimationFrame(()=>document.getElementById("rbtools-help-cikkadmin")?.scrollIntoView({behavior:"smooth",block:"start"}));
 });
 
 function toast(msg="Vágólapra másolva"){
