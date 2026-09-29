@@ -923,7 +923,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v13";
+const RBTOOLS_VERSION="pages-v14";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -1336,7 +1336,10 @@ rbGet("copyArticleHtml").addEventListener("click",()=>copyToClipboard(rbGet("art
 rbGet("previewArticle").addEventListener("click",()=>{
   if(!rbGet("articleOutput").value)doConvertArticle();
   const frame=rbGet("articlePreviewFrame");
-  frame.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}</style></head><body>${rbGet("articleOutput").value}</body></html>`;
+  frame.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}</style></head><body>${rbGet("articleOutput").value}<footer style="max-width:1400px;margin:18px auto 30px;padding:0 16px;color:#777;font:12px/1.5 Arial,Helvetica,sans-serif;text-align:center">
+  RegionalBahn Tools · <a href="/privacy.html">Adatkezelési tájékoztató</a> · <a href="/terms.html">Használati feltételek</a>
+</footer>
+</body></html>`;
   frame.closest("details").open=true;
 });
 rbGet("downloadArticle").addEventListener("click",()=>{
