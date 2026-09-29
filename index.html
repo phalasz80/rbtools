@@ -1,0 +1,1734 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RBTools – RegionalBahn szerkesztői konverter</title>
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
+<meta name="googlebot" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
+<meta name="bingbot" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
+<meta name="referrer" content="no-referrer">
+<style>
+html,body{margin:0;min-height:100%;background:#f3f4f6;}
+@media (prefers-color-scheme:dark){html,body{background:#101114;}}
+</style>
+</head>
+<body>
+<div id="rbtools-app">
+<div class="rbtools-shell-header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="header-copy">
+        <h1>RegionalBahn mindentudó szerkesztői konverter</h1>
+        <p class="subtitle">Markdown / plain text / DOCX / Google Dokumentum → Blogger HTML, külön keretes- és táblázatkonverter, HTML-ellenőrző, gyűjtőoldal-építő, képkód-normalizáló és Unicode betűstílus-műhely egyetlen helyi HTML-fájlban. <span id="rbtools-rbtoolsRuntime" class="rbtools-runtime">JS: indul…</span></p>
+      </div>
+    </div>
+    <div class="theme-row">
+      <button id="rbtools-themeToggle" class="theme-toggle" type="button" aria-pressed="false" title="Világos és sötét mód váltása">Sötét mód</button>
+    </div>
+    <nav class="tabs" aria-label="Eszközök">
+      <button class="tabbtn active" data-tab="article">Cikk → Blogger</button>
+      <button class="tabbtn" data-tab="boxed">Keretes</button>
+      <button class="tabbtn" data-tab="collections">Gyűjtőoldalak</button>
+      <button class="tabbtn" data-tab="tables">Táblázatok</button>
+      <button class="tabbtn" data-tab="images">Képkódok</button>
+      <button class="tabbtn" data-tab="htmlcheck">HTML ellenőrző</button>
+      <button class="tabbtn" data-tab="unicode">Unicode stílusok</button>
+      <button class="tabbtn" data-tab="help">Súgó</button>
+    </nav>
+  </div>
+</div>
+
+<div class="rbtools-shell-main">
+<section id="rbtools-tab-article" class="tab active">
+  <div class="panel">
+    <h2>Cikkprofil és kimeneti szerkezet</h2>
+    <div class="grid4">
+      <div class="field"><label>Cikkprofil</label>
+        <select id="rbtools-profile">
+          <option value="general">Általános RegionalBahn cikk</option>
+          <option value="sectioned">Szekciós / gyártói szemle</option>
+          <option value="news">#nyúz / heti hírösszefoglaló</option>
+        </select>
+      </div>
+      <div class="field"><label>Főkép melletti félkövér szöveg</label>
+        <select id="rbtools-topTextMode">
+          <option value="auto">Automatikus a profil szerint</option>
+          <option value="title">Cikk címe</option>
+          <option value="lead">Lead</option>
+        </select>
+      </div>
+      <div class="field"><label>Footer</label>
+        <select id="rbtools-footerMode">
+          <option value="author">Szerző neve</option>
+          <option value="compiled">Összeállította: …</option>
+          <option value="reporters">Tudósítói / több szerzős footer</option>
+          <option value="none">Nincs footer</option>
+        </select>
+      </div>
+      <div class="field"><label>Gyors preset</label>
+        <select id="rbtools-preset">
+          <option value="">Nincs</option>
+          <option value="nyuz">#nyúz / Hétvégi gyors</option>
+          <option value="innotrans2026">InnoTrans 2026</option>
+          <option value="genericreport">Általános helyszíni tudósítás</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="toolbar">
+      <label class="filelabel" for="rbtools-mdFile">📂 .md / .txt / .docx megnyitása</label>
+      <input id="rbtools-mdFile" type="file" accept=".md,.markdown,.txt,.docx,text/markdown,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+      <button id="rbtools-convertArticle" class="primary">⚙ Konvertálás</button>
+      <button id="rbtools-copyTitle">▣ Cím másolása</button>
+      <button id="rbtools-copyArticleHtml">⧉ HTML másolása</button>
+      <button id="rbtools-previewArticle">◉ Előnézet</button>
+      <button id="rbtools-downloadArticle">⇩ HTML mentése</button>
+      <button id="rbtools-clearArticle">× Törlés</button>
+      <span id="rbtools-articleStatus" class="status">Készen áll.</span>
+    </div>
+    <div id="rbtools-mdDrop" class="drop">Húzd ide a <strong>.md</strong>, <strong>.txt</strong> vagy <strong>.docx</strong> fájlt, vagy válaszd ki a fenti gombbal.</div>
+    <div class="grid3" style="margin-top:10px">
+      <div class="field"><label>Szöveges bemenet értelmezése</label><select id="rbtools-sourceMode"><option value="auto">Automatikus</option><option value="markdown">Markdown</option><option value="plain">Plain text</option></select></div>
+      <div class="field"><label>Google Dokumentum megosztható linkje</label><input id="rbtools-googleDocUrl" type="url" placeholder="https://docs.google.com/document/d/…/edit"></div>
+      <div class="toolbar" style="margin:0">
+        <button id="rbtools-importGoogleDoc">🔗 Google Dokumentum beolvasása</button>
+        <button id="rbtools-openGoogleDocExport">⇩ DOCX export megnyitása</button>
+      </div>
+    </div>
+    <p class="small" style="margin:8px 0 0">A DOCX-feldolgozás teljesen helyben történik. A <strong>Plain text</strong> mód a bekezdéseket Blogger-kompatibilis <code>&lt;div&gt;</code> + <code>&lt;br /&gt;</code> szerkezetté alakítja, Markdown-formázás nélkül. Google Dokumentumnál a konverter először DOCX-, majd egyszerű szöveges exporttal próbálkozik; ha a Google böngészős CORS-védelme mindkettőt blokkolja, a DOCX export megnyitható és a letöltött fájl behúzható.</p>
+  </div>
+
+  <div class="panel">
+    <div class="grid4">
+      <div class="field"><label>Blogger-cím</label><input id="rbtools-title" placeholder="Automatikusan a # címsorból"></div>
+      <div class="field"><label>Szerző</label><input id="rbtools-author" value="Halász Péter"></div>
+      <div class="field"><label>Főkép 200 px URL</label><input id="rbtools-thumb" placeholder="FOKEP_KIS_URL"></div>
+      <div class="field"><label>Főkép eredeti URL</label><input id="rbtools-full" placeholder="FOKEP_NAGY_URL"></div>
+    </div>
+    <div class="grid2" style="margin-top:10px">
+      <div class="field"><label>Főkép title / kredit</label><input id="rbtools-credit" placeholder="fotó: © Név • www.RegionalBahn.hu"></div>
+      <div class="field"><label>HTML-fájlnév alapja</label><input id="rbtools-filenameBase" placeholder="Automatikusan a címből"></div>
+    </div>
+    <div id="rbtools-reporterFields" class="grid3 hidden" style="margin-top:10px">
+      <div class="field"><label>Footer bevezető</label><input id="rbtools-footerIntro" placeholder="pl. A helyszínről"></div>
+      <div class="field"><label>Tudósítók / szerzők</label><input id="rbtools-reporters" placeholder="Név, Név és Név"></div>
+      <div class="field"><label>Footer zárómondat</label><input id="rbtools-footerOutro" value="tudósította a RegionalBahn olvasóit."></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <section class="card">
+      <div class="cardhead">Cikkszöveg bemenet: Markdown vagy plain text</div>
+      <textarea id="rbtools-mdInput" spellcheck="false" placeholder="# Cikk címe
+
+**Ez a lead.**
+
+Első bekezdés **félkövérrel**, *dőlttel*, ++aláhúzással++, ~~áthúzással~~ és [linkkel](https://example.com/).
+
+## Fejezet vagy gyártó neve
+
+További szöveg.
+
+<!-- RB:IMAGE full=&quot;KEP_NAGY_URL&quot; display=&quot;KEP_600_URL&quot; credit=&quot;fotó: © Név • www.RegionalBahn.hu&quot; caption=&quot;Képaláírás&quot; -->
+
+Források:
+
+- [Forrás neve](https://example.com/)"></textarea>
+    </section>
+    <section class="card">
+      <div class="cardhead">Másolható Blogger HTML</div>
+      <textarea id="rbtools-articleOutput" spellcheck="false" readonly></textarea>
+    </section>
+  </div>
+
+  <details class="panel">
+    <summary>HTML-előnézet</summary>
+    <p class="small">Az előnézet csak a generált cikkfragmentum megjelenését mutatja. A Blogger saját sablon-CSS-e ettől eltérhet.</p>
+    <iframe id="rbtools-articlePreviewFrame" class="preview" sandbox=""></iframe>
+  </details>
+
+  <details class="panel">
+    <summary>#nyúz / Hétvégi gyors Markdown-minta</summary>
+    <p class="small">A <code>#</code> sor csak a Blogger-cím. Az első önálló félkövér bekezdés a lead. Minden <code>##</code> címsor új hírt nyit; a hírt érdemes <code>**Város | Ország** –</code> formával kezdeni. Képet ugyanazzal az <code>RB:IMAGE</code> jelöléssel lehet a hírbe tenni.</p>
+    <pre class="codebox"># Hétvégi gyors – 2026. szeptember 14–20.
+
+**A hét legfontosabb híreinek rövid összefoglalója.**
+
+## Hír címe
+
+**Berlin | Németország** – A hír szövege, akár több bekezdésben.
+
+&lt;!-- RB:IMAGE full=&quot;KEP_NAGY_URL&quot; display=&quot;KEP_600_URL&quot; credit=&quot;fotó: © Név • www.RegionalBahn.hu&quot; caption=&quot;Képaláírás&quot; --&gt;
+
+## Második hír címe
+
+**Prága | Csehország** – A következő hír szövege.</pre>
+  </details>
+</section>
+
+
+<section id="rbtools-tab-boxed" class="tab">
+  <div class="panel">
+    <h2>Keretes szöveg → Blogger HTML</h2>
+    <p class="intro">Önálló keretesblokk-konverter a RegionalBahn szürke dobozos sablonjához. A cím, a bekezdések és az opcionális kép egyetlen, közvetlenül a Blogger HTML-nézetébe másolható blokká állnak össze.</p>
+    <div class="toolbar">
+      <label class="filelabel" for="rbtools-boxFile">📂 .md / .txt / .docx megnyitása</label>
+      <input id="rbtools-boxFile" type="file" accept=".md,.markdown,.txt,.docx,text/markdown,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+      <button id="rbtools-convertBox" class="primary">⚙ Keretes konvertálása</button>
+      <button id="rbtools-refreshBoxHtml" title="A módosított forrásszövegből újragenerálja a keretes HTML-t">↻ HTML frissítése</button>
+      <button id="rbtools-copyBoxHtml">⧉ HTML másolása</button>
+      <button id="rbtools-previewBox">◉ Előnézet</button>
+      <button id="rbtools-downloadBox">⇩ HTML mentése</button>
+      <button id="rbtools-clearBox">× Törlés</button>
+      <span id="rbtools-boxStatus" class="status">Készen áll.</span>
+    </div>
+    <div id="rbtools-boxDrop" class="drop">Húzd ide a <strong>.md</strong>, <strong>.txt</strong> vagy <strong>.docx</strong> fájlt, vagy illeszd be lent a keretes szövegét.</div>
+    <div class="grid3" style="margin-top:10px">
+      <div class="field"><label>Keretes cím</label><input id="rbtools-boxTitle" placeholder="KERETES CÍM"></div>
+      <div class="field"><label>Szöveg értelmezése</label><select id="rbtools-boxSourceMode"><option value="auto">Automatikus</option><option value="markdown">Markdown</option><option value="plain">Plain text</option></select></div>
+      <div class="field"><label>Képszélesség</label><select id="rbtools-boxImageWidth"><option value="600">600 px</option><option value="800">800 px</option><option value="100%">100%</option></select></div>
+    </div>
+    <div class="grid2" style="margin-top:10px">
+      <div class="field"><label>Keretes kép eredeti / nagy URL</label><input id="rbtools-boxImageFull" placeholder="https://…/s1600/kep.jpg"></div>
+      <div class="field"><label>Keretes kép megjelenített URL</label><input id="rbtools-boxImageDisplay" placeholder="https://…/s600/kep.jpg"></div>
+    </div>
+    <div class="grid2" style="margin-top:10px">
+      <div class="field"><label>Kép title / kredit</label><input id="rbtools-boxImageCredit" placeholder="fotó: © Név • www.RegionalBahn.hu"></div>
+      <div class="field"><label>Képaláírás</label><input id="rbtools-boxImageCaption" placeholder="KERETES KÉP"></div>
+    </div>
+    <p class="small" style="margin:8px 0 0">A kép teljesen opcionális. Ha csak az egyik kép-URL-t adod meg, a konverter azt használja a nagy és a megjelenített változathoz is. A bekezdések paddingje: első <code>15px 15px 5px</code>, közbenső <code>0px 15px 5px</code>, utolsó <code>0px 15px 15px</code>; egyetlen bekezdésnél <code>15px 15px 15px</code>.</p>
+  </div>
+
+  <div class="grid2">
+    <section class="card">
+      <div class="cardhead">Keretes szöveg bemenet</div>
+      <textarea id="rbtools-boxInput" spellcheck="false" placeholder="Első bekezdés.\n\nKözbenső bekezdés.\n\nUtolsó bekezdés."></textarea>
+    </section>
+    <section class="card">
+      <div class="cardhead">Másolható keretes Blogger HTML</div>
+      <textarea id="rbtools-boxOutput" spellcheck="false" readonly></textarea>
+    </section>
+  </div>
+
+  <details class="panel">
+    <summary>Keretes előnézet</summary>
+    <p class="small">Az előnézet a generált szürke blokkot mutatja; a Blogger-oldal saját CSS-e ettől kis mértékben eltérhet.</p>
+    <iframe id="rbtools-boxPreviewFrame" class="preview" sandbox=""></iframe>
+  </details>
+</section>
+
+
+<section id="rbtools-tab-collections" class="tab">
+  <div class="panel">
+    <h2>RegionalBahn gyűjtőoldal-konverter</h2>
+    <p class="intro">Külön a Közvetlen Kocsi epizódarchívumához és az InnoTranshoz hasonló tematikus gyűjtőoldalakhoz. A <code>#</code> címet külön Blogger-oldalcímként kezeli, a tartalmi HTML-be nem ismétli bele.</p>
+    <div class="grid4">
+      <div class="field"><label>Gyűjtőoldal profil</label>
+        <select id="rbtools-collectionProfile">
+          <option value="podcast">Közvetlen Kocsi / éves epizódarchívum</option>
+          <option value="thematic">Tematikus gyűjtőoldal / InnoTrans-logika</option>
+        </select>
+      </div>
+      <div class="field"><label>Blogger-oldal címe</label><input id="rbtools-collectionTitle" placeholder="Automatikusan a # címsorból"></div>
+      <div class="field"><label>Bejegyzés linkfelirata</label><input id="rbtools-collectionMoreText" value="Tovább »"></div>
+      <div class="field"><label>Gyors preset</label>
+        <select id="rbtools-collectionPreset">
+          <option value="">Nincs</option>
+          <option value="kozvetlen">Közvetlen Kocsi</option>
+          <option value="innotrans2026">InnoTrans 2026 gyűjtőoldal</option>
+        </select>
+      </div>
+    </div>
+    <div class="toolbar" style="margin-top:12px">
+      <button id="rbtools-convertCollection" class="primary">⚙ Gyűjtőoldal konvertálása</button>
+      <button id="rbtools-copyCollectionTitle">▣ Oldalcím másolása</button>
+      <button id="rbtools-copyCollectionHtml">⧉ HTML másolása</button>
+      <button id="rbtools-previewCollection">◉ Előnézet</button>
+      <button id="rbtools-downloadCollection">⇩ HTML mentése</button>
+      <button id="rbtools-clearCollection">× Törlés</button>
+      <span id="rbtools-collectionStatus" class="status">Készen áll.</span>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <section class="card">
+      <div class="cardhead">Gyűjtőoldal Markdown bemenet</div>
+      <textarea id="rbtools-collectionInput" spellcheck="false" placeholder="# Közvetlen Kocsi
+
+A Közvetlen Kocsi a RegionalBahn podcastja. Rövid bevezető szöveg.
+
+## 2026
+
+### Adás címe – 2026. évi 1. adás
+Dátum: 2026.03.09.
+Link: https://www.regionalbahn.hu/...
+
+Az epizód rövid ajánlója.
+
+### Következő adás címe – 2026. évi 2. adás
+Dátum: 2026.03.22.
+Link: https://www.regionalbahn.hu/...
+
+A következő epizód rövid ajánlója."></textarea>
+    </section>
+    <section class="card">
+      <div class="cardhead">Másolható Blogger-oldal HTML</div>
+      <textarea id="rbtools-collectionOutput" spellcheck="false" readonly></textarea>
+    </section>
+  </div>
+
+  <details class="panel">
+    <summary>Markdown-szabályok ehhez a két oldaltípushoz</summary>
+    <div class="helpgrid" style="margin-top:12px">
+      <div class="rule"><code># Oldalcím</code> → csak a Blogger-oldal címe, nem kerül újra a tartalmi HTML-be.</div>
+      <div class="rule"><code>## 2026</code> → évblokk a Közvetlen Kocsi profilban; a tematikus profilban opcionális szekciócím.</div>
+      <div class="rule"><code>### Bejegyzés címe</code> → új epizód/cikk ajánlóblokk.</div>
+      <div class="rule"><code>Dátum: 2026.08.16.</code> → a bejegyzés dátuma.</div>
+      <div class="rule"><code>Link: https://…</code> vagy <code>URL: https://…</code> → a „Tovább »” célja.</div>
+      <div class="rule">A metaadatok utáni bekezdések → rövid ajánló; a szokásos félkövér/dőlt/link/<code>&lt;abbr&gt;</code> formázás használható.</div>
+      <div class="rule"><code>RB:IMAGE</code> → a bevezetőben vagy egy ajánlóban is használható RegionalBahn-kép.</div>
+      <div class="rule">A Közvetlen Kocsi profil évváltáskor automatikusan vízszintes elválasztót tesz; a tematikus profil egyetlen folytonos cikklistát készít.</div>
+    </div>
+    <pre class="codebox"># InnoTrans 2026
+
+&lt;!-- RB:IMAGE full=&quot;KEP_NAGY_URL&quot; display=&quot;KEP_600_URL&quot; credit=&quot;fotó: © Név • www.RegionalBahn.hu&quot; caption=&quot;&quot; --&gt;
+
+Ezen a gyűjtőoldalon az InnoTrans 2026 szakkiállítással kapcsolatos írásaink érhetők el.
+
+### InnoTrans 2026 – Előhang
+Dátum: 2026.08.20.
+Link: https://www.regionalbahn.hu/2026/08/...html
+
+A cikk rövid ajánlója.
+
+### InnoTrans 2026 – 0. nap
+Dátum: 2026.09.21.
+Link: https://www.regionalbahn.hu/2026/09/...html
+
+A következő cikk rövid ajánlója.</pre>
+  </details>
+
+  <details class="panel">
+    <summary>HTML-előnézet</summary>
+    <p class="small">Az előnézet a generált oldalfragmentumot mutatja; a Blogger sablonja a tényleges oldalon további CSS-t adhat hozzá.</p>
+    <iframe id="rbtools-collectionPreviewFrame" class="preview" sandbox=""></iframe>
+  </details>
+</section>
+
+<section id="rbtools-tab-tables" class="tab">
+  <div class="panel">
+    <h2>Táblázat → Blogger HTML</h2>
+    <p class="intro">CSV, TSV, XLSX és DOCX táblázatokból készít másolható, mobilon vízszintesen görgethető HTML-t. XLSX esetén a munkalap kiválasztható; Word dokumentumnál minden megtalált táblázat külön blokként kerül a kimenetbe.</p>
+    <div class="toolbar">
+      <label class="filelabel" for="rbtools-tableFile">📂 .xlsx / .csv / .tsv / .docx megnyitása</label>
+      <input id="rbtools-tableFile" type="file" accept=".xlsx,.csv,.tsv,.docx,text/csv,text/tab-separated-values,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+      <button id="rbtools-convertTable" class="primary">⚙ Táblázat formázása</button>
+      <button id="rbtools-copyTableHtml">⧉ HTML másolása</button>
+      <button id="rbtools-previewTable">◉ Előnézet</button>
+      <button id="rbtools-downloadTable">⇩ HTML mentése</button>
+      <button id="rbtools-clearTable">× Törlés</button>
+      <span id="rbtools-tableStatus" class="status">Készen áll.</span>
+    </div>
+    <div id="rbtools-tableDrop" class="drop">Húzd ide az <strong>.xlsx</strong>, <strong>.csv</strong>, <strong>.tsv</strong> vagy <strong>.docx</strong> fájlt.</div>
+    <div class="grid4" style="margin-top:10px">
+      <div class="field"><label>CSV elválasztó</label><select id="rbtools-csvDelimiter"><option value="auto">Automatikus</option><option value=";">pontosvessző ;</option><option value=",">vessző ,</option><option value="tab">tabulátor</option></select></div>
+      <div class="field"><label>XLSX munkalap</label><select id="rbtools-xlsxSheet"><option value="">Első munkalap</option></select></div>
+      <div class="field"><label>Táblázat címe / felirata</label><input id="rbtools-tableCaption" placeholder="Opcionális"></div>
+      <div class="field"><label>Első sor</label><select id="rbtools-tableHeader"><option value="yes">Fejléc</option><option value="no">Normál adatsor</option></select></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <section class="card"><div class="cardhead">CSV / TSV bemenet vagy importált adatok</div><textarea id="rbtools-tableInput" spellcheck="false" placeholder="Oszlop A;Oszlop B;Oszlop C
+1;2;3"></textarea></section>
+    <section class="card"><div class="cardhead">Másolható táblázat HTML</div><textarea id="rbtools-tableOutput" spellcheck="false" readonly></textarea></section>
+  </div>
+  <details class="panel">
+    <summary>Táblázat-előnézet</summary>
+    <iframe id="rbtools-tablePreviewFrame" class="preview" sandbox=""></iframe>
+  </details>
+</section>
+
+<section id="rbtools-tab-images" class="tab">
+  <div class="panel">
+    <h2>Blogger képkód → RegionalBahn képkód</h2>
+    <p class="intro">Egyetlen kép vagy akár több száz Blogger-képblokk feldolgozása. A program a teljes bemenetet egyszer parse-olja, majd 100 képes kötegekben dolgozza fel.</p>
+    <div class="grid3">
+      <div class="field"><label>Fotós neve</label>
+        <input id="rbtools-imagePhotographer" value="Halász Péter" list="photographers">
+        <datalist id="rbtools-photographers"><option value="Halász Péter"><option value="Adorján Péter"><option value="Magyarics Zoltán"><option value="Óvári Péter"></datalist>
+      </div>
+      <div class="field"><label>Kredit utótag</label><input id="rbtools-imageCreditSuffix" value="• www.RegionalBahn.hu"></div>
+      <div class="field"><label>Képaláírás / helyőrző</label><input id="rbtools-imageCaption" value="KÉPaláírás"></div>
+    </div>
+    <div class="toolbar">
+      <button id="rbtools-convertImages" class="primary">⚙ Képkód átalakítása</button>
+      <button id="rbtools-copyImages">⧉ Képkód másolása</button>
+      <button id="rbtools-downloadImages">⇩ Képkód mentése</button>
+      <button id="rbtools-clearImages">× Törlés</button>
+      <span id="rbtools-imageStatus" class="status">Készen áll.</span>
+    </div>
+  </div>
+  <div class="grid2 image-area">
+    <section class="card"><div class="cardhead">Eredeti Blogger képkód</div><textarea id="rbtools-imageInput" spellcheck="false"></textarea></section>
+    <section class="card"><div class="cardhead">RegionalBahn képkód</div><textarea id="rbtools-imageOutput" spellcheck="false" readonly></textarea></section>
+  </div>
+</section>
+
+<section id="rbtools-tab-htmlcheck" class="tab">
+  <div class="panel">
+    <h2>HTML ellenőrző és javító</h2>
+    <p class="intro">Kézzel írt Blogger/RegionalBahn HTML-fragmentumok szerkezeti és szerkesztési ellenőrzése. A javítás a böngésző HTML-parserével lezárja a nyitva maradt elemeket, egységesíti a void tageket, a <code>&lt;b&gt;</code>/<code>&lt;i&gt;</code> elemeket és az alapvető képattribútumokat, de a tartalmat nem törli.</p>
+    <div class="toolbar">
+      <button id="rbtools-checkHtml" class="primary">✓ Ellenőrzés</button>
+      <button id="rbtools-repairHtml">🛠 Automatikus javítás</button>
+      <button id="rbtools-copyCheckedHtml">⧉ Javított HTML másolása</button>
+      <button id="rbtools-previewCheckedHtml">◉ Előnézet</button>
+      <button id="rbtools-clearHtmlCheck">× Törlés</button>
+      <span id="rbtools-htmlCheckStatus" class="status">Készen áll.</span>
+    </div>
+    <div class="checks">
+      <label><input id="rbtools-checkRbConventions" type="checkbox" checked> RegionalBahn/Blogger szerkesztési konvenciók</label>
+      <label><input id="rbtools-checkAccessibility" type="checkbox" checked> Kép/link alapellenőrzések</label>
+    </div>
+    <div id="rbtools-htmlIssues" class="issue-list"></div>
+  </div>
+  <div class="grid2">
+    <section class="card"><div class="cardhead">Ellenőrizendő HTML</div><textarea id="rbtools-htmlCheckInput" spellcheck="false" placeholder="Illeszd be ide a kézzel írt Blogger HTML-kódot."></textarea></section>
+    <section class="card"><div class="cardhead">Javított / normalizált HTML</div><textarea id="rbtools-htmlCheckOutput" spellcheck="false"></textarea></section>
+  </div>
+  <details class="panel">
+    <summary>Javított HTML előnézete</summary>
+    <iframe id="rbtools-htmlCheckPreviewFrame" class="preview" sandbox=""></iframe>
+  </details>
+</section>
+
+<section id="rbtools-tab-unicode" class="tab">
+  <div class="panel">
+    <h2>Unicode betűstílus-műhely</h2>
+    <p class="intro">Valódi Unicode-karakterekből készít másolható változatokat közösségi oldalakhoz, címekhez és egyéb felületekhez. A matematikai ábécék ékezetes magyar betűknél alapbetű + kombináló ékezet formát használhatnak.</p>
+    <textarea id="rbtools-uInput" spellcheck="false" style="min-height:120px;font:18px/1.5 system-ui,sans-serif">RegionalBahn – Közvetlen Kocsi – Deutscher Wald</textarea>
+    <div class="unicode-controls">
+      <button id="rbtools-uCopyAll" class="primary">Összes látható másolása</button>
+      <button id="rbtools-uClear">Törlés</button>
+      <button id="rbtools-uExample">Példaszöveg</button>
+      <input id="rbtools-uSearch" type="search" placeholder="Szűrés névre, pl. Fraktur, kör, dőlt…">
+      <span id="rbtools-uCounter" class="status"></span>
+    </div>
+    <div id="rbtools-uCats" class="ucats"></div>
+    <details>
+      <summary>Extrém kombináló díszítések beállítása</summary>
+      <div class="tworange">
+        <div class="rangebox"><label>„Zalgo” intenzitás: <span id="rbtools-uZalgoVal">2</span></label><input id="rbtools-uZalgo" type="range" min="1" max="6" value="2"></div>
+        <div class="rangebox"><label>Véletlen dekoráció sűrűsége: <span id="rbtools-uRandVal">2</span></label><input id="rbtools-uRand" type="range" min="1" max="5" value="2"></div>
+      </div>
+    </details>
+  </div>
+  <div id="rbtools-uGrid" class="ugrid"></div>
+</section>
+
+<section id="rbtools-tab-help" class="tab">
+  <div class="panel">
+    <h2>Markdown formázási szabályok</h2>
+    <div class="helpgrid">
+      <div class="rule"><code>**félkövér**</code> → <strong>félkövér</strong></div>
+      <div class="rule"><code>*dőlt*</code> → <em>dőlt</em></div>
+      <div class="rule"><code>***félkövér + dőlt***</code> → <strong><em>félkövér + dőlt</em></strong></div>
+      <div class="rule"><code>++aláhúzott++</code> → <span style="text-decoration:underline">aláhúzott</span></div>
+      <div class="rule"><code>~~áthúzott~~</code> → <span style="text-decoration:line-through">áthúzott</span></div>
+      <div class="rule"><code>**++félkövér + aláhúzott++**</code> → kombinált</div>
+      <div class="rule"><code>*~~dőlt + áthúzott~~*</code> → kombinált</div>
+      <div class="rule"><code>***++~~mind a négy~~++***</code> → mind a négy formázás</div>
+      <div class="rule"><code>[linkszöveg](https://pelda.hu/)</code> → hiperlink</div>
+      <div class="rule"><code>&lt;abbr title="Digital Automatic Coupling"&gt;DAC&lt;/abbr&gt;</code> → HTML5 rövidítés</div>
+      <div class="rule"><code>## Fejezet</code> → vízszintes vonal + középre zárt H3</div>
+      <div class="rule"><code>### Alcím</code> → középre zárt H4</div>
+      <div class="rule">Markdown táblázat (<code>| fejléc | … |</code>) → valódi, Blogger-kompatibilis HTML-táblázat.</div>
+      <div class="rule"><strong>Plain text mód:</strong> az üres sorokkal elválasztott bekezdésekből <code>&lt;div style=&quot;text-align: justify;&quot;&gt;</code> + <code>&lt;br /&gt;</code> készül.</div>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>RegionalBahn speciális blokkok</h2>
+    <p><code>&lt;!-- RB:MAIN_IMAGE thumb="..." full="..." credit="..." --&gt;</code> – főkép adatai.</p>
+    <p><code>&lt;!-- RB:LEAD --&gt; ... &lt;!-- /RB:LEAD --&gt;</code> – explicit lead.</p>
+    <p><code>&lt;!-- RB:IMAGE full="..." display="..." credit="..." caption="..." --&gt;</code> – normál kép.</p>
+    <p><code>&lt;!-- RB:ITALIC --&gt; ... &lt;!-- /RB:ITALIC --&gt;</code> – teljes dőlt bekezdés.</p>
+    <p><code>&lt;!-- RB:BOX title="..." --&gt; ... &lt;!-- RB:BOX_IMAGE ... --&gt; ... &lt;!-- /RB:BOX --&gt;</code> – szürke információs doboz opcionális képpel.</p>
+    <p><code>&lt;!-- RB:SOURCES --&gt; - [Forrás](https://...) &lt;!-- /RB:SOURCES --&gt;</code> – explicit forrásblokk.</p>
+    <p><code>&lt;!-- RB:AUTHOR --&gt; Név &lt;!-- /RB:AUTHOR --&gt;</code> – szerző felülírása.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Word és Google Dokumentum import</h2>
+    <p><strong>.docx:</strong> a fájlt közvetlenül megnyithatod vagy behúzhatod. A konverter a DOCX-et helyben bontja ki, és a Word félkövér, dőlt, aláhúzott, áthúzott, hiperlinkes, címsoros és listás formázásából Markdownot készít.</p>
+    <p><strong>Google Dokumentum:</strong> illeszd be a normál <code>docs.google.com/document/d/…</code> megosztható linket. A program először a DOCX-exportot, majd tartalék megoldásként a plain-text exportot próbálja közvetlenül beolvasni. Ha ezt a Google böngészős CORS-védelme blokkolja, használd a <strong>DOCX export megnyitása</strong> gombot, majd húzd be a letöltött fájlt.</p>
+    <p>A Wordbe ágyazott képek nem tölthetők fel automatikusan a Bloggerre, ezért az import a helyükön <code>[KÉP A WORD-DOKUMENTUMBAN]</code> jelölést hagy. A képet ezután a Bloggerbe kell feltölteni, és a <strong>Képkódok</strong> füllel RegionalBahn-formára alakítható.</p>
+  </div>
+  <div class="panel">
+    <h2>Keretes szövegek, táblázatok és HTML-ellenőrzés</h2>
+    <p><strong>Keretes szöveg:</strong> az első bekezdés paddingje <code>15px 15px 5px</code>, a közbensőké <code>0px 15px 5px</code>, az utolsóé <code>0px 15px 15px</code>. Egyetlen bekezdésnél felül és alul is 15 px marad. Az opcionális keretes kép a meglévő RegionalBahn-képsablont követi.</p>
+    <p><strong>Táblázatok:</strong> CSV/TSV fájlnál az elválasztó automatikusan felismerhető; XLSX esetén a munkalapok közül lehet választani; DOCX esetén a Word-táblák külön HTML-táblázatokká alakulnak. A cikkszövegként importált Word-táblázatokat a cikk-konverter is valódi HTML-táblázatként rendereli.</p>
+    <p><strong>HTML ellenőrző:</strong> jelzi többek között a lezáratlan vagy feleslegesen zárt elemeket, hiányzó kép- és linkattribútumokat, többszörös Blogger <code>&lt;!--more--&gt;</code> jelölőt és néhány RegionalBahn-konvenciót. Az automatikus javítás a böngésző HTML-parserére támaszkodik, ezért az eredetit érdemes megőrizni.</p>
+  </div>
+  <div class="panel">
+    <h2>Önálló keretes konverter</h2>
+    <p>A <strong>Keretes</strong> fül közvetlenül Blogger HTML-t készít a szürke információs dobozhoz. A címet külön mezőben, a törzsszöveget Markdownként vagy plain textként lehet megadni; a bekezdéseket üres sor választja el.</p>
+    <p>Opcionálisan megadható nagy és megjelenített kép-URL, kredit és képaláírás. Ha csak egy kép-URL van kitöltve, azt használja mindkét helyen. A Word-import a DOCX szövegét Markdownná alakítja, majd keretes blokkba rendezi.</p>
+    <p>A cikk-konverterben továbbra is használható az <code>RB:BOX</code> jelölés, tehát a külön fül nem váltja ki a meglévő funkciót, hanem önálló gyorseszközként egészíti ki.</p>
+  </div>
+  <div class="panel">
+    <h2>Profilok</h2>
+    <p><strong>Általános RegionalBahn cikk:</strong> automatikusan az első önálló félkövér bekezdést használja leadként, és alapból ezt teszi a főkép mellé. Ez a klasszikus RegionalBahn-logika.</p>
+    <p><strong>Szekciós / gyártói szemle:</strong> alapból a címet ismétli a főkép mellett; a cím utáni első normál bekezdés megmarad felvezetőként a <code>&lt;!--more--&gt;</code> után. A <code>##</code> sorok önálló szekciókat készítenek.</p>
+    <p><strong>#nyúz profil:</strong> a <code># Cikk címe</code> csak a Blogger-cím, az első önálló <code>**félkövér bekezdés**</code> a lead, a <code>## Hír címe</code> új hírt kezd. A hír első mondata írható <code>**Város | Ország** – Hír szövege</code> formában. A hírek közé a konverter automatikusan vízszintes elválasztót tesz; a végén az <code>Összeállította: …</code> footer használható.</p>
+    <p>A főkép melletti szöveg és a footer ettől függetlenül kézzel is felülírható, ezért ugyanaz a fájl használható normál hírhez, hosszabb cikkhez, vásári szemléhez vagy helyszíni tudósításhoz.</p>
+  </div>
+</section>
+</div>
+
+<div id="rbtools-toast" class="toast">Vágólapra másolva</div>
+</div>
+<style>
+
+#rbtools-app{
+  color-scheme:light;
+  --bg:#f3f4f6;--panel:#fff;--panel2:#fafafa;--ink:#18181b;--muted:#666;
+  --line:#d4d4d8;--soft:#eceef1;--accent:#1f2937;--accentText:#fff;
+  --ok:#166534;--warn:#92400e;
+}
+#rbtools-app[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#101114;--panel:#191b20;--panel2:#202329;--ink:#f4f4f5;--muted:#a1a1aa;
+  --line:#3f4148;--soft:#262a31;--accent:#f4f4f5;--accentText:#111827;--ok:#86efac;--warn:#fcd34d;
+}
+#rbtools-app[data-theme="light"]{color-scheme:light}
+@media  (prefers-color-scheme:dark){
+  #rbtools-app:not([data-theme="light"]):not([data-theme="dark"]){
+    color-scheme:dark;
+    --bg:#101114;--panel:#191b20;--panel2:#202329;--ink:#f4f4f5;--muted:#a1a1aa;
+    --line:#3f4148;--soft:#262a31;--accent:#f4f4f5;--accentText:#111827;--ok:#86efac;--warn:#fcd34d;
+  }
+}
+#rbtools-app, #rbtools-app *{box-sizing:border-box}
+#rbtools-app{scroll-behavior:smooth}
+#rbtools-app{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Arial,Helvetica,sans-serif}
+#rbtools-app header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(9px);border-bottom:1px solid var(--line)}
+#rbtools-app .header-inner{max-width:1600px;margin:auto;padding:18px 22px 12px}
+#rbtools-app .header-top{display:flex;align-items:flex-start;gap:16px}
+#rbtools-app .header-copy{min-width:0;flex:1}
+#rbtools-app .theme-row{display:flex;justify-content:flex-end;align-items:center;min-height:42px;margin-top:10px}
+#rbtools-app .theme-toggle{white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:650;width:132px;min-width:132px}
+#rbtools-app h1{font-size:25px;margin:0 0 4px}
+#rbtools-app .subtitle{margin:0;color:var(--muted)}
+#rbtools-app .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+#rbtools-app .tabbtn,#rbtools-app button,#rbtools-app .filelabel,#rbtools-app select,#rbtools-app input{
+  font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  border-radius:8px;padding:8px 11px
+}
+#rbtools-app button,#rbtools-app .filelabel,#rbtools-app .tabbtn{cursor:pointer}
+#rbtools-app button:hover,#rbtools-app .filelabel:hover,#rbtools-app .tabbtn:hover{background:var(--soft)}
+#rbtools-app button.primary,#rbtools-app .tabbtn.active{background:var(--accent);color:var(--accentText);border-color:var(--accent)}
+#rbtools-app main{max-width:1600px;margin:auto;padding:20px 22px 60px}
+#rbtools-app .tab{display:none}#rbtools-app .tab.active{display:block}
+#rbtools-app .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:15px}
+#rbtools-app .panel h2{margin:0 0 7px;font-size:18px}
+#rbtools-app .panel h3{margin:0 0 7px;font-size:15px}
+#rbtools-app .intro,#rbtools-app .note{color:var(--muted);margin:0 0 10px}
+#rbtools-app .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+#rbtools-app .status{margin-left:auto;color:var(--muted);font-size:13px}
+#rbtools-app .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+#rbtools-app .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#rbtools-app .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+#rbtools-app .field{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 10px}
+#rbtools-app .field label{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}
+#rbtools-app .field input,#rbtools-app .field select{width:100%;border:0;background:transparent;padding:3px 0;outline:0;border-radius:0}
+#rbtools-app textarea{width:100%;min-height:500px;resize:vertical;border:0;outline:0;padding:13px;background:var(--panel);color:var(--ink);font:13px/1.45 Consolas,"Courier New",monospace}
+#rbtools-app .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+#rbtools-app .cardhead{padding:10px 12px;background:var(--panel2);border-bottom:1px solid var(--line);font-weight:700}
+#rbtools-app .drop{border:2px dashed var(--line);border-radius:10px;padding:14px;text-align:center;color:var(--muted);cursor:pointer}
+#rbtools-app .drop.drag{background:var(--soft)}
+#rbtools-app .helpgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:8px}
+#rbtools-app .rule{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px}
+#rbtools-app code{font-family:Consolas,"Courier New",monospace;background:var(--soft);padding:1px 4px;border-radius:4px;overflow-wrap:anywhere;word-break:break-word;white-space:normal}
+#rbtools-app pre,#rbtools-app .codebox{font-family:Consolas,"Courier New",monospace;font-size:13px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;max-width:100%;overflow-x:hidden;margin:10px 0;padding:12px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px}
+#rbtools-app details,#rbtools-app .panel,#rbtools-app .card,#rbtools-app .grid2>*{min-width:0}
+#rbtools-app details{margin-top:8px}
+#rbtools-app summary{cursor:pointer;font-weight:700}
+#rbtools-app .hidden{display:none!important}
+#rbtools-app .preview{width:100%;height:520px;border:1px solid var(--line);border-radius:10px;background:white}
+#rbtools-app .badge{display:inline-block;padding:2px 7px;border-radius:999px;background:var(--soft);font-size:11px;color:var(--muted)}
+#rbtools-app .image-area textarea{min-height:330px}
+#rbtools-app .unicode-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#rbtools-app .unicode-controls input[type="search"]{min-width:250px;flex:1}
+#rbtools-app .ucats{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+#rbtools-app .uchip{border-radius:999px;padding:6px 9px}
+#rbtools-app .uchip.active{background:var(--accent);color:var(--accentText);border-color:var(--accent)}
+#rbtools-app .ugrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:10px}
+#rbtools-app .ucard{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:11px;min-width:0}
+#rbtools-app .uhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:7px}
+#rbtools-app .uname{font-weight:750}#rbtools-app .ucat{font-size:11px;color:var(--muted);font-weight:500}
+#rbtools-app .uout{min-height:54px;padding:9px;background:var(--soft);border-radius:8px;font-size:18px;white-space:pre-wrap;overflow-wrap:anywhere;user-select:text}
+#rbtools-app .unote{font-size:12px;color:var(--muted);margin-top:6px}
+#rbtools-app .tworange{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#rbtools-app .rangebox{background:var(--soft);padding:10px;border-radius:8px}
+#rbtools-app .rangebox input{width:100%}
+#rbtools-app .toast{position:fixed;right:18px;bottom:18px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;opacity:0;transform:translateY(8px);transition:.18s;pointer-events:none;z-index:99}
+#rbtools-app .toast.show{opacity:1;transform:none}
+#rbtools-app .small{font-size:12px;color:var(--muted)}
+#rbtools-app .issue-list{display:grid;gap:7px;margin-top:10px}
+#rbtools-app .issue{border:1px solid var(--line);border-left-width:4px;border-radius:8px;padding:8px 10px;background:var(--panel2)}
+#rbtools-app .issue.error{border-left-color:#b91c1c}#rbtools-app .issue.warn{border-left-color:#b45309}#rbtools-app .issue.info{border-left-color:#0369a1}#rbtools-app .issue.ok{border-left-color:#15803d}
+#rbtools-app .issue strong{display:inline-block;margin-right:7px}#rbtools-app .issue code{font-size:12px}
+#rbtools-app .checks{display:flex;gap:16px;flex-wrap:wrap;align-items:center}#rbtools-app .checks label{display:inline-flex;gap:6px;align-items:center}
+#rbtools-app hr.sep{border:0;border-top:1px solid var(--line);margin:16px 0}
+@media (max-width:1000px){#rbtools-app .grid2,#rbtools-app .grid3,#rbtools-app .grid4{grid-template-columns:1fr}#rbtools-app .status{width:100%;margin-left:0}#rbtools-app .preview{height:400px}}
+@media (max-width:700px){#rbtools-app .header-top{flex-direction:column}#rbtools-app .theme-row{justify-content:flex-start}#rbtools-app .theme-toggle{align-self:auto}}
+
+#rbtools-app{width:100%;max-width:none;margin:0;padding:0;background:var(--bg);color:var(--ink);font:14px/1.5 Arial,Helvetica,sans-serif;border-radius:12px;overflow:visible;isolation:isolate}
+#rbtools-app .rbtools-runtime{display:inline-flex;align-items:center;gap:6px;margin-left:8px;padding:2px 7px;border-radius:999px;background:var(--soft);color:var(--muted);font-size:11px;vertical-align:middle}
+#rbtools-app .rbtools-runtime.ok{color:var(--ok)}
+#rbtools-app .rbtools-runtime.err{color:#b91c1c}
+
+#rbtools-app .rbtools-shell-header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(9px);border-bottom:1px solid var(--line);position:relative;top:auto}
+#rbtools-app .rbtools-shell-main{max-width:1600px;margin:auto;padding:20px 22px 60px}
+
+</style>
+<script>
+(function(){
+"use strict";
+const RBTOOLS_VERSION="pages-v1";
+const RBAPP = document.getElementById("rbtools-app");
+const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
+
+/* ---------- Keresőrobotok: ezt az egy oldalt ne indexeljék ---------- */
+function rbInstallNoIndex(){
+  const directives="noindex,nofollow,noarchive,nosnippet,noimageindex";
+  for(const name of ["robots","googlebot","bingbot"]){
+    let meta=document.head.querySelector(`meta[name="${name}"]`);
+    if(!meta){meta=document.createElement("meta");meta.setAttribute("name",name);document.head.appendChild(meta);}
+    meta.setAttribute("content",directives);
+  }
+  if(RBAPP) RBAPP.setAttribute("data-nosnippet","");
+}
+rbInstallNoIndex();
+if(RBAPP){
+  const badge=rbGet("rbtoolsRuntime");
+  if(badge){badge.textContent="JS: aktív "+String.fromCharCode(0x2022)+" "+RBTOOLS_VERSION;badge.classList.add("ok");}
+  window.addEventListener("error",e=>{if(badge){badge.textContent="JS-hiba: "+(e.message||"ismeretlen hiba");badge.classList.remove("ok");badge.classList.add("err");}});
+}
+
+/* ---------- Téma: világos / sötét ---------- */
+const THEME_KEY="regionalbahn-editor-theme";
+function systemTheme(){return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";}
+function currentTheme(){return RBAPP.dataset.theme || systemTheme();}
+function refreshThemeButton(){
+  const btn=rbGet("themeToggle"); if(!btn) return;
+  const dark=currentTheme()==="dark";
+  btn.textContent=(dark ? String.fromCharCode(0x2600)+" Világos mód" : String.fromCharCode(0x263E)+" Sötét mód");
+  btn.setAttribute("aria-pressed",String(dark));
+}
+function setTheme(theme,persist=true){
+  RBAPP.dataset.theme=theme;
+  if(persist){try{localStorage.setItem(THEME_KEY,theme)}catch{}}
+  refreshThemeButton();
+}
+try{
+  const saved=localStorage.getItem(THEME_KEY);
+  if(saved==="dark"||saved==="light") RBAPP.dataset.theme=saved;
+}catch{}
+refreshThemeButton();
+rbGet("themeToggle")?.addEventListener("click",()=>setTheme(currentTheme()==="dark"?"light":"dark"));
+if(window.matchMedia){
+  const mq=window.matchMedia("(prefers-color-scheme: dark)");
+  const syncSystem=()=>{if(!RBAPP.dataset.theme) refreshThemeButton();};
+  if(mq.addEventListener) mq.addEventListener("change",syncSystem); else if(mq.addListener) mq.addListener(syncSystem);
+}
+
+/* ---------- Általános UI ---------- */
+RBAPP.querySelectorAll(".tabbtn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    RBAPP.querySelectorAll(".tabbtn").forEach(x=>x.classList.remove("active"));
+    RBAPP.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");
+    rbGet("tab-"+btn.dataset.tab).classList.add("active");
+  });
+});
+
+function toast(msg="Vágólapra másolva"){
+  const t=rbGet("toast");t.textContent=msg;t.classList.add("show");
+  clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("show"),1300);
+}
+async function copyToClipboard(text, statusEl=null, label="Vágólapra másolva"){
+  if(!text){if(statusEl) statusEl.textContent="Nincs mit másolni.";return false;}
+  try{await navigator.clipboard.writeText(text);}
+  catch{
+    const ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();
+    document.execCommand("copy");ta.remove();
+  }
+  if(statusEl) statusEl.textContent=label;
+  toast(label);return true;
+}
+function downloadText(filename,text,type="text/html;charset=utf-8"){
+  const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}
+function slugify(s){
+  return (s||"regionalbahn-cikk").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-zA-Z0-9]+/g,"-").replace(/^-+|-+$/g,"").toLowerCase()||"regionalbahn-cikk";
+}
+
+/* ---------- Markdown / Blogger ---------- */
+function esc(s,attr=false){
+  s=String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+  if(attr)s=s.replaceAll('"',"&quot;");
+  return s;
+}
+function compact(s){return String(s??"").trim().split(/\r?\n/).map(x=>x.trim()).join(" ").trim();}
+function parseAttrs(text){
+  const out={}; const re=/([A-Za-z_][\w-]*)=(?:"([^"]*)"|'([^']*)')/g; let m;
+  while((m=re.exec(text||""))) out[m[1]]=m[2]??m[3]??"";
+  return out;
+}
+function inlineMd(s){
+  let raw=String(s??"");
+  const protectedHtml=[];
+  const stash=html=>{const token=`@@RBHTML${protectedHtml.length}@@`;protectedHtml.push(html);return token;};
+  const formatText=text=>{
+    let x=esc(text);
+    x=x.replace(/\*\*\*([\s\S]+?)\*\*\*/g,'<strong><em>$1</em></strong>');
+    x=x.replace(/\*\*([\s\S]+?)\*\*/g,'<strong>$1</strong>');
+    x=x.replace(/~~([\s\S]+?)~~/g,'<span style="text-decoration: line-through;">$1</span>');
+    x=x.replace(/\+\+([\s\S]+?)\+\+/g,'<span style="text-decoration: underline;">$1</span>');
+    x=x.replace(/(^|[^*])\*([^*\n]+?)\*(?!\*)/g,'$1<em>$2</em>');
+    return x;
+  };
+  raw=raw.replace(/<abbr\s+title=("|')([^"']*)\1>([\s\S]*?)<\/abbr>/gi,
+    (_,q,title,text)=>stash(`<abbr title="${esc(title,true)}">${formatText(text)}</abbr>`));
+  raw=raw.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
+    (_,label,href)=>stash(`<a href="${esc(href,true)}">${formatText(label)}</a>`));
+  let x=formatText(raw);
+  protectedHtml.forEach((html,i)=>{x=x.replace(`@@RBHTML${i}@@`,html);});
+  return x;
+}
+function getClosedBlock(md,name){
+  const re=new RegExp(`<!--\\s*RB:${name}(?:\\s+(.*?))?\\s*-->\\s*([\\s\\S]*?)\\s*<!--\\s*\\/RB:${name}\\s*-->`,"i");
+  return md.match(re);
+}
+function getMarker(md,name){
+  const re=new RegExp(`<!--\\s*RB:${name}([\\s\\S]*?)-->`,"i");
+  return md.match(re);
+}
+function normalParagraph(s, extraStyle=""){
+  const style=`text-align: justify;${extraStyle? " "+extraStyle:""}`;
+  return `<div style="${style}">${inlineMd(compact(s))}</div>\n<br />`;
+}
+function rbImageHtml(a,boxed=false){
+  const full=a.full||"KEP_NAGY_URL", display=a.display||a.thumb||"KEP_600_URL";
+  const credit=a.credit||"", caption=a.caption||"";
+  const sepStyle=boxed
+    ?"background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"
+    :"clear: both; text-align: center;";
+  const capStyle=boxed
+    ?"background-color: #c3c3c3; padding: 0px 15px 15px; text-align: center;"
+    :"text-align: center;";
+  const titleAttr=credit?` title="${esc(credit,true)}"`:"";
+  const tail=boxed?"":"\n<br />";
+  return `<div class="separator" style="${sepStyle}"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}" width="600" alt="${esc(caption,true)}" /></a></div>\n<div style="${capStyle}">${inlineMd(caption)}</div>${tail}`;
+}
+
+function rbBoxParagraphsHtml(text,mode="markdown"){
+  const paras=String(text||"").trim().split(/\n\s*\n/).map(p=>p.trim()).filter(Boolean);
+  const fmt=mode==="plain"?plainInline:inlineMd;
+  return paras.map((p,i)=>{
+    let padding;
+    if(paras.length===1)padding="15px 15px 15px";
+    else if(i===0)padding="15px 15px 5px";
+    else if(i===paras.length-1)padding="0px 15px 15px";
+    else padding="0px 15px 5px";
+    return `<div style="background-color: #c3c3c3; padding: ${padding}; text-align: justify;">${fmt(compact(p))}</div>`;
+  }).join("\n");
+}
+function rbBoxHtml(title,text,imageAttrs=null,mode="markdown"){
+  const fmt=mode==="plain"?plainInline:inlineMd,out=[];
+  if(String(title||"").trim())out.push(`<div style="background-color: #c3c3c3; padding: 15px; text-align: center;"><strong>${fmt(String(title).trim())}</strong></div>`);
+  const paras=rbBoxParagraphsHtml(text,mode);if(paras)out.push(paras);
+  if(imageAttrs&&(imageAttrs.full||imageAttrs.display)){
+    const full=imageAttrs.full||imageAttrs.display,display=imageAttrs.display||imageAttrs.full,credit=imageAttrs.credit||"",caption=imageAttrs.caption||"",width=imageAttrs.width||"600";
+    const titleAttr=credit?` title="${esc(credit,true)}"`:"";
+    const widthAttr=width==="100%"?' style="max-width: 100%; width: 100%; height: auto;"':` width="${esc(width,true)}"`;
+    out.push(`<div class="separator" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}"${widthAttr} alt="${esc(caption,true)}" /></a></div>`);
+    out.push(`<div style="background-color: #c3c3c3; padding: 0px 15px 15px; text-align: center;">${fmt(caption)}</div>`);
+  }
+  return out.join("\n");
+}
+
+function extractSources(body){
+  let sourcesText="", rbSources=getClosedBlock(body,"SOURCES");
+  if(rbSources){sourcesText=rbSources[2];body=body.replace(rbSources[0],"");}
+  else{
+    const m=body.match(/(?:^|\n)Források:\s*\n([\s\S]*?)\s*$/m);
+    if(m){sourcesText=m[1];body=body.slice(0,m.index).trimEnd();}
+  }
+  const rows=[];
+  for(const line of sourcesText.split("\n")){
+    const sm=line.match(/^\s*-\s+\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
+    if(sm) rows.push(`<a href="${esc(sm[2],true)}">${inlineMd(sm[1])}</a>`);
+  }
+  const html=rows.length?`<div style="text-align: justify;">\n<span style="font-size: 85%;"><strong>Források:</strong><br />\n${rows.join("<br />\n")}\n</span></div>\n<br />`:"";
+  return {body,html};
+}
+function consumeLead(body, profile, topMode){
+  const rbLead=getClosedBlock(body,"LEAD");
+  if(rbLead){
+    return {lead:compact(rbLead[2]),body:body.replace(rbLead[0],"").trim()};
+  }
+  const needLead=(profile==="general"||profile==="news"||topMode==="lead");
+  if(!needLead)return {lead:"",body};
+  const paras=body.split(/\n\s*\n/);
+  const idx=paras.findIndex(p=>/^\s*\*\*[\s\S]*\*\*\s*$/.test(p.trim()) && !/^##/.test(p.trim()));
+  if(idx>=0){
+    const raw=paras[idx].trim();
+    const m=raw.match(/^\*\*([\s\S]*?)\*\*$/);
+    const lead=m?compact(m[1]):compact(raw);
+    paras.splice(idx,1);
+    return {lead,body:paras.join("\n\n").trim()};
+  }
+  return {lead:"",body};
+}
+function mdTableCells(line){
+  let s=String(line||"").trim();if(s.startsWith("|"))s=s.slice(1);if(s.endsWith("|"))s=s.slice(0,-1);
+  const cells=[];let cur="",escaped=false;
+  for(const ch of s){if(escaped){cur+=ch;escaped=false;continue;}if(ch==="\\"){escaped=true;continue;}if(ch==="|"){cells.push(cur.trim());cur="";}else cur+=ch;}
+  cells.push(cur.trim());return cells;
+}
+function tableRowsToHtml(rows,header=true,caption="",alignments=[],contentMode="markdown"){
+  rows=(rows||[]).map(r=>Array.isArray(r)?r.map(v=>String(v??"")):[]);if(!rows.length)return "";
+  const cols=Math.max(...rows.map(r=>r.length),1);rows=rows.map(r=>r.concat(Array(Math.max(0,cols-r.length)).fill("")));
+  const out=['<div style="overflow-x: auto;">','<table style="border-collapse: collapse; width: 100%;">'],fmt=contentMode==="plain"?plainInline:inlineMd;
+  if(caption)out.push(`<caption style="caption-side: top; font-weight: bold; padding: 0px 0px 8px; text-align: center;">${inlineMd(caption)}</caption>`);
+  rows.forEach((row,ri)=>{out.push("<tr>");row.forEach((cell,ci)=>{const isHead=header&&ri===0,tag=isHead?"th":"td",align=alignments[ci]||"left";out.push(`<${tag} style="border: 1px solid #c3c3c3; padding: 8px; text-align: ${align}; vertical-align: top;${isHead?" font-weight: bold;":""}">${fmt(cell)}</${tag}>`);});out.push("</tr>");});
+  out.push("</table>","</div>","<br />");return out.join("\n");
+}
+function markdownTableHtml(text){
+  const lines=String(text||"").trim().split(/\r?\n/).filter(x=>x.trim());if(lines.length<2||!lines[0].includes("|")||!lines[1].includes("|"))return "";
+  const first=mdTableCells(lines[0]),sep=mdTableCells(lines[1]);if(first.length<2||sep.length!==first.length)return "";
+  if(!sep.every(c=>/^:?-{3,}:?$/.test(c.replace(/\s/g,""))))return "";
+  const aligns=sep.map(c=>{c=c.replace(/\s/g,"");return c.startsWith(":")&&c.endsWith(":")?"center":c.endsWith(":")?"right":"left";});
+  return tableRowsToHtml([first,...lines.slice(2).map(mdTableCells)],true,"",aligns);
+}
+
+function renderPlainChunk(text,out){
+  for(const p of text.trim().split(/\n\s*\n/)){
+    if(!p.trim())continue;
+    const t=p.trim();
+    const tableHtml=markdownTableHtml(t);if(tableHtml){out.push(tableHtml);continue;}
+    const h2=t.match(/^##\s+(.+)$/s);
+    if(h2){out.push(`<hr />\n<h3 style="text-align: center;"><strong>${inlineMd(h2[1].trim())}</strong></h3>\n<br />`);continue;}
+    const h3=t.match(/^###\s+(.+)$/s);
+    if(h3){out.push(`<h4 style="text-align: center;"><strong>${inlineMd(h3[1].trim())}</strong></h4>\n<br />`);continue;}
+    if(/^---+$/.test(t)){out.push("<hr />");continue;}
+    out.push(normalParagraph(p));
+  }
+}
+function bodyToHtml(body){
+  const out=[];
+  const tokenRe=/<!--\s*RB:ITALIC\s*-->[\s\S]*?<!--\s*\/RB:ITALIC\s*-->|<!--\s*RB:IMAGE[\s\S]*?-->|<!--\s*RB:BOX\b[\s\S]*?<!--\s*\/RB:BOX\s*-->/gi;
+  let pos=0,m;
+  while((m=tokenRe.exec(body))){
+    renderPlainChunk(body.slice(pos,m.index),out);
+    const token=m[0];
+    if(/^<!--\s*RB:ITALIC/i.test(token)){
+      const im=token.match(/<!--\s*RB:ITALIC\s*-->\s*([\s\S]*?)\s*<!--\s*\/RB:ITALIC\s*-->/i);
+      if(im)out.push(`<div style="text-align: justify;"><em>${inlineMd(compact(im[1]))}</em></div>\n<br />`);
+    }else if(/^<!--\s*RB:IMAGE/i.test(token)){
+      const im=token.match(/^<!--\s*RB:IMAGE([\s\S]*?)-->$/i);
+      out.push(rbImageHtml(parseAttrs(im?im[1]:token),false));
+    }else if(/^<!--\s*RB:BOX/i.test(token)){
+      const open=token.match(/^<!--\s*RB:BOX\b([\s\S]*?)-->/i);
+      const a=parseAttrs(open?open[1]:""), boxTitle=a.title||"";
+      let inner=token.replace(/^<!--\s*RB:BOX\b[\s\S]*?-->/i,"").replace(/<!--\s*\/RB:BOX\s*-->$/i,"");
+      const bim=inner.match(/<!--\s*RB:BOX_IMAGE([\s\S]*?)-->/i);
+      let boxImage="";
+      if(bim){boxImage=rbImageHtml(parseAttrs(bim[1]),true);inner=inner.replace(bim[0],"");}
+      out.push(rbBoxHtml(boxTitle,inner,null,"markdown"));
+      if(boxImage)out.push(boxImage);
+    }
+    pos=tokenRe.lastIndex;
+  }
+  renderPlainChunk(body.slice(pos),out);
+  return out.join("\n");
+}
+function newsBodyToHtml(body){
+  // A #nyúz profilban minden ## címsor egy önálló hír.
+  // A híren belüli RB:IMAGE / RB:ITALIC / RB:BOX elemeket a normál renderer kezeli.
+  const matches=[...body.matchAll(/^##\s+(.+)$/gm)];
+  if(!matches.length)return bodyToHtml(body);
+  const out=[];
+  const before=body.slice(0,matches[0].index).trim();
+  if(before)out.push(bodyToHtml(before));
+  for(let i=0;i<matches.length;i++){
+    const title=matches[i][1].trim();
+    const start=matches[i].index+matches[i][0].length;
+    const end=i+1<matches.length?matches[i+1].index:body.length;
+    const content=body.slice(start,end).trim();
+    out.push(`<h3 style="text-align: center;">${inlineMd(title)}</h3>\n<br />`);
+    if(content){
+      // A hír utolsó elemét közvetlenül az elválasztó zárja, a sablon szerint.
+      const itemHtml=bodyToHtml(content).replace(/\s*<br \/>\s*$/,"");
+      if(itemHtml)out.push(itemHtml);
+    }
+    out.push("<hr />");
+    if(i+1<matches.length)out.push("<br />");
+  }
+  return out.join("\n");
+}
+function formatNames(s){
+  const names=String(s||"").split(/,\s*|\s+és\s+/).map(x=>x.trim()).filter(Boolean);
+  if(!names.length)return "";
+  if(names.length===1)return `<strong>${esc(names[0])}</strong>`;
+  if(names.length===2)return `<strong>${esc(names[0])}</strong> és <strong>${esc(names[1])}</strong>`;
+  return names.map((n,i)=>i===names.length-1?`és <strong>${esc(n)}</strong>`:`<strong>${esc(n)}</strong>${i<names.length-2?",":""}`).join(" ");
+}
+function footerHtml(){
+  const mode=rbGet("footerMode").value;
+  if(mode==="none")return "";
+  if(mode==="author"){
+    const author=rbGet("author").value.trim();
+    return author?`<hr />\n<div style="text-align: right;"><span style="font-size: 85%;"><em>${esc(author)}</em></span></div>`:"";
+  }
+  if(mode==="compiled"){
+    const author=rbGet("author").value.trim();
+    return author?`<div style="text-align: right;"><span style="font-size: 85%;"><em>Összeállította: ${esc(author)}</em></span></div>`:"";
+  }
+  const intro=rbGet("footerIntro").value.trim(), names=formatNames(rbGet("reporters").value), outro=rbGet("footerOutro").value.trim();
+  const parts=[];if(intro)parts.push(esc(intro));if(names)parts.push(names);if(outro)parts.push(esc(outro));
+  return parts.length?`<hr />\n<div style="text-align: right;"><span style="font-size: 85%;"><em>${parts.join("<br />")}</em></span></div>`:"";
+}
+function convertArticleMarkdown(md){
+  md=String(md||"").replace(/\r\n/g,"\n");
+  const profile=rbGet("profile").value, topMode=rbGet("topTextMode").value;
+  const titleMatch=md.match(/^#\s+(.+)$/m), extractedTitle=titleMatch?titleMatch[1].trim():"";
+  if(extractedTitle)rbGet("title").value=extractedTitle;
+  let body=md.replace(/^#\s+.+$/m,"").trim();
+
+  const rbAuthor=getClosedBlock(body,"AUTHOR");
+  if(rbAuthor){if(compact(rbAuthor[2]))rbGet("author").value=compact(rbAuthor[2]);body=body.replace(rbAuthor[0],"").trim();}
+
+  const rbMain=getMarker(body,"MAIN_IMAGE");
+  if(rbMain){
+    const a=parseAttrs(rbMain[1]);if(a.thumb)rbGet("thumb").value=a.thumb;if(a.full)rbGet("full").value=a.full;if(a.credit)rbGet("credit").value=a.credit;
+    body=body.replace(rbMain[0],"").trim();
+  }
+
+  const src=extractSources(body);body=src.body.trim();
+  const leadRes=consumeLead(body,profile,topMode);body=leadRes.body.trim();const lead=leadRes.lead;
+
+  const title=rbGet("title").value.trim()||extractedTitle;
+  const thumb=rbGet("thumb").value.trim()||"FOKEP_KIS_URL", full=rbGet("full").value.trim()||"FOKEP_NAGY_URL", credit=rbGet("credit").value.trim();
+  if(profile==="news"){
+    const newsLead=lead||title;
+    const bodyHtml=newsBodyToHtml(body);
+    return `<div style="text-align: justify;"><strong>${inlineMd(newsLead)}</strong></div>\n<br />\n<!--more-->\n<br />\n${bodyHtml}${bodyHtml?"\n":""}${src.html}${footerHtml()}`;
+  }
+
+  let mode=topMode;if(mode==="auto")mode=profile==="sectioned"?"title":"lead";
+  let topText=mode==="title"?title:lead;
+  if(!topText)topText=title||lead;
+
+  const titleAttr=credit?` title="${esc(credit,true)}"`:"";
+  const bodyHtml=bodyToHtml(body);
+  return `<div style="text-align: justify;">\n<a href="${esc(full,true)}" style="clear: left; float: left; padding: 0px 1em 1em 0px;"${titleAttr}><img src="${esc(thumb,true)}" width="200" alt="" /></a><strong>${inlineMd(topText)}</strong></div>\n<br />\n<!--more-->\n<br />\n${bodyHtml}${bodyHtml?"\n":""}${src.html}${footerHtml()}`;
+}
+function plainInline(s){
+  return esc(String(s??"")).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1">$1</a>');
+}
+function plainBodyToHtml(body){
+  return String(body||"").trim().split(/\n\s*\n/).filter(p=>p.trim()).map(p=>`<div style="text-align: justify;">${plainInline(compact(p))}</div>\n<br />`).join("\n");
+}
+function likelyMarkdown(text){
+  const t=String(text||"");return /(^|\n)#{1,3}\s+\S|\*\*[^*]+\*\*|(^|[^*])\*[^*\n]+\*(?!\*)|\+\+[^+]+\+\+|~~[^~]+~~|\[[^\]]+\]\(https?:\/\/|<!--\s*RB:|(^|\n)\s*[-*]\s+\S|\|\s*[-:]{3,}\s*\|/m.test(t);
+}
+function convertArticlePlainText(text){
+  text=String(text||"").replace(/\r\n/g,"\n").trim();
+  let blocks=text.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
+  let title=rbGet("title").value.trim();
+  if(!title&&blocks.length&&blocks[0].indexOf("\n")<0&&blocks[0].length<=180){title=blocks.shift().trim();rbGet("title").value=title;}
+  const profile=rbGet("profile").value,topMode=rbGet("topTextMode").value;
+  let mode=topMode;if(mode==="auto")mode=profile==="sectioned"?"title":"lead";
+  let lead="";if((profile==="general"||profile==="news"||mode==="lead")&&blocks.length)lead=blocks.shift();
+  const thumb=rbGet("thumb").value.trim()||"FOKEP_KIS_URL",full=rbGet("full").value.trim()||"FOKEP_NAGY_URL",credit=rbGet("credit").value.trim();
+  const bodyHtml=plainBodyToHtml(blocks.join("\n\n"));
+  if(profile==="news"){
+    const newsLead=lead||title;
+    return `<div style="text-align: justify;"><strong>${plainInline(newsLead)}</strong></div>\n<br />\n<!--more-->\n<br />\n${bodyHtml}${bodyHtml?"\n":""}${footerHtml()}`;
+  }
+  let topText=mode==="title"?title:lead;if(!topText)topText=title||lead;
+  const titleAttr=credit?` title="${esc(credit,true)}"`:"";
+  return `<div style="text-align: justify;">\n<a href="${esc(full,true)}" style="clear: left; float: left; padding: 0px 1em 1em 0px;"${titleAttr}><img src="${esc(thumb,true)}" width="200" alt="" /></a><strong>${plainInline(topText)}</strong></div>\n<br />\n<!--more-->\n<br />\n${bodyHtml}${bodyHtml?"\n":""}${footerHtml()}`;
+}
+function convertArticleInput(text){
+  const mode=rbGet("sourceMode")?.value||"markdown";
+  if(mode==="plain"||(mode==="auto"&&!likelyMarkdown(text)))return convertArticlePlainText(text);
+  return convertArticleMarkdown(text);
+}
+function doConvertArticle(){
+  if(!rbGet("mdInput").value.trim()){rbGet("articleOutput").value="";rbGet("articleStatus").textContent="Nincs bemenet.";return;}
+  try{rbGet("articleOutput").value=convertArticleInput(rbGet("mdInput").value);rbGet("articleStatus").textContent="Kész.";}
+  catch(e){console.error(e);rbGet("articleStatus").textContent="Hiba: "+e.message;}
+}
+function updateReporterFields(){rbGet("reporterFields").classList.toggle("hidden",rbGet("footerMode").value!=="reporters");}
+rbGet("footerMode").addEventListener("change",()=>{updateReporterFields();if(rbGet("mdInput").value.trim())doConvertArticle();});
+rbGet("profile").addEventListener("change",()=>{
+  if(rbGet("profile").value==="news"){
+    rbGet("footerMode").value="compiled";rbGet("topTextMode").value="auto";updateReporterFields();
+  }
+  if(rbGet("mdInput").value.trim())doConvertArticle();
+});
+rbGet("topTextMode").addEventListener("change",()=>{if(rbGet("mdInput").value.trim())doConvertArticle();});
+rbGet("sourceMode").addEventListener("change",()=>{if(rbGet("mdInput").value.trim())doConvertArticle();});
+rbGet("preset").addEventListener("change",e=>{
+  if(e.target.value==="nyuz"){
+    rbGet("profile").value="news";rbGet("topTextMode").value="auto";rbGet("footerMode").value="compiled";
+  }else if(e.target.value==="innotrans2026"){
+    rbGet("profile").value="sectioned";rbGet("topTextMode").value="auto";rbGet("footerMode").value="reporters";
+    rbGet("footerIntro").value="Az InnoTrans 2026 kiállításról, a Messe Berlin vásárközpontból";
+    rbGet("reporters").value="Adorján Péter, Halász Péter, Magyarics Zoltán és Óvári Péter";
+    rbGet("footerOutro").value="tudósította a RegionalBahn olvasóit.";
+  }else if(e.target.value==="genericreport"){
+    rbGet("profile").value="sectioned";rbGet("footerMode").value="reporters";rbGet("footerIntro").value="A helyszínről";
+    rbGet("reporters").value=rbGet("author").value.trim()||"Halász Péter";rbGet("footerOutro").value="tudósította a RegionalBahn olvasóit.";
+  }
+  updateReporterFields();if(rbGet("mdInput").value.trim())doConvertArticle();
+});
+for(const id of ["author","thumb","full","credit","footerIntro","reporters","footerOutro"]){
+  rbGet(id).addEventListener("input",()=>{if(rbGet("mdInput").value.trim())doConvertArticle();});
+}
+rbGet("convertArticle").addEventListener("click",doConvertArticle);
+rbGet("copyTitle").addEventListener("click",()=>copyToClipboard(rbGet("title").value,rbGet("articleStatus"),"Cím vágólapra másolva."));
+rbGet("copyArticleHtml").addEventListener("click",()=>copyToClipboard(rbGet("articleOutput").value,rbGet("articleStatus"),"HTML vágólapra másolva."));
+rbGet("previewArticle").addEventListener("click",()=>{
+  if(!rbGet("articleOutput").value)doConvertArticle();
+  const frame=rbGet("articlePreviewFrame");
+  frame.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}</style></head><body>${rbGet("articleOutput").value}</body></html>`;
+  frame.closest("details").open=true;
+});
+rbGet("downloadArticle").addEventListener("click",()=>{
+  doConvertArticle();const text=rbGet("articleOutput").value;if(!text)return;
+  const base=rbGet("filenameBase").value.trim()||slugify(rbGet("title").value);
+  downloadText(base+".html",text);rbGet("articleStatus").textContent="HTML fájl elmentve.";
+});
+rbGet("clearArticle").addEventListener("click",()=>{
+  rbGet("mdInput").value="";rbGet("articleOutput").value="";rbGet("title").value="";rbGet("thumb").value="";rbGet("full").value="";rbGet("credit").value="";rbGet("googleDocUrl").value="";
+  rbGet("articlePreviewFrame").srcdoc="";rbGet("sourceMode").value="auto";rbGet("articleStatus").textContent="Törölve.";
+});
+/* ---------- MD / DOCX / Google Dokumentum import ---------- */
+function zipU16(v,o){return v.getUint16(o,true)}
+function zipU32(v,o){return v.getUint32(o,true)}
+function zipEntries(buffer){
+  const v=new DataView(buffer);let eocd=-1;
+  for(let i=Math.max(0,v.byteLength-22);i>=Math.max(0,v.byteLength-65557);i--){if(zipU32(v,i)===0x06054b50){eocd=i;break;}}
+  if(eocd<0)throw new Error("Nem található érvényes ZIP/DOCX központi könyvtár.");
+  const count=zipU16(v,eocd+10),cdOffset=zipU32(v,eocd+16),dec=new TextDecoder("utf-8"),entries=new Map();let p=cdOffset;
+  for(let i=0;i<count;i++){
+    if(zipU32(v,p)!==0x02014b50)throw new Error("Sérült DOCX ZIP-könyvtár.");
+    const method=zipU16(v,p+10),compressed=zipU32(v,p+20),uncompressed=zipU32(v,p+24),nameLen=zipU16(v,p+28),extraLen=zipU16(v,p+30),commentLen=zipU16(v,p+32),localOffset=zipU32(v,p+42);
+    const name=dec.decode(new Uint8Array(buffer,p+46,nameLen));entries.set(name,{name,method,compressed,uncompressed,localOffset});
+    p+=46+nameLen+extraLen+commentLen;
+  }
+  return entries;
+}
+async function zipExtract(buffer,entry){
+  const v=new DataView(buffer),o=entry.localOffset;
+  if(zipU32(v,o)!==0x04034b50)throw new Error("Sérült DOCX ZIP-bejegyzés: "+entry.name);
+  const nameLen=zipU16(v,o+26),extraLen=zipU16(v,o+28),start=o+30+nameLen+extraLen;
+  const bytes=new Uint8Array(buffer,start,entry.compressed);
+  if(entry.method===0)return bytes.slice();
+  if(entry.method===8){
+    if(typeof DecompressionStream==="undefined")throw new Error("A böngésző nem támogatja a DOCX kicsomagolásához szükséges DecompressionStream API-t.");
+    const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+  throw new Error("Nem támogatott DOCX tömörítési mód: "+entry.method);
+}
+async function docxTextFile(buffer,entries,name){
+  const e=entries.get(name);if(!e)return "";return new TextDecoder("utf-8").decode(await zipExtract(buffer,e));
+}
+function parseXml(text,label="XML"){
+  const x=new DOMParser().parseFromString(text,"application/xml");
+  if(x.querySelector("parsererror"))throw new Error("Hibás "+label+" a DOCX-ben.");return x;
+}
+function localChildren(el,name){return Array.from(el?.childNodes||[]).filter(n=>n.nodeType===1&&n.localName===name)}
+function firstLocal(el,name){return Array.from(el?.childNodes||[]).find(n=>n.nodeType===1&&n.localName===name)||null}
+function attrLocal(el,name){if(!el)return "";for(const a of Array.from(el.attributes||[]))if(a.localName===name)return a.value;return ""}
+function onOff(el){if(!el)return false;const v=(attrLocal(el,"val")||"true").toLowerCase();return !["0","false","off","none"].includes(v)}
+function docxStyleMap(xml){
+  const out=new Map();if(!xml)return out;const x=parseXml(xml,"styles.xml");
+  for(const st of Array.from(x.getElementsByTagNameNS("*","style"))){const id=attrLocal(st,"styleId"),nm=firstLocal(st,"name");if(id)out.set(id,attrLocal(nm,"val")||id);}return out;
+}
+function docxRelMap(xml){
+  const out=new Map();if(!xml)return out;const x=parseXml(xml,"kapcsolati XML");
+  for(const r of Array.from(x.getElementsByTagNameNS("*","Relationship"))){const id=r.getAttribute("Id"),target=r.getAttribute("Target");if(id&&target)out.set(id,target);}return out;
+}
+function docxNumberingMap(xml){
+  const result={numToAbs:new Map(),formats:new Map()};if(!xml)return result;const x=parseXml(xml,"numbering.xml");
+  for(const abs of Array.from(x.getElementsByTagNameNS("*","abstractNum"))){const aid=attrLocal(abs,"abstractNumId");for(const lvl of localChildren(abs,"lvl")){const ilvl=attrLocal(lvl,"ilvl")||"0",fmt=firstLocal(lvl,"numFmt");result.formats.set(aid+":"+ilvl,attrLocal(fmt,"val")||"decimal");}}
+  for(const num of Array.from(x.getElementsByTagNameNS("*","num"))){const nid=attrLocal(num,"numId"),aid=firstLocal(num,"abstractNumId");if(nid&&aid)result.numToAbs.set(nid,attrLocal(aid,"val"));}
+  return result;
+}
+function wrapWordMarkdown(text,props){
+  if(!text)return "";let t=text;
+  if(props.strike)t=`~~${t}~~`;if(props.underline)t=`++${t}++`;
+  if(props.bold&&props.italic)t=`***${t}***`;else if(props.bold)t=`**${t}**`;else if(props.italic)t=`*${t}*`;
+  return t;
+}
+function docxRunMd(run){
+  const pr=firstLocal(run,"rPr"),props={bold:onOff(firstLocal(pr,"b")),italic:onOff(firstLocal(pr,"i")),underline:onOff(firstLocal(pr,"u")),strike:onOff(firstLocal(pr,"strike"))||onOff(firstLocal(pr,"dstrike"))};
+  let text="";
+  for(const n of Array.from(run.childNodes||[])){
+    if(n.nodeType!==1)continue;
+    if(n.localName==="t"||n.localName==="instrText")text+=n.textContent||"";
+    else if(n.localName==="tab")text+="    ";
+    else if(n.localName==="br"||n.localName==="cr")text+="  \n";
+    else if(n.localName==="noBreakHyphen")text+="‑";
+  }
+  return wrapWordMarkdown(text,props);
+}
+function docxInlineMd(parent,rels){
+  let out="";
+  for(const n of Array.from(parent?.childNodes||[])){
+    if(n.nodeType!==1)continue;
+    if(n.localName==="r")out+=docxRunMd(n);
+    else if(n.localName==="hyperlink"){
+      const label=docxInlineMd(n,rels),href=rels.get(attrLocal(n,"id"));out+=href?`[${label}](${href})`:label;
+    }else if(n.localName==="smartTag"||n.localName==="sdt"||n.localName==="ins")out+=docxInlineMd(n,rels);
+  }
+  return out;
+}
+function headingFromWordStyle(styleId,styles){
+  const name=(styles.get(styleId)||styleId||"").trim();
+  if(/^(title|cím)$/i.test(name))return 1;
+  const m=name.match(/(?:heading|címsor)\s*([1-6])/i)||styleId.match(/Heading([1-6])/i);return m?Math.min(3,Number(m[1])+1):0;
+}
+function docxParagraphMd(p,ctx){
+  const pPr=firstLocal(p,"pPr"),styleEl=firstLocal(pPr,"pStyle"),styleId=attrLocal(styleEl,"val"),heading=headingFromWordStyle(styleId,ctx.styles);
+  let text=docxInlineMd(p,ctx.rels).trimEnd();
+  const drawings=p.getElementsByTagNameNS("*","drawing").length+p.getElementsByTagNameNS("*","pict").length;
+  if(drawings){ctx.images+=drawings;text+=(text?"\n\n":"")+Array.from({length:drawings},()=>"[KÉP A WORD-DOKUMENTUMBAN]").join("\n");}
+  if(!text.trim())return "";
+  if(heading)return `${"#".repeat(heading)} ${text.trim()}`;
+  const numPr=firstLocal(pPr,"numPr");if(numPr){
+    const ilvl=attrLocal(firstLocal(numPr,"ilvl"),"val")||"0",numId=attrLocal(firstLocal(numPr,"numId"),"val"),abs=ctx.numbering.numToAbs.get(numId),fmt=ctx.numbering.formats.get(abs+":"+ilvl)||"decimal";
+    const indent="  ".repeat(Math.max(0,Number(ilvl)||0)),bullet=fmt==="bullet"?"- ":"1. ";return indent+bullet+text.trim();
+  }
+  const styleName=(ctx.styles.get(styleId)||styleId||"").toLowerCase();
+  if(/list.*bullet|felsorol/.test(styleName))return "- "+text.trim();
+  if(/list.*number|számoz/.test(styleName))return "1. "+text.trim();
+  return text.trim();
+}
+function docxTableMd(tbl,ctx){
+  ctx.tables++;const rows=[];
+  for(const tr of localChildren(tbl,"tr")){
+    const cells=[];for(const tc of localChildren(tr,"tc")){
+      const ps=localChildren(tc,"p").map(p=>docxParagraphMd(p,ctx)).filter(Boolean).map(x=>x.replace(/^#{1,3}\s+/,"").replace(/^\s*(?:-|1\.)\s+/,""));
+      cells.push(ps.join(" ").replace(/\|/g,"\\|"));
+    }rows.push(cells);
+  }
+  if(!rows.length)return "";
+  const cols=Math.max(...rows.map(r=>r.length),1);for(const r of rows)while(r.length<cols)r.push("");
+  const line=r=>`| ${r.join(" | ")} |`;
+  return [line(rows[0]),line(Array(cols).fill("---")),...rows.slice(1).map(line)].join("\n");
+}
+async function docxToMarkdown(buffer,sourceName="dokumentum.docx"){
+  const entries=zipEntries(buffer),documentXml=await docxTextFile(buffer,entries,"word/document.xml");if(!documentXml)throw new Error("A DOCX-ből hiányzik a word/document.xml.");
+  const [stylesXml,relsXml,numberingXml]=await Promise.all([docxTextFile(buffer,entries,"word/styles.xml"),docxTextFile(buffer,entries,"word/_rels/document.xml.rels"),docxTextFile(buffer,entries,"word/numbering.xml")]);
+  const x=parseXml(documentXml,"document.xml"),body=x.getElementsByTagNameNS("*","body")[0];if(!body)throw new Error("A DOCX dokumentumtörzse nem található.");
+  const ctx={styles:docxStyleMap(stylesXml),rels:docxRelMap(relsXml),numbering:docxNumberingMap(numberingXml),images:0,tables:0},blocks=[];
+  for(const n of Array.from(body.childNodes||[])){
+    if(n.nodeType!==1)continue;let md="";if(n.localName==="p")md=docxParagraphMd(n,ctx);else if(n.localName==="tbl")md=docxTableMd(n,ctx);if(md)blocks.push(md);
+  }
+  let md=blocks.join("\n\n").replace(/\n{3,}/g,"\n\n").trim();
+  if(!/^#\s+/m.test(md)){
+    const base=sourceName.replace(/\.docx$/i,"").replace(/[_-]+/g," ").trim();if(base)rbGet(`title`).value=base;
+  }
+  return {md,images:ctx.images,tables:ctx.tables};
+}
+async function importDocxBuffer(buffer,name="dokumentum.docx"){
+  rbGet("articleStatus").textContent="DOCX feldolgozása…";
+  const result=await docxToMarkdown(buffer,name);rbGet("mdInput").value=result.md;doConvertArticle();
+  const extras=[];if(result.images)extras.push(`${result.images} Word-kép helyőrzővel`);if(result.tables)extras.push(`${result.tables} táblázat HTML-ké alakítható formában`);
+  rbGet("articleStatus").textContent=`${name} betöltve és Markdownná alakítva${extras.length?" ("+extras.join(", ")+")":""}.`;
+}
+async function loadArticleFile(file){
+  if(!file)return;const name=(file.name||"").toLowerCase();
+  try{
+    if(name.endsWith(".docx")||file.type==="application/vnd.openxmlformats-officedocument.wordprocessingml.document"){rbGet("sourceMode").value="markdown";await importDocxBuffer(await file.arrayBuffer(),file.name);}
+    else{const text=await file.text();rbGet("sourceMode").value=name.endsWith(".txt")?"plain":"markdown";rbGet("mdInput").value=text;doConvertArticle();rbGet("articleStatus").textContent=file.name+" betöltve és konvertálva.";}
+  }catch(e){console.error(e);rbGet("articleStatus").textContent="Importhiba: "+e.message;}
+}
+function googleDocInfo(raw){
+  let u;try{u=new URL(String(raw||"").trim());}catch{return null;}
+  let m=u.pathname.match(/\/document\/(?:u\/\d+\/)?d\/([A-Za-z0-9_-]+)/);if(m)return {kind:"doc",id:m[1],resourceKey:u.searchParams.get("resourcekey")||""};
+  m=u.pathname.match(/\/file\/d\/([A-Za-z0-9_-]+)/);if(m)return {kind:"file",id:m[1],resourceKey:u.searchParams.get("resourcekey")||""};return null;
+}
+function googleDocExportUrl(info){
+  if(!info)return "";const rk=info.resourceKey?`&resourcekey=${encodeURIComponent(info.resourceKey)}`:"";
+  return info.kind==="doc"?`https://docs.google.com/document/d/${info.id}/export?format=docx${rk}`:`https://drive.usercontent.google.com/download?id=${encodeURIComponent(info.id)}&export=download${rk}`;
+}
+function googleDocTextExportUrl(info){
+  if(!info||info.kind!=="doc")return "";const rk=info.resourceKey?`&resourcekey=${encodeURIComponent(info.resourceKey)}`:"";
+  return `https://docs.google.com/document/d/${info.id}/export?format=txt${rk}`;
+}
+rbGet("importGoogleDoc").addEventListener("click",async()=>{
+  const info=googleDocInfo(rbGet("googleDocUrl").value);if(!info){rbGet("articleStatus").textContent="Nem felismerhető Google Docs/Drive-link.";return;}
+  const url=googleDocExportUrl(info);rbGet("articleStatus").textContent="Google Dokumentum DOCX-exportjának lekérése…";
+  try{
+    const r=await fetch(url,{method:"GET",credentials:"omit",redirect:"follow"});if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    const buf=await r.arrayBuffer();if(buf.byteLength<1000)throw new Error("A kapott export túl kicsi vagy nem DOCX.");
+    rbGet("sourceMode").value="markdown";await importDocxBuffer(buf,"Google_Dokumentum.docx");return;
+  }catch(e){console.warn("DOCX export sikertelen:",e);}
+  const textUrl=googleDocTextExportUrl(info);
+  if(textUrl){
+    try{
+      const r=await fetch(textUrl,{method:"GET",credentials:"omit",redirect:"follow"});if(!r.ok)throw new Error(`HTTP ${r.status}`);
+      const text=await r.text();if(!text.trim())throw new Error("Üres szöveges export.");
+      rbGet("sourceMode").value="plain";rbGet("mdInput").value=text;doConvertArticle();rbGet("articleStatus").textContent="Google Dokumentum egyszerű szövegként beolvasva és konvertálva.";return;
+    }catch(e){console.warn("TXT export sikertelen:",e);}
+  }
+  rbGet("articleStatus").textContent="A Google közvetlen böngészős exportját a megosztás vagy a CORS-védelem blokkolta. Nyisd meg a DOCX exportot, majd húzd be a letöltött fájlt.";
+});
+rbGet("openGoogleDocExport").addEventListener("click",()=>{
+  const info=googleDocInfo(rbGet("googleDocUrl").value);if(!info){rbGet("articleStatus").textContent="Nem felismerhető Google Docs/Drive-link.";return;}
+  window.open(googleDocExportUrl(info),"_blank","noopener,noreferrer");
+});
+rbGet("mdFile").addEventListener("change",e=>loadArticleFile(e.target.files[0]));
+const drop=rbGet("mdDrop");
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag");}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag");}));
+drop.addEventListener("drop",e=>loadArticleFile(e.dataTransfer.files[0]));drop.addEventListener("click",()=>rbGet("mdFile").click());
+updateReporterFields();
+
+
+/* ---------- Önálló keretes konverter ---------- */
+function currentBoxMode(){
+  const mode=rbGet("boxSourceMode").value;
+  return mode==="auto"?(likelyMarkdown(rbGet("boxInput").value)?"markdown":"plain"):mode;
+}
+function boxImageAttrs(){
+  const full=rbGet("boxImageFull").value.trim(),display=rbGet("boxImageDisplay").value.trim();
+  if(!full&&!display)return null;
+  return {full:full||display,display:display||full,credit:rbGet("boxImageCredit").value.trim(),caption:rbGet("boxImageCaption").value.trim(),width:rbGet("boxImageWidth").value};
+}
+function doConvertBox(){
+  const text=rbGet("boxInput").value,title=rbGet("boxTitle").value.trim(),img=boxImageAttrs();
+  if(!text.trim()&&!title&&!img){rbGet("boxOutput").value="";rbGet("boxStatus").textContent="Nincs bemenet.";return;}
+  try{rbGet("boxOutput").value=rbBoxHtml(title,text,img,currentBoxMode());rbGet("boxStatus").textContent="Kész.";}
+  catch(e){console.error(e);rbGet("boxStatus").textContent="Hiba: "+e.message;}
+}
+async function loadBoxFile(file){
+  if(!file)return;const name=(file.name||"").toLowerCase();rbGet("boxStatus").textContent="Feldolgozás…";
+  try{
+    if(name.endsWith(".docx")||file.type==="application/vnd.openxmlformats-officedocument.wordprocessingml.document"){
+      const result=await docxToMarkdown(await file.arrayBuffer(),file.name);rbGet("boxInput").value=result.md;rbGet("boxSourceMode").value="markdown";
+    }else{
+      rbGet("boxInput").value=await file.text();rbGet("boxSourceMode").value=name.endsWith(".txt")?"plain":"markdown";
+    }
+    doConvertBox();rbGet("boxStatus").textContent=file.name+" betöltve és konvertálva.";
+  }catch(e){console.error(e);rbGet("boxStatus").textContent="Importhiba: "+e.message;}
+}
+rbGet("boxFile").addEventListener("change",e=>loadBoxFile(e.target.files[0]));
+const boxDrop=rbGet("boxDrop");
+["dragenter","dragover"].forEach(ev=>boxDrop.addEventListener(ev,e=>{e.preventDefault();boxDrop.classList.add("drag");}));
+["dragleave","drop"].forEach(ev=>boxDrop.addEventListener(ev,e=>{e.preventDefault();boxDrop.classList.remove("drag");}));
+boxDrop.addEventListener("drop",e=>loadBoxFile(e.dataTransfer.files[0]));boxDrop.addEventListener("click",()=>rbGet("boxFile").click());
+rbGet("convertBox").addEventListener("click",doConvertBox);
+rbGet("refreshBoxHtml").addEventListener("click",()=>{
+  doConvertBox();
+  const details=rbGet("boxPreviewFrame").closest("details");
+  if(details?.open){
+    rbGet("boxPreviewFrame").srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}</style></head><body>${rbGet("boxOutput").value}</body></html>`;
+  }
+  if(rbGet("boxOutput").value)rbGet("boxStatus").textContent="HTML frissítve a jelenlegi forrásszövegből.";
+});
+rbGet("boxInput").addEventListener("input",()=>{
+  if(rbGet("boxOutput").value)rbGet("boxStatus").textContent="A forrásszöveg módosult – kattints az ↻ HTML frissítése gombra.";
+});
+rbGet("copyBoxHtml").addEventListener("click",()=>copyToClipboard(rbGet("boxOutput").value,rbGet("boxStatus"),"Keretes HTML vágólapra másolva."));
+rbGet("previewBox").addEventListener("click",()=>{
+  if(!rbGet("boxOutput").value)doConvertBox();
+  const f=rbGet("boxPreviewFrame");f.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}</style></head><body>${rbGet("boxOutput").value}</body></html>`;f.closest("details").open=true;
+});
+rbGet("downloadBox").addEventListener("click",()=>{if(!rbGet("boxOutput").value)doConvertBox();if(rbGet("boxOutput").value)downloadText("regionalbahn-keretes.html",rbGet("boxOutput").value);});
+rbGet("clearBox").addEventListener("click",()=>{rbGet("boxInput").value="";rbGet("boxOutput").value="";rbGet("boxTitle").value="";rbGet("boxImageFull").value="";rbGet("boxImageDisplay").value="";rbGet("boxImageCredit").value="";rbGet("boxImageCaption").value="";rbGet("boxPreviewFrame").srcdoc="";rbGet("boxStatus").textContent="Törölve.";});
+["boxTitle","boxImageFull","boxImageDisplay","boxImageCredit","boxImageCaption"].forEach(id=>rbGet(id).addEventListener("input",()=>{if(rbGet("boxInput").value.trim()||rbGet("boxTitle").value.trim()||boxImageAttrs())doConvertBox();}));
+["boxSourceMode","boxImageWidth"].forEach(id=>rbGet(id).addEventListener("change",()=>{if(rbGet("boxInput").value.trim()||rbGet("boxTitle").value.trim()||boxImageAttrs())doConvertBox();}));
+
+
+
+/* ---------- Táblázatok: CSV / TSV / XLSX / DOCX ---------- */
+let tableMatrix=[],xlsxWorkbookCache=null,docxTableCache=null;
+function parseDelimited(text,delimiter){
+  const rows=[];let row=[],cell="",quoted=false;const src=String(text||"").replace(/\r\n/g,"\n");
+  for(let i=0;i<src.length;i++){
+    const ch=src[i];
+    if(quoted){if(ch==='"'&&src[i+1]==='"'){cell+='"';i++;}else if(ch==='"')quoted=false;else cell+=ch;}
+    else if(ch==='"')quoted=true;
+    else if(ch===delimiter){row.push(cell);cell="";}
+    else if(ch==='\n'){row.push(cell);rows.push(row);row=[];cell="";}
+    else cell+=ch;
+  }
+  row.push(cell);if(row.some(x=>x!=="")||rows.length===0)rows.push(row);return rows;
+}
+function detectDelimiter(text){
+  const sample=String(text||"").split(/\r?\n/).filter(Boolean).slice(0,10).join("\n"),cands=[";",",","\t"];let best=";",bestScore=-1;
+  for(const d of cands){const widths=parseDelimited(sample,d).map(r=>r.length);const min=widths.length?Math.min(...widths):0,max=widths.length?Math.max(...widths):0,score=min>1?min*100-max:0;if(score>bestScore){bestScore=score;best=d;}}
+  return best;
+}
+function currentDelimiter(){const v=rbGet("csvDelimiter").value;return v==="auto"?detectDelimiter(rbGet("tableInput").value):v==="tab"?"\t":v;}
+function tableHtmlFromCurrent(){
+  const rows=tableMatrix.length?tableMatrix:parseDelimited(rbGet("tableInput").value,currentDelimiter());
+  return tableRowsToHtml(rows,rbGet("tableHeader").value==="yes",rbGet("tableCaption").value.trim(),[],"plain");
+}
+function doConvertTable(){
+  try{const html=tableHtmlFromCurrent();rbGet("tableOutput").value=html;rbGet("tableStatus").textContent=html?"Kész.":"Nincs feldolgozható táblázat.";}
+  catch(e){console.error(e);rbGet("tableStatus").textContent="Hiba: "+e.message;}
+}
+function colLettersToIndex(ref){let n=0;for(const ch of String(ref||"").toUpperCase()){if(ch<"A"||ch>"Z")break;n=n*26+(ch.charCodeAt(0)-64);}return Math.max(0,n-1);}
+function xlsxSharedStrings(xml){
+  if(!xml)return[];const x=parseXml(xml,"sharedStrings.xml"),out=[];
+  for(const si of Array.from(x.getElementsByTagNameNS("*","si")))out.push(Array.from(si.getElementsByTagNameNS("*","t")).map(t=>t.textContent||"").join(""));
+  return out;
+}
+function xlsxSheetRows(xml,shared){
+  const x=parseXml(xml,"worksheet XML"),rows=[];
+  for(const rowEl of Array.from(x.getElementsByTagNameNS("*","row"))){
+    const row=[];
+    for(const c of localChildren(rowEl,"c")){
+      const ref=attrLocal(c,"r"),idx=colLettersToIndex(ref),type=attrLocal(c,"t"),v=firstLocal(c,"v"),is=firstLocal(c,"is");let val="";
+      if(type==="inlineStr")val=is?Array.from(is.getElementsByTagNameNS("*","t")).map(t=>t.textContent||"").join(""):"";
+      else{const raw=v?.textContent??"";if(type==="s")val=shared[Number(raw)]??raw;else if(type==="b")val=raw==="1"?"IGEN":"NEM";else val=raw;}
+      while(row.length<idx)row.push("");row[idx]=val;
+    }
+    rows.push(row);
+  }
+  return rows;
+}
+async function parseXlsx(buffer){
+  const entries=zipEntries(buffer),wbXml=await docxTextFile(buffer,entries,"xl/workbook.xml"),relsXml=await docxTextFile(buffer,entries,"xl/_rels/workbook.xml.rels"),sharedXml=await docxTextFile(buffer,entries,"xl/sharedStrings.xml");
+  if(!wbXml)throw new Error("Az XLSX-ből hiányzik az xl/workbook.xml.");
+  const wb=parseXml(wbXml,"workbook.xml"),rels=docxRelMap(relsXml),shared=xlsxSharedStrings(sharedXml),sheets=[];
+  for(const sh of Array.from(wb.getElementsByTagNameNS("*","sheet"))){
+    const name=attrLocal(sh,"name")||"Munkalap",rid=attrLocal(sh,"id"),target=rels.get(rid);if(!target)continue;
+    let path=target.replace(/^\//,"");if(!path.startsWith("xl/"))path="xl/"+path.replace(/^\.\//,"");path=path.replace(/xl\/worksheets\/\.\.\//,"xl/");
+    const xml=await docxTextFile(buffer,entries,path);if(xml)sheets.push({name,rows:xlsxSheetRows(xml,shared)});
+  }
+  if(!sheets.length)throw new Error("Nem található olvasható munkalap az XLSX-ben.");return sheets;
+}
+function refreshXlsxSheetSelect(){
+  const sel=rbGet("xlsxSheet");sel.innerHTML="";(xlsxWorkbookCache||[]).forEach((sh,i)=>{const o=document.createElement("option");o.value=String(i);o.textContent=sh.name;sel.appendChild(o);});
+}
+async function docxTablesToMatrices(buffer){
+  const entries=zipEntries(buffer),documentXml=await docxTextFile(buffer,entries,"word/document.xml");if(!documentXml)throw new Error("A DOCX-ből hiányzik a word/document.xml.");
+  const stylesXml=await docxTextFile(buffer,entries,"word/styles.xml"),relsXml=await docxTextFile(buffer,entries,"word/_rels/document.xml.rels"),numberingXml=await docxTextFile(buffer,entries,"word/numbering.xml");
+  const x=parseXml(documentXml,"document.xml"),ctx={styles:docxStyleMap(stylesXml),rels:docxRelMap(relsXml),numbering:docxNumberingMap(numberingXml),images:0,tables:0},tables=[];
+  for(const tbl of Array.from(x.getElementsByTagNameNS("*","tbl"))){
+    const rows=[];
+    for(const tr of localChildren(tbl,"tr")){
+      const row=[];
+      for(const tc of localChildren(tr,"tc")){
+        const ps=localChildren(tc,"p").map(p=>docxParagraphMd(p,ctx)).filter(Boolean).map(t=>t.replace(/^#{1,3}\s+/,"").replace(/^\s*(?:-|1\.)\s+/,""));row.push(ps.join(" "));
+      }
+      rows.push(row);
+    }
+    if(rows.length)tables.push(rows);
+  }
+  return tables;
+}
+function renderDocxTableCache(){
+  if(!docxTableCache?.length)return false;
+  const base=rbGet("tableCaption").value.trim(),head=rbGet("tableHeader").value==="yes";
+  rbGet("tableOutput").value=docxTableCache.map((t,i)=>tableRowsToHtml(t,head,docxTableCache.length>1?`${base||"Táblázat"} ${i+1}`:base,[],"markdown")).join("\n");
+  rbGet("tableStatus").textContent=`${docxTableCache.length} Word-táblázat feldolgozva.`;return true;
+}
+async function loadTableFile(file){
+  if(!file)return;const name=(file.name||"").toLowerCase();rbGet("tableStatus").textContent="Feldolgozás…";tableMatrix=[];xlsxWorkbookCache=null;docxTableCache=null;
+  try{
+    if(name.endsWith(".xlsx")){
+      xlsxWorkbookCache=await parseXlsx(await file.arrayBuffer());refreshXlsxSheetSelect();tableMatrix=xlsxWorkbookCache[0].rows;rbGet("tableInput").value=tableMatrix.map(r=>r.join("\t")).join("\n");rbGet("csvDelimiter").value="tab";doConvertTable();
+    }else if(name.endsWith(".docx")){
+      docxTableCache=await docxTablesToMatrices(await file.arrayBuffer());if(!docxTableCache.length)throw new Error("A Word-dokumentumban nem található táblázat.");rbGet("tableInput").value=docxTableCache.map((t,i)=>`[Táblázat ${i+1}]\n`+t.map(r=>r.join("\t")).join("\n")).join("\n\n");renderDocxTableCache();
+    }else{
+      const text=await file.text();rbGet("tableInput").value=text;rbGet("csvDelimiter").value=name.endsWith(".tsv")?"tab":"auto";doConvertTable();
+    }
+    rbGet("tableStatus").textContent=file.name+" betöltve és konvertálva.";
+  }catch(e){console.error(e);rbGet("tableStatus").textContent="Importhiba: "+e.message;}
+}
+rbGet("tableFile").addEventListener("change",e=>loadTableFile(e.target.files[0]));
+const tableDrop=rbGet("tableDrop");
+["dragenter","dragover"].forEach(ev=>tableDrop.addEventListener(ev,e=>{e.preventDefault();tableDrop.classList.add("drag");}));
+["dragleave","drop"].forEach(ev=>tableDrop.addEventListener(ev,e=>{e.preventDefault();tableDrop.classList.remove("drag");}));
+tableDrop.addEventListener("drop",e=>loadTableFile(e.dataTransfer.files[0]));tableDrop.addEventListener("click",()=>rbGet("tableFile").click());
+rbGet("xlsxSheet").addEventListener("change",()=>{if(xlsxWorkbookCache){tableMatrix=xlsxWorkbookCache[Number(rbGet("xlsxSheet").value)||0].rows;rbGet("tableInput").value=tableMatrix.map(r=>r.join("\t")).join("\n");doConvertTable();}});
+rbGet("tableInput").addEventListener("input",()=>{tableMatrix=[];xlsxWorkbookCache=null;docxTableCache=null;});
+rbGet("csvDelimiter").addEventListener("change",()=>{if(!docxTableCache)doConvertTable();});
+rbGet("tableCaption").addEventListener("input",()=>{if(!renderDocxTableCache()&&(rbGet("tableInput").value.trim()||tableMatrix.length))doConvertTable();});
+rbGet("tableHeader").addEventListener("change",()=>{if(!renderDocxTableCache()&&(rbGet("tableInput").value.trim()||tableMatrix.length))doConvertTable();});
+rbGet("convertTable").addEventListener("click",()=>{if(!renderDocxTableCache())doConvertTable();});
+rbGet("copyTableHtml").addEventListener("click",()=>copyToClipboard(rbGet("tableOutput").value,rbGet("tableStatus"),"Táblázat HTML vágólapra másolva."));
+rbGet("previewTable").addEventListener("click",()=>{if(!rbGet("tableOutput").value){if(!renderDocxTableCache())doConvertTable();}const f=rbGet("tablePreviewFrame");f.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:15px/1.45 Arial,sans-serif;padding:20px;color:#111}table{font:inherit}</style></head><body>${rbGet("tableOutput").value}</body></html>`;f.closest("details").open=true;});
+rbGet("downloadTable").addEventListener("click",()=>{if(!rbGet("tableOutput").value){if(!renderDocxTableCache())doConvertTable();}if(rbGet("tableOutput").value)downloadText("regionalbahn-tablazat.html",rbGet("tableOutput").value);});
+rbGet("clearTable").addEventListener("click",()=>{tableMatrix=[];xlsxWorkbookCache=null;docxTableCache=null;rbGet("tableInput").value="";rbGet("tableOutput").value="";rbGet("tableCaption").value="";rbGet("xlsxSheet").innerHTML='<option value="">Első munkalap</option>';rbGet("tablePreviewFrame").srcdoc="";rbGet("tableStatus").textContent="Törölve.";});
+
+/* ---------- Gyűjtőoldalak: Közvetlen Kocsi / tematikus oldalak ---------- */
+function collectionMetaValue(block, names){
+  for(const name of names){
+    const re=new RegExp(`^\\s*${name}\\s*:\\s*(.+?)\\s*$`,`im`);
+    const m=block.match(re); if(m)return m[1].trim();
+  }
+  return "";
+}
+function removeCollectionMeta(block){
+  return block
+    .replace(/^\s*(?:Dátum|Datum|Date)\s*:\s*.+?\s*$/gim,"")
+    .replace(/^\s*(?:Link|URL|Url)\s*:\s*.+?\s*$/gim,"")
+    .trim();
+}
+function normalizeCollectionUrl(v){
+  const raw=String(v||"").trim();
+  const md=raw.match(/^\[.*?\]\((https?:\/\/[^)]+)\)$/);
+  if(md)return md[1];
+  const u=raw.match(/https?:\/\/\S+/); return u?u[0].replace(/[)>.,;]+$/g,""):"";
+}
+function collectionIntroHtml(text){
+  const t=text.trim(); if(!t)return "";
+  return bodyToHtml(t);
+}
+function collectionEntryHtml(title,date,url,summary,moreText){
+  const out=[];
+  out.push(`<h3 style="text-align: center;">${inlineMd(title)}</h3>`);
+  if(date){
+    out.push(`<div style="text-align: center;">|</div>`);
+    out.push(`<h3 style="text-align: center;">${inlineMd(date)}</h3>`);
+  }
+  if(summary){
+    let h=bodyToHtml(summary).replace(/\s*<br \/>\s*$/,"");
+    if(url){
+      const link=`<a href="${esc(url,true)}">${esc(moreText)}</a>`;
+      // Az élő oldalak logikájához hasonlóan a Tovább link az ajánló végére kerül.
+      if(/<\/div>\s*$/.test(h))h=h.replace(/<\/div>\s*$/,`&nbsp;${link}</div>`);
+      else h+=`\n<div style="text-align: justify;">${link}</div>`;
+    }
+    out.push(h);
+  }else if(url){
+    out.push(`<div style="text-align: justify;"><a href="${esc(url,true)}">${esc(moreText)}</a></div>`);
+  }
+  return out.join("\n");
+}
+function parseCollectionMarkdown(md){
+  md=String(md||"").replace(/\r\n/g,"\n");
+  const titleMatch=md.match(/^#\s+(.+)$/m);
+  const title=titleMatch?titleMatch[1].trim():"";
+  let body=titleMatch?md.replace(titleMatch[0],"").trim():md.trim();
+  const entryMatches=[...body.matchAll(/^###\s+(.+)$/gm)];
+  const firstEntry=entryMatches.length?entryMatches[0].index:body.length;
+  const prefix=body.slice(0,firstEntry);
+  const yearMatches=[...prefix.matchAll(/^##\s+(.+)$/gm)];
+  let intro=prefix;
+  if(yearMatches.length)intro=prefix.slice(0,yearMatches[0].index).trim();
+
+  const entries=[];
+  for(let i=0;i<entryMatches.length;i++){
+    const em=entryMatches[i];
+    const start=em.index+em[0].length;
+    const end=i+1<entryMatches.length?entryMatches[i+1].index:body.length;
+    let chunk=body.slice(start,end);
+    // Ha a következő évfejléc a chunk végén ül, azt nem az előző bejegyzéshez számítjuk.
+    const nextYear=chunk.match(/\n##\s+(.+)\s*$/s);
+    if(nextYear)chunk=chunk.slice(0,nextYear.index);
+    const date=collectionMetaValue(chunk,["Dátum","Datum","Date"]);
+    const url=normalizeCollectionUrl(collectionMetaValue(chunk,["Link","URL","Url"]));
+    const summary=removeCollectionMeta(chunk);
+    entries.push({title:em[1].trim(),date,url,summary,index:em.index});
+  }
+  const sections=[...body.matchAll(/^##\s+(.+)$/gm)].map(m=>({title:m[1].trim(),index:m.index}));
+  return {title,intro,entries,sections,body};
+}
+function convertCollectionMarkdown(md){
+  const data=parseCollectionMarkdown(md);
+  if(data.title)rbGet(`collectionTitle`).value=data.title;
+  const profile=rbGet("collectionProfile").value;
+  const moreText=rbGet("collectionMoreText").value.trim()||"Tovább »";
+  const out=[];
+  if(data.intro){out.push(collectionIntroHtml(data.intro).replace(/\s*<br \/>\s*$/, ""));}
+  if(data.entries.length && data.intro)out.push("<hr />");
+
+  if(profile==="podcast"){
+    // Évfejlécek és epizódok az eredeti sorrendben.
+    const events=[];
+    for(const s of data.sections)events.push({type:"section",...s});
+    for(const e of data.entries)events.push({type:"entry",...e});
+    events.sort((a,b)=>a.index-b.index);
+    let hadSection=false,hadEntry=false;
+    for(const ev of events){
+      if(ev.type==="section"){
+        if(hadSection||hadEntry)out.push("<hr />");
+        out.push(`<h3 style="text-align: center;">${inlineMd(ev.title)}</h3>`);
+        hadSection=true;hadEntry=false;
+      }else{
+        out.push(collectionEntryHtml(ev.title,ev.date,ev.url,ev.summary,moreText));
+        hadEntry=true;
+      }
+    }
+  }else{
+    // Tematikus gyűjtőoldal: az opcionális ## szekciókat is megtartjuk, de évbontást nem erőltetünk.
+    const events=[];
+    for(const s of data.sections)events.push({type:"section",...s});
+    for(const e of data.entries)events.push({type:"entry",...e});
+    events.sort((a,b)=>a.index-b.index);
+    for(const ev of events){
+      if(ev.type==="section")out.push(`<hr />\n<h3 style="text-align: center;">${inlineMd(ev.title)}</h3>`);
+      else out.push(collectionEntryHtml(ev.title,ev.date,ev.url,ev.summary,moreText));
+    }
+  }
+  return out.filter(Boolean).join("\n");
+}
+function doConvertCollection(){
+  const md=rbGet("collectionInput").value;
+  if(!md.trim()){rbGet("collectionOutput").value="";rbGet("collectionStatus").textContent="Nincs bemenet.";return;}
+  try{rbGet("collectionOutput").value=convertCollectionMarkdown(md);rbGet("collectionStatus").textContent="Kész.";}
+  catch(e){console.error(e);rbGet("collectionStatus").textContent="Hiba: "+e.message;}
+}
+function setCollectionExample(kind){
+  if(kind==="kozvetlen"){
+    rbGet("collectionProfile").value="podcast";
+    rbGet("collectionTitle").value="Közvetlen Kocsi";
+    rbGet("collectionInput").value=`# Közvetlen Kocsi\n\nA Közvetlen Kocsi a RegionalBahn podcastja. Ezen az oldalon összefoglaljuk az eddigi adásokat.\n\n## 2026\n\n### Új epizód címe – 2026. évi 1. adás\nDátum: 2026.01.01.\nLink: https://www.regionalbahn.hu/2026/01/pelda.html\n\nAz epizód rövid ajánlója.\n\n## 2025\n\n### Korábbi epizód címe – 2025. évi 1. adás\nDátum: 2025.01.01.\nLink: https://www.regionalbahn.hu/2025/01/pelda.html\n\nA korábbi epizód rövid ajánlója.`;
+  }else if(kind==="innotrans2026"){
+    rbGet("collectionProfile").value="thematic";
+    rbGet("collectionTitle").value="InnoTrans 2026";
+    rbGet("collectionInput").value=`# InnoTrans 2026\n\n<!-- RB:IMAGE full="KEP_NAGY_URL" display="KEP_600_URL" credit="fotó: © Név • www.RegionalBahn.hu" caption="" -->\n\nEzen a gyűjtőoldalon az InnoTrans 2026 szakkiállítással kapcsolatos írásaink, tudósítások érhetők el.\n\n### InnoTrans 2026 – Előhang\nDátum: 2026.08.20.\nLink: https://www.regionalbahn.hu/2026/08/pelda.html\n\nAz előzetes rövid ajánlója.\n\n### InnoTrans 2026 – 0. nap\nDátum: 2026.09.21.\nLink: https://www.regionalbahn.hu/2026/09/pelda.html\n\nA helyszíni tudósítás rövid ajánlója.`;
+  }
+  doConvertCollection();
+}
+rbGet("convertCollection").addEventListener("click",doConvertCollection);
+rbGet("copyCollectionTitle").addEventListener("click",()=>copyToClipboard(rbGet("collectionTitle").value,rbGet("collectionStatus"),"Oldalcím vágólapra másolva."));
+rbGet("copyCollectionHtml").addEventListener("click",()=>copyToClipboard(rbGet("collectionOutput").value,rbGet("collectionStatus"),"Gyűjtőoldal HTML vágólapra másolva."));
+rbGet("downloadCollection").addEventListener("click",()=>{doConvertCollection();if(rbGet("collectionOutput").value)downloadText((slugify(rbGet("collectionTitle").value)||"regionalbahn-gyujtooldal")+".html",rbGet("collectionOutput").value);});
+rbGet("previewCollection").addEventListener("click",()=>{
+  if(!rbGet("collectionOutput").value)doConvertCollection();
+  const frame=rbGet("collectionPreviewFrame");
+  frame.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}</style></head><body>${rbGet("collectionOutput").value}</body></html>`;
+  frame.closest("details").open=true;
+});
+rbGet("clearCollection").addEventListener("click",()=>{rbGet("collectionInput").value="";rbGet("collectionOutput").value="";rbGet("collectionTitle").value="";rbGet("collectionPreviewFrame").srcdoc="";rbGet("collectionStatus").textContent="Törölve.";});
+rbGet("collectionProfile").addEventListener("change",()=>{if(rbGet("collectionInput").value.trim())doConvertCollection();});
+rbGet("collectionMoreText").addEventListener("input",()=>{if(rbGet("collectionInput").value.trim())doConvertCollection();});
+rbGet("collectionPreset").addEventListener("change",e=>{if(e.target.value)setCollectionExample(e.target.value);});
+
+/* ---------- Tömeges képkód ---------- */
+function imageCredit(){
+  const name=rbGet("imagePhotographer").value.trim()||"Halász Péter";
+  const suffix=rbGet("imageCreditSuffix").value.trim();
+  return `fotó: © ${name}${suffix?" "+suffix:""}`;
+}
+function canonicalBloggerImage(separator,credit,caption){
+  const link=separator.querySelector("a[href]"),img=separator.querySelector("img");if(!link||!img)return null;
+  const attrs=[],preferred=["alt","width","height","data-original-height","data-original-width","src","srcset","sizes","loading"],seen=new Set();
+  for(const name of preferred){if(img.hasAttribute(name)){attrs.push(`${name}="${esc(img.getAttribute(name),true)}"`);seen.add(name);}}
+  for(const attr of Array.from(img.attributes)){
+    const name=attr.name.toLowerCase();if(seen.has(name)||name==="border"||name==="style")continue;
+    attrs.push(`${attr.name}="${esc(attr.value,true)}"`);
+  }
+  if(!img.hasAttribute("alt"))attrs.unshift('alt=""');
+  return `<div class="separator" style="clear: both; text-align: center;"><a href="${esc(link.getAttribute("href")||"",true)}" style="padding: 0px 1em;" title="${esc(credit,true)}"><img ${attrs.join(" ")} /></a></div>\n<div style="text-align: center;">${inlineMd(caption)}</div>\n<br />`;
+}
+const IMAGE_BATCH_SIZE=100;let imageRunId=0,imageTimer=null;
+const yieldBrowser=()=>new Promise(resolve=>requestAnimationFrame(resolve));
+async function convertBloggerImages(raw,runId){
+  raw=String(raw??"").trim();if(!raw)return {html:"",count:0,skipped:0,cancelled:false};
+  const tpl=document.createElement("template");tpl.innerHTML=raw;
+  const separators=Array.from(tpl.content.querySelectorAll("div.separator")),converted=new Array(separators.length);
+  const credit=imageCredit(),caption=rbGet("imageCaption").value||"KÉPaláírás";let count=0,skipped=0;
+  for(let i=0;i<separators.length;i++){
+    if(i>0&&i%IMAGE_BATCH_SIZE===0){
+      if(runId!==imageRunId)return {html:"",count:0,skipped:0,cancelled:true};
+      rbGet("imageStatus").textContent=`Feldolgozás: ${i}/${separators.length} kép…`;await yieldBrowser();
+    }
+    const block=canonicalBloggerImage(separators[i],credit,caption);
+    if(block){converted[i]=block;count++;}else{converted[i]="";skipped++;}
+  }
+  if(!separators.length){
+    const fake=document.createElement("div");fake.innerHTML=raw;const block=canonicalBloggerImage(fake,credit,caption);
+    if(block){converted.push(block);count=1;}
+  }
+  return {html:converted.filter(Boolean).join("\n"),count,skipped,cancelled:false};
+}
+async function doConvertImages(){
+  const raw=rbGet("imageInput").value,runId=++imageRunId;if(!raw.trim()){rbGet("imageOutput").value="";rbGet("imageStatus").textContent="Nincs képkód.";return;}
+  try{
+    rbGet("imageStatus").textContent="Képkódok feldolgozása…";await yieldBrowser();const r=await convertBloggerImages(raw,runId);
+    if(r.cancelled||runId!==imageRunId)return;rbGet("imageOutput").value=r.html;
+    rbGet("imageStatus").textContent=r.count?`${r.count} kép átalakítva.${r.skipped?` ${r.skipped} blokk kihagyva.`:""}`:"Nem találtam átalakítható képkódot.";
+  }catch(e){if(runId===imageRunId){console.error(e);rbGet("imageStatus").textContent="Hiba: "+e.message;}}
+}
+function scheduleImages(){clearTimeout(imageTimer);imageTimer=setTimeout(()=>{if(rbGet("imageInput").value.trim())doConvertImages();},300);}
+rbGet("convertImages").addEventListener("click",doConvertImages);
+rbGet("copyImages").addEventListener("click",()=>copyToClipboard(rbGet("imageOutput").value,rbGet("imageStatus"),"Képkód vágólapra másolva."));
+rbGet("downloadImages").addEventListener("click",()=>{if(rbGet("imageOutput").value)downloadText("regionalbahn-kepkod.html",rbGet("imageOutput").value);});
+rbGet("clearImages").addEventListener("click",()=>{rbGet("imageInput").value="";rbGet("imageOutput").value="";rbGet("imageStatus").textContent="Törölve.";});
+["imagePhotographer","imageCreditSuffix","imageCaption"].forEach(id=>rbGet(id).addEventListener("input",scheduleImages));
+
+/* ---------- HTML ellenőrző / javító ---------- */
+function htmlIssue(level,title,detail=""){return {level,title,detail};}
+function scanHtmlStructure(src){
+  const issues=[],voidTags=new Set(["area","base","br","col","embed","hr","img","input","link","meta","param","source","track","wbr"]),stack=[];
+  const cleaned=String(src||"").replace(/<!--([\s\S]*?)-->/g,"");const re=/<\/?([a-zA-Z][\w:-]*)(?:\s[^<>]*?)?\s*\/?>/g;let m;
+  while((m=re.exec(cleaned))){
+    const raw=m[0],tag=m[1].toLowerCase(),closing=raw.startsWith("</"),self=/\/>$/.test(raw)||voidTags.has(tag);if(self)continue;
+    if(closing){
+      const idx=stack.map(x=>x.tag).lastIndexOf(tag);
+      if(idx<0)issues.push(htmlIssue("error",`Felesleges záró tag: </${tag}>`,`Pozíció: ${m.index}`));
+      else{for(let i=stack.length-1;i>idx;i--)issues.push(htmlIssue("error",`Lezáratlan <${stack[i].tag}> elem`,`A </${tag}> előtt nyitva maradt.`));stack.splice(idx);}
+    }else stack.push({tag,pos:m.index});
+  }
+  for(const x of stack)issues.push(htmlIssue("error",`Lezáratlan <${x.tag}> elem`,`Nyitó tag pozíciója: ${x.pos}`));return issues;
+}
+function lintHtml(src){
+  src=String(src||"");const issues=[];if(!src.trim())return [htmlIssue("info","Nincs ellenőrizendő HTML.")];issues.push(...scanHtmlStructure(src));
+  const tpl=document.createElement("template");tpl.innerHTML=src;const root=tpl.content;
+  const active=root.querySelectorAll("script,object,embed,form");if(active.length)issues.push(htmlIssue("warn",`${active.length} aktív vagy beágyazott elem található.`,`Blogger-cikkben ezek általában nem szükségesek; ellenőrizd tudatosan.`));
+  const handlers=Array.from(root.querySelectorAll("*")).flatMap(el=>Array.from(el.attributes).filter(a=>/^on/i.test(a.name)).map(a=>`${el.tagName.toLowerCase()}[${a.name}]`));if(handlers.length)issues.push(htmlIssue("warn",`${handlers.length} inline eseménykezelő található.`,handlers.slice(0,8).join(", ")));
+  if(rbGet("checkAccessibility").checked){
+    root.querySelectorAll("img").forEach((img,i)=>{if(!img.getAttribute("src"))issues.push(htmlIssue("error",`A(z) ${i+1}. képnek nincs src attribútuma.`));if(!img.hasAttribute("alt"))issues.push(htmlIssue("warn",`A(z) ${i+1}. képnek nincs alt attribútuma.`,`Dekoratív képnél legalább alt=\"\" javasolt.`));});
+    root.querySelectorAll("a").forEach((a,i)=>{const href=a.getAttribute("href")||"";if(!href)issues.push(htmlIssue("warn",`A(z) ${i+1}. linknek nincs href attribútuma.`));if(/^javascript:/i.test(href))issues.push(htmlIssue("error",`A(z) ${i+1}. link javascript: URL-t használ.`));});
+  }
+  if(rbGet("checkRbConventions").checked){
+    const more=(src.match(/<!--\s*more\s*-->/gi)||[]).length;if(more>1)issues.push(htmlIssue("warn",`${more} darab <!--more--> jelölő van a kódban.`,`Blogger-bejegyzésben általában egy szükséges.`));
+    if(/<br\s*\/?>/i.test(src)&&/<br(?!\s*\/>)\s*>/i.test(src))issues.push(htmlIssue("info","Nem minden sortörés RegionalBahn-formájú <br />."));
+    if(/<(?:b|i)(?:\s|>)/i.test(src))issues.push(htmlIssue("info","Találtam <b> vagy <i> taget.","A javító ezeket <strong>/<em> elemekre normalizálja."));
+    const just=root.querySelectorAll('div[style*="text-align: justify"]');if(!just.length)issues.push(htmlIssue("info","Nem találtam sorkizárt szövegblokkot.","Ez nem feltétlen hiba, de a szokásos RegionalBahn-cikkszöveg ilyen <div> blokkokat használ."));
+  }
+  if(!issues.length)issues.push(htmlIssue("ok","Nem találtam szerkezeti vagy alapvető szerkesztési hibát."));return issues;
+}
+function renderHtmlIssues(issues){
+  const box=rbGet("htmlIssues");box.innerHTML="";
+  for(const it of issues){const d=document.createElement("div");d.className="issue "+it.level;const strong=document.createElement("strong");strong.textContent=it.level==="error"?"HIBA":it.level==="warn"?"FIGYELMEZTETÉS":it.level==="ok"?"RENDBEN":"INFO";d.appendChild(strong);d.append(document.createTextNode(it.title));if(it.detail){const x=document.createElement("div");x.className="small";x.textContent=it.detail;d.appendChild(x);}box.appendChild(d);}
+  const errors=issues.filter(x=>x.level==="error").length,warns=issues.filter(x=>x.level==="warn").length;rbGet("htmlCheckStatus").textContent=errors?`${errors} hiba, ${warns} figyelmeztetés.`:warns?`${warns} figyelmeztetés, szerkezeti hiba nélkül.`:"Rendben.";
+}
+function repairHtmlFragment(src){
+  const tpl=document.createElement("template");tpl.innerHTML=String(src||"");const root=tpl.content;
+  root.querySelectorAll("b").forEach(el=>{const n=document.createElement("strong");for(const a of Array.from(el.attributes))n.setAttribute(a.name,a.value);while(el.firstChild)n.appendChild(el.firstChild);el.replaceWith(n);});
+  root.querySelectorAll("i").forEach(el=>{const n=document.createElement("em");for(const a of Array.from(el.attributes))n.setAttribute(a.name,a.value);while(el.firstChild)n.appendChild(el.firstChild);el.replaceWith(n);});
+  root.querySelectorAll("img").forEach(img=>{if(!img.hasAttribute("alt"))img.setAttribute("alt","");});
+  let html=tpl.innerHTML;
+  html=html.replace(/<br\s*\/?\s*>/gi,"<br />").replace(/<hr\s*\/?\s*>/gi,"<hr />").replace(/<img\s+([^>]*?)(?:\s*\/?)>/gi,(m,a)=>`<img ${a.replace(/\s*\/$/,"").trim()} />`);
+  html=html.replace(/\n{3,}/g,"\n\n");return html.trim();
+}
+rbGet("checkHtml").addEventListener("click",()=>renderHtmlIssues(lintHtml(rbGet("htmlCheckInput").value)));
+rbGet("repairHtml").addEventListener("click",()=>{const fixed=repairHtmlFragment(rbGet("htmlCheckInput").value);rbGet("htmlCheckOutput").value=fixed;renderHtmlIssues(lintHtml(fixed));rbGet("htmlCheckStatus").textContent+=" Javított változat elkészült.";});
+rbGet("copyCheckedHtml").addEventListener("click",()=>copyToClipboard(rbGet("htmlCheckOutput").value||rbGet("htmlCheckInput").value,rbGet("htmlCheckStatus"),"HTML vágólapra másolva."));
+rbGet("previewCheckedHtml").addEventListener("click",()=>{const html=rbGet("htmlCheckOutput").value||rbGet("htmlCheckInput").value;const f=rbGet("htmlCheckPreviewFrame");f.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}table{max-width:100%}</style></head><body>${html}</body></html>`;f.closest("details").open=true;});
+rbGet("clearHtmlCheck").addEventListener("click",()=>{rbGet("htmlCheckInput").value="";rbGet("htmlCheckOutput").value="";rbGet("htmlIssues").innerHTML="";rbGet("htmlCheckPreviewFrame").srcdoc="";rbGet("htmlCheckStatus").textContent="Törölve.";});
+
+/* ---------- Unicode stílusok ---------- */
+const AZ='ABCDEFGHIJKLMNOPQRSTUVWXYZ',az='abcdefghijklmnopqrstuvwxyz',digits='0123456789';
+const chars=s=>Array.from(s),cpRange=(start,count)=>Array.from({length:count},(_,i)=>String.fromCodePoint(start+i)).join('');
+function mapFromStrings(src,dst){const a=chars(src),b=chars(dst),m=new Map();a.forEach((c,i)=>m.set(c,b[i]??c));return m}
+function transformMap(s,m){return chars(s.normalize('NFD')).map(c=>m.get(c)||c).join('')}
+function makeRangeMap(U,L,D=null){return mapFromStrings(AZ+az+(D?digits:''),U+L+(D||''))}
+const M={};
+M.bold=makeRangeMap(cpRange(0x1D400,26),cpRange(0x1D41A,26),cpRange(0x1D7CE,10));
+const italicUpper=cpRange(0x1D434,26),italicLower=cpRange(0x1D44E,7)+'ℎ'+cpRange(0x1D456,18);
+M.italic=makeRangeMap(italicUpper,italicLower);M.boldItalic=makeRangeMap(cpRange(0x1D468,26),cpRange(0x1D482,26));
+const scriptUpper=['𝒜','ℬ','𝒞','𝒟','ℰ','ℱ','𝒢','ℋ','ℐ','𝒥','𝒦','ℒ','ℳ','𝒩','𝒪','𝒫','𝒬','ℛ','𝒮','𝒯','𝒰','𝒱','𝒲','𝒳','𝒴','𝒵'].join('');
+const scriptLower=['𝒶','𝒷','𝒸','𝒹','ℯ','𝒻','ℊ','𝒽','𝒾','𝒿','𝓀','𝓁','𝓂','𝓃','ℴ','𝓅','𝓆','𝓇','𝓈','𝓉','𝓊','𝓋','𝓌','𝓍','𝓎','𝓏'].join('');
+M.script=makeRangeMap(scriptUpper,scriptLower);M.boldScript=makeRangeMap(cpRange(0x1D4D0,26),cpRange(0x1D4EA,26));
+const frakUpper=['𝔄','𝔅','ℭ','𝔇','𝔈','𝔉','𝔊','ℌ','ℑ','𝔍','𝔎','𝔏','𝔐','𝔑','𝔒','𝔓','𝔔','ℜ','𝔖','𝔗','𝔘','𝔙','𝔚','𝔛','𝔜','ℨ'].join('');
+M.fraktur=makeRangeMap(frakUpper,cpRange(0x1D51E,26));M.boldFraktur=makeRangeMap(cpRange(0x1D56C,26),cpRange(0x1D586,26));
+const dsUpper=['𝔸','𝔹','ℂ','𝔻','𝔼','𝔽','𝔾','ℍ','𝕀','𝕁','𝕂','𝕃','𝕄','ℕ','𝕆','ℙ','ℚ','ℝ','𝕊','𝕋','𝕌','𝕍','𝕎','𝕏','𝕐','ℤ'].join('');
+M.double=makeRangeMap(dsUpper,cpRange(0x1D552,26),cpRange(0x1D7D8,10));
+M.sans=makeRangeMap(cpRange(0x1D5A0,26),cpRange(0x1D5BA,26),cpRange(0x1D7E2,10));
+M.sansBold=makeRangeMap(cpRange(0x1D5D4,26),cpRange(0x1D5EE,26),cpRange(0x1D7EC,10));
+M.sansItalic=makeRangeMap(cpRange(0x1D608,26),cpRange(0x1D622,26));
+M.sansBoldItalic=makeRangeMap(cpRange(0x1D63C,26),cpRange(0x1D656,26));
+M.mono=makeRangeMap(cpRange(0x1D670,26),cpRange(0x1D68A,26),cpRange(0x1D7F6,10));
+function fullwidth(s){return chars(s).map(c=>{const n=c.codePointAt(0);if(n>=0x21&&n<=0x7e)return String.fromCodePoint(n+0xFEE0);if(c===' ')return '\u3000';return c}).join('')}
+function circled(s){return chars(s).map(c=>{let n=c.codePointAt(0);if(n>=65&&n<=90)return String.fromCodePoint(0x24B6+n-65);if(n>=97&&n<=122)return String.fromCodePoint(0x24D0+n-97);if(c==='0')return '⓪';if(n>=49&&n<=57)return String.fromCodePoint(0x2460+n-49);return c}).join('')}
+function parenthesized(s){return chars(s).map(c=>{let n=c.toLowerCase().codePointAt(0);if(n>=97&&n<=122)return String.fromCodePoint(0x249C+n-97);if(c>='1'&&c<='9')return String.fromCodePoint(0x2474+(c.charCodeAt(0)-49));return c}).join('')}
+function squared(s){return chars(s).map(c=>{let n=c.toUpperCase().codePointAt(0);if(n>=65&&n<=90)return String.fromCodePoint(0x1F130+n-65);return c}).join('')}
+function negSquared(s){return chars(s).map(c=>{let n=c.toUpperCase().codePointAt(0);if(n>=65&&n<=90)return String.fromCodePoint(0x1F170+n-65);return c}).join('')}
+function regional(s){return chars(s).map(c=>{let n=c.toUpperCase().codePointAt(0);if(n>=65&&n<=90)return String.fromCodePoint(0x1F1E6+n-65);return c===' '?'  ':c}).join(' ')}
+const smallMap={a:'ᴀ',b:'ʙ',c:'ᴄ',d:'ᴅ',e:'ᴇ',f:'ꜰ',g:'ɢ',h:'ʜ',i:'ɪ',j:'ᴊ',k:'ᴋ',l:'ʟ',m:'ᴍ',n:'ɴ',o:'ᴏ',p:'ᴘ',q:'ǫ',r:'ʀ',s:'ꜱ',t:'ᴛ',u:'ᴜ',v:'ᴠ',w:'ᴡ',x:'x',y:'ʏ',z:'ᴢ'};
+function smallCaps(s){return chars(s.normalize('NFD')).map(c=>smallMap[c.toLowerCase()]||c).join('')}
+const superMap=Object.assign({},...Object.entries({'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','a':'ᵃ','b':'ᵇ','c':'ᶜ','d':'ᵈ','e':'ᵉ','f':'ᶠ','g':'ᵍ','h':'ʰ','i':'ⁱ','j':'ʲ','k':'ᵏ','l':'ˡ','m':'ᵐ','n':'ⁿ','o':'ᵒ','p':'ᵖ','r':'ʳ','s':'ˢ','t':'ᵗ','u':'ᵘ','v':'ᵛ','w':'ʷ','x':'ˣ','y':'ʸ','z':'ᶻ','A':'ᴬ','B':'ᴮ','D':'ᴰ','E':'ᴱ','G':'ᴳ','H':'ᴴ','I':'ᴵ','J':'ᴶ','K':'ᴷ','L':'ᴸ','M':'ᴹ','N':'ᴺ','O':'ᴼ','P':'ᴾ','R':'ᴿ','T':'ᵀ','U':'ᵁ','V':'ⱽ','W':'ᵂ','+':'⁺','-':'⁻','=':'⁼','(':'⁽',')':'⁾'}).map(([k,v])=>({[k]:v})));
+function superscript(s){return chars(s.normalize('NFD')).map(c=>superMap[c]||c).join('')}
+const subMap={'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉','a':'ₐ','e':'ₑ','h':'ₕ','i':'ᵢ','j':'ⱼ','k':'ₖ','l':'ₗ','m':'ₘ','n':'ₙ','o':'ₒ','p':'ₚ','r':'ᵣ','s':'ₛ','t':'ₜ','u':'ᵤ','v':'ᵥ','x':'ₓ','+':'₊','-':'₋','=':'₌','(':'₍',')':'₎'};
+function subscript(s){return chars(s.normalize('NFD')).map(c=>subMap[c]||c).join('')}
+const upsideMap={a:'ɐ',b:'q',c:'ɔ',d:'p',e:'ǝ',f:'ɟ',g:'ƃ',h:'ɥ',i:'ᴉ',j:'ɾ',k:'ʞ',l:'l',m:'ɯ',n:'u',o:'o',p:'d',q:'b',r:'ɹ',s:'s',t:'ʇ',u:'n',v:'ʌ',w:'ʍ',x:'x',y:'ʎ',z:'z',A:'∀',B:'𐐒',C:'Ɔ',D:'◖',E:'Ǝ',F:'Ⅎ',G:'פ',H:'H',I:'I',J:'ſ',K:'⋊',L:'˥',M:'W',N:'N',O:'O',P:'Ԁ',Q:'Ό',R:'ᴚ',S:'S',T:'⊥',U:'∩',V:'Λ',W:'M',X:'X',Y:'⅄',Z:'Z','0':'0','1':'Ɩ','2':'ᄅ','3':'Ɛ','4':'ㄣ','5':'ϛ','6':'9','7':'ㄥ','8':'8','9':'6','.':'˙',',':"'", "'":',','"':'„','?':'¿','!':'¡','(':')',')':'(','[':']',']':'[','{':'}','}':'{','<':'>','>':'<','_':'‾'};
+function upside(s){return chars(s).reverse().map(c=>upsideMap[c]||c).join('')}
+function reverseText(s){return chars(s).reverse().join('')}
+function comb(s,mark){return chars(s).map(c=>/\s/.test(c)?c:c+mark).join('')}
+function alternating(s){let i=0;return chars(s).map(c=>/[A-Za-zÀ-ž]/.test(c)?((i++%2)?c.toLowerCase():c.toUpperCase()):c).join('')}
+function spaced(s){return chars(s).join(' ')}function wideSpaced(s){return chars(s).join('　')}function dotted(s){return chars(s).join(' · ')}function dashed(s){return chars(s).join(' − ')}
+function hashString(s){let h=2166136261;for(const c of s){h^=c.codePointAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){let x=seed||123456789;return ()=>{x^=x<<13;x^=x>>>17;x^=x<<5;return (x>>>0)/4294967296}}
+const above=['\u0300','\u0301','\u0302','\u0303','\u0304','\u0306','\u0307','\u0308','\u030A','\u030B','\u030C','\u0342','\u034A','\u034B','\u034C'],mid=['\u0334','\u0335','\u0336','\u0337','\u0338'],below=['\u0316','\u0317','\u0318','\u0319','\u031C','\u031D','\u031E','\u031F','\u0320','\u0323','\u0324','\u0325','\u0326','\u0329','\u032A','\u032B','\u032C','\u032D','\u032E','\u032F','\u0330','\u0331','\u0332','\u0333'];
+function zalgo(s){const level=+rbGet("uZalgo").value,R=rng(hashString(s)+level*7919);return chars(s).map(c=>{if(/\s/.test(c))return c;let z=c;for(let i=0;i<level;i++)z+=above[Math.floor(R()*above.length)];for(let i=0;i<Math.ceil(level/2);i++)z+=mid[Math.floor(R()*mid.length)];for(let i=0;i<level;i++)z+=below[Math.floor(R()*below.length)];return z;}).join('')}
+function randomDecor(s){const level=+rbGet("uRand").value,all=above.concat(mid,below),R=rng(hashString(s)+level*104729);return chars(s).map(c=>{if(/\s/.test(c))return c;let z=c;for(let i=0;i<level;i++)z+=all[Math.floor(R()*all.length)];return z;}).join('')}
+function keycap(s){return chars(s).map(c=>/[0-9#*]/.test(c)?c+'\uFE0F\u20E3':c).join('')}
+function enclosedCircleComb(s){return chars(s).map(c=>/\s/.test(c)?c:c+'\u20DD').join('')}
+function enclosedSquareComb(s){return chars(s).map(c=>/\s/.test(c)?c:c+'\u20DE').join('')}
+function enclosedDiamondComb(s){return chars(s).map(c=>/\s/.test(c)?c:c+'\u20DF').join('')}
+function slashOverlay(s){return chars(s).map(c=>/\s/.test(c)?c:c+'\u0338').join('')}
+function xOverlay(s){return chars(s).map(c=>/\s/.test(c)?c:c+'\u033D').join('')}
+const USTYLES=[];function uAdd(name,cat,fn,note=''){USTYLES.push({name,cat,fn,note})}
+uAdd('Félkövér serif','Matematikai',s=>transformMap(s,M.bold));uAdd('Dőlt serif','Matematikai',s=>transformMap(s,M.italic));uAdd('Félkövér dőlt serif','Matematikai',s=>transformMap(s,M.boldItalic));
+uAdd('Script / kalligrafikus','Matematikai',s=>transformMap(s,M.script));uAdd('Bold Script','Matematikai',s=>transformMap(s,M.boldScript));uAdd('Fraktur','Matematikai',s=>transformMap(s,M.fraktur));uAdd('Bold Fraktur','Matematikai',s=>transformMap(s,M.boldFraktur));
+uAdd('Double-struck / blackboard','Matematikai',s=>transformMap(s,M.double));uAdd('Sans serif','Matematikai',s=>transformMap(s,M.sans));uAdd('Sans serif félkövér','Matematikai',s=>transformMap(s,M.sansBold));uAdd('Sans serif dőlt','Matematikai',s=>transformMap(s,M.sansItalic));uAdd('Sans félkövér dőlt','Matematikai',s=>transformMap(s,M.sansBoldItalic));uAdd('Monospace / írógép','Matematikai',s=>transformMap(s,M.mono));
+uAdd('Karikázott','Zárt karakterek',circled);uAdd('Zárójeles','Zárt karakterek',parenthesized,'A Unicode csak bizonyos latin betűket/számokat tartalmaz ebben a formában.');uAdd('Négyzetes','Zárt karakterek',squared);uAdd('Fekete négyzetes','Zárt karakterek',negSquared);
+uAdd('Kombináló kör','Zárt karakterek',enclosedCircleComb,'Megjelenítése betűkészletfüggő.');uAdd('Kombináló négyzet','Zárt karakterek',enclosedSquareComb,'Megjelenítése betűkészletfüggő.');uAdd('Kombináló rombusz','Zárt karakterek',enclosedDiamondComb,'Megjelenítése betűkészletfüggő.');uAdd('Keycap számok','Zárt karakterek',keycap);
+uAdd('Fullwidth','Szélesség',fullwidth);uAdd('Fullwidth + szóközölve','Szélesség',s=>wideSpaced(fullwidth(s)));uAdd('Betűközös','Szélesség',spaced);uAdd('Ideografikus szóközös','Szélesség',wideSpaced);uAdd('Pontokkal tagolt','Szélesség',dotted);uAdd('Vonalakkal tagolt','Szélesség',dashed);
+uAdd('Kiskapitális jellegű','Betűalak',smallCaps,'Fonetikus Unicode-karakterekből álló közelítés.');uAdd('FELSŐBETŰS','Betűalak',s=>s.toUpperCase());uAdd('kisbetűs','Betűalak',s=>s.toLowerCase());uAdd('Váltakozó kis/NAGY','Betűalak',alternating);uAdd('Felső index','Betűalak',superscript,'Nincs teljes felső index Unicode-ábécé.');uAdd('Alsó index','Betűalak',subscript,'Nincs teljes alsó index Unicode-ábécé.');
+uAdd('Visszafelé','Irány / tükrözés',reverseText);uAdd('Fejjel lefelé','Irány / tükrözés',upside,'Közelítő karakterkészlet.');
+[['Áthúzott','\u0336'],['Rövid áthúzás','\u0335'],['Hosszú ferde áthúzás','\u0338'],['Rövid ferde áthúzás','\u0337'],['Aláhúzott','\u0332'],['Duplán aláhúzott','\u0333'],['Felülvonás','\u0305'],['Dupla felülvonás','\u033F'],['Pont fölötte','\u0307'],['Két pont fölötte','\u0308'],['Pont alatta','\u0323'],['Két pont alatta','\u0324'],['Gyűrű fölötte','\u030A'],['Gyűrű alatta','\u0325'],['Tilde fölötte','\u0303'],['Tilde alatta','\u0330'],['Hullámvonal középen','\u0334'],['X fölötte','\u033D'],['Függőleges vonal alatta','\u0329'],['Macron alatta','\u0331'],['Híd alatta','\u032A'],['Fordított híd alatta','\u032B'],['Circumflex alatta','\u032D'],['Breve alatta','\u032E']].forEach(([n,m])=>uAdd(n,'Díszítés',s=>comb(s,m)));
+uAdd('Perjeles overlay','Díszítés',slashOverlay);uAdd('X-overlay','Díszítés',xOverlay);uAdd('【Japán zárójelek】','Díszítés',s=>'【'+s+'】');uAdd('『Dupla japán zárójelek』','Díszítés',s=>'『'+s+'』');uAdd('「Sarokzárójelek」','Díszítés',s=>'「'+s+'」');uAdd('《Dupla szögletes》','Díszítés',s=>'《'+s+'》');uAdd('〈Szögletes〉','Díszítés',s=>'〈'+s+'〉');uAdd('꧁ Díszes keret ꧂','Díszítés',s=>'꧁ '+s+' ꧂');uAdd('༺ Díszes tibeti keret ༻','Díszítés',s=>'༺ '+s+' ༻');uAdd('✦ Csillagkeret ✦','Díszítés',s=>'✦ '+s+' ✦');uAdd('•·.·´¯`·.·• keret','Díszítés',s=>'•·.·´¯`·.·• '+s+' •·.·´¯`·.·•');
+uAdd('Zalgo','Extrém',zalgo,'Sok kombináló jelet rak a karakterek fölé/alá.');uAdd('Véletlen kombináló dekoráció','Extrém',randomDecor);uAdd('Glitch: áthúzás + pont + aláhúzás','Extrém',s=>chars(s).map(c=>/\s/.test(c)?c:c+'\u0336\u0307\u0332').join(''));uAdd('Glitch: tilde + ferde + pont alul','Extrém',s=>chars(s).map(c=>/\s/.test(c)?c:c+'\u0303\u0338\u0323').join(''));uAdd('Glitch: dupla felső + dupla alsó','Extrém',s=>chars(s).map(c=>/\s/.test(c)?c:c+'\u033F\u0333').join(''));
+for(const [baseName,key] of [['Bold Fraktur',M.boldFraktur],['Fraktur',M.fraktur],['Bold Script',M.boldScript],['Sans Bold',M.sansBold],['Monospace',M.mono],['Double-struck',M.double]]){uAdd(baseName+' + áthúzott','Kombinált',s=>comb(transformMap(s,key),'\u0336'));uAdd(baseName+' + aláhúzott','Kombinált',s=>comb(transformMap(s,key),'\u0332'));uAdd(baseName+' + felülvonás','Kombinált',s=>comb(transformMap(s,key),'\u0305'));}
+uAdd('Karikázott + betűköz','Kombinált',s=>spaced(circled(s)));uAdd('Fullwidth + áthúzott','Kombinált',s=>comb(fullwidth(s),'\u0336'));uAdd('Kiskapitális + betűköz','Kombinált',s=>spaced(smallCaps(s)));
+
+let uActiveCat='Mind';
+const uCategories=['Mind',...Array.from(new Set(USTYLES.map(x=>x.cat)))];
+for(const c of uCategories){
+  const b=document.createElement('button');b.className='uchip'+(c==='Mind'?' active':'');b.textContent=c;
+  b.onclick=()=>{uActiveCat=c;RBAPP.querySelectorAll('.uchip').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderUnicode();};
+  rbGet("uCats").appendChild(b);
+}
+function visibleUnicodeStyles(){
+  const q=rbGet("uSearch").value.trim().toLocaleLowerCase('hu');
+  return USTYLES.filter(x=>(uActiveCat==='Mind'||x.cat===uActiveCat)&&(!q||(x.name+' '+x.cat+' '+x.note).toLocaleLowerCase('hu').includes(q)));
+}
+function renderUnicode(){
+  const s=rbGet("uInput").value,list=visibleUnicodeStyles();rbGet("uGrid").innerHTML="";rbGet("uCounter").textContent=list.length+" / "+USTYLES.length+" változat";
+  for(const st of list){
+    let output="";try{output=st.fn(s)}catch(e){output="[Nem jeleníthető ezen a böngészőn]";}
+    const card=document.createElement("div");card.className="ucard";const head=document.createElement("div");head.className="uhead";
+    const nm=document.createElement("div");nm.className="uname";nm.textContent=st.name;const cat=document.createElement("span");cat.className="ucat";cat.textContent=" · "+st.cat;nm.appendChild(cat);
+    const btn=document.createElement("button");btn.textContent="Másolás";btn.onclick=()=>copyToClipboard(output,null,"Vágólapra másolva");
+    const box=document.createElement("div");box.className="uout";box.textContent=output;head.append(nm,btn);card.append(head,box);
+    if(st.note){const n=document.createElement("div");n.className="unote";n.textContent=st.note;card.append(n);}
+    rbGet("uGrid").appendChild(card);
+  }
+}
+rbGet("uInput").addEventListener("input",renderUnicode);rbGet("uSearch").addEventListener("input",renderUnicode);
+rbGet("uZalgo").addEventListener("input",e=>{rbGet("uZalgoVal").textContent=e.target.value;renderUnicode();});
+rbGet("uRand").addEventListener("input",e=>{rbGet("uRandVal").textContent=e.target.value;renderUnicode();});
+rbGet("uClear").onclick=()=>{rbGet("uInput").value="";renderUnicode();rbGet("uInput").focus();};
+rbGet("uExample").onclick=()=>{rbGet("uInput").value="RegionalBahn – Közvetlen Kocsi – Deutscher Wald – Árvíztűrő tükörfúrógép 0123456789";renderUnicode();};
+rbGet("uCopyAll").onclick=()=>{const s=rbGet("uInput").value,list=visibleUnicodeStyles();copyToClipboard(list.map(st=>st.name+":\n"+st.fn(s)).join("\n\n"),null,"Összes látható változat másolva.");};
+renderUnicode();
+})();
+</script>
+
+</body>
+</html>
