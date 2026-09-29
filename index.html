@@ -38,7 +38,6 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
     </div>
     <nav class="tabs" aria-label="Eszközök">
       <button class="tabbtn active" data-tab="admin">Cikkadmin</button>
-      <button class="tabbtn" data-tab="article">Szöveg → Blogger konverter</button>
       <button class="tabbtn" data-tab="boxed">Keretes</button>
       <button class="tabbtn" data-tab="collections">Gyűjtőoldalak</button>
       <button class="tabbtn" data-tab="tables">Táblázatok</button>
@@ -55,7 +54,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
   <div class="panel admin-hero">
     <div>
       <h2>RBTools Cikkadmin</h2>
-      <p class="intro">Komplett RegionalBahn-cikk összeállítása vizuálisan. A Bloggerben csak a képeket kell feltölteni; a cikkszöveg, a képek helye, a képaláírások, a keretes blokkok és a formázás itt áll össze végleges Blogger HTML-lé.</p>
+      <p class="intro">A RegionalBahn egységes cikkműhelye. A vizuális szerkesztés mellett itt érhető el a korábbi Szöveg → Blogger konverter teljes tudása is: Markdown/plain text/DOCX/Google Dokumentum import, RB-jelölések, profilok, presetek, HTML-előnézet, Blogger-draftkezelés, képek, keretesek és iframe-ek.</p>
     </div>
     <div class="toolbar">
       <button id="rbtools-adminBuild" class="primary">⚙ Cikk felépítése</button>
@@ -105,13 +104,14 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
     <div class="admin-section-head">
       <div>
         <h2 style="margin:0">Gyorstalpaló</h2>
-        <p class="small" style="margin:3px 0 0">A teljes szerkesztési kör az RBToolsban végezhető; képfeltöltéshez továbbra is a Blogger saját feltöltője kell.</p>
+        <p class="small" style="margin:3px 0 0">A Cikkadmin most az egyetlen cikkes munkafelület: a korábbi Szöveg → Blogger konverter is ide költözött. Képfeltöltéshez továbbra is a Blogger saját feltöltője kell.</p>
       </div>
       <span class="badge">Blogger ↔ RBTools</span>
     </div>
     <ol class="admin-quicksteps">
       <li><strong>Válassz tartalomtípust:</strong> cikk, #nyúz, podcast shownotes, InnoTrans vagy statikus oldal; igény szerint töltsd be a hozzá tartozó sablont.</li>
-      <li><strong>Új anyag:</strong> írj közvetlenül a WYSIWYG-ben, vagy importálj Markdown/TXT/DOCX szöveget. Képes cikknél Bloggerben előbb töltsd fel a képeket egy draftba, majd nyisd meg azt itt.</li>
+      <li><strong>Új anyag:</strong> a legtöbb munkához írj közvetlenül a WYSIWYG-ben, vagy importálj Markdown/TXT/DOCX szöveget. Képes cikknél Bloggerben előbb töltsd fel a képeket egy draftba, majd nyisd meg azt itt.</li>
+      <li><strong>Haladó forráskonverzió:</strong> ha Google Dokumentumból dolgozol, régi RB-jelöléseket (<code>RB:IMAGE</code>, <code>RB:BOX</code>, <code>RB:SOURCES</code> stb.) használsz, profil/preset kell, vagy külön HTML-előnézetet szeretnél, nyisd le a Cikkadmin alján a <strong>Haladó forráskonverzió, Google Docs és RB-jelölések</strong> részt. A létrejött HTML egy gombbal visszatölthető a WYSIWYG-be.</li>
       <li><strong>Meglévő draft:</strong> kapcsolódj a Bloggerhez, válaszd ki a piszkozatot, majd <strong>Piszkozat megnyitása</strong>. A cím, címkék, szöveg, képek és iframe-ek betöltődnek.</li>
       <li><strong>Szerkesztés:</strong> a WYSIWYG-ben közvetlenül használható a formázás, link, felsorolás, igazítás, keretes, kép, iframe és blokkmozgatás. Az <strong>x² / x₂</strong> gomb HTML <code>&lt;sup&gt;</code>/<code>&lt;sub&gt;</code> formázást készít a kijelölt szövegből.</li>
       <li><strong>Különleges jelek:</strong> nyisd le az <strong>Ω Különleges karakterek…</strong> panelt Unicode-jelekhez, emojihoz, Unicode felső/alsó indexhez és HTML-entitásokhoz. Kijelölt szövegnél a beszúrt jel vagy entitás <strong>lecseréli a kijelölést</strong>; a <code>&amp;nbsp;</code> rózsaszín szerkesztői jelölést kap.</li>
@@ -123,7 +123,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
     <div class="admin-help-callout">
       <strong>Első használat vagy hiba esetén:</strong>
       a <a href="#rbtools-help-cikkadmin" id="rbtools-adminHelpLink">Súgó részletes Cikkadmin-fejezete</a>
-      lépésről lépésre végigvezet a Google-belépésen, draftkezelésen, WYSIWYG-en, képeken, iframe-eken, felső/alsó indexen, különleges karaktereken, HTML-entitásokon, keresésen, statikus oldalakon és a tipikus hibaüzenetek elhárításán.
+      lépésről lépésre végigvezet a Google-belépésen, draftkezelésen, WYSIWYG-en, a beépített haladó forráskonverteren, Google Docs/DOCX importon, RB-jelöléseken, képeken, iframe-eken, felső/alsó indexen, különleges karaktereken, HTML-entitásokon, keresésen, statikus oldalakon és a tipikus hibaüzenetek elhárításán.
     </div>
   </div>
 
@@ -354,12 +354,13 @@ További szöveg..."></textarea>
     <div class="cardhead admin-section-head"><span>5. Végleges Blogger HTML</span><span class="small">A WYSIWYG szerkesztő minden módosítása automatikusan frissíti.</span></div>
     <textarea id="rbtools-adminOutput" spellcheck="false" readonly></textarea>
   </section>
-</section>
 
 
-<section id="rbtools-tab-article" class="tab">
-  <div class="panel">
-    <h2>Cikkprofil és kimeneti szerkezet</h2>
+  <details class="admin-integrated-converter" id="rbtools-adminAdvancedConverter">
+    <summary><strong>Haladó forráskonverzió, Google Docs és RB-jelölések</strong> <span class="small">A korábbi külön konverter összes funkciója</span></summary>
+    <div class="admin-integrated-converter-body">
+<div class="panel">
+    <h2>Haladó forráskonverzió és kimeneti szerkezet</h2><p class="intro">A korábbi Szöveg → Blogger konverter teljes tudása itt, a Cikkadmin részeként érhető el: profilok, presetek, Markdown/plain text/DOCX/Google Dokumentum, RB-jelölések, közvetlen HTML-kimenet és előnézet.</p>
     <div class="grid4">
       <div class="field"><label>Cikkprofil</label>
         <select id="rbtools-profile">
@@ -399,6 +400,7 @@ További szöveg..."></textarea>
       <label class="filelabel" for="rbtools-mdFile">📂 .md / .txt / .docx megnyitása</label>
       <input id="rbtools-mdFile" type="file" accept=".md,.markdown,.txt,.docx,text/markdown,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
       <button id="rbtools-convertArticle" class="primary">⚙ Konvertálás</button>
+      <button id="rbtools-useArticleInAdmin" type="button">↪ Kimenet megnyitása a WYSIWYG-ben</button>
       <button id="rbtools-copyTitle">▣ Cím másolása</button>
       <button id="rbtools-copyArticleHtml">⧉ HTML másolása</button>
       <button id="rbtools-previewArticle">◉ Előnézet</button>
@@ -484,6 +486,9 @@ Források:
 
 **Prága | Csehország** – A következő hír szövege.</pre>
   </details>
+    </div>
+  </details>
+
 </section>
 
 
@@ -760,7 +765,7 @@ A következő cikk rövid ajánlója.</pre>
 <section id="rbtools-tab-help" class="tab">
   <div class="panel help-admin-guide" id="rbtools-help-cikkadmin">
     <h2>Cikkadmin – teljes, lépésről lépésre használati útmutató</h2>
-    <p><strong>Ha most használod először az RBToolst, ezt a fejezetet érdemes végigolvasni.</strong> A Cikkadmin a RegionalBahn teljes vizuális szerkesztője. Többek között ezekre használható:</p>
+    <p><strong>Ha most használod először az RBToolst, ezt a fejezetet érdemes végigolvasni.</strong> A Cikkadmin a RegionalBahn egységes cikkes munkafelülete. A korábbi külön <strong>Szöveg → Blogger konverter</strong> megszűnt mint önálló fül, és teljes funkcionalitása a Cikkadmin <strong>Haladó forráskonverzió, Google Docs és RB-jelölések</strong> részébe került. Többek között ezekre használható:</p>
     <ul>
       <li>új anyag írása üres lapról;</li>
       <li>meglévő Blogger-piszkozat megnyitása és ugyanabba visszamentése;</li>
@@ -768,7 +773,10 @@ A következő cikk rövid ajánlója.</pre>
       <li>felső/alsó index és listák formázása;</li>
       <li>Unicode-karakterek, emoji és HTML-entitások beszúrása;</li>
       <li>keresés az aktuális WYSIWYG-cikkben;</li>
-      <li>cikk-, #nyúz-, podcast-, InnoTrans- és statikusoldal-sablonok használata.</li>
+      <li>cikk-, #nyúz-, podcast-, InnoTrans- és statikusoldal-sablonok használata;</li>
+      <li>haladó Markdown/plain text/DOCX/Google Dokumentum konverzió profilokkal és presetekkel;</li>
+      <li>RB:MAIN_IMAGE, RB:LEAD, RB:IMAGE, RB:ITALIC, RB:BOX, RB:SOURCES és RB:AUTHOR jelölések feldolgozása;</li>
+      <li>külön HTML-előnézet és a haladó konverter kimenetének visszatöltése a WYSIWYG-be.</li>
     </ul>
     <p>A szerkesztés közben a Blogger-kompatibilis HTML folyamatosan újragenerálódik.</p>
 
@@ -844,6 +852,19 @@ A következő cikk rövid ajánlója.</pre>
     <h3>8. Meglévő Blogger-piszkozat megnyitása</h3>
     <p>Kapcsolódás után válaszd ki a blogot. A <strong>Piszkozat keresése</strong> mező cím vagy post ID alapján szűr. A <strong>Piszkozat</strong> listából válassz, majd <strong>Piszkozat megnyitása</strong>. A program betölti a címet, HTML-t, Blogger-címkéket, képeket, iframe-eket és a felismerhető szerkezeti blokkokat.</p>
     <p>A megnyitott bejegyzés post ID-ja megmarad. Ez a legfontosabb különbség a kézi HTML-importhoz képest: a későbbi <strong>Mentés Blogger-piszkozatba</strong> ugyanazt a draftot frissíti, nem készít új másolatot.</p>
+
+    <h3>8/A. Haladó forráskonverzió, Google Docs és RB-jelölések</h3>
+    <p>A Cikkadmin alján található, lenyitható <strong>Haladó forráskonverzió, Google Docs és RB-jelölések</strong> rész tartalmazza mindazt, ami korábban a külön Szöveg → Blogger konverter fülön volt.</p>
+    <ul>
+      <li><strong>Profil:</strong> általános RegionalBahn-cikk, szekciós/gyártói szemle vagy #nyúz/heti hírösszefoglaló.</li>
+      <li><strong>Preset:</strong> #nyúz, InnoTrans 2026 vagy általános helyszíni tudósítás.</li>
+      <li><strong>Forrás:</strong> Markdown, plain text, DOCX vagy Google Dokumentum.</li>
+      <li><strong>RB-jelölések:</strong> használható az <code>RB:MAIN_IMAGE</code>, <code>RB:LEAD</code>, <code>RB:IMAGE</code>, <code>RB:ITALIC</code>, <code>RB:BOX</code>, <code>RB:SOURCES</code> és <code>RB:AUTHOR</code>.</li>
+      <li><strong>Speciális footer:</strong> szerző, „Összeállította”, több tudósítós footer vagy footer nélküli kimenet.</li>
+      <li><strong>Előnézet:</strong> a generált Blogger HTML külön iframe-ben ellenőrizhető.</li>
+      <li><strong>Átadás a WYSIWYG-nek:</strong> a <strong>Kimenet megnyitása a WYSIWYG-ben</strong> gomb a konvertált HTML-t visszatölti a fő Cikkadmin szerkesztőjébe. Ezután a blokkok, képek, keretesek és iframe-ek a normál vizuális eszközökkel tovább szerkeszthetők.</li>
+    </ul>
+    <p>A haladó konverter közvetlen HTML-kimenete önmagában is másolható vagy menthető. Ha a WYSIWYG-be töltöd át, különösen a főkép és az összetett, több tudósítós footer ellenőrzése ajánlott, mert a vizuális visszafejtés a HTML szerkezetéből dolgozik.</p>
 
     <h3>9. Régi vagy kézzel kapott HTML visszatöltése</h3>
     <p>Ha a cikk nincs az API-n keresztül megnyitva, a <strong>Meglévő Blogger-cikk HTML-jének visszatöltése szerkesztésre</strong> részbe teljes HTML-fragmentum illeszthető vagy <code>.html</code> fájl tölthető. A parser felismeri a tipikus RegionalBahn leadet, képeket, képaláírásokat, H3/H4 címeket, kereteseket, iframe-eket és néhány speciális blokkot. Nem általános célú tökéletes HTML round-trip szerkesztő, ezért különösen régi vagy szokatlan kézi HTML-nél mindig ellenőrizd a végleges kimenetet.</p>
@@ -1052,7 +1073,7 @@ A következő cikk rövid ajánlója.</pre>
   </div>
 
   <div class="panel">
-    <h2>Word és Google Dokumentum import</h2>
+    <h2>Cikkadmin: Word és Google Dokumentum import</h2>
     <ul>
       <li><strong>.docx:</strong> a fájlt közvetlenül megnyithatod vagy behúzhatod. A konverter a DOCX-et helyben bontja ki, és a Word félkövér, dőlt, aláhúzott, áthúzott, hiperlinkes, címsoros és listás formázásából Markdownot készít.</li>
       <li><strong>Google Dokumentum:</strong> illeszd be a normál <code>docs.google.com/document/d/…</code> megosztható linket. A program először a DOCX-exportot, majd tartalék megoldásként a plain-text exportot próbálja közvetlenül beolvasni. Ha ezt a Google böngészős CORS-védelme blokkolja, használd a <strong>DOCX export megnyitása</strong> gombot, majd húzd be a letöltött fájlt.</li>
@@ -1069,7 +1090,7 @@ A következő cikk rövid ajánlója.</pre>
           <li>XLSX esetén a munkalapok közül lehet választani;</li>
           <li>DOCX esetén a Word-táblák külön HTML-táblázatokká alakulnak.</li>
         </ul>
-        A cikkszövegként importált Word-táblázatokat a cikk-konverter is valódi HTML-táblázatként rendereli.
+        A cikkszövegként importált Word-táblázatokat a Cikkadmin haladó forráskonverziója is valódi HTML-táblázatként rendereli.
       </li>
       <li><strong>HTML ellenőrző:</strong> jelzi többek között a lezáratlan vagy feleslegesen zárt elemeket, hiányzó kép- és linkattribútumokat, többszörös Blogger <code>&lt;!--more--&gt;</code> jelölőt és néhány RegionalBahn-konvenciót. Az automatikus javítás a böngésző HTML-parserére támaszkodik, ezért az eredetit érdemes megőrizni.</li>
     </ul>
@@ -1078,10 +1099,10 @@ A következő cikk rövid ajánlója.</pre>
     <h2>Önálló keretes konverter</h2>
     <p>A <strong>Keretes</strong> fül közvetlenül Blogger HTML-t készít a szürke információs dobozhoz. A címet külön mezőben, a törzsszöveget Markdownként vagy plain textként lehet megadni; a bekezdéseket üres sor választja el.</p>
     <p>Opcionálisan megadható nagy és megjelenített kép-URL, kredit és képaláírás. Ha csak egy kép-URL van kitöltve, azt használja mindkét helyen. A Word-import a DOCX szövegét Markdownná alakítja, majd keretes blokkba rendezi.</p>
-    <p>A cikk-konverterben továbbra is használható az <code>RB:BOX</code> jelölés, tehát a külön fül nem váltja ki a meglévő funkciót, hanem önálló gyorseszközként egészíti ki.</p>
+    <p>A Cikkadmin haladó forráskonverziójában továbbra is használható az <code>RB:BOX</code> jelölés; a külön <strong>Keretes</strong> fül ettől függetlenül gyorseszközként továbbra is megmarad.</p>
   </div>
   <div class="panel">
-    <h2>Profilok</h2>
+    <h2>Cikkadmin: haladó forrásprofilok</h2>
     <ul>
       <li><strong>Általános RegionalBahn cikk:</strong> automatikusan az első önálló félkövér bekezdést használja leadként, és alapból ezt teszi a főkép mellé. Ez a klasszikus RegionalBahn-logika.</li>
       <li><strong>Szekciós / gyártói szemle:</strong> alapból a címet ismétli a főkép mellett; a cím utáni első normál bekezdés megmarad felvezetőként a <code>&lt;!--more--&gt;</code> után. A <code>##</code> sorok önálló szekciókat készítenek.</li>
@@ -1331,6 +1352,12 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-empty{padding:26px;text-align:center;color:var(--muted);border:2px dashed var(--line);border-radius:9px}
 #rbtools-app .admin-output-card{margin-top:15px}
 #rbtools-app .admin-output-card textarea{min-height:380px}
+#rbtools-app .admin-integrated-converter{margin-top:15px;border:1px solid var(--line);border-radius:11px;background:var(--panel);padding:0}
+#rbtools-app .admin-integrated-converter>summary{cursor:pointer;padding:14px 16px;font-size:16px}
+#rbtools-app .admin-integrated-converter[open]>summary{border-bottom:1px solid var(--line)}
+#rbtools-app .admin-integrated-converter-body{padding:12px}
+#rbtools-app .admin-integrated-converter-body>.panel:first-child{margin-top:0}
+#rbtools-app .admin-integrated-converter-body>.panel:last-child{margin-bottom:0}
 @media(max-width:800px){#rbtools-app .admin-embedbar{grid-template-columns:1fr}#rbtools-app .admin-canvas{padding:12px;min-height:460px;height:65vh}#rbtools-app .admin-block{padding-right:38px}#rbtools-app .admin-image-library{grid-template-columns:1fr}}#rbtools-app .admin-block{padding-right:38px}#rbtools-app .admin-image-library{grid-template-columns:1fr}}
 @media(max-width:700px){#rbtools-app .image-url-grid{grid-template-columns:1fr}}
 
@@ -1375,7 +1402,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v22";
+const RBTOOLS_VERSION="pages-v23";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -1486,6 +1513,7 @@ function rbWatchStatus(id,source){
 }
 rbWatchStatus("adminStatus","Cikkadmin");
 rbWatchStatus("bloggerStatus","Blogger");
+rbWatchStatus("articleStatus","Cikkadmin / haladó forráskonverzió");
 rbMainStatus("Készen áll. Válassz tartalomtípust, nyiss meg egy Blogger-piszkozatot, vagy kezdj új anyagot.","Cikkadmin","info");
 
 /* ---------- Markdown / Blogger ---------- */
@@ -1787,6 +1815,24 @@ function doConvertArticle(){
   try{rbGet("articleOutput").value=convertArticleInput(rbGet("mdInput").value);rbGet("articleStatus").textContent="Kész.";}
   catch(e){console.error(e);rbGet("articleStatus").textContent="Hiba: "+e.message;}
 }
+function adminOpenAdvancedOutput(){
+  if(!rbGet("articleOutput").value.trim())doConvertArticle();
+  let html=rbGet("articleOutput").value.trim();
+  if(!html){rbGet("articleStatus").textContent="Nincs megnyitható konverterkimenet.";return;}
+  const title=rbGet("title").value.trim();
+  const preset=rbGet("preset").value,profile=rbGet("profile").value;
+  rbGet("adminContentType").value=preset==="innotrans2026"?"innotrans":profile==="news"?"news":"article";
+  adminContentTypeChanged(false);
+  rbGet("adminExistingHtml").value=html;
+  adminLoadExistingHtml(html);
+  if(title)rbGet("adminTitle").value=title;
+  if(rbGet("author").value.trim()&&rbGet("footerMode").value==="author")rbGet("adminAuthor").value=rbGet("author").value.trim();
+  adminRenderCanvas();adminGenerateHtml(false);
+  rbGet("adminStatus").textContent="A haladó forráskonverter kimenete betöltve a WYSIWYG Cikkadminba. Ellenőrizd a képeket és a footert.";
+  rbGet("articleStatus").textContent="Kimenet átadva a WYSIWYG Cikkadminnak.";
+  rbGet("adminAdvancedConverter").open=false;
+  requestAnimationFrame(()=>rbGet("adminCanvas")?.scrollIntoView({behavior:"smooth",block:"start"}));
+}
 function updateReporterFields(){rbGet("reporterFields").classList.toggle("hidden",rbGet("footerMode").value!=="reporters");}
 rbGet("footerMode").addEventListener("change",()=>{updateReporterFields();if(rbGet("mdInput").value.trim())doConvertArticle();});
 rbGet("profile").addEventListener("change",()=>{
@@ -1815,6 +1861,7 @@ for(const id of ["author","thumb","full","credit","footerIntro","reporters","foo
   rbGet(id).addEventListener("input",()=>{if(rbGet("mdInput").value.trim())doConvertArticle();});
 }
 rbGet("convertArticle").addEventListener("click",doConvertArticle);
+rbGet("useArticleInAdmin").addEventListener("click",adminOpenAdvancedOutput);
 rbGet("copyTitle").addEventListener("click",()=>copyToClipboard(rbGet("title").value,rbGet("articleStatus"),"Cím vágólapra másolva."));
 rbGet("copyArticleHtml").addEventListener("click",()=>copyToClipboard(rbGet("articleOutput").value,rbGet("articleStatus"),"HTML vágólapra másolva."));
 rbGet("previewArticle").addEventListener("click",()=>{
