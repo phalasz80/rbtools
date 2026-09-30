@@ -199,3 +199,10 @@ Visszaellenőrzés: `node tests/theme-compat.test.cjs`, majd az összes `tests/*
 A WYSIWYG formázósorában és a kijelölt szöveg helyi menüjében egyaránt elérhető az **ABBR** funkció. A kijelölt rövidítéshez külön panelen add meg a teljes feloldást: a kimenet `<abbr title="…">rövidítés</abbr>`. Meglévő abbr-re kattintva a title módosítható; a jelölés eltávolításakor a benne lévő szöveg megmarad. A helyi menü a Firefox jobb kattintásával összeomló kijelölését ugyanúgy menti, mint a linkeknél.
 
 A **Szerzők és cikkzárás** mezőcsoport közvetlenül a WYSIWYG alatt található. Itt sablontól függetlenül adhatók meg a nevek és a megjelenés: szerzők, **Összeállította:** vagy nincs szerzői footer. A normál és az összeállítói változat a korábbi RegionalBahn-szintaxist követi: középre helyezett `<hr>`, jobbra zárt, dőlt, 85%-os sor. Megnyitott cikk esetén kizárólag a szabványos, tényleges utolsó szerzői blokkot olvassuk vissza; hiánya esetén üres névvel, kikapcsolt footerrel indul, nem a korábban szerkesztett cikk adataival. A gyorstalpaló és a Súgó frissült; a Súgó fő fejezetei 0-tól 28-ig folyamatos számozást kaptak.
+
+
+## Változásnapló és gombos Súgó (pages-v43)
+
+A fejlécben található `JS: aktív • pages-v43 ↗` verziójelzés kattintható: új lapon megnyitja a `/release-notes.html` önálló változásnaplót. A dátumozott kiadási napló a GitHub által egyértelműen azonosítható v29, v37–v43 kiadásokat fedi le; az ennél régebbi és köztes fejlesztések nem kapnak bizonytalanul visszavetített verziószámot. A következő kiadásoknál a fájlt és a `RBTOOLS_VERSION` azonosítót együtt kell frissíteni.
+
+A Súgó tartalomjegyzéke az archívumokhoz hasonló, billentyűzettel is használható témagombokat és **Összes** lehetőséget kínál. Alapértelmezésben a Cikkadmin látható, azon belül külön fejezetgombokkal. Mélyhivatkozás vagy hashváltozás esetén a keresett fejezet szülőtémáját automatikusan megnyitja. A Gyűjtőoldalak útmutatója a részletes Cikkadmin-szakasz után következik.

@@ -31,7 +31,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
               <div id="rbtools-mainStatusText">Készen áll. Válassz tartalomtípust, nyiss meg egy Blogger-piszkozatot, vagy kezdj új anyagot.</div>
             </div>
           </div>
-          <div id="rbtools-rbtoolsRuntime" class="rbtools-runtime rbtools-runtime-panel">JS: indul…</div>
+          <a id="rbtools-rbtoolsRuntime" class="rbtools-runtime rbtools-runtime-panel rb-release-link" href="/release-notes.html" target="_blank" rel="noopener" title="Változásnapló megnyitása új lapon">JS: indul… · Változásnapló ↗</a>
         </div>
       </div>
     </div>
@@ -1028,21 +1028,10 @@ A következő cikk rövid ajánlója.</pre>
 <section id="rbtools-tab-help" class="tab">
   <nav class="panel rb-help-toc" id="rbtools-helpTOC" aria-label="Súgó tartalomjegyzéke">
     <h2>Súgó: tartalomjegyzék</h2>
-    <p>A témára kattintva közvetlenül a megfelelő lépésről lépésre útmutatóhoz ugorhatsz.</p>
-    <div id="rbtools-helpTOCLinks"></div>
+    <p>A témák gombokként működnek: a kiválasztott fejezetcsoport látszik, az <strong>Összes</strong> mindet kinyitja. A részletes fejezetgombok közvetlenül a megfelelő címhez ugranak.</p>
+    <div id="rbtools-helpTOCLinks" role="group" aria-label="Súgó témaválasztó"></div>
+    <div id="rbtools-helpChapterLinks" class="rb-help-chapters" aria-label="Fejezetválasztó"></div>
   </nav>
-  <div class="panel" id="rbtools-help-gyujtooldalak">
-    <h2>Gyűjtőoldalak: lépésről lépésre</h2>
-    <ol>
-      <li>A <strong>Gyűjtőoldalak</strong> fülön válaszd ki a kívánt típust: Közvetlen Kocsi, InnoTrans, aktuális Impresszum, Vasúti fékezés, Magyar Zusi vagy üres szöveges oldal.</li>
-      <li>Meglévő <code>/p/</code> oldal pontos szerkesztéséhez kapcsolódj a Bloggerhez, frissítsd az oldallistát, válaszd ki az oldalt, majd kattints a <strong>Megnyitás</strong> gombra. A rendszer az eredeti HTML-t tartja meg, a speciális gombokat és szkripteket külön zárolja.</li>
-      <li>A szerkesztőnek átadott, <strong>legfrissebb oldaltartalomból külön helyi mintát</strong> a „Friss sablon az eredeti Blogger-oldalból” gomb készít. Így a kézzel módosított Impresszum is pontosan a Blogger API-ban meglévő tartalommal használható. A beépített offline minták csupán kiindulási vázlatok, nem az élő oldal másolatai.</li>
-      <li>Új Közvetlen Kocsi- vagy InnoTrans-anyaghoz használd az <strong>Új év / Új adás / Új cikk</strong> gombokat. A két archívumban az évválasztó és az „Összes” gomb megmarad. A fékezés- és Zusi-sablonokban szerkeszthető szekciókat, linkeket és tartalomblokkokat kapsz.</li>
-      <li>Szerkeszd a fehér tartalmi blokkokat WYSIWYG-ben, a sötét jelzésű speciális HTML-t a program változtatás nélkül kezeli. Nyisd meg a <strong>Biztonságos előnézetet</strong>, szükség esetén töltsd le a teljes HTML-t.</li>
-      <li>Élő oldal mentése előtt <strong>ajánlott</strong> letölteni az eredeti HTML-t. Ha erről lemondasz, ezt külön jelölőnégyzettel kell megerősítened. A mentés előtt újabb szerverellenőrzés fut, a közzétett oldal módosítása azonnal látható lehet.</li>
-      <li>A mentés utáni ellenőrzés összeveti a Bloggerben található HTML-t az elküldött változattal és ellenőrzi a védett kódrészeket. Eltérésnél ellenőrizd az állapotsávot, ne ments rá automatikusan újra.</li>
-    </ol>
-  </div>
   <div class="panel" id="rbtools-help-keretes">
     <h2>Keretes: WYSIWYG és HTML használata</h2>
     <ol>
@@ -1368,6 +1357,19 @@ A következő cikk rövid ajánlója.</pre>
 
     <h3>28. Amit soha ne adj meg</h3>
     <p>Az RBTools <strong>nem kér Google-jelszót</strong>, és nem kér <strong>OAuth Client Secretet</strong>. Ha ilyen adat beírását kérné valami, az nem a normál RBTools-munkamenet. A beépített OAuth Client ID önmagában nyilvános alkalmazásazonosító; a tényleges hozzáférést a Google által kiadott rövid életű token adja.</p>
+  </div>
+
+  <div class="panel" id="rbtools-help-gyujtooldalak">
+    <h2>Gyűjtőoldalak: lépésről lépésre</h2>
+    <ol>
+      <li>A <strong>Gyűjtőoldalak</strong> fülön válaszd ki a kívánt típust: Közvetlen Kocsi, InnoTrans, aktuális Impresszum, Vasúti fékezés, Magyar Zusi vagy üres szöveges oldal.</li>
+      <li>Meglévő <code>/p/</code> oldal pontos szerkesztéséhez kapcsolódj a Bloggerhez, frissítsd az oldallistát, válaszd ki az oldalt, majd kattints a <strong>Megnyitás</strong> gombra. A rendszer az eredeti HTML-t tartja meg, a speciális gombokat és szkripteket külön zárolja.</li>
+      <li>A szerkesztőnek átadott, <strong>legfrissebb oldaltartalomból külön helyi mintát</strong> a „Friss sablon az eredeti Blogger-oldalból” gomb készít. Így a kézzel módosított Impresszum is pontosan a Blogger API-ban meglévő tartalommal használható. A beépített offline minták csupán kiindulási vázlatok, nem az élő oldal másolatai.</li>
+      <li>Új Közvetlen Kocsi- vagy InnoTrans-anyaghoz használd az <strong>Új év / Új adás / Új cikk</strong> gombokat. A két archívumban az évválasztó és az „Összes” gomb megmarad. A fékezés- és Zusi-sablonokban szerkeszthető szekciókat, linkeket és tartalomblokkokat kapsz.</li>
+      <li>Szerkeszd a fehér tartalmi blokkokat WYSIWYG-ben, a sötét jelzésű speciális HTML-t a program változtatás nélkül kezeli. Nyisd meg a <strong>Biztonságos előnézetet</strong>, szükség esetén töltsd le a teljes HTML-t.</li>
+      <li>Élő oldal mentése előtt <strong>ajánlott</strong> letölteni az eredeti HTML-t. Ha erről lemondasz, ezt külön jelölőnégyzettel kell megerősítened. A mentés előtt újabb szerverellenőrzés fut, a közzétett oldal módosítása azonnal látható lehet.</li>
+      <li>A mentés utáni ellenőrzés összeveti a Bloggerben található HTML-t az elküldött változattal és ellenőrzi a védett kódrészeket. Eltérésnél ellenőrizd az állapotsávot, ne ments rá automatikusan újra.</li>
+    </ol>
   </div>
 
   <div class="panel">
@@ -1931,7 +1933,16 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .rb-box-visual-editor:empty::before{content:attr(data-placeholder);color:#728293;pointer-events:none}
 #rbtools-app #rbtools-boxRichHtml:not([hidden]){display:block;min-height:240px;width:100%;font:13px/1.5 Consolas,monospace}
 #rbtools-app .rb-help-toc{border:2px solid #5182aa;scroll-margin-top:20px}
-#rbtools-app .rb-help-toc a{display:inline-block;margin:4px 7px 4px 0;padding:6px 10px;background:var(--panel2);border-radius:5px}
+#rbtools-app .rb-help-toc #rbtools-helpTOCLinks{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}
+#rbtools-app .rb-help-toc button{border:1px solid var(--line);border-radius:999px;padding:9px 15px;background:var(--panel2);color:var(--ink);font:inherit;cursor:pointer;transition:background .15s,transform .15s,box-shadow .15s}
+#rbtools-app .rb-help-toc button:hover{transform:translateY(-1px);box-shadow:0 3px 12px #0002}
+#rbtools-app .rb-help-toc button[aria-pressed="true"]{background:#0b5394;color:#fff;border-color:#0b5394;font-weight:700;box-shadow:0 3px 12px #0b539444}
+#rbtools-app .rb-help-chapters{display:flex;gap:7px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:12px}
+#rbtools-app .rb-help-chapters:empty{display:none}
+#rbtools-app .rb-help-chapters button{font-size:.89rem;padding:7px 11px;border-radius:7px}
+#rbtools-app .rb-help-section[hidden]{display:none!important}
+#rbtools-app .rb-release-link{display:inline-flex;align-items:center;color:inherit;text-decoration:none;cursor:pointer}
+#rbtools-app .rb-release-link:hover,#rbtools-app .rb-release-link:focus-visible{outline:2px solid #0b5394;outline-offset:3px;text-decoration:underline}
 #rbtools-app #rbtools-help-gyujtooldalak,#rbtools-app #rbtools-help-keretes{scroll-margin-top:20px}
 #rbtools-app .admin-box-variant{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel2);font-size:12px}
 #rbtools-app .admin-box-variant select{max-width:240px;min-width:140px}
@@ -1940,7 +1951,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v42";
+const RBTOOLS_VERSION="pages-v43";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
 const RBAPP = document.getElementById("rbtools-app");
@@ -1959,7 +1970,7 @@ function rbInstallNoIndex(){
 rbInstallNoIndex();
 if(RBAPP){
   const badge=rbGet("rbtoolsRuntime");
-  if(badge){badge.textContent="JS: aktív "+String.fromCharCode(0x2022)+" "+RBTOOLS_VERSION;badge.classList.add("ok");}
+  if(badge){badge.textContent="JS: aktív "+String.fromCharCode(0x2022)+" "+RBTOOLS_VERSION+" ↗";badge.title="Változásnapló: "+RBTOOLS_VERSION;badge.classList.add("ok");}
   window.addEventListener("error",e=>{if(badge){badge.textContent="JS-hiba: "+(e.message||"ismeretlen hiba");badge.classList.remove("ok");badge.classList.add("err");}});
 }
 
@@ -5553,29 +5564,60 @@ rbGet("uExample").onclick=()=>{rbGet("uInput").value="RegionalBahn – Közvetle
 rbGet("uCopyAll").onclick=()=>{const s=rbGet("uInput").value,list=visibleUnicodeStyles();copyToClipboard(list.map(st=>st.name+":\n"+st.fn(s)).join("\n\n"),null,"Összes látható változat másolva.");};
 renderUnicode();
 function rbBuildHelpContents(){
- const tab=rbGet("tab-help"),host=rbGet("helpTOCLinks");if(!tab||!host)return;
- host.replaceChildren();
- const ids=new Set();const slug=t=>{
-  const base="rbtools-guide-"+String(t||"").toLocaleLowerCase("hu-HU").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
-    .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60);
+ const tab=rbGet("tab-help"),host=rbGet("helpTOCLinks"),chapters=rbGet("helpChapterLinks");
+ if(!tab||!host||!chapters)return;
+ host.replaceChildren();chapters.replaceChildren();
+ const ids=new Set();
+ const slug=t=>{
+  const base="rbtools-guide-"+String(t||"").toLocaleLowerCase("hu-HU").normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60);
   let id=base,n=2;while(ids.has(id)||document.getElementById(id))id=base+"-"+n++;
   ids.add(id);return id;
  };
- for(const panel of tab.querySelectorAll(":scope > .panel")){
-   const heading=panel.querySelector("h2");if(!heading||panel.id==="rbtools-helpTOC")continue;
-   if(!heading.id)heading.id=slug(heading.textContent);
-   const link=document.createElement("a");link.href="#"+heading.id;link.textContent=heading.textContent;host.appendChild(link);
-   const subs=Array.from(panel.querySelectorAll("h3"));
-   if(subs.length){
-     const details=document.createElement("details"),summary=document.createElement("summary");
-     summary.textContent="Alfejezetek: "+heading.textContent;details.appendChild(summary);
-     const children=document.createElement("div");
-     subs.forEach(sub=>{
-       if(!sub.id)sub.id=slug(sub.textContent);
-       const a=document.createElement("a");a.href="#"+sub.id;a.textContent=sub.textContent;children.appendChild(a);
-     });details.appendChild(children);host.appendChild(details);
-   }
+ const entries=Array.from(tab.querySelectorAll(":scope > .panel"))
+   .filter(panel=>panel.id!=="rbtools-helpTOC")
+   .map((panel,i)=>{
+    const heading=panel.querySelector("h2");
+    if(!panel.id)panel.id="rbtools-help-panel-"+i;
+    if(heading&&!heading.id)heading.id=slug(heading.textContent);
+    panel.classList.add("rb-help-section");
+    const subheadings=Array.from(panel.querySelectorAll("h3"));
+    subheadings.forEach(sub=>{if(!sub.id)sub.id=slug(sub.textContent);});
+    return {panel,heading,subheadings,button:null};
+   });
+ const button=(label,action)=>{
+  const b=document.createElement("button");b.type="button";b.textContent=label;b.addEventListener("click",action);return b;
+ };
+ function chaptersFor(entry){
+  chapters.replaceChildren();
+  if(!entry)return;
+  entry.subheadings.forEach(heading=>{
+   chapters.appendChild(button(heading.textContent,()=>{
+    heading.scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+    history.replaceState(null,"","#"+heading.id);
+   }));
+  });
  }
+ function choose(entry,scroll=false){
+  entries.forEach(e=>{
+   e.panel.hidden=!!entry&&e!==entry;
+   e.button.setAttribute("aria-pressed",String(e===entry));
+  });
+  all.setAttribute("aria-pressed",String(!entry));
+  chaptersFor(entry);
+  if(scroll)rbGet("helpTOC").scrollIntoView({block:"start",behavior:"smooth"});
+ }
+ const all=button("Összes",()=>choose(null));host.appendChild(all);
+ entries.forEach(e=>{e.button=button(e.heading?.textContent||"Egyéb",()=>choose(e,true));host.appendChild(e.button);});
+ const hash=decodeURIComponent(location.hash.slice(1)),target=hash&&document.getElementById(hash);
+ const linked=target?entries.find(e=>e.panel.contains(target)||e.panel===target):null;
+ choose(linked||entries.find(e=>e.panel.id==="rbtools-help-cikkadmin")||entries[0]);
+ if(linked)requestAnimationFrame(()=>target.scrollIntoView({block:"start"}));
+ window.addEventListener("hashchange",()=>{
+  const t=document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  const e=t?entries.find(x=>x.panel.contains(t)||x.panel===t):null;
+  if(e){choose(e);t.scrollIntoView({block:"start"});}
+ });
 }
 rbBuildHelpContents();
 
