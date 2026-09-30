@@ -455,6 +455,33 @@ function entryNode(tag,html,style){
 }
 function insertEntry(){
   if(!state.tree?.safe)return;
+  const mode=typeof presets!=="undefined"&&typeof activeTemplate==="function"?activeTemplate():"";
+  if((mode==="kk"||mode==="it")&&presets.detect(currentHtml())===mode){
+    const selector=get("pageEntrySection");
+    const explicit=String(selector?.selectedOptions?.[0]?.textContent||"").match(/\b((?:19|20)\d{2})\b/);
+    const dateYear=String(get("pageEntryDate").value||"").match(/^((?:19|20)\d{2})\./);
+    const existing=presets.years(currentHtml());
+    const year=explicit?.[1]||((dateYear&&existing.includes(dateYear[1]))?dateYear[1]:existing[0]);
+    try{
+      const html=presets.addEntry(currentHtml(),mode,year,{
+        title:get("pageEntryTitle").value.trim(),
+        date:get("pageEntryDate").value.trim(),
+        url:get("pageEntryUrl").value.trim(),
+        summary:get("pageEntrySummary").value.trim(),
+        thumbImage:get("pageEntryThumb").value.trim(),
+        fullImage:get("pageEntryFull").value.trim(),
+        credit:get("pageEntryCredit").value.trim(),
+        newTab:get("pageEntryNewTab").checked
+      });
+      reparseEditedHtml(html);
+      for(const id of ["pageEntryTitle","pageEntryUrl","pageEntrySummary","pageEntryThumb","pageEntryFull","pageEntryCredit"])
+        get(id).value="";
+      get("pageEntryTools").open=false;
+      message("ÚJ "+(mode==="kk"?"PODCAST-ADÁS":"INNOTRANS-CIKK")+" HOZZÁADVA",
+        "A(z) "+year+" évhez illesztettük a cím–dátum soros, 200 pixeles képes sablont. Az eredeti archívum változatlan maradt, a Blogger-mentés még hátravan.","dirty");
+    }catch(e){message("A BEJEGYZÉS NEM SZÚRHATÓ BE",e.message,"error");}
+    return;
+  }
   const title=get("pageEntryTitle").value.trim(),date=get("pageEntryDate").value.trim(),
     url=get("pageEntryUrl").value.trim(),summary=get("pageEntrySummary").value.trim();
   if(!title||!date||!url||!summary){
@@ -595,6 +622,15 @@ async function savePage(){
   }catch(e){state.error=e.message||String(e);}
   finally{state.saving=false;update();}
 }
+get("pageTemplateMode").addEventListener("change",()=>{update();});
+get("pageStartTemplate").addEventListener("click",startLocalTemplate);
+get("pageImportFile").addEventListener("change",importHtmlFile);
+get("pageNewYearQuick").addEventListener("click",()=>{prepareYear();openQuick("pageYearTools","pageYearNumber");});
+get("pageNewEpisodeQuick").addEventListener("click",()=>{setArchiveDate();openQuick("pageEntryTools","pageEntryTitle");});
+get("pageNewArticleQuick").addEventListener("click",()=>{setArchiveDate();openQuick("pageEntryTools","pageEntryTitle");});
+get("pageNewImprintQuick").addEventListener("click",()=>{openQuick("pageImprintTools","pageImprintTitle");});
+get("pageYearInsert").addEventListener("click",insertYear);
+get("pageImprintInsert").addEventListener("click",insertImprintSection);
 get("pageConnect").addEventListener("click",()=>{
   if(!bridge.isConnected())bridge.connect();
   else refreshConnection();
