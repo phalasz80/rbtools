@@ -28,6 +28,9 @@ function updateTemplateControls(){
   const selected=get("pageTemplateMode").value,mode=activeTemplate();
   const safe=!!state.tree?.safe&&!state.saving,archive=safe&&(mode==="kk"||mode==="it");
   const imprint=safe&&mode==="impresszum";
+  const originalType=get("pageTemplateMode").value;
+  get("pageUseLiveTemplate").disabled=!bridge.isConnected()||!view.blog.value||
+    !starters.catalog[originalType]?.slug||state.saving;
   for(const id of ["pageNewYearQuick","pageNewEpisodeQuick","pageNewArticleQuick"])
     get(id).disabled=!archive;
   get("pageNewEpisodeQuick").hidden=!archive||mode!=="kk";
@@ -41,8 +44,11 @@ function updateTemplateControls(){
     ?"⚠ A kiválasztott sablon nem egyezik a megnyitott HTML-lel. A gyorsműveletek biztonsági okból letiltva."
     :mode==="kk"?"Közvetlen Kocsi: új év, új epizód és új évválasztó gomb. A korábbi 104 adás módosítás nélkül megmarad."
     :mode==="it"?"InnoTrans: új kiállítási év, fejléc és új tudósítás. Az eredeti cikkek és évhivatkozások megmaradnak."
-    :mode==="impresszum"?"Impresszum: új rovatok, meglévő HU / DE / EN szövegek megőrzése. A helyi vázlat jogi szövegeit közzététel előtt ellenőrizni kell."
-    :"Nyiss meg egy meglévő Blogger-oldalt, töltsd be a két HTML-archívumot, vagy válassz új, helyi sablont.";
+    :mode==="impresszum"?"Impresszum: a kézzel módosított, aktuális változatot a Bloggerből kérd le. A korábbi beépített minta csak offline tartalék."
+    :mode==="braking"?"Vasúti fékezés: különkiadások, 55 részes fő sorozat és Rhätische Bahn-sorozat. Meglévő címekhez a Bloggerből töltsd le az eredeti HTML-t."
+    :mode==="zusi"?"Magyar Zusi: letöltési és telepítési blokkok. A csomagok aktuális URL-jeit csak az élő Blogger-oldal tartalmazza."
+    :mode==="plain"?"Üres szöveges oldal: egyszerű alcímek és bekezdések WYSIWYG-ben."
+    :"Nyiss meg egy meglévő Blogger-oldalt, vagy válassz egy helyi sablont.";
 }
 function reparseEditedHtml(html){
   const next=core.parse(html);
@@ -80,18 +86,71 @@ function insertYear(){
       ": az évblokk, a kapcsolódó gomb és az évválasztás CSS-szabályai hozzáadva. A Bloggerbe még nem mentettünk.","dirty");
   }catch(e){message("AZ ÚJ ÉV NEM HOZHATÓ LÉTRE",e.message,"error");}
 }
-function startLocalTemplate(){
+async function loadCurrentTemplate({alreadyConfirmed=false}={}){
+  const mode=get("pageTemplateMode").value,entry=starters.catalog[mode];
+  if(!entry?.slug)throw Error("A kiválasztott típushoz nem tartozik eredeti Blogger-oldal.");
+  if(!bridge.isConnected()||!view.blog.value)throw Error("Kapcsolódj a Bloggerhez és válaszd ki a megfelelő blogot.");
+  if(!alreadyConfirmed&&!abandonCheck())return false;
+  const blogId=view.blog.value,slug="/p/"+entry.slug;
+  message("FRISS SABLON BEOLVASÁSA","A(z) "+slug+" oldal teljes, jelenlegi HTML-jét a Blogger API-tól kérjük.","working");
+  let found=state.list.find(p=>{
+    try{return new URL(p.url||"").pathname.toLowerCase()===slug;}catch{return false;}
+  });
+  if(!found){
+    const all=[];
+    for(const status of ["live","draft"]){
+      let token="",rounds=0;
+      do{
+        const query="view=ADMIN&fetchBodies=false&maxResults=200&status="+status+
+          (token?"&pageToken="+encodeURIComponent(token):"");
+        const batch=await bridge.request({blogId,query});
+        all.push(...batch.items||[]);
+        token=batch.nextPageToken||"";
+      }while(token&&++rounds<10);
+    }
+    found=all.find(p=>{
+      try{return new URL(p.url||"").pathname.toLowerCase()===slug;}catch{return false;}
+    });
+  }
+  if(!found)throw Error("A(z) "+slug+" oldal nem található a kiválasztott Blogger-fiók oldallistájában. Nem helyettesítjük feltételezett vagy régebbi tartalommal.");
+  const page=await getPage(found.id,blogId);
+  if(page.url&&new URL(page.url).pathname.toLowerCase()!==slug)
+    throw Error("A Blogger másik oldal HTML-jét adta vissza. Biztonsági okból a szerkesztő nem nyitja meg.");
+  // Deliberately detached local template, never silently writes into the live page.
+  loadHtml(page.content,{title:page.title||entry.title});
+  get("pageTemplateMode").value=mode;state.profile=mode;
+  get("pageTemplateOrigin").textContent="✓ A(z) "+slug+" jelenlegi teljes HTML-je a Bloggerből, helyi másolatban. Az eredeti oldal még nincs hozzárendelve mentési célként.";
+  view.info.textContent="Blogger-forrás: "+(page.url||slug)+" • Page ID: "+page.id+
+    ". Ez a másolat csak letölthető/szerkeszthető. Az éles oldal mentéséhez külön nyisd meg az eredeti oldalt.";
+  update();
+  message("FRISS BLOGGER-SABLON BETÖLTVE","A meglévő tartalom és speciális kódok megmaradnak. A szerkesztés helyi másolaton történik.","idle");
+  return true;
+}
+async function startLocalTemplate(){
   const selected=get("pageTemplateMode").value;
-  if(selected==="auto"){message("VÁLASSZ SABLONT",
-    "Új helyi oldalhoz előbb válaszd ki a Közvetlen Kocsi, InnoTrans vagy Impresszum sablont.","working");return;}
+  if(selected==="auto"){
+    message("VÁLASSZ SABLONT","Előbb válaszd ki a létrehozandó oldal típusát.","working");return;
+  }
   if(!abandonCheck())return;
+  if(selected==="impresszum"&&bridge.isConnected()&&view.blog.value){
+    try{await loadCurrentTemplate({alreadyConfirmed:true});return;}
+    catch(e){message("A FRISS IMPRESSZUM NEM OLVASHATÓ BE",e.message+" Az offline korábbi mintát csak kapcsolat nélkül lehet kérni.","error");return;}
+  }
   try{
     const year=String(new Date().getFullYear());
-    const html=selected==="impresszum"?starters.impresszum():starters.archive(selected,year);
-    loadHtml(html,{title:selected==="kk"?"Közvetlen Kocsi":selected==="it"?"InnoTrans":"Impresszum"});
+    const html=selected==="impresszum"?starters.impresszum():
+      selected==="kk"||selected==="it"?starters.archive(selected,year):
+      starters[selected]?.();
+    if(typeof html!=="string"||!html)throw Error("A kiválasztott sablon nem érhető el.");
+    const title=selected==="kk"?"Közvetlen Kocsi":selected==="it"?"InnoTrans":
+      starters.catalog[selected]?.title||"Új oldal";
+    loadHtml(html,{title});
     get("pageTemplateMode").value=selected;state.profile=selected;update();
-    view.info.textContent="HELYI sablon, még nincs Blogger-oldalhoz rendelve. Az éles oldal módosításához azt külön meg kell nyitni.";
-    message("HELYI SABLON ELKÉSZÜLT","Szerkeszthető és letölthető. Nem mentünk automatikusan meglévő Blogger-oldalra.","working");
+    get("pageTemplateOrigin").textContent=selected==="impresszum"
+      ?"⚠ Ez a korábbi RBTools-impresszumtervezet. A kézzel frissített változathoz kapcsolódj és olvasd be a Bloggerből!"
+      :"Új üres szerkesztői vázlat; a meglévő oldal tartalmát és linkjeit nem másolja át.";
+    view.info.textContent="HELYI sablon. A meglévő Blogger-oldalt semmilyen formában nem módosítottuk.";
+    message("HELYI SABLON ELKÉSZÜLT","Szerkeszthető és letölthető. A tényleges meglévő tartalomhoz használd a Blogger-beolvasást.","working");
   }catch(e){message("SABLON BETÖLTÉSI HIBA",e.message,"error");}
 }
 async function importHtmlFile(event){
@@ -100,7 +159,8 @@ async function importHtmlFile(event){
     if(file.size>3_000_000)throw Error("A helyi HTML-fájl maximum 3 MB lehet.");
     if(!abandonCheck())return;
     const html=await file.text(),guessed=presets.detect(html,file.name);
-    loadHtml(html,{title:guessed==="kk"?"Közvetlen Kocsi":guessed==="it"?"InnoTrans":guessed==="impresszum"?"Impresszum":file.name.replace(/\.[^.]+$/,"")});
+    loadHtml(html,{title:guessed==="kk"?"Közvetlen Kocsi":guessed==="it"?"InnoTrans":
+      starters.catalog[guessed]?.title||file.name.replace(/\.[^.]+$/,"")});
     if(!state.tree.safe)throw Error("A fájl szerkezete összetett vagy szabálytalan, ezért a szerkesztés zárolva maradt.");
     message("HELYI HTML BEOLVASVA",file.name+
       " • a teljes eredeti forrás megmaradt. A Bloggerbe történő mentéshez a konkrét élő oldalt nyisd meg.","working");
@@ -651,6 +711,9 @@ get("pageConnect").addEventListener("click",()=>{
 });
 get("pageTemplateMode").addEventListener("change",()=>{update();});
 get("pageStartTemplate").addEventListener("click",startLocalTemplate);
+get("pageUseLiveTemplate").addEventListener("click",async()=>{
+  try{await loadCurrentTemplate();}catch(e){message("A FRISS BLOGGER-SABLON NEM ELÉRHETŐ",e.message,"error");}
+});
 get("pageImportFile").addEventListener("change",importHtmlFile);
 get("pageNewYearQuick").addEventListener("click",()=>{prepareYear();openQuick("pageYearTools","pageYearNumber");});
 get("pageNewEpisodeQuick").addEventListener("click",()=>{setArchiveDate();openQuick("pageEntryTools","pageEntryTitle");});
