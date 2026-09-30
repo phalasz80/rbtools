@@ -117,9 +117,10 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
       <li><strong>Blogger-piszkozatkezelés:</strong> a frissítés, piszkozat megnyitása, új helyi cikk, mentés, időzítés és piszkozatba visszaállítás most egyetlen, színkódolt <strong>Piszkozatkezelés</strong> csoportban található. A zöld gomb kizárólag piszkozatot ment. Az időzítés szerkesztői feladat, a Bloggerben történik.</li>
       <li><strong>Meglévő draft:</strong> kapcsolódj a Bloggerhez, válaszd ki a piszkozatot, majd <strong>Kiválasztott piszkozat megnyitása</strong>. A cím, címkék, szöveg, képek és iframe-ek betöltődnek.</li>
       <li><strong>Szerkesztés:</strong> a WYSIWYG-ben egérrel vagy billentyűzettel jelölj ki szöveget, majd használd a formázógombokat. <strong>Link:</strong> kijelölés után 🔗 Link vagy Ctrl+K, utána URL megadása a külön szerkesztősávban. A blokkot csak a jobb oldali <strong>⠿ fogantyúnál</strong> húzd. Használható továbbá felsorolás, igazítás, keretes, kép és iframe; az <strong>x² / x₂</strong> gomb valódi HTML-indexet készít.</li>
+      <li><strong>Többsoros képaláírás:</strong> a képtár kártyáján a képaláírás többsoros mező, a WYSIWYG-ben pedig Enter vagy a <strong>↵ Sortörés</strong> gomb használható. Ha kell a fotós neve, jelöld be a <strong>Fotós neve külön sorban</strong> lehetőséget és add meg a nevet. A kimenetben egyetlen képaláírás lesz, az új sorok és a fotós neve <code>&lt;br /&gt;</code>-rel elválasztva.</li>
       <li><strong>Különleges jelek:</strong> nyisd le az <strong>Ω Különleges karakterek…</strong> panelt Unicode-jelekhez, emojihoz, Unicode felső/alsó indexhez és HTML-entitásokhoz. Kijelölt szövegnél a beszúrt jel vagy entitás <strong>lecseréli a kijelölést</strong>; a <code>&amp;nbsp;</code> rózsaszín szerkesztői jelölést kap.</li>
       <li><strong>Keresés:</strong> a <strong>Keresés a cikkben</strong> mező az aktuális WYSIWYG-szöveg találatait megszámolja és sárgával kiemeli. A kiemelés csak szerkesztési segédlet, nem kerül a Blogger HTML-be.</li>
-      <li><strong>Mentés:</strong> a <strong>Mentés Blogger-piszkozatba</strong> új draftot készít vagy ugyanazt a post ID-t frissíti. Minden normál draftmentés után az időzítési mező biztonsági alapértéke <strong>2049. 12. 31. 23:59</strong>; valódi időzítéshez ezt kézzel kell átírni. Azonnali publikálás nincs.<br><br><strong style="color:#ff0000;">Az időzítés mindig az illetékes szerkesztő feladata a Blogger felületén, így időzítést ezen a felületen nem kell beállítani. Ha bármi kérdésed van, hogy mikor megy ki a cikked, fordulj Adorján Péterhez vagy Halász Péterhez!</strong></li>
+      <li><strong>Mentés:</strong> a <strong>Mentés Blogger-piszkozatba</strong> új draftot készít vagy ugyanazt a post ID-t frissíti. Minden normál draftmentés után az időzítési mező biztonsági alapértéke <strong>2049. 12. 31. 23:59</strong>. Ezt a mezőt ne írd át: az időzítést az illetékes szerkesztő a Blogger felületén végzi. Azonnali publikálás nincs.<br><br><strong style="color:#ff0000;">Az időzítés mindig az illetékes szerkesztő feladata a Blogger felületén, így időzítést ezen a felületen nem kell beállítani. Ha bármi kérdésed van, hogy mikor megy ki a cikked, fordulj Adorján Péterhez vagy Halász Péterhez!</strong></li>
       <li><strong>Statikus oldal:</strong> a kész HTML-t másold a Blogger oldal HTML-nézetébe. Választható évválasztó gombsoros vagy egyszerű, ömlesztett sablon.</li>
       <li>A széles <strong>állapotsáv</strong> mindig jelzi, hogy éppen betöltés, mentés, sikeres művelet, figyelmeztetés vagy hiba történt.</li>
     </ol>
@@ -1013,7 +1014,14 @@ A következő cikk rövid ajánlója.</pre>
 
     <h3>17. Képtár, főkép és lead</h3>
     <p>A <strong>Képtár</strong> minden beolvasott képhez külön kártyát ad. A képaláírás és a kredit közvetlenül szerkeszthető. Egy törzsszövegbeli kép képaláírását a WYSIWYG-ben közvetlenül vagy a képtári kártyán módosíthatod: mindkét hely ugyanazt az adatot szerkeszti, a végleges HTML-ben egyetlen képaláírás készül. Régi, kétszer szereplő, közvetlenül egymás utáni és azonos képaláírásokat a betöltő összevonja. A főkép a képtár <strong>☆ Főkép</strong> gombjával, a bevezetőblokk saját képkiválasztójával vagy a kép bevezetőbe húzásával jelölhető ki. A valódi leadet ugyanebben a blokkban, a képtől jobbra szerkesztheted. A normál képeket a <strong>＋ Cikk végére</strong> gombbal vagy drag-and-drop módszerrel helyezd el.</p>
-    <p>Ha egy kép a Blogger-draftban benne van, de a WYSIWYG-ben nem ott jelenik meg, ahol szeretnéd, ez nem igényel újrafeltöltést: a képtárból húzd át a kívánt helyre.</p>
+    <p><strong>Többsoros képaláírás:</strong> a WYSIWYG-ben kattints a kép alatti szerkeszthető feliratra. Az <strong>Enter</strong> és a <strong>↵ Sortörés</strong> gomb is új sort hoz létre. A képtár kártyáján ugyanaz a képaláírás többsoros szövegmezőben szerkeszthető.</p>
+    <ol>
+      <li>Írd be a képaláírást. Több sort is használhatsz, ezek a kész HTML-ben <code>&lt;br /&gt;</code> elválasztást kapnak.</li>
+      <li>Ha a képaláírás alatt külön sorban kéred a fotóst, jelöld be a <strong>Fotós neve a képaláírás új sorában</strong> opciót, és add meg a nevet, például <strong>Halász Péter</strong>.</li>
+      <li>A kész kimenet egyetlen képaláírásblokkon belül, a felirat mögött tartalmazza: <code>&lt;br /&gt;(fotó: Halász Péter)</code>. Kikapcsolt jelölőnégyzet esetén nem jelenik meg ez a sor.</li>
+      <li>A képaláírás alatti opcionális fotósor nem azonos a kép <code>title</code> attribútumában szereplő <strong>kredittel</strong>; a kettő külön állítható.</li>
+    </ol>
+    <p>A fotósorral együtt már importált régi képaláírást a betöltő igyekszik külön képaláírásra és opcionális fotósorra bontani. Ha egy kép a Blogger-draftban benne van, de a WYSIWYG-ben nem ott jelenik meg, ahol szeretnéd, ez nem igényel újrafeltöltést: a képtárból húzd át a kívánt helyre.</p>
 
     <h3>18. Blogger-címkék, cím, szerző és footer</h3>
     <ul>
@@ -1029,7 +1037,7 @@ A következő cikk rövid ajánlója.</pre>
     <p>Ha bizonytalan vagy, mentés után nyisd meg vagy frissítsd a Blogger szerkesztőt is. Nagyobb átalakítás előtt jó gyakorlat egy külön tesztdrafton kipróbálni az új funkciót.</p>
 
     <h3>20. Időzítés és visszaállítás piszkozatba</h3>
-    <p>Az <strong>Időzített publikálás</strong> mező biztonsági alapértéke <strong>2049. 12. 31. 23:59</strong>. Új helyi cikknél, draft megnyitásakor, normál Blogger-piszkozatmentés után és piszkozatba visszaállításkor az RBTools erre az értékre állítja a mezőt, hogy egy véletlen időzítés se eredményezzen közeli publikálást. Valódi időzítéshez ezt az értéket kézzel írd át a tényleges jövőbeli dátumra, majd kattints a <strong>Piszkozat időzítése</strong> gombra. A program megerősítést kér. Ha a bejegyzés még nincs elmentve, előbb draftként menti úgy, hogy a szándékosan megadott időpontot nem írja felül. A <strong>Vissza piszkozatba</strong> gomb támogatott scheduled/live állapotból draftba állít vissza, és ismét visszateszi a 2049-es biztonsági alapértéket.</p>
+    <p>Az <strong>Időzített publikálás</strong> mező biztonsági alapértéke <strong>2049. 12. 31. 23:59</strong>. Új helyi cikknél, draft megnyitásakor, normál Blogger-piszkozatmentés után és piszkozatba visszaállításkor az RBTools erre az értékre állítja a mezőt, hogy egy véletlen időzítés se eredményezzen közeli publikálást. A szerkesztőségi munkamenetben ezt az értéket ne módosítsd. Az alkalmazás technikailag továbbra is rendelkezik időzítési funkcióval és megerősítést kér, de azt a szerkesztőségi rend alapján nem kell használni: az időpontot kizárólag az illetékes szerkesztő állítja be a Blogger felületén. A <strong>Vissza piszkozatba</strong> gomb támogatott scheduled/live állapotból draftba állít vissza, és ismét visszateszi a 2049-es biztonsági alapértéket.</p>
     <p><strong style="color:#ff0000;">Az időzítés mindig az illetékes szerkesztő feladata a Blogger felületén, így időzítést ezen a felületen nem kell beállítani. Ha bármi kérdésed van, hogy mikor megy ki a cikked, fordulj Adorján Péterhez vagy Halász Péterhez!</strong></p>
     <p><strong>Azonnali Publish gomb nincs.</strong> Ez szándékos biztonsági döntés: az éles azonnali publikálás a Bloggerben marad. Az egyéni permalinket szintén a Blogger felületén kell beállítani.</p>
 
@@ -1511,7 +1519,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v29";
+const RBTOOLS_VERSION="pages-v30";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -3025,7 +3033,12 @@ function adminConsumeImageCaption(nodes,index){
     const text=adminCaptionNodeText(n);
     if(!text)break;
     if(!caption){caption=text;lastIndex=j;continue;}
-    if(text===caption){lastIndex=j;continue;}
+    if(text===caption
+      ||(adminCaptionParts(text).caption===adminCaptionParts(caption).caption
+        &&!!adminCaptionParts(text).caption)){
+      if(adminCaptionParts(text).captionPhoto&&!adminCaptionParts(caption).captionPhoto)caption=text;
+      lastIndex=j;continue;
+    }
     if(/^\(\s*fotó\s*:\s*[^)]+\)$/i.test(text)&&!adminCaptionParts(caption).captionPhoto){
       caption+="\n"+text;lastIndex=j;continue;
     }
