@@ -554,6 +554,7 @@ Források:
       <label class="filelabel" for="rbtools-boxFile">📂 .md / .txt / .docx / .odt / .rtf megnyitása</label>
       <input id="rbtools-boxFile" type="file" accept=".md,.markdown,.txt,.docx,.odt,.rtf,text/markdown,text/plain,text/rtf,application/rtf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.oasis.opendocument.text" hidden>
       <button id="rbtools-convertBox" class="primary">⚙ Keretes konvertálása</button>
+      <button id="rbtools-boxMarkdownToVisual" type="button">↪ Markdown átemelése WYSIWYG-be</button>
       <button id="rbtools-refreshBoxHtml" title="A módosított forrásszövegből újragenerálja a keretes HTML-t">↻ HTML frissítése</button>
       <button id="rbtools-copyBoxHtml">⧉ HTML másolása</button>
       <button id="rbtools-previewBox">◉ Előnézet</button>
@@ -662,7 +663,7 @@ Források:
       <label class="collection-page-picker">Meglévő oldal <select id="rbtools-pageSelect" aria-label="Megnyitandó Blogger-statikus oldal" disabled><option value="">Válassz statikus oldalt…</option></select></label>
       <button id="rbtools-pageOpen" type="button" disabled>📄 Oldal megnyitása</button>
     </div>
-    <p id="rbtools-pageInfo" class="small">Új oldal létrehozása és automatikus publikálás nincs. Meglévő élő oldal mentése azonnal módosítja annak tartalmát, ezért előtte külön biztonsági mentés és megerősítés szükséges.</p>
+    <p id="rbtools-pageInfo" class="small">Új oldal létrehozása és automatikus publikálás nincs. Meglévő élő oldal mentése azonnal módosíthatja annak tartalmát, ezért a rendszer külön megerősítést és az ajánlott HTML-letöltést vagy kifejezett lemondást kér.</p>
     <div id="rbtools-pageState" class="collection-page-state idle" role="status" aria-live="polite">
       <strong id="rbtools-pageStateTitle">Nincs megnyitott Blogger-oldal</strong>
       <span id="rbtools-pageStateDetail">Kapcsolódj, válaszd ki a blogot, majd nyiss meg egy statikus oldalt.</span>
@@ -1706,6 +1707,7 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-raw-block{overflow:auto}
 #rbtools-app .admin-raw-block table{max-width:100%}
 #rbtools-app .admin-box{background:#c3c3c3;border-radius:4px;overflow:hidden}
+#rbtools-app .admin-box.admin-box-accent{border-left:6px solid #777777;border-radius:0 4px 4px 0}
 #rbtools-app .admin-box-title{padding:15px;text-align:center;font-weight:700;min-height:42px;outline:none}
 #rbtools-app .admin-box-body{padding:0 15px 15px;text-align:justify;min-height:54px;outline:none}
 #rbtools-app .admin-box-image{padding:10px 15px 15px;text-align:center}
@@ -4524,6 +4526,17 @@ function boxShowEditorMode(){
   boxPreviousMode=mode;doConvertBox();
 }
 rbGet("boxEditorMode").addEventListener("change",boxShowEditorMode);
+rbGet("boxMarkdownToVisual").addEventListener("click",()=>{
+ const raw=rbGet("boxInput").value.trim();
+ if(!raw){rbGet("boxStatus").textContent="Előbb adj meg Markdown- vagy egyszerű szöveget.";return;}
+ const fmt=currentBoxMode()==="plain"?plainInline:inlineMd;
+ const html=raw.split(/\n\s*\n/).map(p=>'<p>'+fmt(compact(p.trim()))+'</p>').join("\n");
+ if(rbGet("boxVisual").textContent.trim()&&!window.confirm("A jelenlegi WYSIWYG-szöveget lecseréljük a Markdownból konvertált tartalomra. Folytatod?"))return;
+ rbGet("boxVisual").innerHTML=rbBoxSafeRich(html);
+ rbGet("boxRichHtml").value=rbBoxSafeRich(html);
+ rbGet("boxEditorMode").value="visual";boxPreviousMode="visual";boxShowEditorMode();
+ rbGet("boxStatus").textContent="Markdownból szerkeszthető WYSIWYG készült; az eredeti forrás megmaradt.";
+});
 rbGet("boxVisualToolbar").querySelectorAll("[data-box-format]").forEach(button=>{
   button.addEventListener("mousedown",e=>e.preventDefault());
   button.addEventListener("click",()=>{
