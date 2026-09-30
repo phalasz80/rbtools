@@ -8,6 +8,7 @@ on:
       - "collection-page-core.js"
       - "archive-presets.js"
       - "page-starters.js"
+      - "live-timeline.js"
       - "collection-pages.js"
       - "tests/**"
       - ".github/workflows/rbtools-tests.yml"
@@ -17,6 +18,7 @@ on:
       - "collection-page-core.js"
       - "archive-presets.js"
       - "page-starters.js"
+      - "live-timeline.js"
       - "collection-pages.js"
       - "tests/**"
       - ".github/workflows/rbtools-tests.yml"
@@ -41,6 +43,7 @@ jobs:
           node --check collection-page-core.js
           node --check archive-presets.js
           node --check page-starters.js
+          node --check live-timeline.js
           node --check collection-pages.js
           node - <<'NODE'
           const fs=require('node:fs'),vm=require('node:vm');
