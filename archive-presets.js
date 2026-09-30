@@ -3,7 +3,17 @@
 const spec={kk:{wrap:"kk-sections",block:"kk-year",id:"kozvetlen-",entry:"kk-episode"},it:{wrap:"innotrans-sections",block:"innotrans-year-section",id:"innotrans-choice-",entry:"it-entry"}};
 const esc=x=>String(x??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const ye=x=>{x=String(x);if(!/^(19|20)\d{2}$/.test(x))throw Error("Négyjegyű évszám kell.");return x;};
-function detect(s,label=""){return /id=["']kk-archive["']/.test(s)?"kk":/id=["']innotrans-archive["']/.test(s)?"it":/impresszum/i.test(label)?"impresszum":"";}
+function detect(s,label=""){
+ s=String(s||"");const name=String(label||"").toLowerCase();
+ if(/id=["']kk-archive["']/.test(s))return "kk";
+ if(/id=["']innotrans-archive["']/.test(s))return "it";
+ const tagged=s.match(/data-rb-template=["'](impresszum|braking|zusi|plain)["']/i);
+ if(tagged)return tagged[1].toLowerCase();
+ if(/impresszum\.html|impresszum/i.test(name))return "impresszum";
+ if(/vasuti-fekezes\.html/i.test(name))return "braking";
+ if(/magyar-zusi-letoltesek\.html/i.test(name))return "zusi";
+ return "";
+}
 function years(s){return [...new Set([...s.matchAll(/\bdata-rb-static-section=["'](\d{4})["']/g)].map(m=>m[1]))].sort((a,b)=>b-a);}
 function check(s,k){if(detect(s)!==k||!spec[k]||/<table\b/i.test(s)||!s.includes('id="rb-static-page-nav"')||!s.includes('class="'+spec[k].wrap+'"'))throw Error("Nyisd meg a két jóváhagyott, táblázatmentes archívumsablon egyikét.");return years(s);}
 function section(k,y,o={}){
