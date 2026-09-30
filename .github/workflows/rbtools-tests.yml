@@ -1,0 +1,55 @@
+name: RBTools regression tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "collection-page-core.js"
+      - "collection-pages.js"
+      - "tests/**"
+      - ".github/workflows/rbtools-tests.yml"
+  pull_request:
+    paths:
+      - "index.html"
+      - "collection-page-core.js"
+      - "collection-pages.js"
+      - "tests/**"
+      - ".github/workflows/rbtools-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate inline and external JavaScript
+        shell: bash
+        run: |
+          node --check collection-page-core.js
+          node --check collection-pages.js
+          node - <<'NODE'
+          const fs=require('node:fs'),vm=require('node:vm');
+          const source=fs.readFileSync('index.html','utf8');
+          const scripts=[...source.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
+            .filter(m=>!/\bsrc\s*=/.test(m[1]));
+          for(const [i,s] of scripts.entries())new vm.Script(s[2],{filename:'index-inline-'+i+'.js'});
+          console.log(scripts.length+' inline script(s) parse.');
+          NODE
+      - name: Run all RBTools regression suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          for spec in tests/*.test.cjs; do
+            echo "::group::$spec"
+            node "$spec"
+            echo "::endgroup::"
+          done
