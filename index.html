@@ -889,7 +889,7 @@ A következő cikk rövid ajánlója.</pre>
       <li><strong>Előnézet:</strong> a generált Blogger HTML külön iframe-ben ellenőrizhető.</li>
       <li><strong>Átadás a WYSIWYG-nek:</strong> a <strong>Kimenet megnyitása a WYSIWYG-ben</strong> gomb a konvertált HTML-t visszatölti a fő Cikkadmin szerkesztőjébe. Ezután a blokkok, képek, keretesek és iframe-ek a normál vizuális eszközökkel tovább szerkeszthetők.</li>
     </ul>
-    <p>A haladó konverter közvetlen HTML-kimenete önmagában is másolható vagy menthető. Ha a WYSIWYG-be töltöd át, különösen a főkép és az összetett, több tudósítós footer ellenőrzése ajánlott, mert a vizuális visszafejtés a HTML szerkezetéből dolgozik.</p>
+    <p>A haladó konverter közvetlen HTML-kimenete önmagában is másolható vagy menthető. A közvetlen konverter is a RegionalBahn-szabvány szerinti <code>&lt;hr align="center" /&gt;</code> szerzői elválasztót használja. A képfeliratban megadott sortörések és a külön sorba írt <code>(fotó: …)</code> megmaradnak. Ha a WYSIWYG-be töltöd át, különösen a főkép és az összetett, több tudósítós footer ellenőrzése ajánlott, mert a vizuális visszafejtés a HTML szerkezetéből dolgozik.</p>
 
     <h3>9. Régi vagy kézzel kapott HTML visszatöltése</h3>
     <p>Ha a cikk nincs az API-n keresztül megnyitva, a <strong>Meglévő Blogger-cikk HTML-jének visszatöltése szerkesztésre</strong> részbe teljes HTML-fragmentum illeszthető vagy <code>.html</code> fájl tölthető. A parser felismeri a tipikus RegionalBahn leadet, képeket, képaláírásokat, H3/H4 címeket, kereteseket, iframe-eket és néhány speciális blokkot. Nem általános célú tökéletes HTML round-trip szerkesztő, ezért különösen régi vagy szokatlan kézi HTML-nél mindig ellenőrizd a végleges kimenetet.</p>
@@ -1519,7 +1519,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v30";
+const RBTOOLS_VERSION="pages-v31";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -1680,7 +1680,7 @@ function normalParagraph(s, extraStyle=""){
 }
 function rbImageHtml(a,boxed=false){
   const full=a.full||"KEP_NAGY_URL", display=a.display||a.thumb||"KEP_600_URL";
-  const credit=a.credit||"", caption=a.caption||"";
+  const credit=a.credit||"", caption=adminCaptionParts(a.caption||"",credit);
   const sepStyle=boxed
     ?"background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"
     :"clear: both; text-align: center;";
@@ -1689,7 +1689,8 @@ function rbImageHtml(a,boxed=false){
     :"text-align: center;";
   const titleAttr=credit?` title="${esc(credit,true)}"`:"";
   const tail=boxed?"":"\n<br />";
-  return `<div class="separator" style="${sepStyle}"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}" width="600" alt="${esc(caption,true)}" /></a></div>\n<div style="${capStyle}">${inlineMd(caption)}</div>${tail}`;
+  const alt=adminCleanCaptionText(caption.caption).replace(/\n/g," ");
+  return `<div class="separator" style="${sepStyle}"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}" width="600" alt="${esc(alt,true)}" /></a></div>\n<div style="${capStyle}">${adminCaptionHtml(caption)}</div>${tail}`;
 }
 
 function rbBoxParagraphsHtml(text,mode="markdown"){
@@ -1848,17 +1849,18 @@ function formatNames(s){
 function footerHtml(){
   const mode=rbGet("footerMode").value;
   if(mode==="none")return "";
+  const separator='<hr align="center" />\n';
   if(mode==="author"){
     const author=rbGet("author").value.trim();
-    return author?`<hr />\n<div style="text-align: right;"><span style="font-size: 85%;"><em>${esc(author)}</em></span></div>`:"";
+    return author?separator+`<div style="text-align: right;"><span style="font-size: 85%;"><em>${esc(author)}</em></span></div>`:"";
   }
   if(mode==="compiled"){
     const author=rbGet("author").value.trim();
-    return author?`<div style="text-align: right;"><span style="font-size: 85%;"><em>Összeállította: ${esc(author)}</em></span></div>`:"";
+    return author?separator+`<div style="text-align: right;"><span style="font-size: 85%;"><em>Összeállította: ${esc(author)}</em></span></div>`:"";
   }
-  const intro=rbGet("footerIntro").value.trim(), names=formatNames(rbGet("reporters").value), outro=rbGet("footerOutro").value.trim();
+  const intro=rbGet("footerIntro").value.trim(),names=formatNames(rbGet("reporters").value),outro=rbGet("footerOutro").value.trim();
   const parts=[];if(intro)parts.push(esc(intro));if(names)parts.push(names);if(outro)parts.push(esc(outro));
-  return parts.length?`<hr />\n<div style="text-align: right;"><span style="font-size: 85%;"><em>${parts.join("<br />")}</em></span></div>`:"";
+  return parts.length?separator+`<div style="text-align: right;"><span style="font-size: 85%;"><em>${parts.join("<br />")}</em></span></div>`:"";
 }
 function convertArticleMarkdown(md){
   md=String(md||"").replace(/\r\n/g,"\n");
