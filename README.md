@@ -183,3 +183,12 @@ Az RBTools faviconja a korábban biztosított, kék keretes **RegionalBahn RB-je
 - Branch: `main`
 - Egyedi domain: `tools.regionalbahn.hu`
 - Az oldal `noindex` meta utasításokat tartalmaz, de a közvetlen URL nyilvánosan elérhető.
+
+
+## Illesztés az optimalizált RegionalBahn Blogger-témához (2026.09.30)
+
+Az RBTools kimenete a felhasználó által átadott `RegionalBahn_Blogger_CSS_optimalizalt(1).xml` stílusaihoz igazodik. A téma a `body` részen Inter betűcsaládot, a `.post-body` területen 110%-os, 1.4 sortávolságú törzsszöveget, a képekhez saját keretet és a globális `h2` szabályon widgetcímes, nagybetűs megjelenést alkalmaz. Ezt a kompatibilitási réteg nem írja felül általánosan. A generált cikkek saját osztályokat és mobilhoz alkalmazkodó, az első `<!--more-->` után bekerülő helyi CSS-t kapnak. Nem töltünk be második Inter-fontot, és nem duplázzuk a Blogger képkereteit.
+
+A változás érinti a Cikkadmin, a haladó Markdown/sima szöveges konverter, a képek, címsorok, podcast-beágyazások és az élő tudósítás HTML-kimenetét. A meglévő bejegyzések változatlanok maradnak. A visszaimportáló figyelmen kívül hagyja a `data-rbtools-theme` jelű stíluselemet, ezért nem lesz véletlen szerkeszthető szövegblokk. A statikus oldalak szerkesztése továbbra is külön, saját CSS-sel történik. A stílus csak akkor igazodik automatikusan, ha új HTML-t generálsz; a korábban publikált HTML visszamenőleges átalakítását nem végezzük.
+
+Visszaellenőrzés: `node tests/theme-compat.test.cjs`, majd az összes `tests/*.test.cjs`. A téma megváltoztatásakor a főszínt (`#0b5394`), a globális `h2` stílust, az Inter betűcsaládot és a Blogger saját képkeretezését újra össze kell vetni.
