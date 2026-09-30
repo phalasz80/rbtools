@@ -102,6 +102,12 @@ A Cikkadminban külön tartalomtípus választható: **Cikk**, **#nyúz / Hétv�
 - folyamatosan generált végleges Blogger HTML;
 - széles, színkódolt állapotsáv a betöltési, mentési, siker-, figyelmeztetési és hibaállapotokhoz.
 
+## Szerkesztői mentésállapot és Firefox-helyi menü
+
+A **Piszkozatkezelés** műveletgombjai és az időzítési figyelmeztetés közé külön, élénk színezésű **Blogger-mentésállapot** panel került. Vörös: helyi módosítás / még nincs mentés vagy mentési hiba. Zöld: a Blogger sikeres API-válasszal igazolta a jelenlegi cím, HTML és címkék mentését. Kék: Bloggerből megnyitott, azóta változatlan piszkozat, amelynek újragenerált HTML-jét még nem mentettük vissza. Sárga: mentés folyamatban, kapcsolat nélkül vagy statikus oldal. A program minden WYSIWYG-kimenetfrissítés és címke-/címváltozás után összeveti a helyi állapotot a legutóbbi igazolt mentéssel/betöltéssel; a mentés közben történt újabb változtatások nem kapnak tévesen zöld visszajelzést.
+
+Firefoxban a kijelölés a jobb kattintás előtt összeomolhat. A helyi formázómenü ezért az egérgomb lenyomásakor elmenti a kijelölést, az `contextmenu` eseményt pedig elkapja, és a kijelölt tartalomra használja. **Shift + jobb egérgomb** a Firefox saját helyi menüjét kéri; más esetben kijelölt WYSIWYG-szövegnél az RBTools menüje jelenik meg. A funkció böngészőfüggetlen szimulált regressziós tesztjeit a `tests/editor-interactions.test.cjs` fájl tartalmazza; a valós Firefox + Blogger végpont-ellenőrzés továbbra is szükséges.
+
 ## Dokumentumimport
 
 A Cikkadmin és a haladó forráskonverter közvetlenül fogad **.md, .txt, .docx, .odt és .rtf** fájlokat. A **Keretes** eszköz ugyanígy támogatja ezeket a formátumokat.
