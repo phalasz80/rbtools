@@ -12,7 +12,8 @@ const view={
   info:get("pageInfo"),save:get("pageSave"),backup:get("pageBackup")
 };
 const state={list:[],loaded:null,tree:null,baseline:null,backup:false,saving:false,error:"",
-  active:null,savedRange:null,linkAnchor:null,lastState:"",critical:false};
+  active:null,savedRange:null,linkAnchor:null,lastState:"",critical:false,
+  rightSnapshot:null};
 const knownYearSections=new Map();
 function message(title,detail="",kind="idle"){
   const key=kind+"|"+title+"|"+detail;
@@ -34,6 +35,36 @@ function selection(){
   const editor=base?.closest?.(".collection-page-editable");
   if(!editor||!view.canvas.contains(editor))return false;
   state.active=editor;state.savedRange=range.cloneRange();return true;
+}
+function pageHideMenu(){get("pageContextMenu").hidden=true;state.rightSnapshot=null;}
+function pageCaptureRightClick(e){
+  if(e.button!==2||e.shiftKey)return;
+  const editable=e.target?.closest?.(".collection-page-editable");
+  if(!editable||!view.canvas.contains(editable))return;
+  const selected=window.getSelection(),r=selected?.rangeCount?selected.getRangeAt(0):null;
+  const live=r&&!r.collapsed&&editable.contains(r.commonAncestorContainer)?r:null;
+  const old=state.savedRange&&!state.savedRange.collapsed&&state.active===editable?state.savedRange:null;
+  const range=live||old;
+  if(range?.toString().trim())state.rightSnapshot={editable,range:range.cloneRange()};
+}
+function pageContextAt(e){
+  if(e.shiftKey)return; // Firefox uses Shift+right-click to keep the browser menu.
+  const editable=e.target?.closest?.(".collection-page-editable");
+  if(!editable||!view.canvas.contains(editable))return;
+  const sel=window.getSelection(),r=sel?.rangeCount?sel.getRangeAt(0):null;
+  const live=r&&!r.collapsed&&editable.contains(r.commonAncestorContainer)?r:null;
+  const saved=state.rightSnapshot?.editable===editable?state.rightSnapshot.range:
+    state.active===editable?state.savedRange:null;
+  const range=live||saved;
+  if(!range||range.collapsed||!range.toString().trim())return;
+  e.preventDefault();e.stopPropagation();
+  state.active=editable;state.savedRange=range.cloneRange();
+  const menu=get("pageContextMenu");menu.hidden=false;
+  const size=menu.getBoundingClientRect(),rect=range.getClientRects()[0];
+  const point=e.clientX||e.clientY;
+  menu.style.left=Math.max(8,Math.min(point?e.clientX+6:(rect?.left??12),window.innerWidth-size.width-8))+"px";
+  menu.style.top=Math.max(8,Math.min(point?e.clientY+6:(rect?.bottom??12),window.innerHeight-size.height-8))+"px";
+  menu.querySelector("button")?.focus({preventScroll:true});
 }
 function restore(){
   if(!state.active?.isConnected||!state.savedRange)return false;
@@ -107,6 +138,14 @@ function renderNode(node,siblings){
   input.addEventListener("focus",()=>{state.active=input;selection();});
   input.addEventListener("mouseup",selection);input.addEventListener("keyup",selection);
   input.addEventListener("touchend",()=>requestAnimationFrame(selection));
+  input.addEventListener("paste",e=>{
+    const html=e.clipboardData?.getData("text/html");
+    if(html){
+      e.preventDefault();
+      document.execCommand("insertHTML",false,sanitizeEditable(html));
+      edited(node,input);
+    }
+  });
   input.addEventListener("input",()=>{edited(node,input);selection();});
   // Focusing and leaving a paragraph alone must NOT mark the page as changed.
   // Native editing emits input, while toolbar actions call edited() themselves.
@@ -141,6 +180,7 @@ function refreshYearSections(){
   if(knownYearSections.has(last)||last==="current")picker.value=last;
 }
 function render(){
+  pageHideMenu();
   view.canvas.replaceChildren();
   if(!state.tree){const h=document.createElement("div");h.className="admin-empty";h.textContent="Nyiss meg egy meglévő Blogger-oldalt, vagy add át a Markdown-konverter HTML-kimenetét.";view.canvas.append(h);return;}
   state.tree.nodes.forEach(node=>view.canvas.appendChild(renderNode(node,state.tree.nodes)));
@@ -474,6 +514,30 @@ view.title.addEventListener("input",()=>{
 });
 get("pageRetry").addEventListener("click",()=>{if(state.critical)return;state.error="";update();});
 view.canvas.addEventListener("click",e=>{if(e.target.closest("a"))e.preventDefault();});
+view.canvas.addEventListener("mousedown",pageCaptureRightClick,true);
+view.canvas.addEventListener("contextmenu",pageContextAt,true);
+get("pageContextMenu").querySelectorAll("[data-page-menu]").forEach(btn=>{
+  btn.addEventListener("mousedown",e=>e.preventDefault());
+  btn.addEventListener("click",()=>{
+    const action=btn.dataset.pageMenu,range=state.savedRange?.cloneRange();
+    pageHideMenu();if(range)state.savedRange=range;
+    if(action==="link")showLink();else format(action);
+  });
+});
+get("pageContextMenu").addEventListener("keydown",e=>{
+  if(e.key==="Escape"){e.preventDefault();pageHideMenu();restore();}
+  const buttons=Array.from(get("pageContextMenu").querySelectorAll("button"));
+  if(["ArrowUp","ArrowDown"].includes(e.key)){
+    e.preventDefault();
+    const old=buttons.indexOf(document.activeElement);
+    buttons[(old+(e.key==="ArrowDown"?1:-1)+buttons.length)%buttons.length]?.focus();
+  }
+});
+document.addEventListener("pointerdown",e=>{
+  if(!get("pageContextMenu").hidden&&!get("pageContextMenu").contains(e.target))pageHideMenu();
+});
+window.addEventListener("scroll",pageHideMenu,{passive:true});
+view.canvas.addEventListener("scroll",pageHideMenu,{passive:true});
 document.addEventListener("selectionchange",()=>{if(document.activeElement?.closest?.("#rbtools-pageCanvas"))selection();});
 for(const btn of root.querySelectorAll("[data-page-format]")){
  btn.addEventListener("mousedown",e=>e.preventDefault());
