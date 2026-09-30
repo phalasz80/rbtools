@@ -20,7 +20,7 @@ Mivel a Blogger API-nak nincs dokumentált önálló képfeltöltési művelete:
 2. Töltsd fel az összes szükséges képet a Blogger saját képfeltöltőjével.
 3. RBToolsban kapcsolódj a Bloggerhez, frissítsd a piszkozatlistát, és nyisd meg a draftot.
 4. Az RBTools a draft HTML-jéből automatikusan beolvassa a már feltöltött képeket a képtárba.
-5. A további szerkesztés, képaláírás, sorrend, keretesek és formázás az RBToolsban történik.
+5. A további szerkesztés, többsoros képaláírás, opcionális fotósor, sorrend, keretesek és formázás az RBToolsban történik. A képtár kártyáján Enterrel, a WYSIWYG-ben Enterrel vagy a **↵ Sortörés** gombbal hozható létre új sor.
 6. A **Mentés Blogger-piszkozatba** ugyanazt a draftot frissíti.
 
 ### Meglévő Blogger-piszkozat szerkesztése
@@ -28,7 +28,7 @@ Mivel a Blogger API-nak nincs dokumentált önálló képfeltöltési művelete:
 1. **Kapcsolódás a Bloggerhez**.
 2. Válaszd ki a megfelelő blogot.
 3. Frissítsd a piszkozatlistát, keress rá a címre, majd válaszd a **Piszkozat megnyitása** gombot.
-4. Az RBTools betölti a címet, HTML-t, címkéket és a cikkben szereplő képeket.
+4. Az RBTools betölti a címet, HTML-t, címkéket és a cikkben szereplő képeket. Minden Blogger-cikkművelet a **Piszkozatkezelés** egyetlen, színkódolt gombcsoportjában található.
 5. Szerkesztés után a **Mentés Blogger-piszkozatba** az eredeti post ID-t frissíti, nem készít másolatot.
 
 ## Blogger-integráció
@@ -83,7 +83,9 @@ A Cikkadminban külön tartalomtípus választható: **Cikk**, **#nyúz / Hétv�
 - képtár és főkép;
 - képek húzása konkrét bekezdések közé;
 - kép húzása keretes blokkba;
-- képaláírás és kredit;
+- többsoros képaláírás és külön kezelhető kép-<code>title</code>-kredit;
+- opcionális, képaláírás utáni **(fotó: Név)** külön sor, a HTML-ben `<br />` elválasztással;
+- a képtári kártya szövegmezői kijelölhetők, mert a képek már kizárólag a miniatűrnél fogva húzhatók;
 - egérrel vagy billentyűzettel szabad szövegkijelölés és kiválasztott rész formázása;
 - hivatkozások beszúrása/szerkesztése külön, nem modális URL-szerkesztővel (Ctrl+K / ⌘K);
 - blokkok drag-and-drop rendezése kizárólag a jobb oldali ⠿ fogantyúnál, hogy a szöveg kijelölhető maradjon;
@@ -102,6 +104,12 @@ A Cikkadmin és a haladó forráskonverter közvetlenül fogad **.md, .txt, .doc
 - **ODT:** a böngésző helyben bontja ki az OpenDocument csomagot; a bekezdések, címsorok, alapvető karakterformázás, linkek, listák és táblázatok Markdownná alakulnak. A beágyazott képek helyén helyőrző marad.
 - **RTF:** a szöveg, bekezdések, sortörések, félkövér, dőlt, aláhúzott, áthúzott, felső és alsó index alapformázása kerül át. Régi vagy gyártóspecifikus RTF-kiterjesztéseknél az eredményt ellenőrizni kell.
 - Az import teljesen kliensoldali, a dokumentumot az RBTools nem tölti fel saját szerverre.
+
+## Szerzői footer és időzítés
+
+A Cikkadmin WYSIWYG és a haladó szövegkonverter szerzői footere ugyanazt a RegionalBahn-formátumot használja: a szöveg után új sorban `<hr align="center" />`, majd jobbra zárva, 85 százalékos méretű dőlt szövegként a szerző vagy szerzők neve.
+
+A Blogger-piszkozatokhoz tartozó hat művelet egyetlen, jól elkülönített **Piszkozatkezelés** panelen található. A zöld mentés gomb csak piszkozatot ment. **Az időzítést az illetékes szerkesztő a Blogger saját felületén állítja be**, nem az RBToolsban. Normál piszkozatmentés után az RBTools időzítési mezője 2049. december 31. 23:59 értékre áll vissza.
 
 ## Kézi tartalék munkamenet
 
