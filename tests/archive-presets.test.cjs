@@ -49,6 +49,12 @@ assert.ok(updated.includes('href="#kozvetlen-osszes"'));
 assert.ok(updated.includes('id="kozvetlen-2027"'));
 console.log("Existing archived HTML unchanged outside new navigational additions: PASS");
 const imprint=S.impresszum();
+const sourceImpresszum=fs.readFileSync(path.join(dir,"templates","impresszum-regionalbahn.html"),"utf8");
+assert.equal(imprint,sourceImpresszum,"Starter must exactly match the downloadable Impresszum source");
+assert.ok(imprint.includes("36. § (2)"),"Limited press republication reservation should be explicit");
+assert.ok(imprint.includes("A puszta forrásmegjelölés önmagában nem helyettesíti az engedélyt"));
+assert.ok(!imprint.includes("az oldal bármely részén"),"Avoid obsolete blanket ban");
+
 for(const s of ["Moderálási irányelvek","Redaktion","Editorial team"])
  assert.ok(imprint.includes(s));
 assert.ok(core.parse(imprint).safe);
