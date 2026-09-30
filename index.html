@@ -3033,7 +3033,7 @@ function rbImageAltText(rawCaption,rawCredit="",rawPhotoName=""){
     if(raw){
       const tagged=raw.match(/^(fotó|foto|forrás|source|quelle)\s*:\s*(.*)$/i);
       const name=(tagged?tagged[2]:raw).replace(/^©\s*/,"").split(/\s*[•|]\s*/)[0].trim();
-      if(name)credit=(tagged&&/^fotó|foto$/i.test(tagged[1])?"fotó: ":"forrás: ")+name;
+      if(name)credit=(tagged&&/^(?:fotó|foto)$/i.test(tagged[1])?"fotó: ":"forrás: ")+name;
     }
   }
   return caption+(caption&&credit?" +++ ":"")+credit;
