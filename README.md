@@ -80,7 +80,9 @@ A Cikkadminban külön tartalomtípus választható: **Cikk**, **#nyúz / Hétv�
 - képek húzása konkrét bekezdések közé;
 - kép húzása keretes blokkba;
 - képaláírás és kredit;
-- blokkok drag-and-drop rendezése;
+- egérrel vagy billentyűzettel szabad szövegkijelölés és kiválasztott rész formázása;
+- hivatkozások beszúrása/szerkesztése külön, nem modális URL-szerkesztővel (Ctrl+K / ⌘K);
+- blokkok drag-and-drop rendezése kizárólag a jobb oldali ⠿ fogantyúnál, hogy a szöveg kijelölhető maradjon;
 - meglévő RegionalBahn Blogger HTML visszatöltése szerkesztésre;
 - haladó forráskonverzió a Cikkadminon belül: Markdown/plain text/DOCX/ODT/RTF/Google Dokumentum, profilok, presetek, RB-jelölések, közvetlen HTML-kimenet és előnézet;
 - a haladó konverter kimenetének visszatöltése a WYSIWYG Cikkadminba;
