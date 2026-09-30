@@ -2972,12 +2972,35 @@ function adminImageAttrs(img){
   if(!attrs.some(a=>a.name.toLowerCase()==="alt"))attrs.push({name:"alt",value:""});
   return attrs;
 }
+function adminCleanCaptionText(value){
+  return String(value||"").replace(/<br\s*\/?>/gi,"\n").replace(/\r\n?/g,"\n")
+    .split("\n").map(line=>line.trim()).join("\n").replace(/^\n+|\n+$/g,"");
+}
+function adminCaptionParts(raw,credit=""){
+  const text=adminCleanCaptionText(raw);
+  const photoLine=text.match(/(?:^|\n)\(\s*fotó\s*:\s*([^)]+)\)\s*$/i);
+  const titlePhoto=String(credit||"").match(/fotó\s*:\s*(?:©\s*)?([^•|\r\n]+)/i);
+  return {
+    caption:photoLine?adminCleanCaptionText(text.slice(0,photoLine.index)):text,
+    photoName:(photoLine?photoLine[1]:titlePhoto?.[1]||"").trim(),
+    captionPhoto:!!photoLine
+  };
+}
+function adminCaptionHtml(img,{includePhoto=true}={}){
+  const text=adminCleanCaptionText(img?.caption||"");
+  const textHtml=text.split("\n").map(line=>inlineMd(line)).join("<br />");
+  const photo=includePhoto&&img?.captionPhoto&&String(img?.photoName||"").trim()
+    ?"(fotó: "+esc(String(img.photoName).trim())+")":"";
+  return textHtml+(photo?(textHtml?"<br />":"")+photo:"");
+}
 function adminCaptionNodeText(node){
   if(!node||node.nodeType!==1||node.tagName!=="DIV"
     ||node.classList?.contains("separator")
     ||!/text-align\s*:\s*center/i.test(node.getAttribute("style")||"")
     ||node.querySelector("img,iframe,table"))return "";
-  return (node.textContent||"").replace(/\s+/g," ").trim();
+  const clone=node.cloneNode(true);
+  clone.querySelectorAll("br").forEach(br=>br.replaceWith(document.createTextNode("\n")));
+  return adminCleanCaptionText(clone.textContent);
 }
 function adminConsumeImageCaption(nodes,index){
   let caption="",lastIndex=index;
@@ -2985,13 +3008,20 @@ function adminConsumeImageCaption(nodes,index){
     const n=nodes[j];
     if((n.nodeType===3&&!n.textContent.trim())||(n.nodeType===1&&n.tagName==="BR"))continue;
     const text=adminCaptionNodeText(n);
-    if(!text||(caption&&text!==caption))break;
-    caption=text;lastIndex=j;
+    if(!text)break;
+    if(!caption){caption=text;lastIndex=j;continue;}
+    if(text===caption){lastIndex=j;continue;}
+    if(/^\(\s*fotó\s*:\s*[^)]+\)$/i.test(text)&&!adminCaptionParts(caption).captionPhoto){
+      caption+="\n"+text;lastIndex=j;continue;
+    }
+    break;
   }
   return {caption,lastIndex};
 }
 function adminNearbyCaption(sep){
-  return adminCaptionNodeText(sep?.nextElementSibling);
+  if(!sep?.parentNode)return "";
+  const siblings=Array.from(sep.parentNode.childNodes),idx=siblings.indexOf(sep);
+  return idx<0?"":adminConsumeImageCaption(siblings,idx).caption;
 }
 function adminPruneDuplicateCaptionBlocks(imageId,previousCaption){
   const expected=String(previousCaption||"").replace(/\s+/g," ").trim().toLocaleLowerCase("hu-HU");
@@ -3015,9 +3045,14 @@ function adminAddImageFromElement(holder,caption="",forceCredit=""){
   if(!display&&!full)return null;
   let item=adminImages.find(x=>(x.full||"")==full&&(x.display||"")==display);
   const detectedCredit=forceCredit||(a.getAttribute("title")||"").trim();
+  const parts=adminCaptionParts(caption,detectedCredit);
   if(item){
-    if(caption)item.caption=caption;
+    if(caption){
+      item.caption=parts.caption||"";
+      if(parts.captionPhoto){item.captionPhoto=true;item.photoName=parts.photoName;}
+    }
     if(detectedCredit)item.credit=detectedCredit;
+    if(!item.photoName)item.photoName=parts.photoName;
     return item;
   }
   item={
@@ -3025,7 +3060,9 @@ function adminAddImageFromElement(holder,caption="",forceCredit=""){
     full:full||display,
     display:display||full,
     credit:detectedCredit||"fotó: © Halász Péter • www.RegionalBahn.hu",
-    caption:String(caption||"").trim()||"KÉPaláírás",
+    caption:parts.caption||"KÉPaláírás",
+    captionPhoto:parts.captionPhoto,
+    photoName:parts.photoName||"Halász Péter",
     attrs:adminImageAttrs(img)
   };
   adminImages.push(item);return item;
@@ -3099,13 +3136,13 @@ function adminImageBodyHtml(img){
   const attrs=[];
   for(const a of img.attrs||[]){
     if(a.name.toLowerCase()==="src")continue;
-    if(a.name.toLowerCase()==="alt"){attrs.push('alt="'+esc(img.caption||"",true)+'"');continue;}
+    if(a.name.toLowerCase()==="alt"){attrs.push('alt="'+esc(adminCleanCaptionText(img.caption).replace(/\n/g," "),true)+'"');continue;}
     attrs.push(a.name+'="'+esc(a.value,true)+'"');
   }
-  if(!attrs.some(x=>/^alt=/.test(x)))attrs.unshift('alt="'+esc(img.caption||"",true)+'"');
+  if(!attrs.some(x=>/^alt=/.test(x)))attrs.unshift('alt="'+esc(adminCleanCaptionText(img.caption).replace(/\n/g," "),true)+'"');
   attrs.push('src="'+esc(img.display,true)+'"');
   return '<div class="separator" style="clear: both; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img '+attrs.join(" ")+' /></a></div>\n'
-    +'<div style="text-align: center;">'+inlineMd(img.caption||"")+'</div>\n<br />';
+    +'<div style="text-align: center;">'+adminCaptionHtml(img)+'</div>\n<br />';
 }
 function adminMainImageHtml(img){
   if(!img)return "";
@@ -3134,8 +3171,8 @@ function adminBoxHtml(block){
   });
   const img=adminFindImage(block.imageId);
   if(img){
-    out.push('<div class="separator" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="600" alt="'+esc(img.caption||"",true)+'" /></a></div>');
-    out.push('<div style="background-color: #c3c3c3; padding: 0px 15px 15px; text-align: center;">'+inlineMd(img.caption||"")+'</div>');
+    out.push('<div class="separator" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="600" alt="'+esc(adminCleanCaptionText(img.caption).replace(/\n/g," "),true)+'" /></a></div>');
+    out.push('<div style="background-color: #c3c3c3; padding: 0px 15px 15px; text-align: center;">'+adminCaptionHtml(img)+'</div>');
   }
   return out.join("\n");
 }
