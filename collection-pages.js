@@ -1,9 +1,10 @@
 /* RegionalBahn Tools: protected Blogger static-page WYSIWYG workspace. */
 (function(){
 "use strict";
-const core=window.RBTOOLS_PAGE_CORE,bridge=window.RBTOOLS_PAGE_BRIDGE;
+const core=window.RBTOOLS_PAGE_CORE,bridge=window.RBTOOLS_PAGE_BRIDGE,
+ presets=window.RBTOOLS_ARCHIVE_PRESETS,starters=window.RBTOOLS_PAGE_STARTERS;
 const root=document.getElementById("rbtools-app");
-if(!core||!bridge||!root){console.error("RBTools static page editor dependencies not loaded.");return;}
+if(!core||!bridge||!presets||!starters||!root){console.error("RBTools static page editor dependencies not loaded.");return;}
 const get=id=>root.querySelector("#rbtools-"+id);
 const view={
   blog:get("pageBlogSelect"),page:get("pageSelect"),canvas:get("pageCanvas"),
@@ -13,8 +14,113 @@ const view={
 };
 const state={list:[],loaded:null,tree:null,baseline:null,backup:false,saving:false,error:"",
   active:null,savedRange:null,linkAnchor:null,lastState:"",critical:false,
-  rightSnapshot:null};
+  rightSnapshot:null,profile:""};
 const knownYearSections=new Map();
+function activeTemplate(){
+  if(!state.tree)return "";
+  const actual=presets.detect(currentHtml(),(state.loaded?.url||"")+" "+view.title.value);
+  const selected=get("pageTemplateMode").value;
+  if(selected!=="auto"&&actual&&selected!==actual)return "";
+  return selected==="auto"?actual:selected;
+}
+function updateTemplateControls(){
+  const actual=state.tree?presets.detect(currentHtml(),(state.loaded?.url||"")+" "+view.title.value):"";
+  const selected=get("pageTemplateMode").value,mode=activeTemplate();
+  const safe=!!state.tree?.safe&&!state.saving,archive=safe&&(mode==="kk"||mode==="it");
+  const imprint=safe&&mode==="impresszum";
+  for(const id of ["pageNewYearQuick","pageNewEpisodeQuick","pageNewArticleQuick"])
+    get(id).disabled=!archive;
+  get("pageNewEpisodeQuick").hidden=!archive||mode!=="kk";
+  get("pageNewArticleQuick").hidden=!archive||mode!=="it";
+  get("pageNewImprintQuick").disabled=!imprint;
+  get("pageYearTools").hidden=!archive;
+  get("pageEntryTools").hidden=!archive;
+  get("pageImprintTools").hidden=!imprint;
+  get("pageYearBanner").closest("label").hidden=mode!=="it";
+  get("pageTemplateHint").textContent=selected!=="auto"&&actual&&selected!==actual
+    ?"⚠ A kiválasztott sablon nem egyezik a megnyitott HTML-lel. A gyorsműveletek biztonsági okból letiltva."
+    :mode==="kk"?"Közvetlen Kocsi: új év, új epizód és új évválasztó gomb. A korábbi 104 adás módosítás nélkül megmarad."
+    :mode==="it"?"InnoTrans: új kiállítási év, fejléc és új tudósítás. Az eredeti cikkek és évhivatkozások megmaradnak."
+    :mode==="impresszum"?"Impresszum: új rovatok, meglévő HU / DE / EN szövegek megőrzése. A helyi vázlat jogi szövegeit közzététel előtt ellenőrizni kell."
+    :"Nyiss meg egy meglévő Blogger-oldalt, töltsd be a két HTML-archívumot, vagy válassz új, helyi sablont.";
+}
+function reparseEditedHtml(html){
+  const next=core.parse(html);
+  if(!next.safe)throw Error("Az eredmény HTML-szerkezete nem biztonságosan értelmezhető. Az eredeti változat változatlan maradt.");
+  state.tree=next;state.error="";state.critical=false;
+  render();update();
+}
+function openQuick(id,field){
+  const panel=get(id);panel.hidden=false;panel.open=true;
+  panel.scrollIntoView({behavior:"smooth",block:"nearest"});
+  get(field)?.focus({preventScroll:true});
+}
+function setArchiveDate(){
+  const x=new Date(),date=x.getFullYear()+"."+String(x.getMonth()+1).padStart(2,"0")+"."+
+    String(x.getDate()).padStart(2,"0")+".";
+  if(!get("pageEntryDate").value.trim())get("pageEntryDate").value=date;
+}
+function prepareYear(){
+  const years=state.tree?presets.years(currentHtml()):[];
+  const today=new Date().getFullYear();
+  const latest=Number(years[0]||today);
+  const step=activeTemplate()==="it"?2:1;
+  get("pageYearNumber").value=String(Math.max(today,latest+step));
+}
+function insertYear(){
+  const mode=activeTemplate();if(!["kk","it"].includes(mode)||!state.tree?.safe)return;
+  const year=get("pageYearNumber").value.trim();
+  try{
+    const html=presets.addYear(currentHtml(),mode,year,
+      {summary:get("pageYearSummary").value.trim(),banner:get("pageYearBanner").value.trim()});
+    reparseEditedHtml(html);
+    get("pageYearNumber").value="";get("pageYearSummary").value="";get("pageYearBanner").value="";
+    get("pageYearTools").open=false;
+    message("ÚJ ÉV HELYILEG ELKÉSZÜLT",year+
+      ": az évblokk, a kapcsolódó gomb és az évválasztás CSS-szabályai hozzáadva. A Bloggerbe még nem mentettünk.","dirty");
+  }catch(e){message("AZ ÚJ ÉV NEM HOZHATÓ LÉTRE",e.message,"error");}
+}
+function startLocalTemplate(){
+  const selected=get("pageTemplateMode").value;
+  if(selected==="auto"){message("VÁLASSZ SABLONT",
+    "Új helyi oldalhoz előbb válaszd ki a Közvetlen Kocsi, InnoTrans vagy Impresszum sablont.","working");return;}
+  if(!abandonCheck())return;
+  try{
+    const year=String(new Date().getFullYear());
+    const html=selected==="impresszum"?starters.impresszum():starters.archive(selected,year);
+    loadHtml(html,{title:selected==="kk"?"Közvetlen Kocsi":selected==="it"?"InnoTrans":"Impresszum"});
+    get("pageTemplateMode").value=selected;state.profile=selected;update();
+    view.info.textContent="HELYI sablon, még nincs Blogger-oldalhoz rendelve. Az éles oldal módosításához azt külön meg kell nyitni.";
+    message("HELYI SABLON ELKÉSZÜLT","Szerkeszthető és letölthető. Nem mentünk automatikusan meglévő Blogger-oldalra.","working");
+  }catch(e){message("SABLON BETÖLTÉSI HIBA",e.message,"error");}
+}
+async function importHtmlFile(event){
+  const file=event.target.files?.[0];if(!file)return;
+  try{
+    if(file.size>3_000_000)throw Error("A helyi HTML-fájl maximum 3 MB lehet.");
+    if(!abandonCheck())return;
+    const html=await file.text(),guessed=presets.detect(html,file.name);
+    loadHtml(html,{title:guessed==="kk"?"Közvetlen Kocsi":guessed==="it"?"InnoTrans":guessed==="impresszum"?"Impresszum":file.name.replace(/\.[^.]+$/,"")});
+    if(!state.tree.safe)throw Error("A fájl szerkezete összetett vagy szabálytalan, ezért a szerkesztés zárolva maradt.");
+    message("HELYI HTML BEOLVASVA",file.name+
+      " • a teljes eredeti forrás megmaradt. A Bloggerbe történő mentéshez a konkrét élő oldalt nyisd meg.","working");
+  }catch(e){message("HTML-IMPORT HIBA",e.message,"error");}
+  finally{event.target.value="";}
+}
+function insertImprintSection(){
+  if(activeTemplate()!=="impresszum"||!state.tree?.safe)return;
+  const title=get("pageImprintTitle").value.trim(),body=get("pageImprintBody").value.trim();
+  if(!title||!body){message("HIÁNYZÓ IMPRESSZUM-ADATOK","Add meg a rovat címét és jóváhagyott szövegét.","working");return;}
+  const div=state.tree.nodes.find(n=>n.kind==="container"&&/class=["'][^"']*rb-impresszum/.test(n.prefix));
+  const target=div?div.children:state.tree.nodes;
+  target.push({kind:"raw",original:"\n<hr align=\"center\" />\n",protected:false});
+  target.push(entryNode("h3",escapeEntry(title),"text-align:left;"));
+  target.push(entryNode("div",escapeEntry(body).replace(/\r?\n/g,"<br />"),"text-align:justify;"));
+  render();update();
+  get("pageImprintTitle").value="";get("pageImprintBody").value="";
+  message("ÚJ IMPRESSZUM-ROVAT HOZZÁADVA","Az új szöveg helyben bekerült. Az eredeti jogi és nyelvi blokkokat nem módosítottuk.","dirty");
+}
+
 function message(title,detail="",kind="idle"){
   const key=kind+"|"+title+"|"+detail;
   if(key===state.lastState)return;
@@ -177,7 +283,10 @@ function refreshYearSections(){
     }
   }
   if(state.tree)visit(state.tree.nodes);
-  if(knownYearSections.has(last)||last==="current")picker.value=last;
+  if(knownYearSections.has(last))picker.value=last;
+  else if(activeTemplate()==="kk"||activeTemplate()==="it"){
+    picker.value=Array.from(picker.options).find(o=>o.value!=="current")?.value||"current";
+  }else picker.value="current";
 }
 function render(){
   pageHideMenu();
@@ -189,6 +298,7 @@ function render(){
 }
 function update(){
   const has=!!state.tree,hasPage=!!state.loaded?.id;
+  updateTemplateControls();
   const code=currentHtml(),audit=has?core.audit(state.tree,code):null;
   view.raw.value=code;
   ["pageCopy","pageDownload","pagePreview","pageAddParagraph","pageAddHeading","pageAddRule","pageLink"].forEach(id=>get(id).disabled=!has||!state.tree.safe);
@@ -279,6 +389,8 @@ function loadHtml(html,{page=null,title="",origin="loaded"}={}){
   state.loaded=page?{...page,blogId:view.blog.value,originalHtml:html}:null;
   state.backup=false;view.title.value=title;
   state.baseline=page?{title,html,updated:page.updated||"",origin}:null;
+  state.profile=presets.detect(html,(page?.url||"")+" "+title);
+  get("pageTemplateMode").value=state.profile||"auto";
   render();update();
   if(!state.tree.safe){
     state.error="Az eredeti HTML szerkezete nem értelmezhető veszteségmentesen. A teljes forrás zárolva maradt; mentsd el a biztonsági másolatot, és ne módosítsd WYSIWYG-ben.";
