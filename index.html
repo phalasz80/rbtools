@@ -182,6 +182,13 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
         <button id="rbtools-bloggerSchedulePost" type="button" class="blogger-workflow-button blogger-action-schedule" disabled><span aria-hidden="true">⚠</span> IDŐZÍTÉS (csak szerkesztő)</button>
         <button id="rbtools-bloggerRevertPost" type="button" class="blogger-workflow-button blogger-action-revert" disabled><span aria-hidden="true">↩</span> Visszaállítás piszkozatba</button>
       </div>
+      <div id="rbtools-bloggerSaveIndicator" class="blogger-save-indicator" data-state="local" role="status" aria-live="polite" aria-atomic="true">
+        <span class="blogger-save-indicator-icon" id="rbtools-bloggerSaveIcon" aria-hidden="true">!</span>
+        <span class="blogger-save-indicator-copy">
+          <strong id="rbtools-bloggerSaveHeadline">NINCS BLOGGER-MENTÉS</strong>
+          <span id="rbtools-bloggerSaveDetail">Az aktuális cikk helyben van; a Blogger nem igazolt vissza mentést.</span>
+        </span>
+      </div>
       <p class="blogger-workflow-warning"><strong>Az időzítés kizárólag az illetékes szerkesztő feladata, a Blogger felületén. Ezen a felületen ne időzíts cikket!</strong></p>
       <div class="blogger-workflow-meta">
         <span id="rbtools-bloggerCurrentPost" class="small">Nincs Blogger-bejegyzés hozzárendelve.</span>
@@ -1337,6 +1344,18 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .blogger-action-schedule{background:#fff0f1;color:#8c1727;border-color:#e9a0a9}
 #rbtools-app .blogger-action-revert{background:#fff3db;color:#704713;border-color:#e8c484}
 #rbtools-app .blogger-workflow-button:disabled{opacity:.43;box-shadow:none;cursor:not-allowed}
+#rbtools-app .blogger-save-indicator{display:flex;align-items:center;gap:12px;margin:15px 0 9px;padding:13px 15px;border:2px solid;border-radius:10px;font:14px/1.45 Arial,Helvetica,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+#rbtools-app .blogger-save-indicator-icon{flex:0 0 36px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:23px;font-weight:900}
+#rbtools-app .blogger-save-indicator-copy{display:flex;flex-direction:column;gap:4px;min-width:0;overflow-wrap:anywhere}
+#rbtools-app .blogger-save-indicator-copy strong{font-size:17px;font-weight:900;letter-spacing:.3px}
+#rbtools-app .blogger-save-indicator[data-state="local"],#rbtools-app .blogger-save-indicator[data-state="dirty"],#rbtools-app .blogger-save-indicator[data-state="error"]{background:#ffe1e0;color:#7f1d1d;border-color:#dc2626}
+#rbtools-app .blogger-save-indicator[data-state="local"] .blogger-save-indicator-icon,#rbtools-app .blogger-save-indicator[data-state="dirty"] .blogger-save-indicator-icon,#rbtools-app .blogger-save-indicator[data-state="error"] .blogger-save-indicator-icon{background:#b91c1c;color:white}
+#rbtools-app .blogger-save-indicator[data-state="saved"]{background:#ceffdc;color:#14532d;border-color:#15803d}
+#rbtools-app .blogger-save-indicator[data-state="saved"] .blogger-save-indicator-icon{background:#15803d;color:white}
+#rbtools-app .blogger-save-indicator[data-state="loaded"]{background:#d7edff;color:#163c6a;border-color:#2372bb}
+#rbtools-app .blogger-save-indicator[data-state="loaded"] .blogger-save-indicator-icon{background:#1d65a3;color:white}
+#rbtools-app .blogger-save-indicator[data-state="working"],#rbtools-app .blogger-save-indicator[data-state="offline"],#rbtools-app .blogger-save-indicator[data-state="static"]{background:#fff1bd;color:#634300;border-color:#b98906}
+#rbtools-app .blogger-save-indicator[data-state="working"] .blogger-save-indicator-icon,#rbtools-app .blogger-save-indicator[data-state="offline"] .blogger-save-indicator-icon,#rbtools-app .blogger-save-indicator[data-state="static"] .blogger-save-indicator-icon{background:#9b7100;color:white}
 #rbtools-app .blogger-workflow-warning{margin:13px 0 10px;border-left:4px solid #e11d48;background:#ffe9ee;color:#9f1239;padding:9px 11px;font-size:12px}
 #rbtools-app .blogger-workflow-meta{display:flex;flex-direction:column;gap:5px;margin-top:10px}
 @media(max-width:1000px){#rbtools-app .blogger-workflow-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -1547,7 +1566,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v33";
+const RBTOOLS_VERSION="pages-v34";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -2474,7 +2493,61 @@ let bloggerTokenClient=null;
 let bloggerBlogs=[];
 let bloggerDrafts=[];
 let bloggerCurrentPost=null;
+let bloggerKnownSnapshot=null,bloggerSavePending=false,bloggerSaveError="",bloggerLastBannerState="",bloggerLastBannerText="";
 
+function bloggerLocalSnapshot(){
+  return {blogId:rbGet("bloggerBlogSelect")?.value||"",postId:String(bloggerCurrentPost?.id||""),
+    title:rbGet("adminTitle")?.value.trim()||"",content:rbGet("adminOutput")?.value||"",
+    labels:bloggerParseLabels().slice().sort((a,b)=>a.localeCompare(b,"hu")).join("\u001f")};
+}
+function bloggerSnapshotEquals(a,b){
+  return !!a&&!!b&&a.blogId===b.blogId&&a.postId===b.postId
+    &&a.title===b.title&&a.content===b.content&&a.labels===b.labels;
+}
+function bloggerUpdateSaveBanner(){
+  const badge=rbGet("bloggerSaveIndicator");if(!badge)return;
+  const current=bloggerLocalSnapshot(),known=bloggerKnownSnapshot;
+  const time=known?.when?new Date(known.when).toLocaleString("hu-HU"):"";
+  const hasContent=!!(current.title||current.content.trim()||current.labels);
+  let state="local",title="NINCS BLOGGER-MENTÉS",
+    detail="Az aktuális cikk csak helyben található. Mentés nélkül a változások nem kerülnek a Bloggerbe.",icon="!";
+  if(rbGet("adminContentType")?.value==="static"){
+    state="static";title="STATIKUS OLDAL • NINCS BLOGGER-PISZKOZAT";
+    detail="A statikus oldal HTML-jét külön kell beilleszteni a Blogger oldalába.";icon="i";
+  }else if(bloggerSavePending){
+    state="working";title="MENTÉS FOLYAMATBAN…";
+    detail="A Blogger visszaigazolására várunk. Mentés közben írt új változtatásokat ismét el kell menteni.";icon="↻";
+  }else if(bloggerSaveError){
+    state="error";title="A BLOGGER-MENTÉS NEM SIKERÜLT";
+    detail=bloggerSaveError+" A jelenlegi helyi változtatások még nem kaptak mentési visszaigazolást.";icon="×";
+  }else if(known&&!bloggerConnected()){
+    state="offline";title="NINCS AKTÍV BLOGGER-KAPCSOLAT";
+    detail="Korábbi "+(known.origin==="saved"?"sikeres mentés":"Blogger-betöltés")+(time?" • "+time:"")+
+      ". Kapcsolódj újra;"+(bloggerSnapshotEquals(known,current)?" nem látszik új helyi módosítás.":" a helyi módosítások nincsenek elmentve.");icon="!";
+  }else if(known&&bloggerSnapshotEquals(known,current)){
+    if(known.origin==="saved"){
+      state="saved";title="MENTVE A BLOGGERBE";
+      detail="Sikeresen visszaigazolt cím, szöveg és címkék"+(time?" • "+time:"")+
+        ". Azóta nem történt helyi módosítás.";icon="✓";
+    }else{
+      state="loaded";title="BLOGGER-PISZKOZAT BETÖLTVE";
+      detail="A betöltés óta nincs helyi módosítás. Az első mentéskor a WYSIWYG által előállított HTML kerül a Bloggerbe.";icon="✓";
+    }
+  }else if(known){
+    state="dirty";title="NINCS MENTVE • HELYI MÓDOSÍTÁSOK!";
+    detail=(time?"Utolsó "+(known.origin==="saved"?"sikeres mentés":"betöltés")+": "+time+". ":"")+
+      "A cím, cikkszöveg vagy címkék változásait el kell menteni a Bloggerbe.";icon="!";
+  }else if(!hasContent){
+    state="local";title="NINCS MÉG BLOGGER-MENTÉS";
+    detail="Új helyi cikk. Kezdj írni, majd mentsd a piszkozatot a Bloggerbe.";
+  }
+  const pair=title+"\n"+detail;
+  if(state!==bloggerLastBannerState||pair!==bloggerLastBannerText){
+    badge.dataset.state=state;rbGet("bloggerSaveIcon").textContent=icon;
+    rbGet("bloggerSaveHeadline").textContent=title;rbGet("bloggerSaveDetail").textContent=detail;
+    bloggerLastBannerState=state;bloggerLastBannerText=pair;
+  }
+}
 function bloggerStatus(msg){const el=rbGet("bloggerStatus");if(el)el.textContent=msg;}
 function bloggerConnected(){return !!bloggerAccessToken&&Date.now()<bloggerTokenExpiresAt-15000;}
 function bloggerSetUi(){
@@ -2492,6 +2565,7 @@ function bloggerSetUi(){
   rbGet("bloggerSchedulePost").disabled=staticMode||!connected||!rbGet("bloggerBlogSelect").value;
   rbGet("bloggerRevertPost").disabled=staticMode||!connected||!bloggerCurrentPost||!["scheduled","live"].includes(String(bloggerCurrentPost.status||"").toLowerCase());
   rbGet("bloggerConnectionBadge").closest(".admin-blogger-panel")?.classList.toggle("connected",connected);
+  bloggerUpdateSaveBanner();
 }
 function bloggerClientId(){
   return rbGet("bloggerClientId").value.trim();
@@ -2511,6 +2585,7 @@ function bloggerDisconnect(){
   rbGet("bloggerBlogSelect").innerHTML='<option value="">Kapcsolódás után választható</option>';
   rbGet("bloggerDraftSelect").innerHTML='<option value="">Nincs betöltve</option>';
   rbGet("bloggerCurrentPost").textContent="Nincs Blogger-bejegyzés hozzárendelve.";
+  bloggerSavePending=false;bloggerSaveError="";
   bloggerStatus("Kapcsolat bontva. Az access token elfelejtve.");bloggerSetUi();
 }
 async function bloggerApi(path,{method="GET",body=null}={}){
@@ -2609,6 +2684,8 @@ async function bloggerOpenDraft(){
   adminLoadExistingHtml(post.content||"");
   rbGet("adminTitle").value=post.title||rbGet("adminTitle").value;
   adminRenderCanvas();adminGenerateHtml(false);bloggerPostMeta();bloggerSetSafeSchedule();
+  bloggerKnownSnapshot={...bloggerLocalSnapshot(),origin:"loaded",when:post.updated||""};
+  bloggerSaveError="";bloggerSavePending=false;bloggerUpdateSaveBanner();
   bloggerStatus("Piszkozat megnyitva. A mentés ugyanazt a Blogger-bejegyzést frissíti. Biztonsági időzítés: 2049. 12. 31. 23:59.");
 }
 function bloggerSetSafeSchedule(){
@@ -2621,22 +2698,36 @@ async function bloggerSaveDraft({resetSchedule=true}={}){
   if(!title)throw new Error("A cikknek nincs címe.");
   if(!content.trim())throw new Error("A cikk tartalma üres.");
   const body={kind:"blogger#post",title,content,labels:bloggerParseLabels()};
-  let post;
-  if(bloggerCurrentPost?.id){
-    const status=String(bloggerCurrentPost.status||"draft").toLowerCase();
-    if(status!=="draft")throw new Error("A hozzárendelt bejegyzés már nem piszkozat. Előbb állítsd vissza piszkozatba.");
-    post=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts/"+encodeURIComponent(bloggerCurrentPost.id),{method:"PATCH",body});
-    bloggerStatus("Meglévő Blogger-piszkozat frissítve.");
-  }else{
-    post=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts?isDraft=true",{method:"POST",body});
-    bloggerStatus("Új Blogger-piszkozat létrehozva.");
+  const sent=bloggerLocalSnapshot();
+  bloggerSaveError="";bloggerSavePending=true;bloggerUpdateSaveBanner();
+  try{
+    let post;
+    if(bloggerCurrentPost?.id){
+      const status=String(bloggerCurrentPost.status||"draft").toLowerCase();
+      if(status!=="draft")throw new Error("A hozzárendelt bejegyzés már nem piszkozat. Előbb állítsd vissza piszkozatba.");
+      post=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts/"+encodeURIComponent(bloggerCurrentPost.id),{method:"PATCH",body});
+    }else post=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts?isDraft=true",{method:"POST",body});
+    if(!post?.id)throw new Error("A Blogger-válasz nem igazolta vissza a bejegyzésazonosítót.");
+    bloggerCurrentPost=post;
+    bloggerKnownSnapshot={...sent,blogId,postId:String(post.id),origin:"saved",when:new Date().toISOString()};
+    bloggerPostMeta();
+    try{await bloggerLoadDrafts();}catch(error){bloggerStatus("Mentve, de a piszkozatlista frissítése sikertelen: "+error.message);}
+    rbGet("bloggerDraftSelect").value=post.id||"";
+    if(resetSchedule)bloggerSetSafeSchedule();
+    bloggerSetUi();
+    bloggerStatus("Blogger-piszkozat elmentve."+
+      (bloggerSnapshotEquals(bloggerKnownSnapshot,bloggerLocalSnapshot())?"":" Figyelem: mentés közben újabb helyi módosítás keletkezett."));
+    return post;
+  }catch(error){
+    bloggerSaveError=error.message||String(error);
+    throw error;
+  }finally{
+    bloggerSavePending=false;bloggerUpdateSaveBanner();
   }
-  bloggerCurrentPost=post;bloggerPostMeta();await bloggerLoadDrafts();
-  rbGet("bloggerDraftSelect").value=post.id||"";if(resetSchedule)bloggerSetSafeSchedule();bloggerSetUi();return post;
 }
 async function bloggerSaveDraftClick(){
   try{bloggerStatus("Mentés a Bloggerbe…");await bloggerSaveDraft();}
-  catch(e){console.error(e);bloggerStatus("Mentési hiba: "+e.message);}
+  catch(e){console.error(e);bloggerSaveError=e.message||String(e);bloggerUpdateSaveBanner();bloggerStatus("Mentési hiba: "+e.message);}
 }
 async function bloggerSchedulePost(){
   try{
@@ -2665,7 +2756,9 @@ async function bloggerRevertPost(){
   }catch(e){console.error(e);bloggerStatus("Visszaállítási hiba: "+e.message);}
 }
 function bloggerNewLocal(){
-  rbGet("bloggerLabels").value="";bloggerSetSafeSchedule();adminClear();bloggerStatus("Új helyi cikk. A Mentés Blogger-piszkozatba új draftot fog létrehozni. Biztonsági időzítés: 2049. 12. 31. 23:59.");
+  rbGet("bloggerLabels").value="";bloggerSetSafeSchedule();adminClear();
+  bloggerKnownSnapshot=null;bloggerSaveError="";bloggerUpdateSaveBanner();
+  bloggerStatus("Új helyi cikk. A Mentés Blogger-piszkozatba új draftot fog létrehozni. Biztonsági időzítés: 2049. 12. 31. 23:59.");
 }
 try{rbGet("bloggerClientId").value=localStorage.getItem(BLOGGER_CLIENT_ID_KEY)||BLOGGER_DEFAULT_CLIENT_ID;}catch{rbGet("bloggerClientId").value=BLOGGER_DEFAULT_CLIENT_ID;}
 rbGet("bloggerSaveClientId").addEventListener("click",bloggerSaveClientId);
@@ -2673,7 +2766,8 @@ rbGet("bloggerForgetClientId").addEventListener("click",bloggerForgetClientId);
 rbGet("bloggerConnect").addEventListener("click",bloggerConnect);
 rbGet("bloggerDisconnect").addEventListener("click",bloggerDisconnect);
 rbGet("bloggerRefreshBlogs").addEventListener("click",()=>bloggerLoadBlogs().catch(e=>bloggerStatus("Hiba: "+e.message)));
-rbGet("bloggerBlogSelect").addEventListener("change",()=>{bloggerCurrentPost=null;bloggerPostMeta();bloggerLoadDrafts().catch(e=>bloggerStatus("Hiba: "+e.message));});
+rbGet("bloggerBlogSelect").addEventListener("change",()=>{bloggerCurrentPost=null;bloggerKnownSnapshot=null;bloggerSaveError="";bloggerPostMeta();bloggerLoadDrafts().catch(e=>bloggerStatus("Hiba: "+e.message));});
+rbGet("bloggerLabels").addEventListener("input",bloggerUpdateSaveBanner);
 rbGet("bloggerDraftSearch").addEventListener("input",bloggerRenderDrafts);
 rbGet("bloggerDraftSelect").addEventListener("change",bloggerSetUi);
 rbGet("bloggerRefreshDrafts").addEventListener("click",()=>bloggerLoadDrafts().catch(e=>bloggerStatus("Hiba: "+e.message)));
@@ -3300,6 +3394,7 @@ function adminGenerateHtml(setStatus=true){
     if(rbGet("adminFooter").value==="author"&&author)out+='\n<hr align="center" />\n<div style="text-align: right;"><span style="font-size: 85%;"><em>'+esc(author)+'</em></span></div>';
   }
   rbGet("adminOutput").value=out;
+  bloggerUpdateSaveBanner();
   if(setStatus)rbGet("adminStatus").textContent=contentType==="static"?"Statikus oldal HTML-je frissítve.":"Végleges HTML frissítve.";
 }
 function adminMoveBlock(id,delta){
@@ -3958,7 +4053,7 @@ function adminClear(){
   adminBlocks.push({id:adminUid("b"),type:"p",html:"",align:"justify"});
   ["adminSource","adminImageSource","adminExistingHtml","adminTitle","adminOutput"].forEach(id=>rbGet(id).value="");
   rbGet("adminAuthor").value="Halász Péter";rbGet("adminFooter").value="author";
-  bloggerCurrentPost=null;bloggerPostMeta();
+  bloggerCurrentPost=null;bloggerKnownSnapshot=null;bloggerSaveError="";bloggerPostMeta();
   adminRenderImageLibrary();adminRenderCanvas();adminGenerateHtml(false);rbGet("adminStatus").textContent="Új, üres cikk. Írhatsz közvetlenül a WYSIWYG szerkesztőben.";
 }
 rbGet("adminContentType").addEventListener("change",()=>adminContentTypeChanged(true));
