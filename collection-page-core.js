@@ -66,6 +66,9 @@ function make(p,d=0){
  if(locked(p)||d>18)return {kind:"raw",original:raw,protected:true};
  const prefix=raw.slice(0,p.openEnd),inner=raw.slice(p.openEnd,p.closeStart),suffix=raw.slice(p.closeStart);
  const children=split(inner);if(!children)return {kind:"raw",original:raw,protected:true};
+ if(p.tag==="section"&&/data-rb-static-section\s*=/.test(prefix)){
+   return {kind:"container",tag:p.tag,original:raw,prefix,suffix,children:children.map(x=>make(x,d+1))};
+ }
  if(WRAP.has(p.tag)&&children.some(x=>WRAP.has(x.tag)||LOCK.has(x.tag)||/\n\s*\n/.test(x.raw)))
   return {kind:"container",tag:p.tag,original:raw,prefix,suffix,children:children.map(x=>make(x,d+1))};
  if(children.some(x=>LOCK.has(x.tag))||/<(?:script|style|button|iframe|img|svg|form|input|select|textarea)\b/i.test(inner))
