@@ -3681,7 +3681,7 @@ function adminHtmlToBlocks(html){
     if(node.nodeType!==1)continue;
     const tag=node.tagName.toLowerCase();
     if(tag==="br")continue;
-    if(node.matches?.('.rb-live-entry[data-rb-live="1"]')){
+    if(node.matches?.('.rb-live-entry')){
       const update=adminLiveFromNode(node);
       if(update)blocks.push(update);
       continue;
@@ -4498,7 +4498,7 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
     adminLeadHtml=preHtml;adminLeadAlign=preIntro?.align||adminAlignFromNode(preBold.closest("div"),"justify");
   }
   const tpl=document.createElement("template");tpl.innerHTML=post;const nodes=Array.from(tpl.content.childNodes);
-  const incomingLive=!!tpl.content.querySelector('.rb-live-entry[data-rb-live="1"]');
+  const incomingLive=!!tpl.content.querySelector('.rb-live-entry');
   if(incomingLive){
     rbGet("adminContentType").value="live";adminContentTypeChanged(false);
     const lastDate=Array.from(tpl.content.querySelectorAll('.rb-live-entry[data-rb-live-date]'))
@@ -4530,7 +4530,7 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
     const n=nodes[i];if(n.nodeType===3&&!n.textContent.trim())continue;if(n.nodeType!==1)continue;
     const tag=n.tagName.toLowerCase();if(tag==="br")continue;
     if(n.matches?.('.rb-live-navigation'))continue; // auto rebuilt after import
-    if(n.matches?.('.rb-live-entry[data-rb-live="1"]')){
+    if(n.matches?.('.rb-live-entry')){
       const update=adminLiveFromNode(n);
       if(update)adminBlocks.push(update);
       continue;
