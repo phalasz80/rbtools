@@ -597,6 +597,30 @@ Források:
   <section class="panel collection-page-workspace" aria-labelledby="rbtools-pageHeading">
     <h2 id="rbtools-pageHeading">Blogger-statikus oldalak: közvetlen WYSIWYG-szerkesztés</h2>
     <p class="intro">A meglévő <code>/p/…</code> oldalak a Blogger API-n keresztül nyithatók meg. A szöveg vizuálisan szerkeszthető, miközben a program a saját évválasztó gombokat, az eredeti JavaScriptet, CSS-t és más egyedi HTML-elemeket változatlan forrásblokkokként őrzi meg. A megnyitott oldal eredeti URL-je és Page ID-ja nem változik.</p>
+    <div class="collection-presets" aria-label="Gyűjtőoldal-sablonok">
+      <div class="collection-presets-title">OLDALTÍPUS ÉS GYORSGOMBOK</div>
+      <div class="collection-page-actions">
+        <label for="rbtools-pageTemplateMode">Sablon
+          <select id="rbtools-pageTemplateMode">
+            <option value="auto">Automatikus felismerés</option>
+            <option value="kk">Közvetlen Kocsi podcastarchívum</option>
+            <option value="it">InnoTrans cikkarchívum</option>
+            <option value="impresszum">Impresszum (HU / DE / EN)</option>
+          </select>
+        </label>
+        <button id="rbtools-pageStartTemplate" type="button">▣ Új, helyi sablon</button>
+        <label class="collection-page-file-label">Sablon vagy HTML-fájl megnyitása
+          <input id="rbtools-pageImportFile" type="file" accept=".html,.htm,.txt,text/html,text/plain">
+        </label>
+      </div>
+      <div class="collection-quickbar">
+        <button id="rbtools-pageNewYearQuick" type="button" disabled>🗓＋ Új év</button>
+        <button id="rbtools-pageNewEpisodeQuick" type="button" disabled>🎙＋ Új adás</button>
+        <button id="rbtools-pageNewArticleQuick" type="button" disabled>📰＋ Új cikk</button>
+        <button id="rbtools-pageNewImprintQuick" type="button" disabled>▣＋ Impresszum-rovat</button>
+      </div>
+      <p id="rbtools-pageTemplateHint" class="small">Nyisd meg az eredeti Blogger-oldalt vagy a két egyszerűsített HTML-sablon valamelyikét. Új helyi sablon soha nem írja felül automatikusan a Bloggeren meglévő oldalt.</p>
+    </div>
     <div class="collection-page-actions">
       <button id="rbtools-pageConnect" type="button">🔐 Blogger-kapcsolat</button>
       <label>Blog <select id="rbtools-pageBlogSelect" aria-label="A szerkesztendő statikus oldal blogja"><option value="">Kapcsolódás után választható</option></select></label>
@@ -632,17 +656,42 @@ Források:
       <button type="button" id="rbtools-pageAddHeading">＋ Alcím</button>
       <button type="button" id="rbtools-pageAddRule">＋ Elválasztó</button>
     </div>
-    <details class="collection-page-entry-tools">
+    <details id="rbtools-pageYearTools" class="collection-page-entry-tools" hidden>
+      <summary>🗓 Új év és évválasztó gomb létrehozása</summary>
+      <p class="small">A program együtt egészíti ki az évblokkot, a navigációs gombot és a CSS-only évválasztás szabályait. Az eddigi gombok, cikkek és mélyhivatkozások változatlanok maradnak.</p>
+      <div class="collection-page-entry-grid">
+        <label for="rbtools-pageYearNumber">Új év <input id="rbtools-pageYearNumber" inputmode="numeric" maxlength="4" placeholder="2028"></label>
+        <label for="rbtools-pageYearBanner">InnoTrans-fejléckép URL (nem kötelező) <input id="rbtools-pageYearBanner" type="url" placeholder="https://…/s600/fejlec.png"></label>
+      </div>
+      <label class="collection-page-entry-summary" for="rbtools-pageYearSummary">Az új év rövid bevezetése
+        <textarea id="rbtools-pageYearSummary" rows="2" placeholder="Évhez kapcsolódó rövid bevezető (nem kötelező)."></textarea>
+      </label>
+      <button id="rbtools-pageYearInsert" type="button">✓ Új év és gomb elkészítése</button>
+    </details>
+    <details class="collection-page-entry-tools" id="rbtools-pageEntryTools" hidden>
       <summary>＋ Új cikk / podcast-epizód felvétele a meglévő gyűjtőoldalba</summary>
-      <p class="small">A „Beszúrás helye” listában a program által felismert, meglévő évblokkok is kiválaszthatók. Az eredeti évválasztó gombok és szkriptek ekkor változatlanok maradnak. Új év és új évválasztó gomb automatikus létrehozása nem történik.</p>
+      <p class="small">Válassz ki egy meglévő évet, töltsd ki a cikk vagy podcast-adás adatait. Az eredeti 200 pixeles, balra úsztatott képes elrendezést és a cím melletti dátumot a megfelelő archívumsablon készíti el.</p>
       <div class="collection-page-entry-grid">
         <label>Bejegyzés címe <input id="rbtools-pageEntryTitle" type="text" placeholder="Új cikk vagy adás címe"></label>
         <label>Dátum <input id="rbtools-pageEntryDate" type="text" placeholder="2026.09.30."></label>
         <label>A „Tovább »” hivatkozás teljes URL-je <input id="rbtools-pageEntryUrl" type="url" placeholder="https://www.regionalbahn.hu/…"></label>
         <label>Beszúrás helye <select id="rbtools-pageEntrySection"><option value="current">Az aktuálisan szerkesztett blokk után</option></select></label>
       </div>
+      <div class="collection-page-entry-grid">
+        <label for="rbtools-pageEntryThumb">200 pixeles képelőnézet URL <input id="rbtools-pageEntryThumb" type="url" placeholder="https://…/s200/kep.jpg"></label>
+        <label for="rbtools-pageEntryFull">Teljes méretű kép URL <input id="rbtools-pageEntryFull" type="url" placeholder="https://…/s1600/kep.jpg"></label>
+        <label for="rbtools-pageEntryCredit">Fotós vagy forrás megnevezése <input id="rbtools-pageEntryCredit" placeholder="fotó: © Név • www.RegionalBahn.hu"></label>
+      </div>
       <label class="collection-page-entry-summary">Rövid ajánló / epizódleírás <textarea id="rbtools-pageEntrySummary" rows="3" placeholder="Rövid ajánlószöveg"></textarea></label>
-      <button id="rbtools-pageEntryInsert" type="button">＋ Kész cikkajánló beszúrása</button>
+      <label class="collection-page-entry-check"><input id="rbtools-pageEntryNewTab" type="checkbox" checked> A „Tovább »” hivatkozás új lapon nyíljon meg</label>
+      <button id="rbtools-pageEntryInsert" type="button">✓ Új cikk / adás hozzáadása az évhez</button>
+    </details>
+    <details id="rbtools-pageImprintTools" class="collection-page-entry-tools" hidden>
+      <summary>▣ Új Impresszum-rovat / elérhetőség hozzáadása</summary>
+      <p class="small">A meglévő impresszum valamennyi nyelvi változatát és jogi szövegét megőrizzük. Az új rovatot külön szerkeszthető blokkban helyezzük el.</p>
+      <label class="collection-page-entry-summary">Rovat címe <input id="rbtools-pageImprintTitle" placeholder="Például: Új munkatársak"></label>
+      <label class="collection-page-entry-summary">Rovat szövege <textarea id="rbtools-pageImprintBody" rows="3" placeholder="Jóváhagyott, ellenőrzött szöveg"></textarea></label>
+      <button id="rbtools-pageImprintInsert" type="button">✓ Új rovat beszúrása</button>
     </details>
     <div id="rbtools-pageLinkPanel" class="collection-page-link-panel" hidden>
       <label for="rbtools-pageLinkUrl">Link címe <input id="rbtools-pageLinkUrl" type="url" placeholder="https://…"></label>
@@ -1675,6 +1724,17 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .collection-page-context button{display:flex;align-items:center;gap:12px;width:100%;border:0;border-radius:5px;text-align:left;background:transparent;color:var(--ink)}
 #rbtools-app .collection-page-context button:hover,#rbtools-app .collection-page-context button:focus-visible{background:var(--soft)}
 #rbtools-app .collection-page-context button>*:first-child{min-width:20px;text-align:center}
+#rbtools-app .collection-presets{border:2px solid #367ab5;border-radius:10px;padding:12px 14px;background:var(--panel2);margin:8px 0 15px}
+#rbtools-app .collection-presets-title{font-weight:900;font-size:13px;letter-spacing:.04em;color:var(--ink)}
+#rbtools-app .collection-presets .collection-page-actions{margin:8px 0;align-items:end}
+#rbtools-app .collection-page-file-label{display:flex;flex-direction:column!important;gap:5px}
+#rbtools-app .collection-page-file-label input{max-width:270px}
+#rbtools-app .collection-quickbar{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+#rbtools-app .collection-quickbar button{font-size:14px;padding:10px 14px;border:2px solid #2b75b8;background:var(--panel);font-weight:800}
+#rbtools-app .collection-quickbar button:not(:disabled):hover{background:var(--soft)}
+#rbtools-app .collection-quickbar button:disabled{opacity:.38}
+#rbtools-app .collection-page-entry-check{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;margin-bottom:10px}
+#rbtools-app .collection-page-entry-check input{width:18px;height:18px}
 #rbtools-app .collection-page-entry-tools{border:1px solid #86acc9;background:var(--panel2);padding:10px 12px;border-radius:9px;margin-top:10px}
 #rbtools-app .collection-page-entry-tools summary{font-size:14px;font-weight:800;color:var(--ink)}
 #rbtools-app .collection-page-entry-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:9px}
@@ -1706,7 +1766,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v38";
+const RBTOOLS_VERSION="pages-v39";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -4971,8 +5031,10 @@ window.RBTOOLS_PAGE_BRIDGE=Object.freeze({
 
 })();
 </script>
-<script src="/collection-page-core.js?v=37"></script>
-<script src="/collection-pages.js?v=37"></script>
+<script src="/collection-page-core.js?v=39"></script>
+<script src="/archive-presets.js?v=39"></script>
+<script src="/page-starters.js?v=39"></script>
+<script src="/collection-pages.js?v=39"></script>
 
 </body>
 </html>
