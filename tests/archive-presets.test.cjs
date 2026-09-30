@@ -49,7 +49,7 @@ assert.ok(updated.includes('href="#kozvetlen-osszes"'));
 assert.ok(updated.includes('id="kozvetlen-2027"'));
 console.log("Existing archived HTML unchanged outside new navigational additions: PASS");
 const imprint=S.impresszum();
-for(const s of ["Moderálási irányelvek","Redaktion","Editorial Team"])
+for(const s of ["Moderálási irányelvek","Redaktion","Editorial team"])
  assert.ok(imprint.includes(s));
 assert.ok(core.parse(imprint).safe);
 console.log("Impresszum trilingual scaffold: PASS");
