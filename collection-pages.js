@@ -106,7 +106,8 @@ function renderNode(node,siblings){
   input.addEventListener("mouseup",selection);input.addEventListener("keyup",selection);
   input.addEventListener("touchend",()=>requestAnimationFrame(selection));
   input.addEventListener("input",()=>{edited(node,input);selection();});
-  input.addEventListener("blur",()=>edited(node,input));
+  // Focusing and leaving a paragraph alone must NOT mark the page as changed.
+  // Native editing emits input, while toolbar actions call edited() themselves.
   input.addEventListener("click",e=>{if(e.target.closest("a"))e.preventDefault();});
   input.addEventListener("keydown",e=>{
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();selection();showLink();}
@@ -131,13 +132,15 @@ function update(){
     ?(audit.ok?"✓ A védett forráskódrészek sértetlenek: "+audit.count+
        " blokk, "+audit.scripts+" JavaScript, "+audit.buttons+" navigációs elem.":"⚠ Védett forráskód sérült: mentés tiltva.")
     :"Még nincs betöltött HTML.";
-  const changed=dirty();
+  const changed=dirty(),correctBlog=!hasPage||state.loaded.blogId===view.blog.value;
   view.save.disabled=!hasPage||state.loaded.blogId!==view.blog.value||!changed||!bridge.isConnected()||!audit?.ok||!state.tree.safe||state.saving||!!state.error;
   if(state.error){message("A SZERKESZTÉS / MENTÉS HIBÁJA",state.error,"error");return;}
   if(state.saving){message("BLOGGER-MENTÉS FOLYAMATBAN","Mentés közben továbbra is változhatnak a helyi adatok. A Blogger visszaigazolását külön ellenőrizzük.","working");return;}
   if(!has){message("Nincs megnyitott Blogger-oldal","A statikus oldalak lekérésével kezdhetsz.","idle");return;}
   if(!hasPage){message("HELYI GYŰJTŐOLDAL • MÉG NINCS BLOGGER-OLDALHOZ RENDELVE",
     "A konverter HTML-je WYSIWYG-ben szerkeszthető és letölthető. A meglévő oldal biztonságos módosításához előbb nyisd meg azt a Blogger API-ból.","working");return;}
+  if(!correctBlog){message("MÁSIK BLOG VAN KIVÁLASZTVA",
+    "A megnyitott oldalhoz tartozó blogot válaszd vissza. Más bloghoz nem mentjük az oldalt.","working");return;}
   if(!bridge.isConnected()){message("A BLOGGER-KAPCSOLAT MEGSZAKADT",
     "A helyi szerkesztés megmarad ezen a lapon; újrakapcsolódás és mentés szükséges.","working");return;}
   if(changed){message("NEM MENTETT HELYI MÓDOSÍTÁSOK",
@@ -372,8 +375,14 @@ get("pageBackup").addEventListener("click",backup);
 get("pageDownload").addEventListener("click",exportHtml);
 get("pageCopy").addEventListener("click",()=>{
   const text=currentHtml();if(!text)return;
-  navigator.clipboard.writeText(text).then(()=>message("HTML A VÁGÓLAPON","A teljes oldalkód másolva, a speciális blokkokkal együtt.","idle"))
-    .catch(()=>{view.raw.closest("details").open=true;view.raw.focus();view.raw.select();message("HTML KIMÁSOLÁSA","A böngésző blokkolta a vágólapot; használd a nyitott HTML-forrásmezőt.","working");});
+  const fallback=()=>{
+    view.raw.closest("details").open=true;view.raw.focus();view.raw.select();
+    message("HTML KIMÁSOLÁSA","A böngésző nem engedte az automatikus vágólapműveletet. Az alábbi teljes HTML-forrásmező kijelölve.","working");
+  };
+  if(!navigator.clipboard?.writeText){fallback();return;}
+  navigator.clipboard.writeText(text)
+    .then(()=>message("HTML A VÁGÓLAPON","A teljes oldalkód másolva, a speciális blokkokkal együtt.","idle"))
+    .catch(fallback);
 });
 get("pagePreview").addEventListener("click",showPreview);
 get("pageSave").addEventListener("click",savePage);
