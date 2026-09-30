@@ -26,17 +26,17 @@ function render(entry,{normalize=x=>h(x),imageHtml=()=>""}={}){
  const timeEl=t?'<time class="rb-live-time" datetime="'+h(iso)+'">'+h(displayed)+'</time>':
   '<span class="rb-live-time rb-live-time-missing">'+h(displayed)+'</span>';
  const badge=label?'<strong class="rb-live-kind" style="display:inline-block;margin-right:10px;font-weight:800;color:'+
-  (kind==="correction"?"#9a3030":"#194f72")+'">'+h(label)+'</strong>':"";
+  (kind==="correction"?"#9a3030":"#0b5394")+'">'+h(label)+'</strong>':"";
  const location=String(entry.location||"").trim(),reporter=String(entry.reporter||"").trim();
  const place=location?'<strong class="rb-live-location" style="font-weight:700;color:#263746">'+h(location)+'</strong>':"";
  const name=reporter?'<span class="rb-live-reporter" style="font-size:.9em;color:#475569">('+h(reporter)+')</span>':"";
  const line=[place,name].filter(Boolean).join(" ");
  const media=entry.imageId?imageHtml(entry.imageId):"";
  const showMedia=media?'<div class="rb-live-media" style="margin-top:12px">'+media+'</div>':"";
- const extra=kind==="important"?"border-left:4px solid #286887;padding-left:12px;":
+ const extra=kind==="important"?"border-left:4px solid #0b5394;padding-left:12px;":
   kind==="correction"?"border-left:4px solid #994746;padding-left:12px;":"";
  const header='<header class="rb-live-entry-head" style="display:flex;gap:6px 12px;flex-wrap:wrap;align-items:baseline;line-height:1.55;margin:0 0 9px">'+
-  badge+'<strong style="color:#155477;font-size:1.1em">'+timeEl+'</strong>'+
+  badge+'<strong style="color:#0b5394;font-size:1.1em">'+timeEl+'</strong>'+
   (line?'<span class="rb-live-place-credit" style="color:#263746">'+line+'</span>':"")+'</header>';
  const align=["left","center","right","justify"].includes(entry.align)?entry.align:"justify";
  const body='<div class="rb-live-copy" style="line-height:1.65;text-align:'+align+'">'+normalize(String(entry.html||""))+'</div>';
