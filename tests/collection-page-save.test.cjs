@@ -9,7 +9,7 @@ assert.ok(start>=0&&end>start,"savePage not found");
 const fn=uiSrc.slice(start,end)+"\nreturn savePage;";
 const original='<div id="rb-static-page-nav"><button data-rb-target="2026">2026</button></div>'+
   '<script>const preserved = "<div>";</script><div data-rb-static-section="2026"><div>Régi szöveg</div></div>';
-function fixture({conflict=false,scriptLoss=false,changeDuringSave=false,emptyTitle=false,backup=true}={}){
+function fixture({conflict=false,scriptLoss=false,changeDuringSave=false,emptyTitle=false,backup=true,skipBackup=false}={}){
  const tree=parser.parse(original);
  assert.equal(tree.safe,true);
  const l=parser.leaves(tree).find(x=>x.value==="Régi szöveg");
@@ -19,7 +19,8 @@ function fixture({conflict=false,scriptLoss=false,changeDuringSave=false,emptyTi
    status:"LIVE",originalHtml:original},backup,saving:false,error:"",critical:false,
    baseline:{html:original,title:"Teszt oldal",origin:"loaded",updated:"2026-01-01T00:00:00Z"}};
  const view={blog:{value:"b1"},title:{value:title},info:{textContent:""}};
- let verified=null,patches=0,confirmation=0;
+ let verified=null,patches=0,confirmation=0,notices=[];
+ const waiver={checked:skipBackup};
  const currentHtml=()=>parser.serialize(state.tree);
  const dirty=()=>state.baseline.title!==view.title.value||state.baseline.html!==currentHtml();
  const remoteSource=()=>({
@@ -40,11 +41,11 @@ function fixture({conflict=false,scriptLoss=false,changeDuringSave=false,emptyTi
     return {id:"pg1"};
  }};
  const window={confirm:()=>{confirmation++;return true;}};
- const update=()=>{},message=()=>{},originalBackUpRaw=()=>state.loaded.originalHtml;
+ const update=()=>{},message=(...args)=>notices.push(args),originalBackUpRaw=()=>state.loaded.originalHtml;
  const save=new Function("state","view","core","bridge","get","dirty","currentHtml","update","message",
    "getPage","window","originalBackUpRaw",fn)
-   (state,view,parser,bridge,()=>null,dirty,currentHtml,update,message,getPage,window,originalBackUpRaw);
- return {state,save,dirty,get patches(){return patches},get confirmation(){return confirmation}};
+   (state,view,parser,bridge,id=>id==="pageSkipBackup"?waiver:null,dirty,currentHtml,update,message,getPage,window,originalBackUpRaw);
+ return {state,save,dirty,waiver,notices,get patches(){return patches},get confirmation(){return confirmation}};
 }
 (async()=>{
  const ok=fixture();await ok.save();
@@ -52,7 +53,7 @@ function fixture({conflict=false,scriptLoss=false,changeDuringSave=false,emptyTi
  assert.equal(ok.state.error,"");assert.equal(ok.state.critical,false);
  assert.equal(ok.state.backup,false);assert.equal(ok.dirty(),false);
  assert.equal(ok.state.baseline.origin,"saved");
- console.log("Live page save: PATCH + post-GET verification, new backup required: PASS");
+ console.log("Live page save: PATCH + post-GET verification, new backup decision required: PASS");
  const conflicting=fixture({conflict:true});await conflicting.save();
  assert.equal(conflicting.patches,0);
  assert.equal(conflicting.state.critical,true);
@@ -63,13 +64,27 @@ function fixture({conflict=false,scriptLoss=false,changeDuringSave=false,emptyTi
  assert.equal(lost.state.critical,true);
  assert.match(lost.state.error,/JAVASCRIPT/);
  assert.ok(lost.state.loaded.originalHtml.includes("<script>"));
- console.log("Unexpected Blogger script stripping: critical warning with untouched backup: PASS");
+ console.log("Unexpected Blogger script stripping: critical warning with original retained in memory: PASS");
  const changed=fixture({changeDuringSave:true});await changed.save();
  assert.equal(changed.patches,1);assert.equal(changed.dirty(),true);
  console.log("Text edited during network save: remains unsaved: PASS");
  const noBackup=fixture({backup:false});await noBackup.save();
  assert.equal(noBackup.patches,0);assert.equal(noBackup.state.saving,false);
- console.log("Missing original backup blocks write: PASS");
+ assert.equal(noBackup.waiver.checked,false);
+ assert.match(noBackup.notices.at(-1)[0],/VÁLASSZ/);
+ console.log("No download and no explicit waiver: save waits for a deliberate choice: PASS");
+ const skipped=fixture({backup:false,skipBackup:true});await skipped.save();
+ assert.equal(skipped.patches,1);
+ assert.equal(skipped.confirmation,1);
+ assert.equal(skipped.state.baseline.origin,"saved");
+ assert.equal(skipped.waiver.checked,false,"Waiver must reset after the next successful save");
+ console.log("Explicit checked opt-out: one save allowed; next save requires a new decision: PASS");
+ const lostWithoutCopy=fixture({backup:false,skipBackup:true,scriptLoss:true});
+ await lostWithoutCopy.save();
+ assert.equal(lostWithoutCopy.patches,1);
+ assert.match(lostWithoutCopy.state.error,/Nem kértél korábban letöltést/);
+ assert.equal(lostWithoutCopy.state.loaded.originalHtml,original);
+ console.log("Blogger script stripping after opt-out: honest warning and original kept in open editor: PASS");
  const noTitle=fixture({emptyTitle:true});await noTitle.save();
  assert.equal(noTitle.patches,0);assert.match(noTitle.state.error,/címét/);
  console.log("Missing page title blocks write: PASS");
