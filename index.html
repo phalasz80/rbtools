@@ -4514,9 +4514,9 @@ async function loadBoxFile(file){
 let boxPreviousMode="visual";
 function boxShowEditorMode(){
   const mode=rbGet("boxEditorMode").value;
-  if(boxPreviousMode==="visual"&&mode==="html")
+  if(boxPreviousMode==="visual"&&mode!=="visual")
     rbGet("boxRichHtml").value=rbBoxSafeRich(rbGet("boxVisual").innerHTML);
-  else if(boxPreviousMode==="html"&&mode==="visual")
+  else if(boxPreviousMode==="html"&&mode!=="html")
     rbGet("boxVisual").innerHTML=rbBoxSafeRich(rbGet("boxRichHtml").value);
   // Markdown source stays separate and is never silently converted or discarded.
   rbGet("boxVisual").hidden=mode!=="visual";
