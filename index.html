@@ -5189,6 +5189,32 @@ rbGet("uClear").onclick=()=>{rbGet("uInput").value="";renderUnicode();rbGet("uIn
 rbGet("uExample").onclick=()=>{rbGet("uInput").value="RegionalBahn – Közvetlen Kocsi – Deutscher Wald – Árvíztűrő tükörfúrógép 0123456789";renderUnicode();};
 rbGet("uCopyAll").onclick=()=>{const s=rbGet("uInput").value,list=visibleUnicodeStyles();copyToClipboard(list.map(st=>st.name+":\n"+st.fn(s)).join("\n\n"),null,"Összes látható változat másolva.");};
 renderUnicode();
+function rbBuildHelpContents(){
+ const tab=rbGet("tab-help"),host=rbGet("helpTOCLinks");if(!tab||!host)return;
+ host.replaceChildren();
+ const ids=new Set();const slug=t=>{
+  const base="rbtools-guide-"+String(t||"").toLocaleLowerCase("hu-HU").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60);
+  let id=base,n=2;while(ids.has(id)||document.getElementById(id))id=base+"-"+n++;
+  ids.add(id);return id;
+ };
+ for(const panel of tab.querySelectorAll(":scope > .panel")){
+   const heading=panel.querySelector("h2");if(!heading||panel.id==="rbtools-helpTOC")continue;
+   if(!heading.id)heading.id=slug(heading.textContent);
+   const link=document.createElement("a");link.href="#"+heading.id;link.textContent=heading.textContent;host.appendChild(link);
+   const subs=Array.from(panel.querySelectorAll("h3"));
+   if(subs.length){
+     const details=document.createElement("details"),summary=document.createElement("summary");
+     summary.textContent="Alfejezetek: "+heading.textContent;details.appendChild(summary);
+     const children=document.createElement("div");
+     subs.forEach(sub=>{
+       if(!sub.id)sub.id=slug(sub.textContent);
+       const a=document.createElement("a");a.href="#"+sub.id;a.textContent=sub.textContent;children.appendChild(a);
+     });details.appendChild(children);host.appendChild(details);
+   }
+ }
+}
+rbBuildHelpContents();
 
 /* A statikusoldal-szerkesztő önálló JS-moduljának korlátozott Blogger-kapcsolata. */
 window.RBTOOLS_PAGE_BRIDGE=Object.freeze({
