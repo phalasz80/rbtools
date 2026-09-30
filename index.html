@@ -320,6 +320,7 @@ További szöveg..."></textarea>
       <button id="rbtools-adminFmtUnderline" type="button" title="Aláhúzott"><u>U</u></button>
       <button id="rbtools-adminFmtStrike" type="button" title="Áthúzott"><s>S</s></button>
       <button id="rbtools-adminFmtLink" type="button" title="Kijelölt szöveghez hivatkozás hozzáadása vagy meglévő link szerkesztése (Ctrl+K)">🔗 Link</button>
+      <button id="rbtools-adminFmtAbbr" type="button" title="A kijelölt rövidítés teljes feloldása (abbr title)">ABBR</button>
       <button id="rbtools-adminFmtUnlink" type="button" title="Link eltávolítása">⛓ Link törlése</button>
       <button id="rbtools-adminFmtSup" type="button" title="Kijelölt szöveg felső indexbe: &lt;sup&gt;">x<sup>2</sup></button>
       <button id="rbtools-adminFmtSub" type="button" title="Kijelölt szöveg alsó indexbe: &lt;sub&gt;">x<sub>2</sub></button>
@@ -347,6 +348,15 @@ További szöveg..."></textarea>
       <button id="rbtools-adminLinkCancel" type="button">Mégse</button>
     </div>
 
+    <div id="rbtools-adminAbbrPanel" class="admin-link-panel" hidden>
+      <div class="admin-link-description"><strong>Rövidítés feloldása (&lt;abbr title=&quot;…&quot;&gt;)</strong>
+        <span id="rbtools-adminAbbrSelection" class="small"></span></div>
+      <label for="rbtools-adminAbbrTitle">Teljes feloldás (title)</label>
+      <input id="rbtools-adminAbbrTitle" type="text" placeholder="Például: Magyar Államvasutak" autocomplete="off">
+      <button id="rbtools-adminAbbrApply" type="button" class="primary">✓ Alkalmaz</button>
+      <button id="rbtools-adminAbbrRemove" type="button">abbr törlése</button>
+      <button id="rbtools-adminAbbrCancel" type="button">Mégse</button>
+    </div>
     </div><!-- sticky formatting and link tools -->
     <div id="rbtools-adminCanvas" class="admin-canvas">
       <div class="admin-empty">Tölts be vagy illessz be cikkszöveget, majd kattints a „Cikk felépítése” gombra.</div>
@@ -417,6 +427,7 @@ További szöveg..."></textarea>
       <button type="button" role="menuitem" data-admin-context-command="strikeThrough"><s>S</s><span>Áthúzott</span></button>
       <div class="admin-context-divider" role="separator"></div>
       <button type="button" role="menuitem" data-admin-context-command="link"><span aria-hidden="true">🔗</span><span>Hivatkozás beszúrása / szerkesztése</span><kbd>Ctrl+K</kbd></button>
+      <button type="button" role="menuitem" data-admin-context-command="abbr"><span>AB</span><span>Rövidítés (abbr) beszúrása / szerkesztése</span></button>
       <div class="admin-context-divider" role="separator"></div>
       <button type="button" role="menuitem" data-admin-context-command="copy"><span aria-hidden="true">⧉</span><span>Kijelölt szöveg másolása</span><kbd>Ctrl+C</kbd></button>
     </div>
@@ -4381,6 +4392,56 @@ function adminLink(useSavedRange=false){
   rbGet("adminLinkUrl").focus();
   rbGet("adminLinkUrl").select();
 }
+
+let adminAbbrEditElement=null;
+function adminCloseAbbrPanel(restore=false){
+ rbGet("adminAbbrPanel").hidden=true;adminAbbrEditElement=null;
+ if(restore)adminRestoreRange();
+}
+function adminAbbr(useSavedRange=false){
+ if(!useSavedRange)adminRememberRange();
+ const r=adminSavedRange,root=r?adminEditableForRange(r):null;
+ if(!root||root.classList.contains("admin-paper-title")){
+   rbGet("adminStatus").textContent="Jelölj ki egy rövidítést a cikk szerkeszthető szövegében.";return;
+ }
+ const node=r.startContainer.nodeType===1?r.startContainer:r.startContainer.parentElement;
+ const existing=node?.closest?.("abbr");
+ adminAbbrEditElement=existing&&root.contains(existing)?existing:null;
+ if(r.collapsed&&!adminAbbrEditElement){
+   rbGet("adminStatus").textContent="Előbb jelöld ki a rövidítés szövegét.";return;
+ }
+ if(r.collapsed&&adminAbbrEditElement){
+   const full=document.createRange();full.selectNodeContents(adminAbbrEditElement);adminSavedRange=full.cloneRange();
+ }
+ rbGet("adminAbbrSelection").textContent="Kijelölés: "+(adminSavedRange.toString()||"");
+ rbGet("adminAbbrTitle").value=adminAbbrEditElement?.getAttribute("title")||"";
+ rbGet("adminAbbrRemove").disabled=!adminAbbrEditElement;
+ rbGet("adminLinkPanel").hidden=true;rbGet("adminAbbrPanel").hidden=false;rbGet("adminAbbrTitle").focus();
+}
+function adminApplyAbbr(){
+ const title=rbGet("adminAbbrTitle").value.trim();
+ if(!title){rbGet("adminStatus").textContent="A title mezőben add meg a rövidítés teljes jelentését.";rbGet("adminAbbrTitle").focus();return;}
+ if(!adminRestoreRange()){rbGet("adminStatus").textContent="Elveszett a kijelölés; jelöld ki újra a rövidítést.";return;}
+ if(adminAbbrEditElement?.isConnected)adminAbbrEditElement.setAttribute("title",title);
+ else{
+  const sel=window.getSelection(),r=sel?.rangeCount?sel.getRangeAt(0):null;
+  if(!r||r.collapsed||!r.toString().trim()){rbGet("adminStatus").textContent="Jelöld ki a rövidítés szövegét.";return;}
+  const item=document.createElement("abbr");item.setAttribute("title",title);
+  try{r.surroundContents(item);}
+  catch{
+   if(r.commonAncestorContainer?.parentElement?.closest?.("abbr")){rbGet("adminStatus").textContent="Jelöld ki a teljes meglévő rövidítést.";return;}
+   item.appendChild(r.extractContents());r.insertNode(item);
+  }
+  r.selectNodeContents(item);sel.removeAllRanges();sel.addRange(r);
+ }
+ adminSyncActiveEditable();adminCloseAbbrPanel();rbGet("adminStatus").textContent="abbr feloldás beszúrva.";
+}
+function adminRemoveAbbr(){
+ const item=adminAbbrEditElement;
+ if(!item?.isConnected||!adminRestoreRange())return;
+ item.replaceWith(...Array.from(item.childNodes));adminSyncActiveEditable();adminCloseAbbrPanel();
+ rbGet("adminStatus").textContent="abbr jelölés törölve, a szöveg megmaradt.";
+}
 function adminSetLinkTarget(anchor,newWindow){
   if(!anchor)return;
   if(newWindow){
@@ -4644,12 +4705,13 @@ rbGet("adminAddIframe").addEventListener("click",()=>{rbGet("adminIframeInput").
 rbGet("adminInsertIframe").addEventListener("click",adminInsertIframeFromInput);
 rbGet("adminClearIframeInput").addEventListener("click",()=>{rbGet("adminIframeInput").value="";rbGet("adminIframeInput").focus();});
 rbGet("adminAddRule").addEventListener("click",()=>{adminBlocks.push({id:adminUid("b"),type:"hr"});adminRenderCanvas();adminGenerateHtml();});
-for(const id of ["adminFmtBold","adminFmtItalic","adminFmtUnderline","adminFmtStrike","adminFmtLink","adminFmtUnlink","adminFmtSup","adminFmtSub","adminFmtBox","adminFmtUl","adminFmtOl","adminFmtIndent","adminFmtOutdent","adminAlignLeft","adminAlignCenter","adminAlignRight","adminAlignJustify"])rbGet(id).addEventListener("mousedown",e=>e.preventDefault());
+for(const id of ["adminFmtBold","adminFmtItalic","adminFmtUnderline","adminFmtStrike","adminFmtLink","adminFmtAbbr","adminFmtUnlink","adminFmtSup","adminFmtSub","adminFmtBox","adminFmtUl","adminFmtOl","adminFmtIndent","adminFmtOutdent","adminAlignLeft","adminAlignCenter","adminAlignRight","adminAlignJustify"])rbGet(id).addEventListener("mousedown",e=>e.preventDefault());
 rbGet("adminFmtBold").addEventListener("click",()=>adminExec("bold"));
 rbGet("adminFmtItalic").addEventListener("click",()=>adminExec("italic"));
 rbGet("adminFmtUnderline").addEventListener("click",()=>adminExec("underline"));
 rbGet("adminFmtStrike").addEventListener("click",()=>adminExec("strikeThrough"));
 rbGet("adminFmtLink").addEventListener("click",adminLink);
+rbGet("adminFmtAbbr").addEventListener("click",()=>adminAbbr());
 rbGet("adminCanvas").addEventListener("mousedown",adminCaptureRightClick,true);
 rbGet("adminCanvas").addEventListener("contextmenu",adminContextMenuAt,true);
 rbGet("adminContextMenu").querySelectorAll("[data-admin-context-command]").forEach(btn=>{
@@ -4660,6 +4722,7 @@ rbGet("adminContextMenu").querySelectorAll("[data-admin-context-command]").forEa
     adminHideContextMenu();
     if(selected)adminSavedRange=selected;
     if(action==="link")adminLink(true);
+    else if(action==="abbr")adminAbbr(true);
     else if(action==="copy")copyToClipboard(selected?.toString()||"",rbGet("adminStatus"),"Kijelölt szöveg másolva.");
     else adminExec(action,null,true);
   });
@@ -4687,6 +4750,13 @@ rbGet("adminCanvas").addEventListener("scroll",adminHideContextMenu,{passive:tru
 window.addEventListener("scroll",adminHideContextMenu,{passive:true});
 window.addEventListener("resize",adminHideContextMenu);
 rbGet("adminLinkApply").addEventListener("click",adminApplyLink);
+rbGet("adminAbbrApply").addEventListener("click",adminApplyAbbr);
+rbGet("adminAbbrRemove").addEventListener("click",adminRemoveAbbr);
+rbGet("adminAbbrCancel").addEventListener("click",()=>adminCloseAbbrPanel(true));
+rbGet("adminAbbrTitle").addEventListener("keydown",e=>{
+  if(e.key==="Enter"){e.preventDefault();adminApplyAbbr();}
+  if(e.key==="Escape"){e.preventDefault();adminCloseAbbrPanel(true);}
+});
 rbGet("adminLinkCancel").addEventListener("click",()=>adminCloseLinkPanel(true));
 rbGet("adminLinkUrl").addEventListener("keydown",e=>{
   if(e.key==="Enter"){e.preventDefault();adminApplyLink();}
