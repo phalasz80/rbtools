@@ -113,7 +113,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
       <li><strong>Új anyag:</strong> a legtöbb munkához írj közvetlenül a WYSIWYG-ben, vagy importálj Markdown/TXT/DOCX/ODT/RTF szöveget. Képes cikknél Bloggerben előbb töltsd fel a képeket egy draftba, majd nyisd meg azt itt.</li>
       <li><strong>Haladó forráskonverzió:</strong> ha Google Dokumentumból dolgozol, régi RB-jelöléseket (<code>RB:IMAGE</code>, <code>RB:BOX</code>, <code>RB:SOURCES</code> stb.) használsz, profil/preset kell, vagy külön HTML-előnézetet szeretnél, nyisd le a Cikkadmin alján a <strong>Haladó forráskonverzió, Google Docs és RB-jelölések</strong> részt. A létrejött HTML egy gombbal visszatölthető a WYSIWYG-be.</li>
       <li><strong>Meglévő draft:</strong> kapcsolódj a Bloggerhez, válaszd ki a piszkozatot, majd <strong>Piszkozat megnyitása</strong>. A cím, címkék, szöveg, képek és iframe-ek betöltődnek.</li>
-      <li><strong>Szerkesztés:</strong> a WYSIWYG-ben közvetlenül használható a formázás, link, felsorolás, igazítás, keretes, kép, iframe és blokkmozgatás. Az <strong>x² / x₂</strong> gomb HTML <code>&lt;sup&gt;</code>/<code>&lt;sub&gt;</code> formázást készít a kijelölt szövegből.</li>
+      <li><strong>Szerkesztés:</strong> a WYSIWYG-ben egérrel vagy billentyűzettel jelölj ki szöveget, majd használd a formázógombokat. <strong>Link:</strong> kijelölés után 🔗 Link vagy Ctrl+K, utána URL megadása a külön szerkesztősávban. A blokkot csak a jobb oldali <strong>⠿ fogantyúnál</strong> húzd. Használható továbbá felsorolás, igazítás, keretes, kép és iframe; az <strong>x² / x₂</strong> gomb valódi HTML-indexet készít.</li>
       <li><strong>Különleges jelek:</strong> nyisd le az <strong>Ω Különleges karakterek…</strong> panelt Unicode-jelekhez, emojihoz, Unicode felső/alsó indexhez és HTML-entitásokhoz. Kijelölt szövegnél a beszúrt jel vagy entitás <strong>lecseréli a kijelölést</strong>; a <code>&amp;nbsp;</code> rózsaszín szerkesztői jelölést kap.</li>
       <li><strong>Keresés:</strong> a <strong>Keresés a cikkben</strong> mező az aktuális WYSIWYG-szöveg találatait megszámolja és sárgával kiemeli. A kiemelés csak szerkesztési segédlet, nem kerül a Blogger HTML-be.</li>
       <li><strong>Mentés:</strong> a <strong>Mentés Blogger-piszkozatba</strong> új draftot készít vagy ugyanazt a post ID-t frissíti. Minden normál draftmentés után az időzítési mező biztonsági alapértéke <strong>2049. 12. 31. 23:59</strong>; valódi időzítéshez ezt kézzel kell átírni. Azonnali publikálás nincs.<br><br><strong style="color:#ff0000;">Az időzítés mindig az illetékes szerkesztő feladata a Blogger felületén, így időzítést ezen a felületen nem kell beállítani. Ha bármi kérdésed van, hogy mikor megy ki a cikked, fordulj Adorján Péterhez vagy Halász Péterhez!</strong></li>
@@ -252,7 +252,7 @@ További szöveg..."></textarea>
     <div class="admin-section-head">
       <div>
         <h2 style="margin:0">4. Vizuális cikkszerkesztő</h2>
-        <p class="small" style="margin:3px 0 0">Szöveg, kép és keretes blokk egyaránt mozgatható. A kék sávokra képet vagy már létező blokkot is dobhatsz. A szerkesztő függőlegesen átméretezhető az alsó pereménél.</p>
+        <p class="small" style="margin:3px 0 0">Szöveget szabadon kijelölhetsz és formázhatsz. A blokkok csak a jobb oldali ⠿ fogantyúnál húzhatók, a kék beszúrási sávokra pedig kép vagy blokk dobható. A szerkesztő függőlegesen átméretezhető az alsó pereménél.</p>
       </div>
       <div class="toolbar" style="margin:0">
         <button id="rbtools-adminAddParagraph">＋ Bekezdés</button>
@@ -268,7 +268,7 @@ További szöveg..."></textarea>
       <button id="rbtools-adminFmtItalic" type="button" title="Dőlt"><em>I</em></button>
       <button id="rbtools-adminFmtUnderline" type="button" title="Aláhúzott"><u>U</u></button>
       <button id="rbtools-adminFmtStrike" type="button" title="Áthúzott"><s>S</s></button>
-      <button id="rbtools-adminFmtLink" type="button" title="Link hozzáadása">🔗 Link</button>
+      <button id="rbtools-adminFmtLink" type="button" title="Kijelölt szöveghez hivatkozás hozzáadása vagy meglévő link szerkesztése (Ctrl+K)">🔗 Link</button>
       <button id="rbtools-adminFmtUnlink" type="button" title="Link eltávolítása">⛓ Link törlése</button>
       <button id="rbtools-adminFmtSup" type="button" title="Kijelölt szöveg felső indexbe: &lt;sup&gt;">x<sup>2</sup></button>
       <button id="rbtools-adminFmtSub" type="button" title="Kijelölt szöveg alsó indexbe: &lt;sub&gt;">x<sub>2</sub></button>
@@ -285,6 +285,14 @@ További szöveg..."></textarea>
       <button id="rbtools-adminAlignCenter" type="button" title="Középre zárt">≡↔</button>
       <button id="rbtools-adminAlignRight" type="button" title="Jobbra zárt">→≡</button>
       <button id="rbtools-adminAlignJustify" type="button" title="Sorkizárt">☰</button>
+    </div>
+    <div id="rbtools-adminLinkPanel" class="admin-link-panel" hidden>
+      <div class="admin-link-description"><strong>Hivatkozás beszúrása / szerkesztése</strong>
+        <span id="rbtools-adminLinkSelection" class="small"></span></div>
+      <label for="rbtools-adminLinkUrl">Hivatkozás címe (URL)</label>
+      <input id="rbtools-adminLinkUrl" type="url" inputmode="url" placeholder="https://…" spellcheck="false">
+      <button id="rbtools-adminLinkApply" type="button" class="primary">✓ Link alkalmazása</button>
+      <button id="rbtools-adminLinkCancel" type="button">Mégse</button>
     </div>
 
     <div class="admin-findbar" role="search" aria-label="Keresés a WYSIWYG cikkben">
@@ -870,7 +878,7 @@ A következő cikk rövid ajánlója.</pre>
     <p>Ha a cikk nincs az API-n keresztül megnyitva, a <strong>Meglévő Blogger-cikk HTML-jének visszatöltése szerkesztésre</strong> részbe teljes HTML-fragmentum illeszthető vagy <code>.html</code> fájl tölthető. A parser felismeri a tipikus RegionalBahn leadet, képeket, képaláírásokat, H3/H4 címeket, kereteseket, iframe-eket és néhány speciális blokkot. Nem általános célú tökéletes HTML round-trip szerkesztő, ezért különösen régi vagy szokatlan kézi HTML-nél mindig ellenőrizd a végleges kimenetet.</p>
 
     <h3>10. A WYSIWYG szerkesztő felépítése</h3>
-    <p>A szerkesztő „papírján” a cím és a lead után következik a Blogger <code>&lt;!--more--&gt;</code> helye, majd a törzsszöveg blokkjai. A blokkok között kék beszúrási sávok vannak. A blokk jobb oldalán a <strong>↑</strong>, <strong>↓</strong> és <strong>×</strong> gombokkal mozgathatsz vagy törölhetsz; asztali böngészőben húzással is átrendezheted őket.</p>
+    <p>A szerkesztő „papírján” a cím és a lead után következik a Blogger <code>&lt;!--more--&gt;</code> helye, majd a törzsszöveg blokkjai. A blokkok között kék beszúrási sávok vannak. A blokk jobb oldalán a <strong>↑</strong>, <strong>↓</strong> és <strong>×</strong> gombokkal mozgathatsz vagy törölhetsz; asztali böngészőben a jobb oldali ⠿ fogantyúnál megfogva húzással is átrendezheted őket.</p>
     <p>Gyorsgombbal hozzáadható:</p>
     <ul>
       <li><strong>Bekezdés</strong></li>
@@ -881,8 +889,15 @@ A következő cikk rövid ajánlója.</pre>
     </ul>
     <p>A szövegblokkok közvetlenül gépelhetők, tehát nincs külön „szerkesztés” és „előnézet” mód.</p>
 
-    <h3>11. Félkövér, dőlt, aláhúzás, áthúzás és link</h3>
-    <p>Jelöld ki a formázandó szöveget a WYSIWYG-ben, és <em>a kijelölés után</em> kattints a megfelelő formázógombra. A link gomb URL-t kér. A <strong>Link törlése</strong> az aktuális linkformázást szedi le. Ha a státuszsáv azt írja, hogy előbb jelölj ki szöveget, a böngészőben megszűnt a szerkesztői kijelölés, ezért jelöld ki újra.</p>
+    <h3>11. Szöveg kijelölése, formázása és hivatkozások</h3>
+    <ol>
+      <li>Kattints a WYSIWYG-ben a leadbe, egy bekezdésbe, alcímbe vagy keretes szövegbe.</li>
+      <li>Az egérrel húzva, dupla kattintással vagy a <strong>Shift + nyílbillentyűkkel</strong> jelöld ki a formázandó szöveget. A blokk bármely szövegrészén szabadon lehet kijelölni.</li>
+      <li>Kattints a félkövér, dőlt, aláhúzott, áthúzott, felső/alsó index vagy felsorolás gombra. A kijelölés megmarad a műveletig.</li>
+      <li><strong>Link készítése:</strong> jelöld ki a szót vagy mondatrészt, majd kattints a <strong>🔗 Link</strong> gombra, vagy nyomd meg a <strong>Ctrl+K</strong> (Macen <strong>⌘K</strong>) kombinációt. A megjelenő szerkesztősávba írd vagy illeszd a címet, majd <strong>Link alkalmazása</strong> vagy Enter.</li>
+      <li><strong>Meglévő link szerkesztése:</strong> helyezd a kurzort egy meglévő link szövegébe, majd használd ismét a Link gombot. A <strong>Link törlése</strong> a hivatkozást távolítja el a kijelölt részből.</li>
+    </ol>
+    <p><strong>Fontos:</strong> a blokkokat most csak a jobb oldalukon megjelenő <strong>⠿ fogantyúnál</strong> lehet áthúzni; így a szövegen végzett egérhúzás nem kezd véletlen blokkmozgatást. A Blogger-cím külön, egyszerű szöveges mező, ezért a gazdag formázást a leadben és a törzsszövegben használd. A kijelölés és formázás jelenleg blokkon belül működik.</p>
 
     <h3>12. Felsorolások</h3>
     <p>A <strong>• Lista</strong> rendezetlen, az <strong>1. Lista</strong> számozott listát készít. A <strong>→ Behúzás</strong> és <strong>← Kihúzás</strong> többszintű listákhoz használható. Új lista készítésénél a kurzor legyen abban a szerkeszthető bekezdésben, amelyet listává akarsz alakítani. Már meglévő Blogger <code>&lt;ul&gt;</code>/<code>&lt;ol&gt;</code> elemeket az RBTools szerkeszthető szövegblokként próbál visszatölteni.</p>
@@ -1332,7 +1347,19 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-block-controls{position:absolute;right:6px;top:6px;display:flex;flex-direction:column;gap:4px;opacity:.22;transition:.12s}
 #rbtools-app .admin-block:hover .admin-block-controls,#rbtools-app .admin-block:focus-within .admin-block-controls{opacity:1}
 #rbtools-app .admin-block-controls button{padding:2px 6px;min-width:28px;font-size:12px;background:#fff;color:#222;border-color:#d4d4d8}
-#rbtools-app .admin-editable{outline:none;border:1px dashed transparent;border-radius:6px;padding:3px 5px;min-height:28px}
+#rbtools-app .admin-editable{outline:none;border:1px dashed transparent;border-radius:6px;padding:3px 5px;min-height:28px;user-select:text;-webkit-user-select:text;cursor:text}
+#rbtools-app .admin-canvas [contenteditable="true"]{user-select:text;-webkit-user-select:text;cursor:text}
+#rbtools-app .admin-canvas [contenteditable="true"]::selection,#rbtools-app .admin-canvas [contenteditable="true"] *::selection{background:#86b7ff;color:#111}
+#rbtools-app .admin-drag-handle{display:flex;align-items:center;justify-content:center;cursor:grab!important;user-select:none;-webkit-user-select:none;touch-action:none;font-weight:900;font-size:17px!important}
+#rbtools-app .admin-drag-handle:active{cursor:grabbing!important}
+#rbtools-app .admin-link-panel[hidden]{display:none!important}
+#rbtools-app .admin-link-panel{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin-top:8px;padding:12px;border:1px solid #8eb9e7;border-radius:9px;background:var(--panel2)}
+#rbtools-app .admin-link-description{flex:0 0 100%;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+#rbtools-app .admin-link-description .small{overflow-wrap:anywhere}
+#rbtools-app .admin-link-panel label{font-size:13px;font-weight:700}
+#rbtools-app .admin-link-panel input{flex:1 1 270px;min-width:180px}
+#rbtools-app .admin-link-panel button{flex:0 0 auto}
+@media(max-width:700px){#rbtools-app .admin-link-panel label,#rbtools-app .admin-link-panel input{flex:1 1 100%}}
 #rbtools-app .admin-editable:focus{border-color:#aaa;background:#fff}
 #rbtools-app .admin-p{text-align:justify;font:16px/1.55 Arial,Helvetica,sans-serif}
 #rbtools-app .admin-h3{text-align:center;font:700 20px/1.35 Arial,Helvetica,sans-serif}
@@ -1404,7 +1431,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v24";
+const RBTOOLS_VERSION="pages-v25";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -3056,12 +3083,27 @@ function adminRemoveBlock(id){adminBlocks=adminBlocks.filter(x=>x.id!==id);admin
 function adminBlockControls(block){
   const box=document.createElement("div");box.className="admin-block-controls";
   const mk=(t,title,fn)=>{const b=document.createElement("button");b.type="button";b.textContent=t;b.title=title;b.addEventListener("click",fn);return b;};
-  box.append(mk("↑","Feljebb",()=>adminMoveBlock(block.id,-1)),mk("↓","Lejjebb",()=>adminMoveBlock(block.id,1)),mk("×","Blokk törlése",()=>adminRemoveBlock(block.id)));
+  const handle=document.createElement("button");handle.type="button";handle.className="admin-drag-handle";handle.draggable=true;
+  handle.textContent="⠿";handle.title="Blokk áthúzása: kizárólag ennél a fogantyúnál fogd meg";handle.setAttribute("aria-label","Blokk áthúzása");
+  handle.addEventListener("dragstart",e=>{
+    const shell=handle.closest(".admin-block");if(shell)shell.classList.add("dragging");
+    e.dataTransfer.setData("application/x-rbtools-block",block.id);
+    e.dataTransfer.setData("text/plain","RBBLOCK:"+block.id);
+    e.dataTransfer.effectAllowed="move";
+  });
+  handle.addEventListener("dragend",()=>handle.closest(".admin-block")?.classList.remove("dragging"));
+  box.append(handle,mk("↑","Feljebb",()=>adminMoveBlock(block.id,-1)),mk("↓","Lejjebb",()=>adminMoveBlock(block.id,1)),mk("×","Blokk törlése",()=>adminRemoveBlock(block.id)));
   return box;
 }
 function adminTrackEditable(el,onInput){
   el.addEventListener("focus",()=>{adminActiveEditable=el;adminRememberRange();});
   el.addEventListener("mouseup",adminRememberRange);el.addEventListener("keyup",adminRememberRange);
+  el.addEventListener("touchend",()=>requestAnimationFrame(adminRememberRange));
+  el.addEventListener("keydown",e=>{
+    if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.isComposing&&e.key.toLowerCase()==="k"){
+      e.preventDefault();adminRememberRange();adminLink();
+    }
+  });
   el.addEventListener("input",()=>{if(adminSearchFallbackMarks.length)adminClearSearchHighlights(false);onInput();adminRememberRange();adminGenerateHtml(false);});
   el.addEventListener("blur",()=>adminGenerateHtml());
 }
@@ -3171,7 +3213,7 @@ function adminDropZone(index){
   return dz;
 }
 function adminRenderCanvas(){
-  const host=rbGet("adminCanvas");host.textContent="";
+  const host=rbGet("adminCanvas");adminCloseLinkPanel();adminActiveEditable=null;adminSavedRange=null;host.textContent="";
   const title=document.createElement("h1");title.className="admin-paper-title";title.contentEditable="true";title.spellcheck=true;title.textContent=rbGet("adminTitle").value||"Cikk címe";
   title.addEventListener("focus",()=>{adminActiveEditable=title;adminRememberRange();});title.addEventListener("mouseup",adminRememberRange);title.addEventListener("keyup",adminRememberRange);
   title.addEventListener("input",()=>{rbGet("adminTitle").value=title.innerText;adminRememberRange();adminGenerateHtml(false);});title.addEventListener("blur",()=>adminGenerateHtml());host.appendChild(title);
@@ -3185,9 +3227,9 @@ function adminRenderCanvas(){
   if(!adminBlocks.length){host.appendChild(adminDropZone(0));const empty=document.createElement("div");empty.className="admin-empty";empty.textContent="Nincsenek törzsszöveg-blokkok. Adj hozzá bekezdést, keretest, vagy húzz ide képet.";host.appendChild(empty);return;}
   host.appendChild(adminDropZone(0));
   adminBlocks.forEach((block,index)=>{
-    const shell=document.createElement("div");shell.className="admin-block";shell.draggable=true;shell.dataset.blockId=block.id;
-    shell.addEventListener("dragstart",e=>{shell.classList.add("dragging");e.dataTransfer.setData("application/x-rbtools-block",block.id);e.dataTransfer.setData("text/plain","RBBLOCK:"+block.id);e.dataTransfer.effectAllowed="move";});
-    shell.addEventListener("dragend",()=>shell.classList.remove("dragging"));
+    const shell=document.createElement("div");shell.className="admin-block";shell.dataset.blockId=block.id;
+    // Never make the whole block draggable: that prevents native text selection in Firefox/Chrome.
+    // Dragging works only on the handle in adminBlockControls().
     if(block.type==="p")shell.appendChild(adminTextBlockElement(block,"admin-p"));
     else if(block.type==="h3")shell.appendChild(adminTextBlockElement(block,"admin-h3"));
     else if(block.type==="h4")shell.appendChild(adminTextBlockElement(block,"admin-h4"));
@@ -3242,27 +3284,109 @@ function adminQuickBox(){
   adminRenderCanvas();adminGenerateHtml();
   rbGet("adminStatus").textContent="Új keretes blokk beszúrva a cikk végére.";
 }
+function adminEditableForRange(range){
+  if(!range)return null;
+  const start=range.startContainer,end=range.endContainer;
+  const parent=start.nodeType===1?start:start.parentElement;
+  const editable=parent?.closest?.('[contenteditable="true"]');
+  const canvas=rbGet("adminCanvas");
+  return editable&&canvas.contains(editable)&&editable.contains(start)&&editable.contains(end)?editable:null;
+}
 function adminRememberRange(){
-  const sel=window.getSelection();if(!sel||!sel.rangeCount)return;const r=sel.getRangeAt(0);
-  if(adminActiveEditable&&adminActiveEditable.contains(r.commonAncestorContainer))adminSavedRange=r.cloneRange();
+  const sel=window.getSelection();if(!sel?.rangeCount)return false;
+  const r=sel.getRangeAt(0),editable=adminEditableForRange(r);
+  if(!editable)return false;
+  adminActiveEditable=editable;adminSavedRange=r.cloneRange();return true;
 }
 function adminRestoreRange(){
-  if(!adminActiveEditable||!adminSavedRange)return false;
-  adminActiveEditable.focus();const sel=window.getSelection();sel.removeAllRanges();sel.addRange(adminSavedRange);return true;
+  const el=adminActiveEditable,r=adminSavedRange;
+  if(!el?.isConnected||!r||adminEditableForRange(r)!==el)return false;
+  el.focus({preventScroll:true});
+  const sel=window.getSelection();if(!sel)return false;
+  sel.removeAllRanges();sel.addRange(r.cloneRange());return true;
 }
 function adminSyncActiveEditable(){
-  if(!adminActiveEditable)return;
-  adminActiveEditable.dispatchEvent(new Event("input",{bubbles:true}));adminRememberRange();
+  if(!adminActiveEditable?.isConnected)return;
+  adminActiveEditable.dispatchEvent(new Event("input",{bubbles:true}));
+  adminRememberRange();
 }
 function adminExec(command,value=null){
-  if(!adminRestoreRange()){rbGet("adminStatus").textContent="Előbb jelölj ki szöveget a szerkesztőben.";return;}
-  document.execCommand(command,false,value);adminSyncActiveEditable();
+  // Refresh from the real selection when possible, otherwise use the snapshot preserved on toolbar mousedown.
+  adminRememberRange();
+  if(!adminRestoreRange()){
+    rbGet("adminStatus").textContent="Kattints egy szerkeszthető bekezdésbe, jelöld ki a szöveget, majd válaszd a formázást.";
+    return false;
+  }
+  if(adminActiveEditable.classList.contains("admin-paper-title")){
+    rbGet("adminStatus").textContent="A Blogger-cím egyszerű szöveg. A leadben és a törzsszövegben jelölj ki formázandó részt.";
+    return false;
+  }
+  const ok=document.execCommand(command,false,value);
+  if(!ok){
+    rbGet("adminStatus").textContent="A böngésző ezt a formázást nem tudta végrehajtani. Jelöld ki újra a szöveget.";
+    return false;
+  }
+  adminSyncActiveEditable();
+  rbGet("adminStatus").textContent="Formázás alkalmazva.";
+  return true;
+}
+let adminLinkEditAnchor=null;
+function adminCloseLinkPanel(restore=false){
+  rbGet("adminLinkPanel").hidden=true;adminLinkEditAnchor=null;
+  if(restore)adminRestoreRange();
 }
 function adminLink(){
-  if(!adminSavedRange||adminSavedRange.collapsed){rbGet("adminStatus").textContent="Jelöld ki a linkelendő szöveget.";return;}
-  const saved=adminSavedRange.cloneRange();let url=window.prompt("Link címe (https://…):","https://");if(!url)return;
-  url=url.trim();if(!/^(https?:|mailto:)/i.test(url))url="https://"+url.replace(/^\/+/,"");
-  adminSavedRange=saved;adminExec("createLink",url);
+  adminRememberRange();
+  const range=adminSavedRange,root=range?adminEditableForRange(range):null;
+  if(!root||root.classList.contains("admin-paper-title")){
+    rbGet("adminStatus").textContent="A leadben, bekezdésben vagy keretesben jelöld ki a linkelendő szöveget.";return;
+  }
+  const startEl=range.startContainer.nodeType===1?range.startContainer:range.startContainer.parentElement;
+  const existing=startEl?.closest?.("a");
+  adminLinkEditAnchor=existing&&root.contains(existing)?existing:null;
+  if(range.collapsed&&!adminLinkEditAnchor){
+    rbGet("adminStatus").textContent="Először jelöld ki a linkelendő szót vagy mondatrészt.";return;
+  }
+  // For an existing link, allow editing its URL even when the caret is simply inside the link.
+  if(adminLinkEditAnchor&&range.collapsed){
+    const full=document.createRange();full.selectNodeContents(adminLinkEditAnchor);adminSavedRange=full.cloneRange();
+  }
+  rbGet("adminLinkSelection").textContent='Kijelölt szöveg: '+(adminSavedRange.toString()||adminLinkEditAnchor?.textContent||"");
+  rbGet("adminLinkUrl").value=adminLinkEditAnchor?.getAttribute("href")||"https://";
+  rbGet("adminLinkPanel").hidden=false;
+  rbGet("adminLinkUrl").focus();
+  rbGet("adminLinkUrl").select();
+}
+function adminApplyLink(){
+  let url=rbGet("adminLinkUrl").value.trim();
+  if(!url||url==="https://"){
+    rbGet("adminStatus").textContent="Adj meg egy érvényes hivatkozást.";rbGet("adminLinkUrl").focus();return;
+  }
+  if(!/^(https?:|mailto:)/i.test(url))url="https://"+url.replace(/^\/+/,"");
+  try{
+    const parsed=new URL(url);
+    if(!["https:","http:","mailto:"].includes(parsed.protocol))throw new Error("unsupported");
+  }catch{
+    rbGet("adminStatus").textContent="Hibás URL. Példa: https://regionalbahn.hu/ vagy mailto:nev@example.com";rbGet("adminLinkUrl").focus();return;
+  }
+  if(adminLinkEditAnchor?.isConnected){
+    adminLinkEditAnchor.setAttribute("href",url);
+    if(!adminRestoreRange()){rbGet("adminStatus").textContent="A kijelölés elveszett. Jelöld ki újra a szöveget.";return;}
+    adminSyncActiveEditable();adminCloseLinkPanel();
+    rbGet("adminStatus").textContent="Meglévő hivatkozás módosítva.";return;
+  }
+  if(!adminRestoreRange()){rbGet("adminStatus").textContent="A kijelölés elveszett. Jelöld ki újra a szöveget.";return;}
+  // execCommand is still the browser-native contenteditable editing action used for inline links.
+  let ok=document.execCommand("createLink",false,url);
+  if(!ok){
+    // Fallback for browsers returning false for createLink.
+    const s=window.getSelection(),r=s?.rangeCount?s.getRangeAt(0):null;
+    if(!r||r.collapsed){rbGet("adminStatus").textContent="Nem sikerült a link beszúrása. Jelöld ki újra a szöveget.";return;}
+    const a=document.createElement("a");a.setAttribute("href",url);
+    a.appendChild(r.extractContents());r.insertNode(a);
+    r.selectNodeContents(a);s.removeAllRanges();s.addRange(r);ok=true;
+  }
+  if(ok){adminSyncActiveEditable();adminCloseLinkPanel();rbGet("adminStatus").textContent="Hivatkozás elkészült.";}
 }
 function adminIsGrayNode(node){
   if(node?.nodeType!==1)return false;
@@ -3389,6 +3513,12 @@ rbGet("adminFmtItalic").addEventListener("click",()=>adminExec("italic"));
 rbGet("adminFmtUnderline").addEventListener("click",()=>adminExec("underline"));
 rbGet("adminFmtStrike").addEventListener("click",()=>adminExec("strikeThrough"));
 rbGet("adminFmtLink").addEventListener("click",adminLink);
+rbGet("adminLinkApply").addEventListener("click",adminApplyLink);
+rbGet("adminLinkCancel").addEventListener("click",()=>adminCloseLinkPanel(true));
+rbGet("adminLinkUrl").addEventListener("keydown",e=>{
+  if(e.key==="Enter"){e.preventDefault();adminApplyLink();}
+  if(e.key==="Escape"){e.preventDefault();adminCloseLinkPanel(true);}
+});
 rbGet("adminFmtUnlink").addEventListener("click",()=>adminExec("unlink"));
 rbGet("adminFmtSup").addEventListener("click",()=>adminExec("superscript"));
 rbGet("adminFmtSub").addEventListener("click",()=>adminExec("subscript"));
