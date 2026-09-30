@@ -2041,7 +2041,25 @@ function rbBoxParagraphsHtml(text,mode="markdown"){
     return `<div style="background-color: #c3c3c3; padding: ${padding}; text-align: justify;">${fmt(compact(p))}</div>`;
   }).join("\n");
 }
-function rbBoxHtml(title,text,imageAttrs=null,mode="markdown"){
+function rbBoxAccentWrap(html){
+ return '<aside class="rb-box-accent" style="background-color: #c3c3c3; border-left: 6px solid #777777; margin: 1em 0; padding: 0; overflow: hidden;">'+html+'</aside>';
+}
+function rbBoxSafeRich(html){
+ const t=document.createElement("template");t.innerHTML=String(html||"");
+ t.content.querySelectorAll("script,style,iframe,object,embed,form,input,textarea,select,button,svg,canvas,link,meta").forEach(n=>n.remove());
+ t.content.querySelectorAll("*").forEach(n=>Array.from(n.attributes).forEach(a=>{
+  if(/^on/i.test(a.name)||(["href","src"].includes(a.name.toLowerCase())&&/^\s*(?:javascript|data|vbscript):/i.test(a.value)))n.removeAttribute(a.name);
+ }));
+ return t.innerHTML;
+}
+function rbBoxRichHtml(title,html,img=null,variant="classic"){
+ const inner=rbBoxSafeRich(html).trim(),out=[];
+ if(String(title||"").trim())out.push('<div style="background-color: #c3c3c3; padding: 15px; text-align: center;"><strong>'+esc(title)+'</strong></div>');
+ if(inner)out.push('<div style="background-color: #c3c3c3; padding: 15px; text-align: justify;">'+inner+'</div>');
+ if(img&&(img.full||img.display))out.push(rbBoxHtml("","",img,"plain"));
+ return variant==="accent"?rbBoxAccentWrap(out.join("\n")):out.join("\n");
+}
+function rbBoxHtml(title,text,imageAttrs=null,mode="markdown",variant="classic"){
   const fmt=mode==="plain"?plainInline:inlineMd,out=[];
   if(String(title||"").trim())out.push(`<div style="background-color: #c3c3c3; padding: 15px; text-align: center;"><strong>${fmt(String(title).trim())}</strong></div>`);
   const paras=rbBoxParagraphsHtml(text,mode);if(paras)out.push(paras);
@@ -2053,7 +2071,7 @@ function rbBoxHtml(title,text,imageAttrs=null,mode="markdown"){
     out.push(`<div class="separator" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}"${widthAttr} alt="${esc(rbImageAltText(captionParts.caption,credit,captionParts.photoName),true)}" /></a></div>`);
     out.push(`<div style="background-color: #c3c3c3; padding: 0px 15px 15px; text-align: center;">${adminCaptionHtml(captionParts)}</div>`);
   }
-  return out.join("\n");
+  const classic=out.join("\n");return variant==="accent"?rbBoxAccentWrap(classic):classic;
 }
 
 function extractSources(body){
@@ -3655,7 +3673,7 @@ function adminBoxHtml(block){
     out.push('<div class="separator" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="600" alt="'+esc(rbImageAltText(img.caption,img.credit,img.photoName),true)+'" /></a></div>');
     out.push('<div style="background-color: #c3c3c3; padding: 0px 15px 15px; text-align: center;">'+adminCaptionHtml(img)+'</div>');
   }
-  return out.join("\n");
+  const classic=out.join("\n");return block.variant==="accent"?rbBoxAccentWrap(classic):classic;
 }
 function adminBlockHtml(b){
   if(b.type==="p")return '<div style="text-align: '+adminValidAlign(b.align,"justify")+';">'+adminNormalizeInlineHtml(b.html)+'</div>\n<br />';
@@ -3831,7 +3849,13 @@ function adminImageDropOnBox(e,block){
   if(adminFindImage(imageId)){block.imageId=imageId;adminRenderCanvas();adminGenerateHtml();}
 }
 function adminBoxElement(block){
-  const wrap=document.createElement("div");wrap.className="admin-box";
+  const wrap=document.createElement("div");wrap.className="admin-box"+(block.variant==="accent"?" admin-box-accent":"");
+  const chooser=document.createElement("label");chooser.className="admin-box-variant";chooser.textContent="Stílus:";
+  const variant=document.createElement("select");variant.setAttribute("aria-label","Keretes megjelenése");
+  [["classic","Klasszikus szürke"],["accent","Szürke bal oldali sávval"]].forEach(([value,label])=>variant.appendChild(new Option(label,value)));
+  variant.value=block.variant||"classic";
+  variant.addEventListener("change",()=>{block.variant=variant.value;wrap.classList.toggle("admin-box-accent",block.variant==="accent");adminGenerateHtml();});
+  chooser.appendChild(variant);wrap.appendChild(chooser);
   const title=document.createElement("div");title.className="admin-box-title admin-editable";title.contentEditable="true";title.spellcheck=true;title.innerHTML=adminVisualizeSpecials(block.title||"Keretes cím");title.dataset.adminBlockId=block.id;title.dataset.adminAlignTarget="boxTitle";title.style.textAlign=adminValidAlign(block.titleAlign,"center");
   adminTrackEditable(title,()=>{block.title=title.innerHTML;});wrap.appendChild(title);
   const body=document.createElement("div");body.className="admin-box-body admin-editable";body.contentEditable="true";body.spellcheck=true;body.innerHTML=adminVisualizeSpecials(block.html||"Keretes szöveg.");body.dataset.adminBlockId=block.id;body.dataset.adminAlignTarget="boxBody";body.style.textAlign=adminValidAlign(block.bodyAlign,"justify");
@@ -3992,7 +4016,7 @@ function adminQuickBox(){
       const html=adminNormalizeInlineHtml(block.html||"");
       const title=["h2","h3","h4","h5"].includes(block.type)?html:"";
       const body=block.type==="p"?html:"Keretes szöveg.";
-      adminBlocks.splice(idx,1,{id:block.id,type:"box",title:title,html:body,imageId:null});
+      adminBlocks.splice(idx,1,{id:block.id,type:"box",title:title,html:body,imageId:null,variant:rbGet("adminNewBoxVariant").value});
       adminActiveEditable=null;adminSavedRange=null;
       adminRenderCanvas();adminGenerateHtml();
       rbGet("adminStatus").textContent="Az aktuális blokk keretessé alakítva.";
@@ -4290,6 +4314,12 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
     const n=nodes[i];if(n.nodeType===3&&!n.textContent.trim())continue;if(n.nodeType!==1)continue;
     const tag=n.tagName.toLowerCase();if(tag==="br")continue;
     const text=(n.textContent||"").trim();
+    if(tag==="aside"&&n.classList.contains("rb-box-accent")){
+      const previous=adminBlocks.length;
+      adminImportBoxGroup(Array.from(n.childNodes),0);
+      if(adminBlocks.length>previous)adminBlocks.at(-1).variant="accent";
+      continue;
+    }
     if(tag==="div"&&/Források:/i.test(text)&&n.querySelector("strong")){adminSourcesHtml=n.outerHTML+"\n<br />";continue;}
     if(tag==="div"&&/text-align\s*:\s*right/i.test(n.getAttribute("style")||"")&&n.querySelector("em")){
       let a=n.querySelector("em").textContent.trim().replace(/^Összeállította:\s*/i,"");if(a)rbGet("adminAuthor").value=a;rbGet("adminFooter").value="author";
@@ -4362,7 +4392,7 @@ rbGet("adminDownload").addEventListener("click",()=>{adminGenerateHtml(false);if
 rbGet("adminClear").addEventListener("click",adminClear);
 rbGet("adminAddParagraph").addEventListener("click",()=>{adminBlocks.push({id:adminUid("b"),type:"p",html:"Új bekezdés",align:"justify"});adminRenderCanvas();adminGenerateHtml();});
  rbGet("adminAddH3").addEventListener("click",()=>{const level=rbGet("adminHeadingLevel").value;adminBlocks.push({id:adminUid("b"),type:/^h[2-5]$/.test(level)?level:"h3",html:"Új alcím",align:"center"});adminRenderCanvas();adminGenerateHtml();});
-rbGet("adminAddBox").addEventListener("click",()=>{adminBlocks.push({id:adminUid("b"),type:"box",title:"Keretes cím",html:"Keretes szöveg.",imageId:null,titleAlign:"center",bodyAlign:"justify"});adminRenderCanvas();adminGenerateHtml();});
+rbGet("adminAddBox").addEventListener("click",()=>{adminBlocks.push({id:adminUid("b"),type:"box",title:"Keretes cím",html:"Keretes szöveg.",imageId:null,titleAlign:"center",bodyAlign:"justify",variant:rbGet("adminNewBoxVariant").value});adminRenderCanvas();adminGenerateHtml();});
 rbGet("adminAddIframe").addEventListener("click",()=>{rbGet("adminIframeInput").focus();rbGet("adminStatus").textContent="Illeszd be az iframe kódját, majd kattints az „iframe beszúrása” gombra.";});
 rbGet("adminInsertIframe").addEventListener("click",adminInsertIframeFromInput);
 rbGet("adminClearIframeInput").addEventListener("click",()=>{rbGet("adminIframeInput").value="";rbGet("adminIframeInput").focus();});
