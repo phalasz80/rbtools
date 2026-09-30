@@ -31,6 +31,18 @@ Mivel a Blogger API-nak nincs dokumentált önálló képfeltöltési művelete:
 4. Az RBTools betölti a címet, HTML-t, címkéket és a cikkben szereplő képeket. Minden Blogger-cikkművelet a **Piszkozatkezelés** egyetlen, színkódolt gombcsoportjában található.
 5. Szerkesztés után a **Mentés Blogger-piszkozatba** az eredeti post ID-t frissíti, nem készít másolatot.
 
+## Percről percre: 2020-as RegionalBahn-minta modernizálva
+
+A **Cikkadmin → Tartalomtípus → Percről percre / élő tudósítás → Sablon betöltése** művelet a [2020-as RegioJet-premier](https://www.regionalbahn.hu/2020/07/regiojet-premier.html) szerkesztési logikájára épülő, újratölthető mintát készít. A 2018-as Budapest–Berlin útibeszámoló helyszínről helyszínre épülő történetvezetése, a 2016-os Westbahn InterCity-búcsú személyes élő beszámolója és a 2013-as forradalmi havazás legújabbat felül megjelenítő sorrendje is ihlette.
+
+**Használat:** először írd meg a címet, a valódi leadet és az opcionális főképet. A sablon egy kezdeti WYSIWYG-bejegyzést és szerkeszthető nyitó-, illetve záróbekezdést hoz létre. Az **Időbélyeges frissítés** gombnál alapdátum és beszúrási mód választható: normál, növekvő időrend (új frissítés alul), illetve a 2013-as változat szerinti fordított sorrend (új frissítés felül). Ez kizárólag a **következő új bejegyzés helyét** érinti, a már felvitt eseményeket soha nem rendezi át automatikusan. A blokkok kézzel, a szokásos ↑/↓/⠿ vezérlőkkel is mozgathatók.
+
+Minden egyes frissítéshez külön **dátum, 24 órás időpont, helyszín/vonalszakasz, tudósító, eseménytípus (normál, fontos, helyesbítés vagy lezárás), rich-text szöveg és opcionális képtári kép** adható meg. Többnapos közvetítésnél a dátum megjelenítése blokkonként bekapcsolható. A normál Blogger-képsablon őrzi a képaláírást, a fotóst és az ALT-adatokat. A frissítések saját **változatlan mélyhivatkozást** kapnak, a címadó bevezető alatt pedig megjelenik egy ugrólink az időadatok alapján legfrissebb bejegyzéshez. Nincs külön JavaScript az olvasói oldalon, nincs fix szélességű betű, az egyes frissítések inline stílusai önmagukban működnek.
+
+**Mentési szabályok:** az időbélyeg nélküli mintabejegyzést a rendszer feltűnően jelzi, de a piszkozatmentést nem tiltja. Ez nem automatikus élő közvetítési szolgáltatás: az RBTools továbbra is csak Blogger-piszkozatot ment, a publikálást és az éles oldal további frissítéseit a jogosult szerkesztő intézi a Bloggerben. A saját `rb-live-entry` HTML-jelöléssel tárolt bejegyzések a későbbi visszaolvasáskor ismét külön szerkeszthető, állandó hivatkozású blokkokra bomlanak. A régiek, eltérő HTML-szerkezetű közvetítések nem alakulnak át automatikusan.
+
+A sablon működését a `live-timeline.js` önálló modul tartja karban. Regressziós tesztje: `tests/live-timeline.test.cjs`. A vizuális és a Blogger API-végponttal végzett próbamentés ettől függetlenül szükséges az első éles használat előtt.
+
 ## Blogger-integráció
 
 Az RBTools a Blogger API v3-at és a Google Identity Services böngészős OAuth tokenmodelljét használja.
