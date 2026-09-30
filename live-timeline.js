@@ -38,7 +38,8 @@ function render(entry,{normalize=x=>h(x),imageHtml=()=>""}={}){
  const header='<header class="rb-live-entry-head" style="display:flex;gap:6px 12px;flex-wrap:wrap;align-items:baseline;line-height:1.55;margin:0 0 9px">'+
   badge+'<strong style="color:#155477;font-size:1.1em">'+timeEl+'</strong>'+
   (line?'<span class="rb-live-place-credit" style="color:#263746">'+line+'</span>':"")+'</header>';
- const body='<div class="rb-live-copy" style="line-height:1.65;text-align:justify">'+normalize(String(entry.html||""))+'</div>';
+ const align=["left","center","right","justify"].includes(entry.align)?entry.align:"justify";
+ const body='<div class="rb-live-copy" style="line-height:1.65;text-align:'+align+'">'+normalize(String(entry.html||""))+'</div>';
  const permalink='<div class="rb-live-permalink" style="font-size:.8em;text-align:right;margin-top:8px">'+
   '<a href="#'+h(anchor)+'" style="color:#52687b;text-decoration:none" aria-label="Közvetlen hivatkozás a(z) '+
   h(displayed)+' időpontú frissítésre">Hivatkozás erre a frissítésre #</a></div>';
@@ -71,7 +72,8 @@ function parse(el,{uid=()=>"",imageFromElement=()=>null,captionFromNodes=()=>""}
   reporter:(el.querySelector(".rb-live-reporter")?.textContent||"").replace(/^\(|\)$/g,"").trim(),
   kind:Object.hasOwn(kinds,kind)?kind:"report",
   showDate:el.getAttribute("data-rb-live-show-date")==="1",
-  html:el.querySelector(".rb-live-copy")?.innerHTML||"",imageId:image?.id||null
+  html:el.querySelector(".rb-live-copy")?.innerHTML||"",imageId:image?.id||null,
+  align:(el.querySelector(".rb-live-copy")?.style?.textAlign||"justify")
  };
 }
 root.RBTOOLS_LIVE_TIMELINE=Object.freeze({kinds,validTime,validDate,safeAnchor,make,render,latest,parse});
