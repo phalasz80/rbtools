@@ -155,7 +155,7 @@ A **Keretes**, **Gyűjtőoldalak**, **Táblázatok**, **Képkódok**, **HTML ell
 
 ## RBTools favicon
 
-Az RBTools saját, 32 × 32 képpontos, PNG-alapú böngészőikont használ: `favicon-32.png`. A RegionalBahn rövidített **RB** jelölését vasúti vonalakat idéző csíkokkal és a szerszámokra utaló villáskulccsal kombináló, külön tervezett grafika. Az `index.html` két explicit favicon-hivatkozással és verziószámozott URL-lel tölti be, hogy a böngésző gyorsítótárát frissítéskor egyszerűen meg lehessen kerülni.
+Az RBTools faviconja a korábban biztosított, kék keretes **RegionalBahn RB-jelképet** tartja meg, amelynek jobb alsó részét a **🛠️ kalapács és villáskulcs emoji** egészíti ki. A pontos, eredeti kék RB-grafika és az emoji egyesítéséből 32 × 32 képpontos `favicon-32.png` készül. Az ikon hivatkozásai verziózott URL-lel kerülik meg a régi favicon böngészős gyorsítótárazását.
 
 ## Technikai háttér
 
