@@ -85,6 +85,10 @@ A Cikkadminban külön tartalomtípus választható: **Cikk**, **#nyúz / Hétv�
 - kép húzása keretes blokkba;
 - többsoros képaláírás és külön kezelhető kép-<code>title</code>-kredit;
 - opcionális, képaláírás utáni **(fotó: Név)** külön sor, a HTML-ben `<br />` elválasztással;
+- **akadálymentes kép-alt:** a képaláírás szövege a fotós vagy a forrás nevével együtt automatikusan bekerül az `img alt` attribútumába, a kettő között pontosan ` +++ ` szerepel;
+- a látható, többsoros képaláírásban valódi `<br />` jelöli a sortöréseket, az `alt` viszont tisztán szöveges: a képernyőolvasók számára az új sorokat `; ` választja el, nem HTML-tag;
+- **a főkép alatt nem jelenik meg képaláírás**: a szerkesztő képaláírás-mezőjének tartalma és a kredit csak az `alt` attribútumban szerepel; a haladó konverter főképéhez külön, csak `alt`-ba kerülő leírásmező is tartozik, amely `RB:MAIN_IMAGE caption="..."` jelöléssel is feltölthető;
+- ha nincs ismert fotós vagy forrás, az RBTools nem talál ki nevet az `alt` számára. A képtári és főkép-szerkesztőben ezért ténylegesen leíró képaláírást érdemes adni minden tartalmi képhez;
 - a képtári kártya szövegmezői kijelölhetők, mert a képek már kizárólag a miniatűrnél fogva húzhatók;
 - egérrel vagy billentyűzettel szabad szövegkijelölés és kiválasztott rész formázása;
 - hivatkozások beszúrása/szerkesztése külön, nem modális URL-szerkesztővel (Ctrl+K / ⌘K);
