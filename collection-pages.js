@@ -53,7 +53,7 @@ function sanitizeEditable(markup){
   return t.innerHTML;
 }
 function edited(node,el){
-  node.value=node.kind==="text"?el.textContent:sanitizeEditable(el.innerHTML);
+  node.value=node.kind==="text"?String(el.textContent||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"):sanitizeEditable(el.innerHTML);
   node.edited=true;
   const audit=core.audit(state.tree);
   if(!audit.ok){state.error="Egy védett HTML-/JavaScript-blokk sérült. A mentés leállítva.";}
@@ -132,7 +132,7 @@ function update(){
        " blokk, "+audit.scripts+" JavaScript, "+audit.buttons+" navigációs elem.":"⚠ Védett forráskód sérült: mentés tiltva.")
     :"Még nincs betöltött HTML.";
   const changed=dirty();
-  view.save.disabled=!hasPage||!changed||!bridge.isConnected()||!audit?.ok||!state.tree.safe||state.saving||!!state.error;
+  view.save.disabled=!hasPage||state.loaded.blogId!==view.blog.value||!changed||!bridge.isConnected()||!audit?.ok||!state.tree.safe||state.saving||!!state.error;
   if(state.error){message("A SZERKESZTÉS / MENTÉS HIBÁJA",state.error,"error");return;}
   if(state.saving){message("BLOGGER-MENTÉS FOLYAMATBAN","Mentés közben továbbra is változhatnak a helyi adatok. A Blogger visszaigazolását külön ellenőrizzük.","working");return;}
   if(!has){message("Nincs megnyitott Blogger-oldal","A statikus oldalak lekérésével kezdhetsz.","idle");return;}
@@ -194,10 +194,10 @@ async function fetchPages(){
   finally{refreshConnection();}
 }
 function pagePath(id){return "/blogs/"+encodeURIComponent(view.blog.value)+"/pages/"+encodeURIComponent(id);}
-async function getPage(id){
+async function getPage(id,blogId=view.blog.value){
   let result;
-  try{result=await bridge.request({blogId:view.blog.value,pageId:id,query:"view=ADMIN"});}
-  catch(e){if(![403,404].includes(e.status))throw e;result=await bridge.request({blogId:view.blog.value,pageId:id,query:"view=AUTHOR"});}
+  try{result=await bridge.request({blogId,pageId:id,query:"view=ADMIN"});}
+  catch(e){if(![403,404].includes(e.status))throw e;result=await bridge.request({blogId,pageId:id,query:"view=AUTHOR"});}
   if(result.kind&&result.kind!=="blogger#page")throw Error("Nem statikus Blogger-oldal érkezett.");
   if(!result.id||typeof result.content!=="string")throw Error("A Blogger nem küldte vissza a teljes HTML-forrást.");
   return result;
@@ -207,7 +207,7 @@ function abandonCheck(){
 }
 function loadHtml(html,{page=null,title="",origin="loaded"}={}){
   state.error="";state.saving=false;state.tree=core.parse(html);
-  state.loaded=page?{...page,blogId:view.blog.value}:null;
+  state.loaded=page?{...page,blogId:view.blog.value,originalHtml:html}:null;
   state.backup=false;view.title.value=title;
   state.baseline=page?{title,html,updated:page.updated||"",origin}:null;
   render();update();
@@ -231,7 +231,7 @@ async function openPage(){
 }
 function backup(){
   if(!state.loaded)return;
-  bridge.download("RBTools_EREDETI_"+safeName(state.loaded.title)+"_"+state.loaded.id+".html",state.baseline?.origin==="loaded"?state.baseline.html:state.loaded.originalHtml||state.baseline.html);
+  bridge.download("RBTools_EREDETI_"+safeName(state.loaded.title)+"_"+state.loaded.id+".html",originalBackUpRaw());
   state.backup=true;update();
 }
 function exportHtml(){
@@ -308,6 +308,10 @@ function originalBackUpRaw(){
 }
 async function savePage(){
   if(!state.loaded||!dirty()||state.saving)return;
+  if(state.loaded.blogId!==view.blog.value){
+    state.error="A kiválasztott blog nem azonos a megnyitott statikus oldal blogjával. Válaszd vissza az eredeti blogot.";
+    update();return;
+  }
   const html=currentHtml(),title=view.title.value.trim(),audit=core.audit(state.tree,html),page=state.loaded;
   if(!title){state.error="Az oldal címét nem lehet üresen menteni.";update();return;}
   if(!state.tree.safe||!audit.ok){state.error="Az eredeti speciális HTML-kód nem maradt hiánytalanul meg.";update();return;}
@@ -321,32 +325,35 @@ async function savePage(){
   state.saving=true;state.error="";update();
   const sent={html,title};
   try{
-    const remote=await getPage(page.id);
+    const remote=await getPage(page.id,page.blogId);
     if(remote.content!==state.baseline.html||String(remote.title||"")!==state.baseline.title){
       throw Error("AZ OLDALT KÖZBEN MÁS SZERKESZTŐ MÓDOSÍTOTTA. A mentés leállt, hogy ne írd felül a munkáját. Töltsd le a saját szerkesztett HTML-t, majd nyisd meg újra az oldalt, és egyeztesd a különbségeket.");
     }
     const result=await bridge.request({blogId:page.blogId,pageId:page.id,method:"PATCH",body:{title:sent.title,content:sent.html}});
     if(String(result.id||"")!==String(page.id))throw Error("Az API nem a várt Page ID-t igazolta vissza.");
-    const verified=await getPage(page.id);
+    const verified=await getPage(page.id,page.blogId);
     const expected=core.protectedParts(state.tree);
     const intact=expected.every(original=>verified.content.includes(original));
     if(!intact){
+      const backupSource=originalBackUpRaw();
       state.error="A BLOGGER AZ EREDETI GOMB- VAGY JAVASCRIPT-KÓD EGY RÉSZÉT MÓDOSÍTOTTA / ELTÁVOLÍTOTTA. Azonnal ellenőrizd az élő oldalt! Az eredeti biztonsági mentés megmaradt.";
       state.baseline={title:verified.title||"",html:verified.content,updated:verified.updated||"",origin:"saved"};
-      state.loaded={...page,...verified,blogId:page.blogId,originalHtml:originalBackUpRaw()};
+      state.loaded={...page,...verified,blogId:page.blogId,originalHtml:backupSource};
       return;
     }
     if(verified.content!==sent.html||String(verified.title||"")!==sent.title){
+      const backupSource=originalBackUpRaw();
       state.error="A Blogger az eredeti speciális kódot megőrizte, de a teljes HTML-t vagy címet átalakította. Ellenőrizd a szerkesztett és az élő oldalt, mielőtt újra mentesz.";
       state.baseline={title:verified.title||"",html:verified.content,updated:verified.updated||"",origin:"saved"};
-      state.loaded={...page,...verified,blogId:page.blogId,originalHtml:originalBackUpRaw()};
+      state.loaded={...page,...verified,blogId:page.blogId,originalHtml:backupSource};
       return;
     }
     if(page.url&&verified.url&&page.url!==verified.url){
       state.error="A mentés után megváltozott az oldal URL-je. Ellenőrizd a régi /p/ hivatkozásokat.";
     }
+    const backupSource=originalBackUpRaw();
     state.baseline={title:verified.title||sent.title,html:verified.content,updated:verified.updated||"",origin:"saved"};
-    state.loaded={...page,...verified,blogId:page.blogId,originalHtml:originalBackUpRaw()};
+    state.loaded={...page,...verified,blogId:page.blogId,originalHtml:backupSource};
     view.info.textContent="Blogger Page ID: "+verified.id+" • "+verified.status+" • "+(verified.url||"");
   }catch(e){state.error=e.message||String(e);}
   finally{state.saving=false;update();}
