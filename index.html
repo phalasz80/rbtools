@@ -3995,8 +3995,11 @@ function adminLiveElement(block){
   panel.setAttribute("aria-label","Időbélyeges percről percre frissítés szerkesztése");
   const head=document.createElement("div");head.className="admin-live-editor-head";
   const label=document.createElement("strong");label.textContent="PERCRŐL PERCRE / IDŐBÉLYEGES FRISSÍTÉS";head.appendChild(label);
-  const link=document.createElement("a");link.href="#"+block.anchor;link.textContent="Állandó belső hivatkozás: #"+block.anchor;
-  link.title="A bejegyzés azonosítója szerkesztéskor sem változik.";head.appendChild(link);panel.appendChild(head);
+  const link=document.createElement("button");link.type="button";
+  link.textContent="⧉ Belső hivatkozás: #"+block.anchor;
+  link.title="A bejegyzés azonosítója szerkesztéskor sem változik. Kattintás: hivatkozás másolása.";
+  link.addEventListener("click",()=>copyToClipboard("#"+block.anchor,rbGet("adminStatus"),"Az adott frissítés belső hivatkozása kimásolva."));
+  head.appendChild(link);panel.appendChild(head);
   const grid=document.createElement("div");grid.className="admin-live-editor-grid";
   function field(caption,type,name,placeholder=""){
     const wrap=document.createElement("label");wrap.textContent=caption;
