@@ -139,6 +139,10 @@ A korábbi külön **Szöveg → Blogger konverter** fül megszűnt: teljes funk
 
 A **Keretes**, **Gyűjtőoldalak**, **Táblázatok**, **Képkódok**, **HTML ellenőrző**, **Unicode stílusok** és **Súgó** külön eszközfülként továbbra is megmaradt.
 
+## RBTools favicon
+
+Az RBTools saját, 32 × 32 képpontos, PNG-alapú böngészőikont használ: `favicon-32.png`. A RegionalBahn rövidített **RB** jelölését vasúti vonalakat idéző csíkokkal és a szerszámokra utaló villáskulccsal kombináló, külön tervezett grafika. Az `index.html` két explicit favicon-hivatkozással és verziószámozott URL-lel tölti be, hogy a böngésző gyorsítótárát frissítéskor egyszerűen meg lehessen kerülni.
+
 ## Technikai háttér
 
 - Publikálás: GitHub Pages
