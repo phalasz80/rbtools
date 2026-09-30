@@ -84,6 +84,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
           <option value="news">#nyúz / Hétvégi gyors</option>
           <option value="podcast">Podcast shownotes</option>
           <option value="innotrans">InnoTrans cikk</option>
+           <option value="live">Percről percre / élő tudósítás</option>
           <option value="static">Statikus oldal</option>
         </select>
       </div>
@@ -100,6 +101,21 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
       </div>
     </div>
     <p id="rbtools-adminTemplateHint" class="small admin-template-hint">Általános RegionalBahn-cikk: lead, törzsszöveg, keretes blokk és szerzői footer.</p>
+    <div id="rbtools-adminLiveControls" class="admin-live-controls" hidden aria-label="Élő tudósítás műveletei">
+      <div class="admin-section-head">
+        <div><strong>Percről percre: új frissítés</strong>
+        <p class="small">A 2020-as RegioJet-premier nyomán, időponttal, helyszínnel, tudósítóval, képpel és önálló mélyhivatkozással. A dátum és a sorrend az új frissítések alapértéke, a meglévő bejegyzéseket nem rendezi át.</p></div>
+      </div>
+      <div class="grid3">
+        <div class="field"><label for="rbtools-adminLiveDate">Új frissítés dátuma</label><input id="rbtools-adminLiveDate" type="date" aria-label="Az új percről percre frissítés dátuma"></div>
+        <div class="field"><label for="rbtools-adminLiveOrder">Új bejegyzés helye</label><select id="rbtools-adminLiveOrder">
+          <option value="ascending">Végére: időrendben (2020-as minta)</option>
+          <option value="descending">Elejére: legújabb felül (2013-as minta)</option>
+        </select></div>
+        <div class="field" style="justify-content:center"><button id="rbtools-adminAddLive" class="primary" type="button">＋ Időbélyeges frissítés</button></div>
+      </div>
+      <p id="rbtools-adminLiveValidation" class="small" role="status" aria-live="polite">Új bejegyzésnél add meg a pontos időt; többnapos közvetítésnél jelöld a dátum megjelenítését is.</p>
+    </div>
   </div>
 
   <div class="panel admin-quickguide">
@@ -111,7 +127,8 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
       <span class="badge">Blogger ↔ RBTools</span>
     </div>
     <ol class="admin-quicksteps">
-      <li><strong>Válassz tartalomtípust:</strong> cikk, #nyúz, podcast shownotes, InnoTrans vagy statikus oldal; igény szerint töltsd be a hozzá tartozó sablont.</li>
+      <li><strong>Válassz tartalomtípust:</strong> cikk, #nyúz, podcast shownotes, InnoTrans, <strong>percről percre / élő tudósítás</strong> vagy statikus oldal; igény szerint töltsd be a hozzá tartozó sablont.</li>
+      <li><strong>Percről percre:</strong> töltsd be az élő sablont, írd meg a leadet, majd az <strong>＋ Időbélyeges frissítés</strong> gombbal add hozzá az időpontot, helyszínt, tudósító nevét és a frissítés WYSIWYG-szövegét. A képtárból képet is húzhatsz a frissítésbe. Alapértelmezés szerint a legújabb bejegyzés alul jelenik meg, mint a 2020-as RegioJet-tudósításnál. Fordított sorrend is választható. Készülő frissítést ugyanabba a Blogger-piszkozatba ments vissza, az éles közzététel a szerkesztő dolga.</li>
       <li><strong>Cikkcím:</strong> a címet a külön, Blogger-szerű <strong>Cikk címe</strong> mezőbe írd. Nem lesz belőle megismételt törzsszöveg vagy automatikus lead.</li>
       <li><strong>Főkép + valódi lead:</strong> a külön, bekeretezett bevezetőben válassz képet, vagy húzd oda a képtárból, és írd mellé a felvezetőt. A <code>&lt;!--more--&gt;</code> mindig a teljes lead után kerül.</li>
       <li><strong>Új anyag:</strong> írj közvetlenül a WYSIWYG-ben, vagy importálj Markdown/TXT/DOCX/ODT/RTF szöveget. Képes cikknél előbb Bloggerben töltsd fel a képeket egy draftba, majd nyisd meg azt itt. A törzsszövegben a választóval <strong>H2–H5</strong> szintű alcímeket készíthetsz.</li>
@@ -285,6 +302,7 @@ További szöveg..."></textarea>
         <select id="rbtools-adminHeadingLevel" aria-label="Alcím szintje"><option value="h2">H2</option><option value="h3" selected>H3</option><option value="h4">H4</option><option value="h5">H5</option></select>
         <button id="rbtools-adminAddH3" type="button">＋ Alcím</button>
         <button id="rbtools-adminAddBox">＋ Keretes</button>
+          <button id="rbtools-adminLiveAddToolbar" type="button" hidden title="Időbélyeges frissítés hozzáadása a percről percre sablonhoz">＋ Élő frissítés</button>
         <select id="rbtools-adminNewBoxVariant" aria-label="Új keretes megjelenése" title="Válaszd ki, melyik keretes stílust készítsük el">
           <option value="classic">Klasszikus szürke</option>
           <option value="accent">Oldalsávos szürke</option>
@@ -1023,7 +1041,7 @@ A következő cikk rövid ajánlója.</pre>
       <li>felső/alsó index és listák formázása;</li>
       <li>Unicode-karakterek, emoji és HTML-entitások beszúrása;</li>
       <li>keresés az aktuális WYSIWYG-cikkben;</li>
-      <li>cikk-, #nyúz-, podcast-, InnoTrans- és statikusoldal-sablonok használata;</li>
+      <li>cikk-, #nyúz-, podcast-, InnoTrans-, percről percre és statikusoldal-sablonok használata;</li>
       <li>haladó Markdown/plain text/DOCX/ODT/RTF/Google Dokumentum konverzió profilokkal és presetekkel;</li>
       <li>RB:MAIN_IMAGE, RB:LEAD, RB:IMAGE, RB:ITALIC, RB:BOX, RB:SOURCES és RB:AUTHOR jelölések feldolgozása;</li>
       <li>külön HTML-előnézet és a haladó konverter kimenetének visszatöltése a WYSIWYG-be.</li>
@@ -1080,6 +1098,7 @@ A következő cikk rövid ajánlója.</pre>
       <li><strong>#nyúz:</strong> lead, „Még kell” lista, hírcímek és egymást elválasztó híregységek.</li>
       <li><strong>Podcast:</strong> felvezető, Spotify vagy más iframe, időkódlista és közreműködői lista.</li>
       <li><strong>InnoTrans:</strong> felvezető, gyártói szekciók, rövid hírek és helyszíni tudósítói zárás.</li>
+      <li><strong>Percről percre:</strong> egységes lead és frissítési napló; külön időbélyeges, helyszínnel és tudósítóval ellátható bejegyzések, opcionális képek, állandó belső hivatkozások, fontos/hivatalos helyesbítés/zárás jelölések és automatikus ugrás a legfrissebb frissítéshez. Alapesetben növekvő időrend, de a 2013-as havazási tudósítás mintájára fordított is lehet.</li>
       <li><strong>Statikus oldal:</strong> nem cikk, ezért nincs automatikus <code>&lt;!--more--&gt;</code> és cikkfooter.</li>
     </ul>
 
@@ -1117,7 +1136,7 @@ A következő cikk rövid ajánlója.</pre>
     <p>A haladó konverter közvetlen HTML-kimenete önmagában is másolható vagy menthető. A közvetlen konverter is a RegionalBahn-szabvány szerinti <code>&lt;hr align="center" /&gt;</code> szerzői elválasztót használja. A képfeliratban megadott sortörések és a külön sorba írt <code>(fotó: …)</code> megmaradnak. Ha a WYSIWYG-be töltöd át, különösen a főkép és az összetett, több tudósítós footer ellenőrzése ajánlott, mert a vizuális visszafejtés a HTML szerkezetéből dolgozik.</p>
 
     <h3>9. Régi vagy kézzel kapott HTML visszatöltése</h3>
-    <p>Ha a cikk nincs az API-n keresztül megnyitva, a <strong>Meglévő Blogger-cikk HTML-jének visszatöltése szerkesztésre</strong> részbe teljes HTML-fragmentum illeszthető vagy <code>.html</code> fájl tölthető. A parser felismeri a tipikus RegionalBahn leadet, képeket, képaláírásokat, H3/H4 címeket, kereteseket, iframe-eket és néhány speciális blokkot. Nem általános célú tökéletes HTML round-trip szerkesztő, ezért különösen régi vagy szokatlan kézi HTML-nél mindig ellenőrizd a végleges kimenetet.</p>
+    <p>Ha a cikk nincs az API-n keresztül megnyitva, a <strong>Meglévő Blogger-cikk HTML-jének visszatöltése szerkesztésre</strong> részbe teljes HTML-fragmentum illeszthető vagy <code>.html</code> fájl tölthető. A parser felismeri a tipikus RegionalBahn leadet, képeket, képaláírásokat, H3/H4 címeket, kereteseket, az új strukturált élő frissítéseket, iframe-eket és néhány speciális blokkot. Nem általános célú tökéletes HTML round-trip szerkesztő, ezért különösen régi vagy szokatlan kézi HTML-nél mindig ellenőrizd a végleges kimenetet.</p>
 
     <h3>10. A WYSIWYG szerkesztő felépítése</h3>
     <ol>
@@ -1164,6 +1183,20 @@ A következő cikk rövid ajánlója.</pre>
     <p>Új keretes beszúrásakor a <strong>Keretes megjelenése</strong> választón dönthetsz a klasszikus szürke és a bal oldali hangsúlyos sávval ellátott, ugyanúgy szürke változat között. A keretes saját vezérlőjével a típust később is átállíthatod. A külön <strong>Keretes</strong> fülön ugyanez a két forma WYSIWYG-ben és közvetlen HTML-ben is készíthető.</p>
     <p>A <strong>＋ Keretes</strong> új szürke RegionalBahn-dobozt hoz létre. A formázósor <strong>▣ Keretes</strong> gombja az aktuális szövegblokkot alakítja át keretessé. A keretes címe és törzse külön szerkeszthető, külön igazítható, és a képtárból kép húzható bele. A kép eltávolítható anélkül, hogy maga a keretes törlődne.</p>
 
+    <h3>14/B. Percről percre, folyamatos helyszíni tudósítás</h3>
+    <p>Az új sablon alapját elsősorban a <a href="https://www.regionalbahn.hu/2020/07/regiojet-premier.html" target="_blank" rel="noopener">2020-as RegioJet-premier</a> adja: világos, egyszer szerkeszthető felvezető, majd időrendben különálló, időponttal, helyszínnel és a tudósító nevével ellátott frissítések. A <a href="https://www.regionalbahn.hu/2018/03/Budapest-Berlin-VDE8-percrol-percre.html" target="_blank" rel="noopener">2018-as Budapest–Berlin útibeszámolóból</a> az útvonal és az utazás folyamatos követésének szerkezetét, a <a href="https://www.regionalbahn.hu/2013/03/forradalmi-havazas.html" target="_blank" rel="noopener">2013-as havazásból</a> a fordított, legújabbat felül megjelenítő lehetőséget, a <a href="https://www.regionalbahn.hu/2016/12/eloben-bucsuzunk-westbahn-obb-intercity.html" target="_blank" rel="noopener">2016-os ÖBB InterCity-búcsúból</a> a személyes, út közben készülő beszámoló lehetőségét emeltük át. A régi fix szélességű betűk helyett a blog normál, jól olvasható betűkészletét használja.</p>
+    <ol>
+      <li>Nyisd meg a <strong>Cikkadmin</strong> fület, a <strong>Tartalomtípus</strong> listában válaszd a <strong>Percről percre / élő tudósítás</strong> típust, majd kattints a <strong>Sablon betöltése</strong> gombra. Ez csak akkor írja felül a cikket, ha a változtatást megerősítetted; a meglévő képtár és Blogger-hozzárendelés megmarad.</li>
+      <li>A <strong>Cikk címe</strong> mezőbe kerüljön a teljes, informatív cím. A <strong>Főkép + valódi lead</strong> résznél add meg a felvezetőt és, ha szükséges, a borítóképet. A <code>&lt;!--more--&gt;</code> a lead után helyezkedik el.</li>
+      <li>Az első időbélyeges blokkban írd be a 24 órás időpontot (<code>HH:MM</code>), a dátumot (<code>ÉÉÉÉ-HH-NN</code>), az esemény helyszínét vagy útvonal-szakaszát, illetve az adott frissítés tudósítóját. Az időpont és a helyszín külön mező: ne a törzsszöveg elé kézzel gépeld őket.</li>
+      <li>A frissítés törzsét közvetlenül WYSIWYG-ben írhatod. Működik a félkövér, dőlt, link, felsorolás és a többi Cikkadmin-formázógomb. A képtárból közvetlenül a frissítés képdobozába is húzhatsz egy képet; a fotós, képaláírás és ALT az egységes képsablon alapján jelenik meg.</li>
+      <li>Az egyes blokkoknál a típus <strong>normál tudósítás, fontos, helyesbítés vagy közvetítés vége</strong> lehet. A helyesbítést külön jelöld, és ne töröld nyomtalanul a már közzétett eredeti tévedést. A dátum megjelenítése opcionális, többnapos tudósításban ajánlott.</li>
+      <li>Új frissítéshez válassz alapdátumot és beszúrási rendet, majd kattints az <strong>＋ Időbélyeges frissítés</strong> gombra. A 2020-as mintát követő növekvő időrendben az új frissítés az utolsó időbélyeges blokk mögé, a zárószöveg elé kerül; fordított módnál az első frissítés elé. A <strong>↑/↓</strong> gombok és a <strong>⠿</strong> fogantyú egyedi sorrendet is engednek. A sorrendválasztó nem rendezi át automatikusan a már közzétett bejegyzéseket.</li>
+      <li>A közvetítés tetején a program automatikusan készít ugróhivatkozást a legfrissebb, érvényes időpontú frissítésre. Minden frissítés saját, állandó belső linket is kap. Ha egy időpont hiányzik, külön figyelmeztetést kapsz; az időpont nélküli mintablokkot publikálás előtt töltsd ki vagy távolítsd el.</li>
+      <li>A záró bekezdésben köszönd meg az olvasók és a segítők közreműködését, a szokásos <strong>szerzői footerben</strong> pedig tüntesd fel a tudósítókat. A cikk mentése továbbra is <strong>csak Blogger-piszkozatba</strong> történik: a program nem publikál vagy frissít automatikusan nyilvános közvetítést.</li>
+      <li>Újabb időpont hozzáadása előtt nyisd meg ugyanazt a Blogger-piszkozatot. Az RBTools az általa készített élő blokkokat azonosítja, megőrzi mélyhivatkozásaikat és újra szerkeszthető mezőkre bontja. Régebbi, kézzel írt HTML-oldalaknál külön ellenőrzés szükséges, mert azok nem feltétlenül az új struktúrát követik.</li>
+    </ol>
+    <p><strong>Szerkesztőségi ajánlás:</strong> az időpontokat a helyszínhez vagy a tudósításban meghatározott időzónához igazítsd, eltérő időzónák és többnapos közvetítés esetén ezt az olvasóknak is jelezd. Jelentős eseménynél lehetőleg közöld az elsődleges forrást, és különböztesd meg az előzetes információt a megerősített tényektől.</p>
     <h3>15. iframe és beágyazások</h3>
     <p>Az iframe-mezőbe illeszd be a teljes <code>&lt;iframe …&gt;&lt;/iframe&gt;</code> kódot, majd kattints az <strong>iframe beszúrása</strong> gombra. A blokkban külön előnézet és több soros kódszerkesztő jelenik meg. A kód szerkesztése után az előnézet külön frissíthető. Meglévő draftnál például Facebook- vagy Spotify-embedet az RBTools külön iframe-blokként próbál felismerni.</p>
     <p>Ha a külső szolgáltató biztonsági szabályai miatt az iframe az RBTools előnézetében nem renderelődik, attól még a kód bekerülhet a Blogger HTML-be. Ilyenkor a végleges Blogger-előnézetet is ellenőrizd.</p>
