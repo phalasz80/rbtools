@@ -2696,6 +2696,8 @@ let adminMainImageId=null;
 let adminSeq=0;
 let adminActiveEditable=null;
 let adminSavedRange=null;
+let adminRightClickSnapshot=null;
+let adminSelectionLocked=false;
 const adminUid=prefix=>prefix+"-"+(++adminSeq);
 adminBlocks.push({id:adminUid("b"),type:"p",html:"",align:"justify"});
 
@@ -3626,6 +3628,8 @@ function adminEditableForRange(range){
   return editable&&canvas.contains(editable)&&editable.contains(start)&&editable.contains(end)?editable:null;
 }
 function adminRememberRange(){
+  // Focus changes and Firefox's right-click must not replace a highlighted selection.
+  if(adminSelectionLocked||!rbGet("adminContextMenu").hidden||!rbGet("adminLinkPanel").hidden)return !!adminSavedRange;
   const sel=window.getSelection();if(!sel?.rangeCount)return false;
   const r=sel.getRangeAt(0),editable=adminEditableForRange(r);
   if(!editable)return false;
@@ -3633,32 +3637,44 @@ function adminRememberRange(){
 }
 function adminHideContextMenu(){
   rbGet("adminContextMenu").hidden=true;
+  adminRightClickSnapshot=null;
+}
+function adminCaptureRightClick(event){
+  if(event.button!==2||event.shiftKey)return;
+  const editable=event.target?.closest?.('[contenteditable="true"]');
+  if(!editable||!rbGet("adminCanvas").contains(editable)||editable.classList.contains("admin-paper-title"))return;
+  const sel=window.getSelection();
+  const live=sel?.rangeCount?sel.getRangeAt(0):null;
+  const range=live&&!live.collapsed&&adminEditableForRange(live)===editable
+    ?live:adminSavedRange&&!adminSavedRange.collapsed&&adminEditableForRange(adminSavedRange)===editable?adminSavedRange:null;
+  if(range&&range.toString().trim())adminRightClickSnapshot={editable,range:range.cloneRange()};
 }
 function adminContextMenuAt(event){
-  // Shift+right-click leaves the browser's native copy/paste menu available.
+  // Firefox intentionally shows its native menu for Shift+right-click.
   if(event.shiftKey)return;
-  const canvas=rbGet("adminCanvas");
   const editable=event.target?.closest?.('[contenteditable="true"]');
-  if(!editable||!canvas.contains(editable)||editable.classList.contains("admin-paper-title"))return;
-  const sel=window.getSelection();
-  let range=sel?.rangeCount?sel.getRangeAt(0):null;
-  if(!range||range.collapsed||adminEditableForRange(range)!==editable){
-    range=adminSavedRange&&adminEditableForRange(adminSavedRange)===editable?adminSavedRange:null;
-  }
-  if(!range||range.collapsed||!range.toString().trim())return;
-  const rects=Array.from(range.getClientRects());
-  const pointer=event.clientX!==0||event.clientY!==0;
-  if(pointer&&!rects.some(r=>event.clientX>=r.left-4&&event.clientX<=r.right+4
-    &&event.clientY>=r.top-4&&event.clientY<=r.bottom+4))return;
+  if(!editable||!rbGet("adminCanvas").contains(editable)||editable.classList.contains("admin-paper-title"))return;
+  const sel=window.getSelection(),live=sel?.rangeCount?sel.getRangeAt(0):null;
+  // Firefox may collapse the DOM selection before its contextmenu event.
+  const candidates=[
+    adminRightClickSnapshot?.editable===editable?adminRightClickSnapshot.range:null,
+    live&&!live.collapsed?live:null,
+    adminSavedRange
+  ];
+  const range=candidates.find(r=>r&&!r.collapsed&&adminEditableForRange(r)===editable&&r.toString().trim());
+  if(!range)return; // no selected editor text: keep normal copy/paste menu
   event.preventDefault();
+  event.stopPropagation();
   adminActiveEditable=editable;
   adminSavedRange=range.cloneRange();
   const menu=rbGet("adminContextMenu");
   menu.hidden=false;
   const box=menu.getBoundingClientRect();
-  const first=rects[0];
-  const x=pointer?event.clientX+5:(first?.left??12);
-  const y=pointer?event.clientY+5:(first?.bottom??12);
+  const rect=Array.from(range.getClientRects())[0];
+  // Keyboard context-menu key reports (0,0). Mouse users get the menu by the cursor.
+  const pointer=event.clientX!==0||event.clientY!==0;
+  const x=pointer?event.clientX+5:(rect?.left??12);
+  const y=pointer?event.clientY+5:(rect?.bottom??12);
   menu.style.left=Math.max(8,Math.min(x,window.innerWidth-box.width-8))+"px";
   menu.style.top=Math.max(8,Math.min(y,window.innerHeight-box.height-8))+"px";
   menu.querySelector('button[role="menuitem"]')?.focus({preventScroll:true});
@@ -3666,18 +3682,22 @@ function adminContextMenuAt(event){
 function adminRestoreRange(){
   const el=adminActiveEditable,r=adminSavedRange;
   if(!el?.isConnected||!r||adminEditableForRange(r)!==el)return false;
+  adminSelectionLocked=true;
   el.focus({preventScroll:true});
-  const sel=window.getSelection();if(!sel)return false;
-  sel.removeAllRanges();sel.addRange(r.cloneRange());return true;
+  const sel=window.getSelection();
+  if(!sel){adminSelectionLocked=false;return false;}
+  sel.removeAllRanges();sel.addRange(r.cloneRange());
+  setTimeout(()=>{adminSelectionLocked=false;adminRememberRange();},0);
+  return true;
 }
 function adminSyncActiveEditable(){
   if(!adminActiveEditable?.isConnected)return;
   adminActiveEditable.dispatchEvent(new Event("input",{bubbles:true}));
   adminRememberRange();
 }
-function adminExec(command,value=null){
-  // Refresh from the real selection when possible, otherwise use the snapshot preserved on toolbar mousedown.
-  adminRememberRange();
+function adminExec(command,value=null,useSavedRange=false){
+  // Right-click menu actions use the pre-mousedown snapshot, not Firefox's collapsed caret.
+  if(!useSavedRange)adminRememberRange();
   if(!adminRestoreRange()){
     rbGet("adminStatus").textContent="Kattints egy szerkeszthető bekezdésbe, jelöld ki a szöveget, majd válaszd a formázást.";
     return false;
@@ -3700,8 +3720,8 @@ function adminCloseLinkPanel(restore=false){
   rbGet("adminLinkPanel").hidden=true;adminLinkEditAnchor=null;
   if(restore)adminRestoreRange();
 }
-function adminLink(){
-  adminRememberRange();
+function adminLink(useSavedRange=false){
+  if(!useSavedRange)adminRememberRange();
   const range=adminSavedRange,root=range?adminEditableForRange(range):null;
   if(!root||root.classList.contains("admin-paper-title")){
     rbGet("adminStatus").textContent="A leadben, bekezdésben vagy keretesben jelöld ki a linkelendő szöveget.";return;
@@ -3969,15 +3989,18 @@ rbGet("adminFmtItalic").addEventListener("click",()=>adminExec("italic"));
 rbGet("adminFmtUnderline").addEventListener("click",()=>adminExec("underline"));
 rbGet("adminFmtStrike").addEventListener("click",()=>adminExec("strikeThrough"));
 rbGet("adminFmtLink").addEventListener("click",adminLink);
-rbGet("adminCanvas").addEventListener("contextmenu",adminContextMenuAt);
+rbGet("adminCanvas").addEventListener("mousedown",adminCaptureRightClick,true);
+rbGet("adminCanvas").addEventListener("contextmenu",adminContextMenuAt,true);
 rbGet("adminContextMenu").querySelectorAll("[data-admin-context-command]").forEach(btn=>{
   btn.addEventListener("mousedown",event=>event.preventDefault());
   btn.addEventListener("click",()=>{
     const action=btn.dataset.adminContextCommand;
+    const selected=adminSavedRange?.cloneRange();
     adminHideContextMenu();
-    if(action==="link")adminLink();
-    else if(action==="copy")copyToClipboard(adminSavedRange?.toString()||"",rbGet("adminStatus"),"Kijelölt szöveg másolva.");
-    else adminExec(action);
+    if(selected)adminSavedRange=selected;
+    if(action==="link")adminLink(true);
+    else if(action==="copy")copyToClipboard(selected?.toString()||"",rbGet("adminStatus"),"Kijelölt szöveg másolva.");
+    else adminExec(action,null,true);
   });
 });
 rbGet("adminContextMenu").addEventListener("keydown",event=>{
