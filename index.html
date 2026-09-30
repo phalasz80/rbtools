@@ -1351,7 +1351,7 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-heading-control{font-weight:700;font-size:13px}
 #rbtools-app .admin-h2{font:700 23px/1.35 Arial,Helvetica,sans-serif;text-align:center}
 #rbtools-app .admin-h5{font:700 15px/1.35 Arial,Helvetica,sans-serif;text-align:center}
-#rbtools-app .admin-lead-panel{border:2px solid #81b4ea;border-radius:11px;background:var(--panel);padding:13px 15px;margin:10px 0 16px}
+#rbtools-app .admin-lead-panel{border:2px solid #81b4ea;border-radius:11px;background:var(--panel);color:var(--ink);padding:13px 15px;margin:10px 0 16px}
 #rbtools-app .admin-lead-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding:0 0 9px}
 #rbtools-app .admin-lead-image-picker{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:10px 0}
 #rbtools-app .admin-lead-image-picker label{font-weight:700}
@@ -1390,6 +1390,14 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-link-panel button{flex:0 0 auto}
 @media(max-width:700px){#rbtools-app .admin-link-panel label,#rbtools-app .admin-link-panel input{flex:1 1 100%}}
 #rbtools-app .admin-editable:focus{border-color:#aaa;background:#fff}
+/* The article canvas is white in both themes, while the lead uses themed dark/light panels. */
+#rbtools-app .admin-lead-panel .admin-lead{color:var(--ink);background:transparent;caret-color:var(--ink)}
+#rbtools-app .admin-lead-panel .admin-lead:focus{color:var(--ink);background:var(--panel2);border-color:#5b9ee6;outline:2px solid #5b9ee6;outline-offset:1px}
+#rbtools-app .admin-lead-panel .admin-lead-panel-head{color:var(--ink)}
+#rbtools-app .admin-lead-panel .small{color:var(--muted)}
+#rbtools-app .admin-lead-panel .admin-lead:empty:before{color:var(--muted)}
+#rbtools-app .admin-lead-panel .admin-lead::selection,#rbtools-app .admin-lead-panel .admin-lead *::selection{background:#73acfb;color:#111}
+
 #rbtools-app .admin-p{text-align:justify;font:16px/1.55 Arial,Helvetica,sans-serif}
 #rbtools-app .admin-h3{text-align:center;font:700 20px/1.35 Arial,Helvetica,sans-serif}
 #rbtools-app .admin-h4{text-align:center;font:700 17px/1.35 Arial,Helvetica,sans-serif}
@@ -1460,7 +1468,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v26";
+const RBTOOLS_VERSION="pages-v27";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
