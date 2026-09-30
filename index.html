@@ -593,6 +593,65 @@ Források:
 
 
 <section id="rbtools-tab-collections" class="tab">
+
+  <section class="panel collection-page-workspace" aria-labelledby="rbtools-pageHeading">
+    <h2 id="rbtools-pageHeading">Blogger-statikus oldalak: közvetlen WYSIWYG-szerkesztés</h2>
+    <p class="intro">A meglévő <code>/p/…</code> oldalak a Blogger API-n keresztül nyithatók meg. A szöveg vizuálisan szerkeszthető, miközben a program a saját évválasztó gombokat, az eredeti JavaScriptet, CSS-t és más egyedi HTML-elemeket változatlan forrásblokkokként őrzi meg. A megnyitott oldal eredeti URL-je és Page ID-ja nem változik.</p>
+    <div class="collection-page-actions">
+      <button id="rbtools-pageConnect" type="button">🔐 Blogger-kapcsolat</button>
+      <label>Blog <select id="rbtools-pageBlogSelect" aria-label="A szerkesztendő statikus oldal blogja"><option value="">Kapcsolódás után választható</option></select></label>
+      <button id="rbtools-pageFetch" type="button" disabled>↻ Statikus oldalak lekérése</button>
+      <label class="collection-page-picker">Meglévő oldal <select id="rbtools-pageSelect" aria-label="Megnyitandó Blogger-statikus oldal" disabled><option value="">Válassz statikus oldalt…</option></select></label>
+      <button id="rbtools-pageOpen" type="button" disabled>📄 Oldal megnyitása</button>
+    </div>
+    <p id="rbtools-pageInfo" class="small">Új oldal létrehozása és automatikus publikálás nincs. Meglévő élő oldal mentése azonnal módosítja annak tartalmát, ezért előtte külön biztonsági mentés és megerősítés szükséges.</p>
+    <div id="rbtools-pageState" class="collection-page-state idle" role="status" aria-live="polite">
+      <strong id="rbtools-pageStateTitle">Nincs megnyitott Blogger-oldal</strong>
+      <span id="rbtools-pageStateDetail">Kapcsolódj, válaszd ki a blogot, majd nyiss meg egy statikus oldalt.</span>
+    </div>
+    <div class="collection-page-actions">
+      <button id="rbtools-pageUseConverted" type="button">↪ Konverterkimenet megnyitása a WYSIWYG-ben</button>
+      <button id="rbtools-pageBackup" type="button" disabled>⬇ EREDETI HTML biztonsági mentése</button>
+      <button id="rbtools-pageCopy" type="button" disabled>⧉ Szerkesztett HTML másolása</button>
+      <button id="rbtools-pageDownload" type="button" disabled>⇩ Szerkesztett HTML letöltése</button>
+      <button id="rbtools-pagePreview" type="button" disabled>◉ Biztonságos előnézet</button>
+      <button id="rbtools-pageSave" class="collection-page-save" type="button" disabled>💾 MÓDOSÍTÁSOK MENTÉSE AZ EREDETI OLDALRA</button>
+    </div>
+    <label class="collection-page-title-label" for="rbtools-pageTitle">Az oldal Blogger-címe <input id="rbtools-pageTitle" type="text" placeholder="Oldalcím" disabled></label>
+    <div class="collection-page-toolbar" role="toolbar" aria-label="Gyűjtőoldal WYSIWYG formázás">
+      <strong>Szövegformázás:</strong>
+      <button type="button" data-page-format="bold" title="Félkövér"><b>B</b></button>
+      <button type="button" data-page-format="italic" title="Dőlt"><i>I</i></button>
+      <button type="button" data-page-format="underline" title="Aláhúzott"><u>U</u></button>
+      <button type="button" data-page-format="strikeThrough" title="Áthúzott"><s>S</s></button>
+      <button type="button" id="rbtools-pageLink">🔗 Link (új lap alapértelmezés)</button>
+      <button type="button" data-page-format="unlink" title="Link törlése">⛓ Link törlése</button>
+      <span class="collection-page-toolbar-sep" aria-hidden="true"></span>
+      <button type="button" id="rbtools-pageAddParagraph">＋ Bekezdés</button>
+      <button type="button" id="rbtools-pageAddHeading">＋ Alcím</button>
+      <button type="button" id="rbtools-pageAddRule">＋ Elválasztó</button>
+    </div>
+    <div id="rbtools-pageLinkPanel" class="collection-page-link-panel" hidden>
+      <label for="rbtools-pageLinkUrl">Link címe <input id="rbtools-pageLinkUrl" type="url" placeholder="https://…"></label>
+      <label class="collection-page-checkbox"><input id="rbtools-pageLinkNewTab" type="checkbox" checked> Megnyitás új lapon / ablakban</label>
+      <button id="rbtools-pageLinkApply" type="button">✓ Hivatkozás alkalmazása</button>
+      <button id="rbtools-pageLinkCancel" type="button">Mégse</button>
+    </div>
+    <p class="collection-page-legend"><strong>Fehér:</strong> szerkeszthető szöveg, címsor és képaláírás. <strong>Sötétkék:</strong> védett HTML / JavaScript / évválasztó, amelyhez a vizuális szerkesztő nem nyúl. A védett blokkokat az export ellenőrzi.</p>
+    <div id="rbtools-pageCanvas" class="collection-page-canvas" aria-label="Statikus oldal WYSIWYG-felülete"><div class="admin-empty">Nyiss meg egy meglévő oldalt, vagy add át a konverter eredményét.</div></div>
+    <div class="collection-page-protection" id="rbtools-pageProtection" aria-live="polite">A megőrzött egyedi HTML-blokkok ellenőrzése még nem történt meg.</div>
+    <details class="collection-page-output">
+      <summary>Szerkesztett teljes HTML forráskód és kézi mentési tartalék</summary>
+      <textarea id="rbtools-pageRawOutput" readonly spellcheck="false" aria-label="Az oldal teljes, Bloggernek átadható HTML-je"></textarea>
+    </details>
+    <details class="collection-page-output">
+      <summary>Biztonságos HTML-előnézet (a beépített szkriptek itt szándékosan nem futnak)</summary>
+      <iframe id="rbtools-pagePreviewFrame" class="preview" sandbox="" title="Statikus oldal HTML-előnézete"></iframe>
+    </details>
+  </section>
+  <details class="panel collection-legacy-wrap">
+  <summary><strong>Markdown-gyűjtőoldal-konverter</strong> <span class="small">A korábbi Közvetlen Kocsi / InnoTrans Markdown-konverter változatlanul használható.</span></summary>
+  <div class="collection-legacy-body">
   <div class="panel">
     <h2>RegionalBahn gyűjtőoldal-konverter</h2>
     <p class="intro">Külön a Közvetlen Kocsi epizódarchívumához és az InnoTranshoz hasonló tematikus gyűjtőoldalakhoz. A <code>#</code> címet külön Blogger-oldalcímként kezeli, a tartalmi HTML-be nem ismétli bele.</p>
@@ -686,6 +745,8 @@ A következő cikk rövid ajánlója.</pre>
     <summary>HTML-előnézet</summary>
     <p class="small">Az előnézet a generált oldalfragmentumot mutatja; a Blogger sablonja a tényleges oldalon további CSS-t adhat hozzá.</p>
     <iframe id="rbtools-collectionPreviewFrame" class="preview" sandbox=""></iframe>
+  </details>
+  </div>
   </details>
 </section>
 
@@ -1564,11 +1625,55 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .rbtools-shell-header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(9px);border-bottom:1px solid var(--line);position:relative;top:auto}
 #rbtools-app .rbtools-shell-main{max-width:1600px;margin:auto;padding:20px 22px 60px}
 
+/* Static-page WYSIWYG editor: scripts and hand-built controls remain immutable. */
+#rbtools-app .collection-page-workspace{border:2px solid #4687b8}
+#rbtools-app .collection-page-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0}
+#rbtools-app .collection-page-actions>label{display:flex;align-items:center;gap:6px;font-weight:700;min-width:160px}
+#rbtools-app .collection-page-actions select{max-width:320px;min-width:160px}
+#rbtools-app .collection-page-picker{flex:1 1 350px}
+#rbtools-app .collection-page-picker select{flex:1;max-width:100%;min-width:180px}
+#rbtools-app .collection-page-title-label{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 8px;font-weight:800}
+#rbtools-app .collection-page-title-label input{flex:1 1 300px;min-width:0}
+#rbtools-app .collection-page-state{display:flex;flex-direction:column;gap:3px;border:2px solid #3174b0;border-radius:10px;padding:12px 15px;margin:12px 0;background:#e6f1ff;color:#153a64}
+#rbtools-app .collection-page-state strong{font-size:16px}
+#rbtools-app .collection-page-state.dirty,#rbtools-app .collection-page-state.error{background:#ffe4e4;color:#821818;border-color:#d12c2c}
+#rbtools-app .collection-page-state.saved{background:#d5fbdc;color:#15572a;border-color:#208b44}
+#rbtools-app .collection-page-state.working{background:#fff3c7;color:#654700;border-color:#c39208}
+#rbtools-app .collection-page-save{background:#166534!important;color:#fff!important;border-color:#14532d!important;font-weight:900!important;letter-spacing:.2px}
+#rbtools-app .collection-page-save:disabled{opacity:.42;cursor:not-allowed}
+#rbtools-app .collection-page-toolbar{position:sticky;top:8px;z-index:33;display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:8px;background:var(--panel2);border:1px solid #8faecf;border-radius:9px;box-shadow:0 4px 10px rgba(0,0,0,.12)}
+#rbtools-app .collection-page-toolbar button{padding:6px 9px}
+#rbtools-app .collection-page-toolbar-sep{height:25px;border-left:1px solid var(--line);margin:0 5px}
+#rbtools-app .collection-page-link-panel:not([hidden]){display:flex;flex-wrap:wrap;gap:9px;align-items:center;background:var(--panel2);border:1px solid #8faecf;padding:12px;margin:8px 0;border-radius:8px}
+#rbtools-app .collection-page-link-panel label:first-child{display:flex;flex:1 1 260px;gap:7px;align-items:center}
+#rbtools-app .collection-page-link-panel label:first-child input{flex:1;min-width:180px}
+#rbtools-app .collection-page-link-panel .collection-page-checkbox{display:flex;align-items:center;gap:7px}
+#rbtools-app .collection-page-checkbox input{width:18px;height:18px}
+#rbtools-app .collection-page-legend{font-size:12px;color:var(--muted)}
+#rbtools-app .collection-page-canvas{max-height:72vh;min-height:220px;overflow:auto;background:#fafcff;color:#15253d;border:1px solid #9ab6d6;border-radius:10px;padding:16px;resize:vertical}
+#rbtools-app .collection-page-shell{padding:7px;border:1px dashed transparent;border-radius:5px;margin:3px 0}
+#rbtools-app .collection-page-shell:focus-within{border-color:#5b99cc;background:#edf5ff}
+#rbtools-app .collection-page-shell .collection-page-shell{margin-left:5px}
+#rbtools-app .collection-page-block-label{font:11px/1.45 Arial,sans-serif;color:#667992;margin-bottom:3px}
+#rbtools-app .collection-page-editable{color:#101b2c;min-height:25px;outline:1px dashed #bbd1e7;border-radius:5px;padding:6px;line-height:1.55;overflow-wrap:anywhere;background:#fff}
+#rbtools-app .collection-page-editable:focus{outline:2px solid #2d7dc9}
+#rbtools-app .collection-page-editable a{color:#0750a2;text-decoration:underline}
+#rbtools-app .collection-page-locked{border:1px solid #395778;border-left:5px solid #3c82c3;background:#18354f;color:#e3f2ff;border-radius:7px;padding:7px 11px;margin:7px 0;font-size:12px}
+#rbtools-app .collection-page-locked summary{cursor:pointer}
+#rbtools-app .collection-page-locked pre{max-height:125px;overflow:auto;white-space:pre-wrap;background:#10283f;color:#edf7ff;font:11px/1.45 Consolas,monospace;border:0;margin-top:6px}
+#rbtools-app .collection-page-locked small{display:block;color:#b9ddf4;margin-top:3px}
+#rbtools-app .collection-page-protection{margin-top:10px;font-weight:700;color:var(--muted)}
+#rbtools-app .collection-page-output textarea{min-height:230px;height:300px;font:12px/1.5 Consolas,monospace;border:1px solid var(--line)}
+#rbtools-app .collection-legacy-wrap{margin-top:16px}
+#rbtools-app .collection-legacy-wrap>summary{font-size:16px;padding:7px}
+#rbtools-app .collection-legacy-wrap .collection-legacy-body{padding:12px 0}
+@media(max-width:700px){#rbtools-app .collection-page-toolbar{top:0;max-height:40vh;overflow:auto}#rbtools-app .collection-page-actions>label{flex:1 1 100%}#rbtools-app .collection-page-actions select{flex:1}}
+
 </style>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v35";
+const RBTOOLS_VERSION="pages-v36";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -4813,8 +4918,27 @@ rbGet("uClear").onclick=()=>{rbGet("uInput").value="";renderUnicode();rbGet("uIn
 rbGet("uExample").onclick=()=>{rbGet("uInput").value="RegionalBahn – Közvetlen Kocsi – Deutscher Wald – Árvíztűrő tükörfúrógép 0123456789";renderUnicode();};
 rbGet("uCopyAll").onclick=()=>{const s=rbGet("uInput").value,list=visibleUnicodeStyles();copyToClipboard(list.map(st=>st.name+":\n"+st.fn(s)).join("\n\n"),null,"Összes látható változat másolva.");};
 renderUnicode();
+
+/* A statikusoldal-szerkesztő önálló JS-moduljának korlátozott Blogger-kapcsolata. */
+window.RBTOOLS_PAGE_BRIDGE=Object.freeze({
+  isConnected:()=>bloggerConnected(),
+  connect:()=>bloggerConnect(),
+  blogs:()=>bloggerBlogs.map(b=>({id:String(b.id),name:b.name||"Blog",url:b.url||""})),
+  request:async ({blogId,pageId="",method="GET",body=null,query=""})=>{
+    if(!bloggerConnected())throw new Error("A Blogger-kapcsolat nem aktív.");
+    if(!bloggerBlogs.some(b=>String(b.id)===String(blogId)))throw new Error("A bloghoz nincs aktív szerkesztői hozzáférés.");
+    if(!["GET","PATCH"].includes(method))throw new Error("Nem támogatott Blogger-oldalművelet.");
+    if(method==="PATCH"&&(!pageId||!body||typeof body!=="object"))throw new Error("Meglévő oldalak módosítása csak érvényes azonosítóval lehetséges.");
+    if(method==="PATCH"&&Object.keys(body).some(k=>!["title","content"].includes(k)))throw new Error("Csak a cím és a HTML módosítható.");
+    const path="/blogs/"+encodeURIComponent(blogId)+"/pages"+(pageId?"/"+encodeURIComponent(pageId):"")+(method==="GET"&&query?"?"+query:"");
+    return bloggerApi(path,{method,body});
+  },
+  download:(filename,content)=>downloadText(filename,content,"text/html;charset=utf-8")
+});
+
 })();
 </script>
+<script src="/collection-pages.js?v=36"></script>
 
 </body>
 </html>
