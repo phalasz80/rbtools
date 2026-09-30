@@ -3662,6 +3662,16 @@ function adminParseImages(raw){
   rbGet("adminStatus").textContent=adminImages.length?adminImages.length+" kép beolvasva a képtárba.":"Nem találtam Blogger-képkódot.";
 }
 function adminFindImage(id){return adminImages.find(x=>x.id===id)||null;}
+function adminLiveFromNode(element){
+  return LIVE_TIMELINE.parse(element,{
+    uid:()=>adminUid("b"),
+    imageFromElement:adminAddImageFromElement,
+    captionFromNodes:(nodes,sep)=>{
+      const position=nodes.indexOf(sep);
+      return position<0?"":adminConsumeImageCaption(nodes,position).caption;
+    }
+  });
+}
 function adminHtmlToBlocks(html){
   const tpl=document.createElement("template");tpl.innerHTML=html||"";
   const blocks=[],nodes=Array.from(tpl.content.childNodes);
@@ -3671,6 +3681,12 @@ function adminHtmlToBlocks(html){
     if(node.nodeType!==1)continue;
     const tag=node.tagName.toLowerCase();
     if(tag==="br")continue;
+    if(node.matches?.('.rb-live-entry[data-rb-live="1"]')){
+      const update=adminLiveFromNode(node);
+      if(update)blocks.push(update);
+      continue;
+    }
+    if(node.matches?.('.rb-live-navigation'))continue; // regenerated from current timestamps
     if(tag==="hr"){blocks.push({id:adminUid("b"),type:"hr"});continue;}
     if(/^h[2-5]$/.test(tag)){blocks.push({id:adminUid("b"),type:tag,html:node.innerHTML,align:adminAlignFromNode(node,"center")});continue;}
     if(tag==="h1"){blocks.push({id:adminUid("b"),type:"h2",html:node.innerHTML,align:adminAlignFromNode(node,"center")});continue;}
@@ -4482,6 +4498,15 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
     adminLeadHtml=preHtml;adminLeadAlign=preIntro?.align||adminAlignFromNode(preBold.closest("div"),"justify");
   }
   const tpl=document.createElement("template");tpl.innerHTML=post;const nodes=Array.from(tpl.content.childNodes);
+  const incomingLive=!!tpl.content.querySelector('.rb-live-entry[data-rb-live="1"]');
+  if(incomingLive){
+    rbGet("adminContentType").value="live";adminContentTypeChanged(false);
+    const lastDate=Array.from(tpl.content.querySelectorAll('.rb-live-entry[data-rb-live-date]'))
+      .map(n=>n.getAttribute("data-rb-live-date")).filter(LIVE_TIMELINE.validDate).at(-1);
+    if(lastDate)rbGet("adminLiveDate").value=lastDate;
+  }else if(rbGet("adminContentType").value==="live"){
+    rbGet("adminContentType").value="article";adminContentTypeChanged(false);
+  }
   const postIntro=adminFirstLegacyIntro(nodes),postText=postIntro?adminComparableText(postIntro.html):"";
   const promote=!!postIntro&&(!adminLeadHtml||preIsTitle);
   const duplicate=!!postIntro&&!!adminLeadHtml&&adminComparableText(adminLeadHtml)===postText;
@@ -4504,6 +4529,12 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
   for(let i=0;i<nodes.length;i++){
     const n=nodes[i];if(n.nodeType===3&&!n.textContent.trim())continue;if(n.nodeType!==1)continue;
     const tag=n.tagName.toLowerCase();if(tag==="br")continue;
+    if(n.matches?.('.rb-live-navigation'))continue; // auto rebuilt after import
+    if(n.matches?.('.rb-live-entry[data-rb-live="1"]')){
+      const update=adminLiveFromNode(n);
+      if(update)adminBlocks.push(update);
+      continue;
+    }
     const text=(n.textContent||"").trim();
     if(tag==="aside"&&n.classList.contains("rb-box-accent")){
       const previous=adminBlocks.length;
@@ -4536,7 +4567,8 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
     adminBlocks.push({id:adminUid("b"),type:"raw",html:n.outerHTML});
   }
   adminRenderImageLibrary();adminRenderCanvas();adminGenerateHtml(false);
-  rbGet("adminStatus").textContent="Meglévő HTML visszatöltve: "+adminBlocks.length+" törzsblokk, "+adminImages.length+" kép; a főkép és a lead a <!--more--> előtt, közös blokkban van."
+  rbGet("adminStatus").textContent="Meglévő HTML visszatöltve: "+adminBlocks.length+" törzsblokk, "+adminImages.length+" kép; a főkép és a lead a <!--more--> előtt, közös blokkban van."+
+    (incomingLive?" A percről percre frissítéseket külön, időbélyeges szerkesztőelemekként azonosítottuk.":"")
     +(!adminLeadHtml?" Töltsd ki a valódi leadet.":"");
 }
 async function adminLoadTextFile(file){
