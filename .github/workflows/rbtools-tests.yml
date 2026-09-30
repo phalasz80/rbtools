@@ -6,6 +6,8 @@ on:
     paths:
       - "index.html"
       - "collection-page-core.js"
+      - "archive-presets.js"
+      - "page-starters.js"
       - "collection-pages.js"
       - "tests/**"
       - ".github/workflows/rbtools-tests.yml"
@@ -13,6 +15,8 @@ on:
     paths:
       - "index.html"
       - "collection-page-core.js"
+      - "archive-presets.js"
+      - "page-starters.js"
       - "collection-pages.js"
       - "tests/**"
       - ".github/workflows/rbtools-tests.yml"
@@ -35,6 +39,8 @@ jobs:
         shell: bash
         run: |
           node --check collection-page-core.js
+          node --check archive-presets.js
+          node --check page-starters.js
           node --check collection-pages.js
           node - <<'NODE'
           const fs=require('node:fs'),vm=require('node:vm');
