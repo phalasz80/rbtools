@@ -267,12 +267,7 @@ További szöveg..."></textarea>
     <textarea id="rbtools-adminExistingHtml" class="admin-existing-source" spellcheck="false" placeholder="Illeszd be ide a már elkészült Blogger HTML-t."></textarea>
   </details>
 
-  <div class="panel">
-    <div class="grid2">
-      <div class="field"><label for="rbtools-adminAuthor">Szerző</label><input id="rbtools-adminAuthor" value="Halász Péter"></div>
-      <div class="field"><label for="rbtools-adminFooter">Footer</label><select id="rbtools-adminFooter"><option value="author">Szerző neve</option><option value="none">Nincs footer</option></select></div>
-    </div>
-  </div>
+
 
   <section class="card admin-library-card">
     <div class="cardhead admin-section-head">
@@ -361,6 +356,19 @@ További szöveg..."></textarea>
     <div id="rbtools-adminCanvas" class="admin-canvas">
       <div class="admin-empty">Tölts be vagy illessz be cikkszöveget, majd kattints a „Cikk felépítése” gombra.</div>
     </div>
+    <section class="admin-author-panel" aria-label="Szerzők és cikkzárás">
+      <h3>Szerzők és cikkzárás</h3>
+      <p class="small">A mezők a sablontól függetlenül szerkeszthetők. Meglévő Blogger-piszkozatból a tényleges szerzői láblécet olvassuk vissza, ha van.</p>
+      <div class="grid2">
+        <div class="field"><label for="rbtools-adminAuthor">Szerző(k) vagy összeállító(k)</label><input id="rbtools-adminAuthor" value="Halász Péter" autocomplete="off"></div>
+        <div class="field"><label for="rbtools-adminFooter">Cikkzárás formája</label><select id="rbtools-adminFooter">
+          <option value="author">Szerző(k) neve</option>
+          <option value="compiled">Összeállította: név</option>
+          <option value="none">Nincs szerzői footer</option>
+        </select></div>
+      </div>
+      <p class="small">A szerzői sor a cikk végén, külön vonal alatt, jobbra zárva, dőlten, 85%-os betűmérettel jelenik meg.</p>
+    </section>
     <div class="admin-editor-extra-heading">További szerkesztőeszközök: keresés, karakterek és iframe</div>
     <div class="admin-findbar" role="search" aria-label="Keresés a WYSIWYG cikkben">
       <label for="rbtools-adminFind"><strong>Keresés a cikkben</strong></label>
@@ -1689,6 +1697,8 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-paper-title:focus{border-color:#a1a1aa}
 #rbtools-app .admin-title-panel{margin-top:15px;border:1px solid var(--line);border-radius:11px}
 #rbtools-app .admin-title-panel>label{display:block;font-weight:800;font-size:15px;margin-bottom:8px}
+#rbtools-app .admin-author-panel{margin:12px 0 16px;padding:14px;border:2px solid var(--line);border-radius:10px;background:var(--panel2)}
+#rbtools-app .admin-author-panel h3{margin:0 0 8px;font-size:1.08rem}
 #rbtools-app .admin-title-panel input.admin-blogger-title{box-sizing:border-box;width:100%;border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--panel);font:700 25px/1.4 Arial,Helvetica,sans-serif}
 #rbtools-app .admin-title-panel input.admin-blogger-title:focus{outline:2px solid #b4d4f5;border-color:#478ce1}
 #rbtools-app .admin-heading-control{font-weight:700;font-size:13px}
@@ -3384,7 +3394,7 @@ function adminApplyTemplate(){
   if(type==="article"){
     rbGet("adminTitle").value="Cikk címe";adminLeadHtml="Lead / bevezető.";rbGet("adminFooter").value="author";
   }else if(type==="news"){
-    rbGet("adminTitle").value="Hétvégi gyors – ";adminLeadHtml="Lead szövege.";rbGet("adminAuthor").value="Összeállította: Adorján Péter";rbGet("adminFooter").value="author";
+    rbGet("adminTitle").value="Hétvégi gyors – ";adminLeadHtml="Lead szövege.";rbGet("adminAuthor").value="Adorján Péter";rbGet("adminFooter").value="compiled";
   }else if(type==="podcast"){
     rbGet("adminTitle").value="Podcast címe";adminLeadHtml="Podcast felvezető szövege.";rbGet("adminAuthor").value="RegionalBahn szerkesztőség";rbGet("adminFooter").value="author";
   }else if(type==="innotrans"){
@@ -3839,7 +3849,7 @@ function adminGenerateHtml(setStatus=true){
     }
     out+=adminBlocks.map(adminBlockHtml).filter(Boolean).join("\n");
     if(adminSourcesHtml)out+="\n"+adminSourcesHtml;
-    if(rbGet("adminFooter").value==="author"&&author)out+='\n<hr align="center" />\n<div style="text-align: right;"><span style="font-size: 85%;"><em>'+esc(author)+'</em></span></div>';
+    if(["author","compiled"].includes(rbGet("adminFooter").value)&&author)out+='\n<hr align="center" />\n<div style="text-align: right;"><span style="font-size: 85%;"><em>'+(rbGet("adminFooter").value==="compiled"?"Összeállította: ":"")+esc(author)+'</em></span></div>';
   }
   rbGet("adminOutput").value=out;
   if(contentType==="live"){
@@ -4684,6 +4694,8 @@ function adminClear(){
 rbGet("adminContentType").addEventListener("change",()=>adminContentTypeChanged(true));
 rbGet("adminStaticLayout").addEventListener("change",()=>{rbGet("adminTemplateHint").textContent=ADMIN_TEMPLATE_HINTS.static+" Kiválasztott forma: "+rbGet("adminStaticLayout").selectedOptions[0].textContent+".";});
 rbGet("adminLoadTemplate").addEventListener("click",adminApplyTemplate);
+rbGet("adminAuthor").addEventListener("input",()=>adminGenerateHtml(false));
+rbGet("adminFooter").addEventListener("change",()=>adminGenerateHtml(false));
 rbGet("adminAddLive").addEventListener("click",adminAddLiveUpdate);
 rbGet("adminLiveAddToolbar").addEventListener("click",adminAddLiveUpdate);
 adminContentTypeChanged(false);
