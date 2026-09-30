@@ -598,7 +598,7 @@ Források:
       <button type="button" id="rbtools-boxFormatLink">🔗 Link</button>
       <button type="button" data-box-format="unlink">⛓ Link törlése</button>
     </div>
-    <div id="rbtools-boxVisual" class="rb-box-visual-editor" contenteditable="true" spellcheck="true" role="textbox" aria-multiline="true" aria-label="Keretes szöveg WYSIWYG szerkesztése"><p>Ide írhatod a keretes szövegét.</p></div>
+    <div id="rbtools-boxVisual" class="rb-box-visual-editor" contenteditable="true" spellcheck="true" role="textbox" aria-multiline="true" aria-label="Keretes szöveg WYSIWYG szerkesztése" data-placeholder="Ide írhatod a keretes szövegét."></div>
     <textarea id="rbtools-boxRichHtml" spellcheck="false" hidden aria-label="A keretes szöveg belső HTML-forrása"></textarea>
     <p class="small">A WYSIWYG és a közvetlen HTML ugyanazt a szöveget szerkeszti. A Markdown-import változatlanul elérhető lent.</p>
   </div>
@@ -1845,6 +1845,7 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .rb-box-rich-toolbar{margin-bottom:6px;gap:5px}
 #rbtools-app .rb-box-visual-editor{min-height:210px;max-height:65vh;overflow-y:auto;padding:14px 17px;border:2px solid #92b0ca;border-radius:8px;background:#fff;color:#16212b;line-height:1.6}
 #rbtools-app .rb-box-visual-editor:focus{outline:2px solid #3183bf}
+#rbtools-app .rb-box-visual-editor:empty::before{content:attr(data-placeholder);color:#728293;pointer-events:none}
 #rbtools-app #rbtools-boxRichHtml:not([hidden]){display:block;min-height:240px;width:100%;font:13px/1.5 Consolas,monospace}
 #rbtools-app .rb-help-toc{border:2px solid #5182aa;scroll-margin-top:20px}
 #rbtools-app .rb-help-toc a{display:inline-block;margin:4px 7px 4px 0;padding:6px 10px;background:var(--panel2);border-radius:5px}
@@ -4485,18 +4486,74 @@ function boxImageAttrs(){
   return {full:full||display,display:display||full,credit:rbGet("boxImageCredit").value.trim(),caption:rbGet("boxImageCaption").value.trim(),width:rbGet("boxImageWidth").value};
 }
 function doConvertBox(){
-  const text=rbGet("boxInput").value,title=rbGet("boxTitle").value.trim(),img=boxImageAttrs();
-  if(!text.trim()&&!title&&!img){rbGet("boxOutput").value="";rbGet("boxStatus").textContent="Nincs bemenet.";return;}
-  try{rbGet("boxOutput").value=rbBoxHtml(title,text,img,currentBoxMode());rbGet("boxStatus").textContent="Kész.";}
-  catch(e){console.error(e);rbGet("boxStatus").textContent="Hiba: "+e.message;}
+ const mode=rbGet("boxEditorMode").value,variant=rbGet("boxVariant").value;
+ const text=mode==="markdown"?rbGet("boxInput").value:
+   mode==="html"?rbGet("boxRichHtml").value:rbGet("boxVisual").innerHTML;
+ const title=rbGet("boxTitle").value.trim(),img=boxImageAttrs();
+ if(!text.trim()&&!title&&!img){rbGet("boxOutput").value="";rbGet("boxStatus").textContent="Nincs bemenet.";return;}
+ try{
+   rbGet("boxOutput").value=mode==="markdown"?
+     rbBoxHtml(title,text,img,currentBoxMode(),variant):rbBoxRichHtml(title,text,img,variant);
+   rbGet("boxStatus").textContent="Kész: "+(variant==="accent"?"oldalsávos":"klasszikus")+" keretes.";
+ }catch(e){console.error(e);rbGet("boxStatus").textContent="Hiba: "+e.message;}
 }
 async function loadBoxFile(file){
   if(!file)return;rbGet("boxStatus").textContent="Feldolgozás…";
   try{
     const result=await fileToMarkdown(file);rbGet("boxInput").value=result.md;rbGet("boxSourceMode").value=result.plain?"plain":"markdown";
+    rbGet("boxEditorMode").value="markdown";boxShowEditorMode();
     doConvertBox();rbGet("boxStatus").textContent=file.name+" ("+result.format+") betöltve és konvertálva.";
   }catch(e){console.error(e);rbGet("boxStatus").textContent="Importhiba: "+e.message;}
 }
+let boxPreviousMode="visual";
+function boxShowEditorMode(){
+  const mode=rbGet("boxEditorMode").value;
+  if(boxPreviousMode==="visual"&&mode==="html")
+    rbGet("boxRichHtml").value=rbBoxSafeRich(rbGet("boxVisual").innerHTML);
+  else if(boxPreviousMode==="html"&&mode==="visual")
+    rbGet("boxVisual").innerHTML=rbBoxSafeRich(rbGet("boxRichHtml").value);
+  // Markdown source stays separate and is never silently converted or discarded.
+  rbGet("boxVisual").hidden=mode!=="visual";
+  rbGet("boxRichHtml").hidden=mode!=="html";
+  rbGet("boxVisualToolbar").hidden=mode!=="visual";
+  rbGet("boxMarkdownCard").hidden=mode!=="markdown";
+  boxPreviousMode=mode;doConvertBox();
+}
+rbGet("boxEditorMode").addEventListener("change",boxShowEditorMode);
+rbGet("boxVisualToolbar").querySelectorAll("[data-box-format]").forEach(button=>{
+  button.addEventListener("mousedown",e=>e.preventDefault());
+  button.addEventListener("click",()=>{
+    rbGet("boxVisual").focus();
+    document.execCommand(button.dataset.boxFormat,false,null);
+    doConvertBox();
+  });
+});
+rbGet("boxFormatLink").addEventListener("mousedown",e=>e.preventDefault());
+rbGet("boxFormatLink").addEventListener("click",()=>{
+  const selected=window.getSelection();
+  if(!selected?.toString().trim()){
+    rbGet("boxStatus").textContent="Jelöld ki előbb a linkelni kívánt szöveget.";return;
+  }
+  const raw=window.prompt("Hivatkozás (https://… vagy mailto:…):","https://");
+  if(raw===null)return;
+  const url=String(raw).trim();
+  try{
+    const parsed=new URL(url);
+    if(!["https:","http:","mailto:"].includes(parsed.protocol))throw Error("invalid protocol");
+  }catch{
+    rbGet("boxStatus").textContent="Hibás URL, http(s) vagy mailto hivatkozás szükséges.";return;
+  }
+  rbGet("boxVisual").focus();document.execCommand("createLink",false,url);
+  rbGet("boxVisual").querySelectorAll("a").forEach(link=>{
+    if(link.getAttribute("href")===url){
+      link.setAttribute("target","_blank");link.setAttribute("rel","noopener");
+    }
+  });
+  doConvertBox();
+});
+rbGet("boxVisual").addEventListener("input",doConvertBox);
+rbGet("boxRichHtml").addEventListener("input",doConvertBox);
+rbGet("boxVariant").addEventListener("change",doConvertBox);
 rbGet("boxFile").addEventListener("change",e=>loadBoxFile(e.target.files[0]));
 const boxDrop=rbGet("boxDrop");
 ["dragenter","dragover"].forEach(ev=>boxDrop.addEventListener(ev,e=>{e.preventDefault();boxDrop.classList.add("drag");}));
@@ -4520,9 +4577,11 @@ rbGet("previewBox").addEventListener("click",()=>{
   const f=rbGet("boxPreviewFrame");f.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}</style></head><body>${rbGet("boxOutput").value}</body></html>`;f.closest("details").open=true;
 });
 rbGet("downloadBox").addEventListener("click",()=>{if(!rbGet("boxOutput").value)doConvertBox();if(rbGet("boxOutput").value)downloadText("regionalbahn-keretes.html",rbGet("boxOutput").value);});
-rbGet("clearBox").addEventListener("click",()=>{rbGet("boxInput").value="";rbGet("boxOutput").value="";rbGet("boxTitle").value="";rbGet("boxImageFull").value="";rbGet("boxImageDisplay").value="";rbGet("boxImageCredit").value="";rbGet("boxImageCaption").value="";rbGet("boxPreviewFrame").srcdoc="";rbGet("boxStatus").textContent="Törölve.";});
-["boxTitle","boxImageFull","boxImageDisplay","boxImageCredit","boxImageCaption"].forEach(id=>rbGet(id).addEventListener("input",()=>{if(rbGet("boxInput").value.trim()||rbGet("boxTitle").value.trim()||boxImageAttrs())doConvertBox();}));
-["boxSourceMode","boxImageWidth"].forEach(id=>rbGet(id).addEventListener("change",()=>{if(rbGet("boxInput").value.trim()||rbGet("boxTitle").value.trim()||boxImageAttrs())doConvertBox();}));
+rbGet("clearBox").addEventListener("click",()=>{rbGet("boxVisual").innerHTML="";rbGet("boxRichHtml").value="";
+  rbGet("boxEditorMode").value="visual";rbGet("boxVariant").value="classic";boxShowEditorMode();rbGet("boxInput").value="";rbGet("boxOutput").value="";rbGet("boxTitle").value="";rbGet("boxImageFull").value="";rbGet("boxImageDisplay").value="";rbGet("boxImageCredit").value="";rbGet("boxImageCaption").value="";rbGet("boxPreviewFrame").srcdoc="";rbGet("boxStatus").textContent="Törölve.";});
+["boxTitle","boxImageFull","boxImageDisplay","boxImageCredit","boxImageCaption"].forEach(id=>rbGet(id).addEventListener("input",doConvertBox));
+["boxSourceMode","boxImageWidth"].forEach(id=>rbGet(id).addEventListener("change",doConvertBox));
+boxShowEditorMode();
 
 
 
