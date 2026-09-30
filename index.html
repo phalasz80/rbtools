@@ -267,7 +267,7 @@ További szöveg..."></textarea>
     <div class="admin-section-head">
       <div>
         <h2 style="margin:0">4. Vizuális cikkszerkesztő</h2>
-        <p class="small" style="margin:3px 0 0">Szöveget szabadon kijelölhetsz és formázhatsz. A blokkok csak a jobb oldali ⠿ fogantyúnál húzhatók, a kék beszúrási sávokra pedig kép vagy blokk dobható. A szerkesztő függőlegesen átméretezhető az alsó pereménél.</p>
+        <p class="small" style="margin:3px 0 0">Szöveget szabadon kijelölhetsz és formázhatsz, a kijelölésen jobb kattintással helyi formázómenüt is kapsz. Az eszköztár a cikkszöveg felett marad. A blokkok csak a jobb oldali ⠿ fogantyúnál húzhatók, a kék beszúrási sávokra pedig kép vagy blokk dobható. A szerkesztő függőlegesen átméretezhető az alsó pereménél.</p>
       </div>
       <div class="toolbar" style="margin:0">
         <button id="rbtools-adminAddParagraph">＋ Bekezdés</button>
@@ -279,6 +279,7 @@ További szöveg..."></textarea>
         <button id="rbtools-adminAddRule">＋ Elválasztó</button>
       </div>
     </div>
+    <div class="admin-format-shell">
     <div class="admin-formatbar" role="toolbar" aria-label="Szövegformázás">
       <span class="small">Kijelölt szöveg:</span>
       <button id="rbtools-adminFmtBold" type="button" title="Félkövér"><strong>B</strong></button>
@@ -308,10 +309,16 @@ További szöveg..."></textarea>
         <span id="rbtools-adminLinkSelection" class="small"></span></div>
       <label for="rbtools-adminLinkUrl">Hivatkozás címe (URL)</label>
       <input id="rbtools-adminLinkUrl" type="url" inputmode="url" placeholder="https://…" spellcheck="false">
+      <label class="admin-link-new-window" for="rbtools-adminLinkNewWindow"><input id="rbtools-adminLinkNewWindow" type="checkbox" checked> Megnyitás új ablakban / lapon</label>
       <button id="rbtools-adminLinkApply" type="button" class="primary">✓ Link alkalmazása</button>
       <button id="rbtools-adminLinkCancel" type="button">Mégse</button>
     </div>
 
+    </div><!-- sticky formatting and link tools -->
+    <div id="rbtools-adminCanvas" class="admin-canvas">
+      <div class="admin-empty">Tölts be vagy illessz be cikkszöveget, majd kattints a „Cikk felépítése” gombra.</div>
+    </div>
+    <div class="admin-editor-extra-heading">További szerkesztőeszközök: keresés, karakterek és iframe</div>
     <div class="admin-findbar" role="search" aria-label="Keresés a WYSIWYG cikkben">
       <label for="rbtools-adminFind"><strong>Keresés a cikkben</strong></label>
       <input id="rbtools-adminFind" type="search" autocomplete="off" placeholder="Szó vagy mondatrész…">
@@ -370,8 +377,13 @@ További szöveg..."></textarea>
         <button id="rbtools-adminClearIframeInput" type="button">× Mező ürítése</button>
       </div>
     </div>
-    <div id="rbtools-adminCanvas" class="admin-canvas">
-      <div class="admin-empty">Tölts be vagy illessz be cikkszöveget, majd kattints a „Cikk felépítése” gombra.</div>
+    <div id="rbtools-adminContextMenu" class="admin-context-menu" role="menu" aria-label="Kijelölt szöveg helyi formázása" hidden>
+      <button type="button" role="menuitem" data-admin-context-command="bold"><strong>B</strong><span>Félkövér</span><kbd>Ctrl+B</kbd></button>
+      <button type="button" role="menuitem" data-admin-context-command="italic"><em>I</em><span>Dőlt</span><kbd>Ctrl+I</kbd></button>
+      <button type="button" role="menuitem" data-admin-context-command="underline"><u>U</u><span>Aláhúzott</span><kbd>Ctrl+U</kbd></button>
+      <button type="button" role="menuitem" data-admin-context-command="strikeThrough"><s>S</s><span>Áthúzott</span></button>
+      <div class="admin-context-divider" role="separator"></div>
+      <button type="button" role="menuitem" data-admin-context-command="link"><span aria-hidden="true">🔗</span><span>Hivatkozás beszúrása / szerkesztése</span><kbd>Ctrl+K</kbd></button>
     </div>
   </div>
 
@@ -1360,8 +1372,19 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-image-buttons button{padding:6px 8px;font-size:12px}
 #rbtools-app .admin-image-tile.main-image{box-shadow:0 0 0 2px var(--ok) inset}
 #rbtools-app .admin-editor-panel{padding:14px}
-#rbtools-app .admin-formatbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0 0;padding:8px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
+#rbtools-app .admin-format-shell{position:sticky;top:6px;z-index:35;margin:8px 0 0;border:1px solid #94b5d9;border-radius:9px;background:var(--panel);box-shadow:0 3px 12px rgba(15,23,42,.14)}
+#rbtools-app .admin-formatbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0;padding:7px;border:0;border-radius:9px;background:var(--panel2)}
 #rbtools-app .admin-formatbar button{min-width:36px;padding:6px 9px}
+#rbtools-app .admin-editor-extra-heading{margin-top:16px;font-size:12px;font-weight:800;color:var(--muted)}
+#rbtools-app .admin-context-menu[hidden]{display:none!important}
+#rbtools-app .admin-context-menu{position:fixed;z-index:10050;min-width:218px;max-width:min(330px,calc(100vw - 16px));padding:5px;background:var(--panel);color:var(--ink);border:1px solid #8ba3bb;border-radius:9px;box-shadow:0 12px 32px rgba(0,0,0,.24)}
+#rbtools-app .admin-context-menu button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;text-align:left;border:0;border-radius:5px;background:transparent;color:var(--ink)}
+#rbtools-app .admin-context-menu button>*:first-child{flex:0 0 19px;text-align:center}
+#rbtools-app .admin-context-menu button span:nth-child(2){flex:1 1 auto}
+#rbtools-app .admin-context-menu button:hover,#rbtools-app .admin-context-menu button:focus-visible{background:var(--soft);outline:2px solid transparent}
+#rbtools-app .admin-context-menu kbd{margin-left:auto;font:11px Consolas,monospace;opacity:.75;white-space:nowrap}
+#rbtools-app .admin-context-divider{margin:4px 7px;border-top:1px solid var(--line)}
+@media(max-width:650px){#rbtools-app .admin-formatbar{max-height:33vh;overflow-y:auto}#rbtools-app .admin-format-shell{top:0}}
 #rbtools-app .admin-findbar{display:grid;grid-template-columns:auto minmax(180px,1fr) auto auto;gap:8px;align-items:center;margin-top:8px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
 #rbtools-app .admin-findbar input{min-width:0;width:100%}
 #rbtools-app .admin-char-tools{margin-top:8px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
@@ -1437,6 +1460,8 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-link-panel label{font-size:13px;font-weight:700}
 #rbtools-app .admin-link-panel input{flex:1 1 270px;min-width:180px}
 #rbtools-app .admin-link-panel button{flex:0 0 auto}
+#rbtools-app .admin-link-panel .admin-link-new-window{display:inline-flex;align-items:center;gap:7px;flex:1 1 100%;margin:0;cursor:pointer}
+#rbtools-app .admin-link-panel .admin-link-new-window input[type="checkbox"]{width:17px!important;height:17px;flex:0 0 auto;min-width:0;accent-color:#2775ca}
 @media(max-width:700px){#rbtools-app .admin-link-panel label,#rbtools-app .admin-link-panel input{flex:1 1 100%}}
 #rbtools-app .admin-editable:focus{border-color:#aaa;background:#fff}
 /* The article canvas is white in both themes, while the lead uses themed dark/light panels. */
@@ -1520,7 +1545,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v32";
+const RBTOOLS_VERSION="pages-v33";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -3463,7 +3488,7 @@ function adminDropZone(index){
   return dz;
 }
 function adminRenderCanvas(){
-  const host=rbGet("adminCanvas");adminCloseLinkPanel();adminActiveEditable=null;adminSavedRange=null;host.textContent="";
+  const host=rbGet("adminCanvas");adminHideContextMenu();adminCloseLinkPanel();adminActiveEditable=null;adminSavedRange=null;host.textContent="";
   if(rbGet("adminContentType").value!=="static"){
     const panel=document.createElement("section");panel.className="admin-lead-panel";panel.setAttribute("aria-label","Főkép és valódi lead");
     const top=document.createElement("div");top.className="admin-lead-panel-head";
@@ -3604,6 +3629,36 @@ function adminRememberRange(){
   if(!editable)return false;
   adminActiveEditable=editable;adminSavedRange=r.cloneRange();return true;
 }
+function adminHideContextMenu(){
+  rbGet("adminContextMenu").hidden=true;
+}
+function adminContextMenuAt(event){
+  const canvas=rbGet("adminCanvas");
+  const editable=event.target?.closest?.('[contenteditable="true"]');
+  if(!editable||!canvas.contains(editable)||editable.classList.contains("admin-paper-title"))return;
+  const sel=window.getSelection();
+  let range=sel?.rangeCount?sel.getRangeAt(0):null;
+  if(!range||range.collapsed||adminEditableForRange(range)!==editable){
+    range=adminSavedRange&&adminEditableForRange(adminSavedRange)===editable?adminSavedRange:null;
+  }
+  if(!range||range.collapsed||!range.toString().trim())return;
+  const rects=Array.from(range.getClientRects());
+  const pointer=event.clientX!==0||event.clientY!==0;
+  if(pointer&&!rects.some(r=>event.clientX>=r.left-4&&event.clientX<=r.right+4
+    &&event.clientY>=r.top-4&&event.clientY<=r.bottom+4))return;
+  event.preventDefault();
+  adminActiveEditable=editable;
+  adminSavedRange=range.cloneRange();
+  const menu=rbGet("adminContextMenu");
+  menu.hidden=false;
+  const box=menu.getBoundingClientRect();
+  const first=rects[0];
+  const x=pointer?event.clientX+5:(first?.left??12);
+  const y=pointer?event.clientY+5:(first?.bottom??12);
+  menu.style.left=Math.max(8,Math.min(x,window.innerWidth-box.width-8))+"px";
+  menu.style.top=Math.max(8,Math.min(y,window.innerHeight-box.height-8))+"px";
+  menu.querySelector('button[role="menuitem"]')?.focus({preventScroll:true});
+}
 function adminRestoreRange(){
   const el=adminActiveEditable,r=adminSavedRange;
   if(!el?.isConnected||!r||adminEditableForRange(r)!==el)return false;
@@ -3659,11 +3714,28 @@ function adminLink(){
   }
   rbGet("adminLinkSelection").textContent='Kijelölt szöveg: '+(adminSavedRange.toString()||adminLinkEditAnchor?.textContent||"");
   rbGet("adminLinkUrl").value=adminLinkEditAnchor?.getAttribute("href")||"https://";
+  rbGet("adminLinkNewWindow").checked=adminLinkEditAnchor
+    ?adminLinkEditAnchor.getAttribute("target")==="_blank":true;
   rbGet("adminLinkPanel").hidden=false;
   rbGet("adminLinkUrl").focus();
   rbGet("adminLinkUrl").select();
 }
+function adminSetLinkTarget(anchor,newWindow){
+  if(!anchor)return;
+  if(newWindow){
+    anchor.setAttribute("target","_blank");
+    const rel=new Set((anchor.getAttribute("rel")||"").split(/\s+/).filter(Boolean));
+    rel.add("noopener");
+    anchor.setAttribute("rel",Array.from(rel).join(" "));
+  }else{
+    anchor.removeAttribute("target");
+    const rel=(anchor.getAttribute("rel")||"").split(/\s+/).filter(token=>token&&token!=="noopener");
+    if(rel.length)anchor.setAttribute("rel",rel.join(" "));
+    else anchor.removeAttribute("rel");
+  }
+}
 function adminApplyLink(){
+  const newWindow=rbGet("adminLinkNewWindow").checked;
   let url=rbGet("adminLinkUrl").value.trim();
   if(!url||url==="https://"){
     rbGet("adminStatus").textContent="Adj meg egy érvényes hivatkozást.";rbGet("adminLinkUrl").focus();return;
@@ -3676,23 +3748,36 @@ function adminApplyLink(){
     rbGet("adminStatus").textContent="Hibás URL. Példa: https://regionalbahn.hu/ vagy mailto:nev@example.com";rbGet("adminLinkUrl").focus();return;
   }
   if(adminLinkEditAnchor?.isConnected){
-    adminLinkEditAnchor.setAttribute("href",url);
     if(!adminRestoreRange()){rbGet("adminStatus").textContent="A kijelölés elveszett. Jelöld ki újra a szöveget.";return;}
+    adminLinkEditAnchor.setAttribute("href",url);
+    adminSetLinkTarget(adminLinkEditAnchor,newWindow);
     adminSyncActiveEditable();adminCloseLinkPanel();
     rbGet("adminStatus").textContent="Meglévő hivatkozás módosítva.";return;
   }
   if(!adminRestoreRange()){rbGet("adminStatus").textContent="A kijelölés elveszett. Jelöld ki újra a szöveget.";return;}
-  // execCommand is still the browser-native contenteditable editing action used for inline links.
+  const root=adminActiveEditable,existing=new Set(root.querySelectorAll("a"));
+  // Preserve browser text-edit undo when possible, then identify the newly created anchors.
   let ok=document.execCommand("createLink",false,url);
+  let fallbackAnchor=null;
   if(!ok){
-    // Fallback for browsers returning false for createLink.
     const s=window.getSelection(),r=s?.rangeCount?s.getRangeAt(0):null;
     if(!r||r.collapsed){rbGet("adminStatus").textContent="Nem sikerült a link beszúrása. Jelöld ki újra a szöveget.";return;}
-    const a=document.createElement("a");a.setAttribute("href",url);
-    a.appendChild(r.extractContents());r.insertNode(a);
-    r.selectNodeContents(a);s.removeAllRanges();s.addRange(r);ok=true;
+    fallbackAnchor=document.createElement("a");fallbackAnchor.setAttribute("href",url);
+    fallbackAnchor.appendChild(r.extractContents());r.insertNode(fallbackAnchor);
+    r.selectNodeContents(fallbackAnchor);s.removeAllRanges();s.addRange(r);ok=true;
   }
-  if(ok){adminSyncActiveEditable();adminCloseLinkPanel();rbGet("adminStatus").textContent="Hivatkozás elkészült.";}
+  if(ok){
+    let anchors=Array.from(root.querySelectorAll("a")).filter(a=>!existing.has(a));
+    if(fallbackAnchor&&!anchors.includes(fallbackAnchor))anchors.push(fallbackAnchor);
+    if(!anchors.length){
+      const selection=window.getSelection(),selected=selection?.rangeCount?selection.getRangeAt(0):adminSavedRange;
+      anchors=Array.from(root.querySelectorAll("a")).filter(a=>a.getAttribute("href")===url
+        &&selected?.intersectsNode?.(a));
+    }
+    anchors.forEach(a=>adminSetLinkTarget(a,newWindow));
+    adminSyncActiveEditable();adminCloseLinkPanel();
+    rbGet("adminStatus").textContent="Hivatkozás elkészült"+(newWindow?" (új lapon).":" (azonos lapon).");
+  }
 }
 function adminIsGrayNode(node){
   if(node?.nodeType!==1)return false;
@@ -3880,6 +3965,38 @@ rbGet("adminFmtItalic").addEventListener("click",()=>adminExec("italic"));
 rbGet("adminFmtUnderline").addEventListener("click",()=>adminExec("underline"));
 rbGet("adminFmtStrike").addEventListener("click",()=>adminExec("strikeThrough"));
 rbGet("adminFmtLink").addEventListener("click",adminLink);
+rbGet("adminCanvas").addEventListener("contextmenu",adminContextMenuAt);
+rbGet("adminContextMenu").querySelectorAll("[data-admin-context-command]").forEach(btn=>{
+  btn.addEventListener("mousedown",event=>event.preventDefault());
+  btn.addEventListener("click",()=>{
+    const action=btn.dataset.adminContextCommand;
+    adminHideContextMenu();
+    if(action==="link")adminLink();
+    else adminExec(action);
+  });
+});
+rbGet("adminContextMenu").addEventListener("keydown",event=>{
+  const menu=rbGet("adminContextMenu");
+  const buttons=Array.from(menu.querySelectorAll('button[role="menuitem"]'));
+  let i=buttons.indexOf(document.activeElement);
+  if(event.key==="Escape"){
+    event.preventDefault();adminHideContextMenu();adminRestoreRange();
+  }else if(["ArrowDown","ArrowUp","Home","End"].includes(event.key)){
+    event.preventDefault();
+    i=event.key==="Home"?0:event.key==="End"?buttons.length-1:
+      (i+(event.key==="ArrowDown"?1:-1)+buttons.length)%buttons.length;
+    buttons[i]?.focus();
+  }
+});
+rbGet("adminContextMenu").addEventListener("focusout",()=>{
+  requestAnimationFrame(()=>{if(!rbGet("adminContextMenu").contains(document.activeElement))adminHideContextMenu();});
+});
+document.addEventListener("pointerdown",event=>{
+  if(!rbGet("adminContextMenu").hidden&&!rbGet("adminContextMenu").contains(event.target))adminHideContextMenu();
+});
+rbGet("adminCanvas").addEventListener("scroll",adminHideContextMenu,{passive:true});
+window.addEventListener("scroll",adminHideContextMenu,{passive:true});
+window.addEventListener("resize",adminHideContextMenu);
 rbGet("adminLinkApply").addEventListener("click",adminApplyLink);
 rbGet("adminLinkCancel").addEventListener("click",()=>adminCloseLinkPanel(true));
 rbGet("adminLinkUrl").addEventListener("keydown",e=>{
