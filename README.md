@@ -7,7 +7,7 @@ A RegionalBahn belső szerkesztői eszköze: **https://tools.regionalbahn.hu**
 ### Új cikk közvetlenül az RBToolsban
 
 1. Nyisd meg a **Cikkadmin** fület, és kattints az **Új cikk** gombra.
-2. A címet, leadet és a törzsszöveget közvetlenül a WYSIWYG felületen is megírhatod; nem szükséges előre Markdownot vagy DOCX-et készíteni.
+2. A **Cikk címe** külön, Blogger-szerű mező, itt add meg a címet. A **Főkép + valódi lead** bekeretezett WYSIWYG-blokkban válaszd a borítóképet és írd mellé a felvezetőt. A `<!--more-->` mindig ez után kerül. A törzs H2–H5 alcímeket használhat.
 3. Használd a formázógombokat, alcímeket, kereteseket, képeket és drag-and-drop rendezést.
 4. Blogger-kapcsolat esetén a **Mentés Blogger-piszkozatba** gomb új draftot hoz létre.
 5. Kép nélküli cikkhez a Blogger felületét egyáltalán nem kell megnyitni a szerkesztés alatt.
@@ -76,6 +76,10 @@ A Cikkadminban külön tartalomtípus választható: **Cikk**, **#nyúz / Hétv�
 - rendezetlen és számozott listák, valamint lista-behúzás és -kihúzás;
 - Unicode- és emoji-beszúró, HTML-entitás paletta (kiemelt `&nbsp;` jelöléssel), HTML `<sup>`/`<sub>` formázás és Unicode felső/alsó index számok;
 - WYSIWYG szövegkereső sárga találatkiemeléssel;
+- Blogger-szerű, különálló címmező, amely nem kerül automatikusan a törzsszövegbe vagy a leadbe;
+- közös, jól elkülönített főkép + valódi lead blokk, amely mögé az egyetlen `<!--more-->` kerül;
+- régi hibás főkép/lead duplázások felismerése és javítása meglévő draft beolvasásakor;
+- H2–H5 szintű alcímek közvetlen választása a WYSIWYG eszköztárán;
 - képtár és főkép;
 - képek húzása konkrét bekezdések közé;
 - kép húzása keretes blokkba;
