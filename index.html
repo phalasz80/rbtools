@@ -128,6 +128,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
     </div>
     <ol class="admin-quicksteps">
       <li><strong>Válassz tartalomtípust:</strong> cikk, #nyúz, podcast shownotes, InnoTrans, <strong>percről percre / élő tudósítás</strong> vagy statikus oldal; igény szerint töltsd be a hozzá tartozó sablont.</li>
+      <li><strong>Témakompatibilitás:</strong> a RegionalBahn optimalizált Blogger-témájának Inter betűjét örököljük. Az új cikk-HTML a globális H2 widgetstílust külön kezeli, a képeket és podcastokat mobilon átméretezi, a Blogger saját képkeretét nem duplázza.</li>
       <li><strong>Percről percre:</strong> töltsd be az élő sablont, írd meg a leadet, majd az <strong>＋ Időbélyeges frissítés</strong> gombbal add hozzá az időpontot, helyszínt, tudósító nevét és a frissítés WYSIWYG-szövegét. A képtárból képet is húzhatsz a frissítésbe. Alapértelmezés szerint a legújabb bejegyzés alul jelenik meg, mint a 2020-as RegioJet-tudósításnál. Fordított sorrend is választható. Készülő frissítést ugyanabba a Blogger-piszkozatba ments vissza, az éles közzététel a szerkesztő dolga.</li>
       <li><strong>Cikkcím:</strong> a címet a külön, Blogger-szerű <strong>Cikk címe</strong> mezőbe írd. Nem lesz belőle megismételt törzsszöveg vagy automatikus lead.</li>
       <li><strong>Főkép + valódi lead:</strong> a külön, bekeretezett bevezetőben válassz képet, vagy húzd oda a képtárból, és írd mellé a felvezetőt. A <code>&lt;!--more--&gt;</code> mindig a teljes lead után kerül.</li>
@@ -1184,6 +1185,7 @@ A következő cikk rövid ajánlója.</pre>
     <p>A <strong>＋ Keretes</strong> új szürke RegionalBahn-dobozt hoz létre. A formázósor <strong>▣ Keretes</strong> gombja az aktuális szövegblokkot alakítja át keretessé. A keretes címe és törzse külön szerkeszthető, külön igazítható, és a képtárból kép húzható bele. A kép eltávolítható anélkül, hogy maga a keretes törlődne.</p>
 
     <h3>14/B. Percről percre, folyamatos helyszíni tudósítás</h3>
+    <p><strong>Illesztés a 2026-os optimalizált RegionalBahn CSS-hez:</strong> az Inter betűcsaládot a Blogger biztosítja. A téma globális H2-szabálya widgetcímekre készült, ezért a generált cikkcímsorok <code>rbtools-heading</code> osztállyal kapják a cikkhez illő formát. A képkeret marad a Blogger feladata, az RBTools csak a reszponzív szélességet biztosítja. Az új cikkbe írt, <code>data-rbtools-theme</code> jelű CSS a visszaimportáláskor nem lesz tartalmi blokk; a régi cikkeket nem írja át.</p>
     <p>Az új sablon alapját elsősorban a <a href="https://www.regionalbahn.hu/2020/07/regiojet-premier.html" target="_blank" rel="noopener">2020-as RegioJet-premier</a> adja: világos, egyszer szerkeszthető felvezető, majd időrendben különálló, időponttal, helyszínnel és a tudósító nevével ellátott frissítések. A <a href="https://www.regionalbahn.hu/2018/03/Budapest-Berlin-VDE8-percrol-percre.html" target="_blank" rel="noopener">2018-as Budapest–Berlin útibeszámolóból</a> az útvonal és az utazás folyamatos követésének szerkezetét, a <a href="https://www.regionalbahn.hu/2013/03/forradalmi-havazas.html" target="_blank" rel="noopener">2013-as havazásból</a> a fordított, legújabbat felül megjelenítő lehetőséget, a <a href="https://www.regionalbahn.hu/2016/12/eloben-bucsuzunk-westbahn-obb-intercity.html" target="_blank" rel="noopener">2016-os ÖBB InterCity-búcsúból</a> a személyes, út közben készülő beszámoló lehetőségét emeltük át. A régi fix szélességű betűk helyett a blog normál, jól olvasható betűkészletét használja.</p>
     <ol>
       <li>Nyisd meg a <strong>Cikkadmin</strong> fület, a <strong>Tartalomtípus</strong> listában válaszd a <strong>Percről percre / élő tudósítás</strong> típust, majd kattints a <strong>Sablon betöltése</strong> gombra. Ez csak akkor írja felül a cikket, ha a változtatást megerősítetted; a meglévő képtár és Blogger-hozzárendelés megmarad.</li>
@@ -1671,8 +1673,8 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-iframe-preview iframe{max-width:100%}
 #rbtools-app .admin-iframe-code{width:100%;min-height:120px;height:120px;resize:vertical;border:1px solid #c7c7c7;border-radius:7px;padding:9px;background:#f7f7f7;color:#111;font:12px/1.45 Consolas,"Courier New",monospace;white-space:pre-wrap;overflow-wrap:anywhere}
 #rbtools-app .admin-iframe-note{font:12px/1.4 Arial,Helvetica,sans-serif;color:#666}
-#rbtools-app .admin-canvas{margin-top:12px;background:#fff;color:#111;border:1px solid var(--line);border-radius:11px;padding:20px;min-height:620px;height:70vh;resize:vertical;overflow:auto}
-#rbtools-app .admin-paper-title{font:700 27px/1.2 Arial,Helvetica,sans-serif;margin:0 0 14px;padding:7px 9px;border:1px dashed transparent;border-radius:7px;outline:none}
+#rbtools-app .admin-canvas{margin-top:12px;background:#fff;color:#444;font-family:Inter,Arial,Helvetica,sans-serif;line-height:1.4;border:1px solid var(--line);border-radius:11px;padding:20px;min-height:620px;height:70vh;resize:vertical;overflow:auto}
+#rbtools-app .admin-paper-title{font:700 27px/1.2 Inter,Arial,Helvetica,sans-serif;margin:0 0 14px;padding:7px 9px;border:1px dashed transparent;border-radius:7px;outline:none}
 #rbtools-app .admin-paper-title:focus{border-color:#a1a1aa}
 #rbtools-app .admin-title-panel{margin-top:15px;border:1px solid var(--line);border-radius:11px}
 #rbtools-app .admin-title-panel>label{display:block;font-weight:800;font-size:15px;margin-bottom:8px}
@@ -2086,7 +2088,7 @@ function rbImageHtml(a,boxed=false){
   const titleAttr=credit?` title="${esc(credit,true)}"`:"";
   const tail=boxed?"":"\n<br />";
   const alt=rbImageAltText(caption.caption,credit,caption.photoName);
-  return `<div class="separator" style="${sepStyle}"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}" width="600" alt="${esc(alt,true)}" /></a></div>\n<div style="${capStyle}">${adminCaptionHtml(caption)}</div>${tail}`;
+  return `<div class="separator rbtools-image" style="${sepStyle}"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}" width="600" alt="${esc(alt,true)}" /></a></div>\n<div class="rbtools-caption" style="${capStyle}">${adminCaptionHtml(caption)}</div>${tail}`;
 }
 
 function rbBoxParagraphsHtml(text,mode="markdown"){
@@ -2128,7 +2130,7 @@ function rbBoxHtml(title,text,imageAttrs=null,mode="markdown",variant="classic")
     const captionParts=adminCaptionParts(caption,credit);
     const titleAttr=credit?` title="${esc(credit,true)}"`:"";
     const widthAttr=width==="100%"?' style="max-width: 100%; width: 100%; height: auto;"':` width="${esc(width,true)}"`;
-    out.push(`<div class="separator" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}"${widthAttr} alt="${esc(rbImageAltText(captionParts.caption,credit,captionParts.photoName),true)}" /></a></div>`);
+    out.push(`<div class="separator rbtools-image" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}"${widthAttr} alt="${esc(rbImageAltText(captionParts.caption,credit,captionParts.photoName),true)}" /></a></div>`);
     out.push(`<div style="background-color: #c3c3c3; padding: 0px 15px 15px; text-align: center;">${adminCaptionHtml(captionParts)}</div>`);
   }
   const classic=out.join("\n");return variant==="accent"?rbBoxAccentWrap(classic):classic;
@@ -2281,6 +2283,22 @@ function footerHtml(){
   const parts=[];if(intro)parts.push(esc(intro));if(names)parts.push(names);if(outro)parts.push(esc(outro));
   return parts.length?separator+`<div style="text-align: right;"><span style="font-size: 85%;"><em>${parts.join("<br />")}</em></span></div>`:"";
 }
+
+/* RBTools post-only CSS for RegionalBahn's optimized Inter Blogger theme. */
+function rbThemePostCss(){
+ return '<style data-rbtools-theme="regionalbahn-inter-2026">'+
+ '.rbtools-heading{font-family:inherit!important;font-size:1.35em!important;font-weight:700!important;line-height:1.35!important;text-transform:none!important;color:inherit!important;margin:1.1em 0 .6em!important}'+
+ '.rbtools-lead{display:flow-root;line-height:1.5;overflow-wrap:anywhere}'+
+ '.rbtools-main-image img,.rbtools-image img,.rb-live-media img{max-width:100%!important;height:auto!important;box-sizing:border-box}'+
+ '.rbtools-image,.rbtools-image a{max-width:100%;box-sizing:border-box}'+
+ '.rbtools-caption{color:#0b5394;font-size:.9em;line-height:1.45;overflow-wrap:anywhere}'+
+ '.rbtools-embed iframe{max-width:100%;border:0}'+
+ '.rb-live-entry{font-family:inherit;overflow-wrap:anywhere;scroll-margin-top:1rem}'+
+ '.rb-live-entry .rb-live-copy{font-family:inherit;line-height:1.55}'+
+ '.rb-box-accent{border-left-color:#0b5394!important}'+
+ '@media(max-width:600px){.rbtools-lead{text-align:left!important}.rbtools-main-image{float:none!important;display:block;max-width:100%;padding:0 0 .75em!important}.rbtools-main-image img{width:auto!important;max-width:100%!important}.rb-live-entry{padding-right:.25em!important}.rbtools-heading{font-size:1.2em!important}.rbtools-embed iframe{width:100%}}'+
+ '</style>';
+}
 function convertArticleMarkdown(md){
   md=String(md||"").replace(/\r\n/g,"\n");
   const profile=rbGet("profile").value, topMode=rbGet("topTextMode").value;
@@ -2305,7 +2323,7 @@ function convertArticleMarkdown(md){
   if(profile==="news"){
     const newsLead=lead||title;
     const bodyHtml=newsBodyToHtml(body);
-    return `<div style="text-align: justify;"><strong>${inlineMd(newsLead)}</strong></div>\n<br />\n<!--more-->\n<br />\n${bodyHtml}${bodyHtml?"\n":""}${src.html}${footerHtml()}`;
+    return `<div style="text-align: justify;"><strong>${inlineMd(newsLead)}</strong></div>\n<br />\n<!--more-->\n<br />\n${rbThemePostCss()}\n${bodyHtml}${bodyHtml?"\n":""}${src.html}${footerHtml()}`;
   }
 
   let mode=topMode;if(mode==="auto")mode=profile==="sectioned"?"title":"lead";
@@ -2314,7 +2332,7 @@ function convertArticleMarkdown(md){
 
   const titleAttr=credit?` title="${esc(credit,true)}"`:"";
   const bodyHtml=bodyToHtml(body);
-  return `<div style="text-align: justify;">\n<a href="${esc(full,true)}" style="clear: left; float: left; padding: 0px 1em 1em 0px;"${titleAttr}><img src="${esc(thumb,true)}" width="200" alt="${esc(rbImageAltText(rbGet("mainCaption").value,credit),true)}" /></a><strong>${inlineMd(topText)}</strong></div>\n<br />\n<!--more-->\n<br />\n${bodyHtml}${bodyHtml?"\n":""}${src.html}${footerHtml()}`;
+  return `<div style="text-align: justify;">\n<a href="${esc(full,true)}" style="clear: left; float: left; padding: 0px 1em 1em 0px;"${titleAttr}><img src="${esc(thumb,true)}" width="200" alt="${esc(rbImageAltText(rbGet("mainCaption").value,credit),true)}" /></a><strong>${inlineMd(topText)}</strong></div>\n<br />\n<!--more-->\n<br />\n${rbThemePostCss()}\n${bodyHtml}${bodyHtml?"\n":""}${src.html}${footerHtml()}`;
 }
 function plainInline(s){
   return esc(String(s??"")).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1">$1</a>');
@@ -2337,11 +2355,11 @@ function convertArticlePlainText(text){
   const bodyHtml=plainBodyToHtml(blocks.join("\n\n"));
   if(profile==="news"){
     const newsLead=lead||title;
-    return `<div style="text-align: justify;"><strong>${plainInline(newsLead)}</strong></div>\n<br />\n<!--more-->\n<br />\n${bodyHtml}${bodyHtml?"\n":""}${footerHtml()}`;
+    return `<div style="text-align: justify;"><strong>${plainInline(newsLead)}</strong></div>\n<br />\n<!--more-->\n<br />\n${rbThemePostCss()}\n${bodyHtml}${bodyHtml?"\n":""}${footerHtml()}`;
   }
   let topText=mode==="title"?title:lead;if(!topText)topText=title||lead;
   const titleAttr=credit?` title="${esc(credit,true)}"`:"";
-  return `<div style="text-align: justify;">\n<a href="${esc(full,true)}" style="clear: left; float: left; padding: 0px 1em 1em 0px;"${titleAttr}><img src="${esc(thumb,true)}" width="200" alt="${esc(rbImageAltText(rbGet("mainCaption").value,credit),true)}" /></a><strong>${plainInline(topText)}</strong></div>\n<br />\n<!--more-->\n<br />\n${bodyHtml}${bodyHtml?"\n":""}${footerHtml()}`;
+  return `<div style="text-align: justify;">\n<a href="${esc(full,true)}" style="clear: left; float: left; padding: 0px 1em 1em 0px;"${titleAttr}><img src="${esc(thumb,true)}" width="200" alt="${esc(rbImageAltText(rbGet("mainCaption").value,credit),true)}" /></a><strong>${plainInline(topText)}</strong></div>\n<br />\n<!--more-->\n<br />\n${rbThemePostCss()}\n${bodyHtml}${bodyHtml?"\n":""}${footerHtml()}`;
 }
 function convertArticleInput(text){
   const mode=rbGet("sourceMode")?.value||"markdown";
@@ -3680,7 +3698,7 @@ function adminHtmlToBlocks(html){
     if(node.nodeType===3&&!node.textContent.trim())continue;
     if(node.nodeType!==1)continue;
     const tag=node.tagName.toLowerCase();
-    if(tag==="br")continue;
+    if(tag==="br"||(tag==="style"&&node.hasAttribute("data-rbtools-theme")))continue;
     if(node.matches?.('.rb-live-entry')){
       const update=adminLiveFromNode(node);
       if(update)blocks.push(update);
@@ -3738,12 +3756,12 @@ function adminImageBodyHtml(img){
   }
   if(!attrs.some(x=>/^alt=/.test(x)))attrs.unshift('alt="'+esc(alt,true)+'"');
   attrs.push('src="'+esc(img.display,true)+'"');
-  return '<div class="separator" style="clear: both; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img '+attrs.join(" ")+' /></a></div>\n'
-    +'<div style="text-align: center;">'+adminCaptionHtml(img)+'</div>\n<br />';
+  return '<div class="separator rbtools-image" style="clear: both; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img '+attrs.join(" ")+' /></a></div>\n'
+    +'<div class="rbtools-caption" style="text-align: center;">'+adminCaptionHtml(img)+'</div>\n<br />';
 }
 function adminMainImageHtml(img){
   if(!img)return "";
-  return '<a href="'+esc(img.full||img.display,true)+'" style="clear: left; float: left; padding: 0px 1em 1em 0px;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="200" alt="'+esc(rbImageAltText(img.caption,img.credit,img.photoName),true)+'" /></a>';
+  return '<a class="rbtools-main-image" href="'+esc(img.full||img.display,true)+'" style="clear: left; float: left; padding: 0px 1em 1em 0px;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="200" alt="'+esc(rbImageAltText(img.caption,img.credit,img.photoName),true)+'" /></a>';
 }
 function adminBoxBodyParts(html){
   const t=document.createElement("template");t.innerHTML=String(html||"");
@@ -3768,14 +3786,14 @@ function adminBoxHtml(block){
   });
   const img=adminFindImage(block.imageId);
   if(img){
-    out.push('<div class="separator" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="600" alt="'+esc(rbImageAltText(img.caption,img.credit,img.photoName),true)+'" /></a></div>');
+    out.push('<div class="separator rbtools-image" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="600" alt="'+esc(rbImageAltText(img.caption,img.credit,img.photoName),true)+'" /></a></div>');
     out.push('<div style="background-color: #c3c3c3; padding: 0px 15px 15px; text-align: center;">'+adminCaptionHtml(img)+'</div>');
   }
   const classic=out.join("\n");return block.variant==="accent"?rbBoxAccentWrap(classic):classic;
 }
 function adminBlockHtml(b){
   if(b.type==="p")return '<div style="text-align: '+adminValidAlign(b.align,"justify")+';">'+adminNormalizeInlineHtml(b.html)+'</div>\n<br />';
-  if(["h2","h3","h4","h5"].includes(b.type))return '<'+b.type+' style="text-align: '+adminValidAlign(b.align,"center")+';">'+adminNormalizeInlineHtml(b.html)+'</'+b.type+'>\n<br />';
+  if(["h2","h3","h4","h5"].includes(b.type))return '<'+b.type+' class="rbtools-heading" style="text-align: '+adminValidAlign(b.align,"center")+';'+(b.type==="h2"?"font-family:inherit;font-size:1.35em;font-weight:700;text-transform:none;color:inherit;":"")+'>'+adminNormalizeInlineHtml(b.html)+'</'+b.type+'>\n<br />';
   if(b.type==="hr")return '<hr />';
   if(b.type==="image"){const img=adminFindImage(b.imageId);return img?adminImageBodyHtml(img):"";}
   if(b.type==="box")return adminBoxHtml(b);
@@ -3784,7 +3802,7 @@ function adminBlockHtml(b){
       const image=adminFindImage(id);return image?adminImageBodyHtml(image):"";
     }
   });
-  if(b.type==="iframe"){const html=adminNormalizeIframeHtml(b.html);return html?'<div style="text-align: '+adminValidAlign(b.align,"justify")+';">'+html+'</div>\n<br />':"";}
+  if(b.type==="iframe"){const html=adminNormalizeIframeHtml(b.html);return html?'<div class="rbtools-embed" style="text-align: '+adminValidAlign(b.align,"justify")+';">'+html+'</div>\n<br />':"";}
   if(b.type==="raw")return String(b.html||"")+(b.noBreak?"\n":"\n<br />");
   return "";
 }
@@ -3798,7 +3816,7 @@ function adminGenerateHtml(setStatus=true){
     if(adminRepairLegacyLeadBlock())adminRenderCanvas();
     const topHtml=adminNormalizeInlineHtml(adminLeadHtml);
     const main=adminFindImage(adminMainImageId);
-    out='<div style="text-align: '+adminValidAlign(adminLeadAlign,"justify")+';">\n'+adminMainImageHtml(main)+'<strong>'+topHtml+'</strong></div>\n<br />\n<!--more-->\n<br />\n';
+    out='<div class="rbtools-lead" style="text-align: '+adminValidAlign(adminLeadAlign,"justify")+';">\n'+adminMainImageHtml(main)+'<strong>'+topHtml+'</strong></div>\n<br />\n<!--more-->\n<br />\n'+rbThemePostCss()+'\n';
     if(contentType==="live"){
       const last=LIVE_TIMELINE.latest(adminBlocks);
       if(last&&LIVE_TIMELINE.safeAnchor(last.anchor)){
@@ -4531,7 +4549,7 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
   if(adminComparableText(adminLeadHtml)===title&&title)adminLeadHtml="";
   for(let i=0;i<nodes.length;i++){
     const n=nodes[i];if(n.nodeType===3&&!n.textContent.trim())continue;if(n.nodeType!==1)continue;
-    const tag=n.tagName.toLowerCase();if(tag==="br")continue;
+    const tag=n.tagName.toLowerCase();if(tag==="br"||(tag==="style"&&n.hasAttribute("data-rbtools-theme")))continue;
     if(n.matches?.('.rb-live-navigation'))continue; // auto rebuilt after import
     if(n.matches?.('.rb-live-entry')){
       const update=adminLiveFromNode(n);
@@ -5168,8 +5186,8 @@ function imageItemHtml(item){
   if(!hasAlt)attrs.unshift('alt="'+esc(alt,true)+'"');
   const full=item.full||item.display||"";
   const title=item.credit?' title="'+esc(item.credit,true)+'"':"";
-  return '<div class="separator" style="clear: both; text-align: center;"><a href="'+esc(full,true)+'" style="padding: 0px 1em;"'+title+'><img '+attrs.join(" ")+' /></a></div>\n'
-    +'<div style="text-align: center;">'+adminCaptionHtml(caption)+'</div>\n<br />';
+  return '<div class="separator rbtools-image" style="clear: both; text-align: center;"><a href="'+esc(full,true)+'" style="padding: 0px 1em;"'+title+'><img '+attrs.join(" ")+' /></a></div>\n'
+    +'<div class="rbtools-caption" style="text-align: center;">'+adminCaptionHtml(caption)+'</div>\n<br />';
 }
 function renderImagesOutput(setStatus=true){
   const html=imageEditorItems.map(imageItemHtml).join("\n");
