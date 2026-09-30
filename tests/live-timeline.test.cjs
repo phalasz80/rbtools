@@ -55,7 +55,8 @@ function fakeEntry(entry){
   ".rb-live-copy":node(entry.html,{},entry.html,{textAlign:"justify"}),
   ".rb-live-media":null
  };
- return {id:entry.anchor,matches:q=>q==='.rb-live-entry[data-rb-live="1"]',
+ return {id:entry.anchor,matches:q=>q===".rb-live-entry",
+  classList:{contains:cls=>cls==="rb-live-entry"||cls==="rb-live-"+entry.kind},
   getAttribute:n=>({
    "data-rb-live-kind":entry.kind,
    "data-rb-live-date":entry.date,
@@ -72,6 +73,11 @@ assert.equal(restored.reporter,changed.reporter);
 assert.equal(restored.kind,"correction");
 assert.equal(restored.showDate,true);
 assert.equal(restored.html,changed.html);
+const withoutData=fakeEntry({...changed,imageId:null});
+withoutData.getAttribute=()=>null;
+const fallback=live.parse(withoutData,{uid:()=>"reload-1"});
+assert.equal(fallback.kind,"correction","Type survives when Blogger removes data-attributes");
+assert.equal(fallback.showDate,true,"Date visibility survives from actual time text");
 const unknown=live.parse(fakeEntry({...changed,kind:"<script>"}),{uid:()=> "new-id"});
 assert.equal(unknown.kind,"report","Untrusted update kind must default to a supported one");
 const ui=fs.readFileSync(path.join(root,"index.html"),"utf8");
