@@ -12,7 +12,7 @@ const view={
   info:get("pageInfo"),save:get("pageSave"),backup:get("pageBackup")
 };
 const state={list:[],loaded:null,tree:null,baseline:null,backup:false,saving:false,error:"",
-  active:null,savedRange:null,linkAnchor:null,lastState:""};
+  active:null,savedRange:null,linkAnchor:null,lastState:"",critical:false};
 function message(title,detail="",kind="idle"){
   const key=kind+"|"+title+"|"+detail;
   if(key===state.lastState)return;
@@ -55,6 +55,7 @@ function sanitizeEditable(markup){
 function edited(node,el){
   node.value=node.kind==="text"?String(el.textContent||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"):sanitizeEditable(el.innerHTML);
   node.edited=true;
+  if(!state.critical)state.error="";
   const audit=core.audit(state.tree);
   if(!audit.ok){state.error="Egy védett HTML-/JavaScript-blokk sérült. A mentés leállítva.";}
   update();
@@ -133,6 +134,7 @@ function update(){
        " blokk, "+audit.scripts+" JavaScript, "+audit.buttons+" navigációs elem.":"⚠ Védett forráskód sérült: mentés tiltva.")
     :"Még nincs betöltött HTML.";
   const changed=dirty(),correctBlog=!hasPage||state.loaded.blogId===view.blog.value;
+  get("pageRetry").hidden=!state.error||state.critical;
   view.save.disabled=!hasPage||state.loaded.blogId!==view.blog.value||!changed||!bridge.isConnected()||!audit?.ok||!state.tree.safe||state.saving||!!state.error;
   if(state.error){message("A SZERKESZTÉS / MENTÉS HIBÁJA",state.error,"error");return;}
   if(state.saving){message("BLOGGER-MENTÉS FOLYAMATBAN","Mentés közben továbbra is változhatnak a helyi adatok. A Blogger visszaigazolását külön ellenőrizzük.","working");return;}
@@ -209,7 +211,7 @@ function abandonCheck(){
   return !dirty()||window.confirm("A jelenlegi szerkesztésben mentetlen változtatások vannak. Biztosan eldobod őket és másik oldalt nyitsz meg?");
 }
 function loadHtml(html,{page=null,title="",origin="loaded"}={}){
-  state.error="";state.saving=false;state.tree=core.parse(html);
+  state.error="";state.critical=false;state.saving=false;state.tree=core.parse(html);
   state.loaded=page?{...page,blogId:view.blog.value,originalHtml:html}:null;
   state.backup=false;view.title.value=title;
   state.baseline=page?{title,html,updated:page.updated||"",origin}:null;
@@ -234,7 +236,7 @@ async function openPage(){
 }
 function backup(){
   if(!state.loaded)return;
-  bridge.download("RBTools_EREDETI_"+safeName(state.loaded.title)+"_"+state.loaded.id+".html",originalBackUpRaw());
+  bridge.download("RBTools_EREDETI_"+safeName(state.loaded.title)+"_"+state.loaded.id+".html",state.baseline.html);
   state.backup=true;update();
 }
 function exportHtml(){
@@ -330,6 +332,7 @@ async function savePage(){
   try{
     const remote=await getPage(page.id,page.blogId);
     if(remote.content!==state.baseline.html||String(remote.title||"")!==state.baseline.title){
+      state.critical=true;
       throw Error("AZ OLDALT KÖZBEN MÁS SZERKESZTŐ MÓDOSÍTOTTA. A mentés leállt, hogy ne írd felül a munkáját. Töltsd le a saját szerkesztett HTML-t, majd nyisd meg újra az oldalt, és egyeztesd a különbségeket.");
     }
     const result=await bridge.request({blogId:page.blogId,pageId:page.id,method:"PATCH",body:{title:sent.title,content:sent.html}});
@@ -339,6 +342,7 @@ async function savePage(){
     const intact=expected.every(original=>verified.content.includes(original));
     if(!intact){
       const backupSource=originalBackUpRaw();
+      state.critical=true;
       state.error="A BLOGGER AZ EREDETI GOMB- VAGY JAVASCRIPT-KÓD EGY RÉSZÉT MÓDOSÍTOTTA / ELTÁVOLÍTOTTA. Azonnal ellenőrizd az élő oldalt! Az eredeti biztonsági mentés megmaradt.";
       state.baseline={title:verified.title||"",html:verified.content,updated:verified.updated||"",origin:"saved"};
       state.loaded={...page,...verified,blogId:page.blogId,originalHtml:backupSource};
@@ -346,6 +350,7 @@ async function savePage(){
     }
     if(verified.content!==sent.html||String(verified.title||"")!==sent.title){
       const backupSource=originalBackUpRaw();
+      state.critical=true;
       state.error="A Blogger az eredeti speciális kódot megőrizte, de a teljes HTML-t vagy címet átalakította. Ellenőrizd a szerkesztett és az élő oldalt, mielőtt újra mentesz.";
       state.baseline={title:verified.title||"",html:verified.content,updated:verified.updated||"",origin:"saved"};
       state.loaded={...page,...verified,blogId:page.blogId,originalHtml:backupSource};
@@ -357,6 +362,7 @@ async function savePage(){
     const backupSource=originalBackUpRaw();
     state.baseline={title:verified.title||sent.title,html:verified.content,updated:verified.updated||"",origin:"saved"};
     state.loaded={...page,...verified,blogId:page.blogId,originalHtml:backupSource};
+    state.backup=false; // every later live update needs a fresh backup
     view.info.textContent="Blogger Page ID: "+verified.id+" • "+verified.status+" • "+(verified.url||"");
   }catch(e){state.error=e.message||String(e);}
   finally{state.saving=false;update();}
@@ -386,7 +392,11 @@ get("pageCopy").addEventListener("click",()=>{
 });
 get("pagePreview").addEventListener("click",showPreview);
 get("pageSave").addEventListener("click",savePage);
-view.title.addEventListener("input",update);
+view.title.addEventListener("input",()=>{
+  if(!state.critical)state.error="";
+  update();
+});
+get("pageRetry").addEventListener("click",()=>{if(state.critical)return;state.error="";update();});
 view.canvas.addEventListener("click",e=>{if(e.target.closest("a"))e.preventDefault();});
 document.addEventListener("selectionchange",()=>{if(document.activeElement?.closest?.("#rbtools-pageCanvas"))selection();});
 for(const btn of root.querySelectorAll("[data-page-format]")){
