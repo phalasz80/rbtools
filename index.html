@@ -636,11 +636,20 @@ Források:
     <button id="rbtools-pageRetry" type="button" hidden>↻ Hiba bezárása, újbóli próbálkozás a helyi változtatások megtartásával</button>
     <div class="collection-page-actions">
       <button id="rbtools-pageUseConverted" type="button">↪ Konverterkimenet megnyitása a WYSIWYG-ben</button>
-      <button id="rbtools-pageBackup" type="button" disabled>⬇ EREDETI HTML biztonsági mentése</button>
+      <button id="rbtools-pageBackup" type="button" disabled>⬇ EREDETI HTML letöltése (ajánlott)</button>
       <button id="rbtools-pageCopy" type="button" disabled>⧉ Szerkesztett HTML másolása</button>
       <button id="rbtools-pageDownload" type="button" disabled>⇩ Szerkesztett HTML letöltése</button>
       <button id="rbtools-pagePreview" type="button" disabled>◉ Biztonságos előnézet</button>
       <button id="rbtools-pageSave" class="collection-page-save" type="button" disabled>💾 MÓDOSÍTÁSOK MENTÉSE AZ EREDETI OLDALRA</button>
+    </div>
+    <div class="collection-backup-choice" role="group" aria-label="Biztonsági másolat választása">
+      <strong>Eredeti HTML biztonsági másolata</strong>
+      <span>A letöltés ajánlott, különösen nyilvános oldal módosításakor, de nem kötelező.</span>
+      <label for="rbtools-pageSkipBackup">
+        <input type="checkbox" id="rbtools-pageSkipBackup" disabled>
+        <span><strong>NEM kérem az eredeti HTML mentését.</strong> Tudomásul veszem, hogy szükség esetén így nem feltétlenül tudom visszaállítani az előző változatot.</span>
+      </label>
+      <span id="rbtools-pageBackupChoiceStatus" class="small" aria-live="polite">Mentés előtt töltsd le az eredeti HTML-t, vagy jelöld be a lemondó nyilatkozatot.</span>
     </div>
     <label class="collection-page-title-label" for="rbtools-pageTitle">Az oldal Blogger-címe <input id="rbtools-pageTitle" type="text" placeholder="Oldalcím" disabled></label>
     <div class="collection-page-toolbar" role="toolbar" aria-label="Gyűjtőoldal WYSIWYG formázás">
@@ -1710,6 +1719,14 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .collection-page-state.working{background:#fff3c7;color:#654700;border-color:#c39208}
 #rbtools-app .collection-page-save{background:#166534!important;color:#fff!important;border-color:#14532d!important;font-weight:900!important;letter-spacing:.2px}
 #rbtools-app .collection-page-save:disabled{opacity:.42;cursor:not-allowed}
+#rbtools-app .collection-backup-choice{display:flex;flex-direction:column;gap:8px;margin:8px 0 17px;padding:13px 15px;border:2px solid #d6a727;border-radius:9px;background:#fff6d9;color:#493700}
+#rbtools-app .collection-backup-choice>strong{font-size:15px}
+#rbtools-app .collection-backup-choice label{display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:9px 10px;border:1px solid #d6a727;border-radius:6px;background:#fffef6}
+#rbtools-app .collection-backup-choice label:has(input:checked){border-color:#ba3030;background:#ffedeb;color:#7e1616}
+#rbtools-app .collection-backup-choice input{flex:0 0 19px;width:19px;height:19px;margin:1px 0 0;accent-color:#bc3030}
+#rbtools-app .collection-backup-choice input:disabled{opacity:.5}
+@media(prefers-color-scheme:dark){#rbtools-app .collection-backup-choice{background:#493800;color:#fff3c6}#rbtools-app .collection-backup-choice label{background:#3d350f;color:#fff0cb}#rbtools-app .collection-backup-choice label:has(input:checked){background:#592321;color:#fff1ea}}
+
 #rbtools-app .collection-page-toolbar{position:sticky;top:8px;z-index:33;display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:8px;background:var(--panel2);border:1px solid #8faecf;border-radius:9px;box-shadow:0 4px 10px rgba(0,0,0,.12)}
 #rbtools-app .collection-page-toolbar button{padding:6px 9px}
 #rbtools-app .collection-page-toolbar-sep{height:25px;border-left:1px solid var(--line);margin:0 5px}
