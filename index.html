@@ -650,8 +650,15 @@ Források:
       <button id="rbtools-pageLinkApply" type="button">✓ Hivatkozás alkalmazása</button>
       <button id="rbtools-pageLinkCancel" type="button">Mégse</button>
     </div>
-    <p class="collection-page-legend"><strong>Fehér:</strong> szerkeszthető szöveg, címsor és képaláírás. <strong>Sötétkék:</strong> védett HTML / JavaScript / évválasztó, amelyhez a vizuális szerkesztő nem nyúl. A védett blokkokat az export ellenőrzi.</p>
+    <p class="collection-page-legend"><strong>Fehér:</strong> szerkeszthető szöveg, címsor és képaláírás. A kijelölésre jobb egérgombbal kattintva formázási menü nyílik (Shift + jobb egérgomb: böngészőmenü). <strong>Sötétkék:</strong> védett HTML / JavaScript / évválasztó, amelyhez a vizuális szerkesztő nem nyúl. A védett blokkokat az export ellenőrzi.</p>
     <div id="rbtools-pageCanvas" class="collection-page-canvas" aria-label="Statikus oldal WYSIWYG-felülete"><div class="admin-empty">Nyiss meg egy meglévő oldalt, vagy add át a konverter eredményét.</div></div>
+    <div id="rbtools-pageContextMenu" class="collection-page-context" role="menu" aria-label="Gyűjtőoldal kijelölt szövegének helyi menüje" hidden>
+      <button type="button" data-page-menu="bold"><strong>B</strong> Félkövér</button>
+      <button type="button" data-page-menu="italic"><em>I</em> Dőlt</button>
+      <button type="button" data-page-menu="underline"><u>U</u> Aláhúzott</button>
+      <button type="button" data-page-menu="strikeThrough"><s>S</s> Áthúzott</button>
+      <button type="button" data-page-menu="link"><span aria-hidden="true">🔗</span> Hivatkozás</button>
+    </div>
     <div class="collection-page-protection" id="rbtools-pageProtection" aria-live="polite">A megőrzött egyedi HTML-blokkok ellenőrzése még nem történt meg.</div>
     <details class="collection-page-output">
       <summary>Szerkesztett teljes HTML forráskód és kézi mentési tartalék</summary>
@@ -1663,6 +1670,11 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .collection-page-link-panel .collection-page-checkbox{display:flex;align-items:center;gap:7px}
 #rbtools-app .collection-page-checkbox input{width:18px;height:18px}
 #rbtools-app .collection-page-legend{font-size:12px;color:var(--muted)}
+#rbtools-app .collection-page-context[hidden]{display:none!important}
+#rbtools-app .collection-page-context{position:fixed;z-index:10050;min-width:210px;padding:6px;border:1px solid #3c81bd;border-radius:9px;background:var(--panel);color:var(--ink);box-shadow:0 12px 25px rgba(0,0,0,.25)}
+#rbtools-app .collection-page-context button{display:flex;align-items:center;gap:12px;width:100%;border:0;border-radius:5px;text-align:left;background:transparent;color:var(--ink)}
+#rbtools-app .collection-page-context button:hover,#rbtools-app .collection-page-context button:focus-visible{background:var(--soft)}
+#rbtools-app .collection-page-context button>*:first-child{min-width:20px;text-align:center}
 #rbtools-app .collection-page-entry-tools{border:1px solid #86acc9;background:var(--panel2);padding:10px 12px;border-radius:9px;margin-top:10px}
 #rbtools-app .collection-page-entry-tools summary{font-size:14px;font-weight:800;color:var(--ink)}
 #rbtools-app .collection-page-entry-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:9px}
