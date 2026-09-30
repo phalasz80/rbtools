@@ -1337,7 +1337,7 @@ A következő cikk rövid ajánlója.</pre>
       <li><code>&lt;!-- RB:LEAD --&gt; ... &lt;!-- /RB:LEAD --&gt;</code> – explicit lead.</li>
       <li><code>&lt;!-- RB:IMAGE full="..." display="..." credit="..." caption="..." --&gt;</code> – normál kép.</li>
       <li><code>&lt;!-- RB:ITALIC --&gt; ... &lt;!-- /RB:ITALIC --&gt;</code> – teljes dőlt bekezdés.</li>
-      <li><code>&lt;!-- RB:BOX title="..." --&gt; ... &lt;!-- RB:BOX_IMAGE ... --&gt; ... &lt;!-- /RB:BOX --&gt;</code> – szürke információs doboz opcionális képpel.</li>
+      <li><code>&lt;!-- RB:BOX title="..." style="accent" --&gt; ... &lt;!-- RB:BOX_IMAGE ... --&gt; ... &lt;!-- /RB:BOX --&gt;</code> – szürke információs doboz opcionális képpel.</li>
       <li><code>&lt;!-- RB:SOURCES --&gt; - [Forrás](https://...) &lt;!-- /RB:SOURCES --&gt;</code> – explicit forrásblokk.</li>
       <li><code>&lt;!-- RB:AUTHOR --&gt; Név &lt;!-- /RB:AUTHOR --&gt;</code> – szerző felülírása.</li>
     </ul>
@@ -2163,8 +2163,12 @@ function bodyToHtml(body){
       const bim=inner.match(/<!--\s*RB:BOX_IMAGE([\s\S]*?)-->/i);
       let boxImage="";
       if(bim){boxImage=rbImageHtml(parseAttrs(bim[1]),true);inner=inner.replace(bim[0],"");}
-      out.push(rbBoxHtml(boxTitle,inner,null,"markdown"));
-      if(boxImage)out.push(boxImage);
+      const variant=a.style==="accent"||a.variant==="accent"?"accent":"classic";
+      if(variant==="accent")out.push(rbBoxAccentWrap(rbBoxHtml(boxTitle,inner,null,"markdown")+(boxImage?"\n"+boxImage:"")));
+      else{
+        out.push(rbBoxHtml(boxTitle,inner,null,"markdown"));
+        if(boxImage)out.push(boxImage);
+      }
     }
     pos=tokenRe.lastIndex;
   }
