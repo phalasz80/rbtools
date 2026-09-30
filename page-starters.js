@@ -4,11 +4,11 @@ const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>
 const css=[
 "<style>",
 "/* RBTools archive starter: same CSS class structure as the approved RegionalBahn archives. */",
-".rb-nav{margin:0 0 1.6em;padding:14px 16px 13px;border:1px solid #d7d7d7;border-top:4px solid #4a4a4a;border-radius:8px;background:#f7f7f7;box-shadow:0 1px 3px #0001;font-family:inherit}",
+".rb-nav{margin:0 0 1.6em;padding:14px 16px 13px;border:1px solid #d7d7d7;border-top:4px solid #0b5394;border-radius:8px;background:#f7f7f7;box-shadow:0 1px 3px #0001;font-family:inherit}",
 ".rb-nav .rb-nav-title{margin:0 0 8px;font-size:.88em;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#555}",
 ".rb-nav .rb-nav-years{display:flex;flex-wrap:wrap;gap:7px}",
 ".rb-nav a{display:inline-block;box-sizing:border-box;min-width:58px;padding:7px 12px;border:1px solid #c9c9c9;border-radius:999px;background:white;color:#333;font-weight:700;line-height:1.2;text-align:center;text-decoration:none}",
-".rb-nav a:hover,.rb-nav a:focus-visible{border-color:#444;background:#444;color:white;text-decoration:none}",
+".rb-nav a:hover,.rb-nav a:focus-visible{border-color:#0b5394;background:#0b5394;color:white;text-decoration:none}",
 ".rb-nav .rb-nav-note{margin-top:9px;font-size:.84em;line-height:1.45;color:#666}",
 ".kk-filter-target,.it-filter-target{display:block;width:0;height:0;overflow:hidden;scroll-margin-top:24px}",
 ".kk-year,.innotrans-year-section{display:none}",
