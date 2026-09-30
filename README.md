@@ -102,6 +102,18 @@ A Cikkadminban külön tartalomtípus választható: **Cikk**, **#nyúz / Hétv�
 - folyamatosan generált végleges Blogger HTML;
 - széles, színkódolt állapotsáv a betöltési, mentési, siker-, figyelmeztetési és hibaállapotokhoz.
 
+## Gyűjtőoldalak és meglévő statikus `/p/` oldalak
+
+A **Gyűjtőoldalak** fül önálló, blokkos **WYSIWYG-szerkesztőt** kapott a régi Markdown-konverter megtartásával (utóbbi lenyitható). A Cikkadmin meglévő OAuth-kapcsolatát használva az **oldallista lekérése → oldal megnyitása** művelet a Blogger **Pages API** list/get végpontjait hívja meg. A szerkesztő elkülönítve mutatja a vizuálisan szerkeszthető bekezdéseket, címsorokat és képaláírásokat az **érinthetetlenül megőrzött** navigációs gomboktól, JavaScripttől, CSS-től és speciális HTML-től. Évblokk-keretek eredeti attribútumai is megmaradnak. Szerkesztés nélkül az eredeti HTML **bájtról bájtra ugyanaz** marad a helyi exportban.
+
+Az új blokkos szerkesztőben formázás, linkelés (alapértelmezett új lap, kikapcsolható), bekezdés/alcím/elválasztó beszúrás, előnézet, teljes HTML másolása/letöltése és az **eredeti HTML kötelező biztonsági másolata** érhető el. A régi Markdown-konverter HTML-jét külön gombbal átveheted, de ilyenkor **helyi, nem hozzárendelt** oldal nyílik: a konverter nem írhatja észrevétlenül felül a meglévő oldalt, és nem találhatja ki, hogyan illeszkedjen annak egyedi gombjaihoz.
+
+**Éles meglévő oldal mentése** csak az eredeti HTML letöltése, explicit megerősítés és közvetlenül a mentés előtti újabb szerverolvasás után engedélyezett. Ha az oldalt egy másik szerkesztő közben módosította, a mentés leáll. A program kizárólag az eredeti **Page ID** `PATCH` műveletével, a cím és a HTML megadásával ment, majd ismét lekéri a Blogger-oldalt, és összeveti az eredményt az elküldött HTML-lel és az eredeti védett forrásrészekkel. Az eredeti `/p/` URL megváltozását külön jelzi. Következő mentéshez friss biztonsági másolat kell. Nem jön létre új oldal, és nincs külön Publish gomb; **már nyilvános oldalnál a PATCH viszont azonnal módosítja az élő tartalmat**.
+
+Az eredeti script- és gombkódokat az RBTools saját WYSIWYG-je nem alakítja át, de a Blogger esetleges szerveroldali szűrését kizárólag a **mentés utáni API-ellenőrzés** tudja kimutatni. Emiatt az első éles mentés előtt különösen ajánlott az új munkafolyamatot egy tesztoldalon kipróbálni. Ha a forrás HTML szabálytalan szerkezete nem értelmezhető veszteségmentesen, a teljes forrás zárolva jelenik meg: ilyenkor előbb mentsd le, és kézi javítás nélkül ne írd felül a Blogger-oldalt. A beépített előnézet sandboxos, az oldalon lévő szkripteket biztonsági okból **nem futtatja**.
+
+A forráskódmegtartást a `collection-page-core.js`, az OAuth/Blogger-integrációt és a WYSIWYG-felületet a `collection-pages.js` kezeli. Regressziós tesztek: `tests/collection-page-core.test.cjs`, `tests/collection-page-save.test.cjs`.
+
 ## Szerkesztői mentésállapot és Firefox-helyi menü
 
 A **Piszkozatkezelés** műveletgombjai és az időzítési figyelmeztetés közé külön, élénk színezésű **Blogger-mentésállapot** panel került. Vörös: helyi módosítás / még nincs mentés vagy mentési hiba. Zöld: a Blogger sikeres API-válasszal igazolta a jelenlegi cím, HTML és címkék mentését. Kék: Bloggerből megnyitott, azóta változatlan piszkozat, amelynek újragenerált HTML-jét még nem mentettük vissza. Sárga: mentés folyamatban, kapcsolat nélkül vagy statikus oldal. A program minden WYSIWYG-kimenetfrissítés és címke-/címváltozás után összeveti a helyi állapotot a legutóbbi igazolt mentéssel/betöltéssel; a mentés közben történt újabb változtatások nem kapnak tévesen zöld visszajelzést.
