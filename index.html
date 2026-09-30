@@ -114,7 +114,8 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
       <li><strong>Főkép + valódi lead:</strong> a külön, bekeretezett bevezetőben válassz képet, vagy húzd oda a képtárból, és írd mellé a felvezetőt. A <code>&lt;!--more--&gt;</code> mindig a teljes lead után kerül.</li>
       <li><strong>Új anyag:</strong> írj közvetlenül a WYSIWYG-ben, vagy importálj Markdown/TXT/DOCX/ODT/RTF szöveget. Képes cikknél előbb Bloggerben töltsd fel a képeket egy draftba, majd nyisd meg azt itt. A törzsszövegben a választóval <strong>H2–H5</strong> szintű alcímeket készíthetsz.</li>
       <li><strong>Haladó forráskonverzió:</strong> ha Google Dokumentumból dolgozol, régi RB-jelöléseket (<code>RB:IMAGE</code>, <code>RB:BOX</code>, <code>RB:SOURCES</code> stb.) használsz, profil/preset kell, vagy külön HTML-előnézetet szeretnél, nyisd le a Cikkadmin alján a <strong>Haladó forráskonverzió, Google Docs és RB-jelölések</strong> részt. A létrejött HTML egy gombbal visszatölthető a WYSIWYG-be.</li>
-      <li><strong>Meglévő draft:</strong> kapcsolódj a Bloggerhez, válaszd ki a piszkozatot, majd <strong>Piszkozat megnyitása</strong>. A cím, címkék, szöveg, képek és iframe-ek betöltődnek.</li>
+      <li><strong>Blogger-piszkozatkezelés:</strong> a frissítés, piszkozat megnyitása, új helyi cikk, mentés, időzítés és piszkozatba visszaállítás most egyetlen, színkódolt <strong>Piszkozatkezelés</strong> csoportban található. A zöld gomb kizárólag piszkozatot ment. Az időzítés szerkesztői feladat, a Bloggerben történik.</li>
+      <li><strong>Meglévő draft:</strong> kapcsolódj a Bloggerhez, válaszd ki a piszkozatot, majd <strong>Kiválasztott piszkozat megnyitása</strong>. A cím, címkék, szöveg, képek és iframe-ek betöltődnek.</li>
       <li><strong>Szerkesztés:</strong> a WYSIWYG-ben egérrel vagy billentyűzettel jelölj ki szöveget, majd használd a formázógombokat. <strong>Link:</strong> kijelölés után 🔗 Link vagy Ctrl+K, utána URL megadása a külön szerkesztősávban. A blokkot csak a jobb oldali <strong>⠿ fogantyúnál</strong> húzd. Használható továbbá felsorolás, igazítás, keretes, kép és iframe; az <strong>x² / x₂</strong> gomb valódi HTML-indexet készít.</li>
       <li><strong>Különleges jelek:</strong> nyisd le az <strong>Ω Különleges karakterek…</strong> panelt Unicode-jelekhez, emojihoz, Unicode felső/alsó indexhez és HTML-entitásokhoz. Kijelölt szövegnél a beszúrt jel vagy entitás <strong>lecseréli a kijelölést</strong>; a <code>&amp;nbsp;</code> rózsaszín szerkesztői jelölést kap.</li>
       <li><strong>Keresés:</strong> a <strong>Keresés a cikkben</strong> mező az aktuális WYSIWYG-szöveg találatait megszámolja és sárgával kiemeli. A kiemelés csak szerkesztési segédlet, nem kerül a Blogger HTML-be.</li>
@@ -162,23 +163,30 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
       <div class="field"><label>Piszkozat keresése</label><input id="rbtools-bloggerDraftSearch" placeholder="Cím vagy post ID…" disabled></div>
       <div class="field"><label>Piszkozat</label><select id="rbtools-bloggerDraftSelect" disabled><option value="">Nincs betöltve</option></select></div>
     </div>
-    <div class="toolbar">
-      <button id="rbtools-bloggerRefreshDrafts" disabled>↻ Piszkozatok frissítése</button>
-      <button id="rbtools-bloggerOpenDraft" disabled>📄 Piszkozat megnyitása</button>
-      <button id="rbtools-bloggerNewLocal">✎ Új helyi cikk</button>
-      <span id="rbtools-bloggerCurrentPost" class="small">Nincs Blogger-bejegyzés hozzárendelve.</span>
-    </div>
-
     <div class="grid2">
       <div class="field"><label>Címkék / labels</label><input id="rbtools-bloggerLabels" placeholder="vasút, Berlin, DB"></div>
-      <div class="field"><label>Időzített publikálás</label><input id="rbtools-bloggerSchedule" type="datetime-local" value="2049-12-31T23:59"><span class="small">Biztonsági alapérték: 2049. 12. 31. 23:59. Normál piszkozatmentés után erre áll vissza.</span></div>
+      <div class="field"><label>Időzített publikálás</label><input id="rbtools-bloggerSchedule" type="datetime-local" value="2049-12-31T23:59"><span class="small">Biztonsági alapérték: 2049. 12. 31. 23:59. Az időzítést az illetékes szerkesztő a Blogger felületén végzi.</span></div>
     </div>
-    <div class="toolbar">
-      <button id="rbtools-bloggerSaveDraft" class="primary" disabled>☁ Mentés Blogger-piszkozatba</button>
-      <button id="rbtools-bloggerSchedulePost" disabled>🕒 Piszkozat időzítése</button>
-      <button id="rbtools-bloggerRevertPost" disabled>↩ Vissza piszkozatba</button>
-      <span class="small">Az <strong>egyéni permalink</strong> nincs dokumentáltan írható Blogger API-mezőként, ezért azt a Blogger felületén kell beállítani.</span>
-    </div>
+
+    <section class="blogger-workflow" aria-label="Blogger-piszkozatkezelés: valamennyi művelet">
+      <div class="blogger-workflow-heading">
+        <strong>Piszkozatkezelés</strong>
+        <span class="small">Minden cikkművelet egy helyen. A zöld gomb kizárólag piszkozatot ment.</span>
+      </div>
+      <div class="blogger-workflow-grid">
+        <button id="rbtools-bloggerRefreshDrafts" type="button" class="blogger-workflow-button blogger-action-list" disabled><span aria-hidden="true">↻</span> 1. Piszkozatlista frissítése</button>
+        <button id="rbtools-bloggerOpenDraft" type="button" class="blogger-workflow-button blogger-action-open" disabled><span aria-hidden="true">📄</span> 2. Kiválasztott piszkozat megnyitása</button>
+        <button id="rbtools-bloggerNewLocal" type="button" class="blogger-workflow-button blogger-action-new"><span aria-hidden="true">✎</span> Új helyi cikk indítása</button>
+        <button id="rbtools-bloggerSaveDraft" type="button" class="blogger-workflow-button blogger-action-save" disabled><span aria-hidden="true">☁</span> PISZKOZAT MENTÉSE A BLOGGERBE</button>
+        <button id="rbtools-bloggerSchedulePost" type="button" class="blogger-workflow-button blogger-action-schedule" disabled><span aria-hidden="true">⚠</span> IDŐZÍTÉS (csak szerkesztő)</button>
+        <button id="rbtools-bloggerRevertPost" type="button" class="blogger-workflow-button blogger-action-revert" disabled><span aria-hidden="true">↩</span> Visszaállítás piszkozatba</button>
+      </div>
+      <p class="blogger-workflow-warning"><strong>Az időzítés kizárólag az illetékes szerkesztő feladata, a Blogger felületén. Ezen a felületen ne időzíts cikket!</strong></p>
+      <div class="blogger-workflow-meta">
+        <span id="rbtools-bloggerCurrentPost" class="small">Nincs Blogger-bejegyzés hozzárendelve.</span>
+        <span class="small">Az <strong>egyéni permalinket</strong> a Blogger szerkesztőjében állítsd be.</span>
+      </div>
+    </section>
   </div>
 
   <div class="grid2 admin-import-grid">
@@ -1012,10 +1020,11 @@ A következő cikk rövid ajánlója.</pre>
       <li><strong>Blogger-cím:</strong> egy önálló, egyszerű szövegmező, a Blogger bejegyzés címe. Nem ismétlődik meg a HTML törzsében, és nem lehet véletlenül a lead első mondata.</li>
       <li><strong>Címkék / labels:</strong> vesszővel, pontosvesszővel vagy új sorral elválasztott címkék írhatók.</li>
       <li><strong>Szerző:</strong> a RegionalBahn HTML-footerhez használható; nem változtatja meg a Blogger-fiók tényleges szerzőségét.</li>
-      <li><strong>Footer:</strong> a szerzői zárás ki- vagy bekapcsolható.</li>
+      <li><strong>Footer:</strong> a szerzői zárás ki- vagy bekapcsolható. A RegionalBahn-szabvány szerint a szöveg után külön sorban <code>&lt;hr align="center" /&gt;</code> következik, majd egy jobbra zárt <code>&lt;div&gt;</code>-ben 85 százalékos betűmérettel és dőlt betűkkel a szerző vagy szerzők neve.</li>
     </ul>
 
     <h3>19. Mentés Blogger-piszkozatba</h3>
+    <p>A Blogger-csatlakozásnál a hat művelet immár egyetlen, színkódolt <strong>Piszkozatkezelés</strong> gombcsoportban van. A piszkozatlista frissítése után nyisd meg a kiválasztott anyagot, vagy indíts új helyi cikket. A <strong>zöld PISZKOZAT MENTÉSE A BLOGGERBE</strong> gomb nem publikálja az anyagot. Az időzítési gomb figyelmeztető színű: a szerkesztőségi rend szerint a tényleges időzítést a kijelölt szerkesztő a Blogger felületén végzi.</p>
     <p>Ha az anyag új és még nincs Blogger post ID-ja, a <strong>Mentés Blogger-piszkozatba</strong> új Blogger draftot hoz létre. Ha meglévő draftot nyitottál meg, ugyanazt a post ID-t frissíti. Mentés után figyeld a széles státuszsávot: zöld sikerüzenet esetén a Blogger API elfogadta a mentést.</p>
     <p>Ha bizonytalan vagy, mentés után nyisd meg vagy frissítsd a Blogger szerkesztőt is. Nagyobb átalakítás előtt jó gyakorlat egy külön tesztdrafton kipróbálni az új funkciót.</p>
 
@@ -1291,6 +1300,25 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-quicksteps strong{font-weight:750}
 #rbtools-app .admin-blogger-panel{border-left:4px solid var(--line)}
 #rbtools-app .admin-blogger-panel.connected{border-left-color:var(--ok)}
+#rbtools-app .blogger-workflow{margin:16px 0 5px;border:2px solid #73a4cf;border-radius:12px;padding:14px;background:var(--panel2)}
+#rbtools-app .blogger-workflow-heading{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:11px}
+#rbtools-app .blogger-workflow-heading>strong{font-size:17px}
+#rbtools-app .blogger-workflow-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+#rbtools-app .blogger-workflow-button{display:flex;align-items:center;justify-content:flex-start;gap:8px;text-align:left;padding:14px 12px;white-space:normal;min-height:62px;border:2px solid var(--line);border-radius:9px;line-height:1.35;font-size:13px;font-weight:800;box-shadow:0 2px 4px rgba(0,0,0,.08);transition:transform .1s,box-shadow .1s}
+#rbtools-app .blogger-workflow-button>span{font-size:20px;flex:0 0 auto}
+#rbtools-app .blogger-workflow-button:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(0,0,0,.13)}
+#rbtools-app .blogger-action-list{background:#ebf4ff;color:#17385d;border-color:#a4c5e9}
+#rbtools-app .blogger-action-open{background:#daeaff;color:#143e70;border-color:#72a6e3}
+#rbtools-app .blogger-action-new{background:#eceff6;color:#26374f;border-color:#bac5d5}
+#rbtools-app .blogger-action-save{background:#1f7a46;color:#fff;border-color:#165b32;font-size:14px}
+#rbtools-app .blogger-action-schedule{background:#fff0f1;color:#8c1727;border-color:#e9a0a9}
+#rbtools-app .blogger-action-revert{background:#fff3db;color:#704713;border-color:#e8c484}
+#rbtools-app .blogger-workflow-button:disabled{opacity:.43;box-shadow:none;cursor:not-allowed}
+#rbtools-app .blogger-workflow-warning{margin:13px 0 10px;border-left:4px solid #e11d48;background:#ffe9ee;color:#9f1239;padding:9px 11px;font-size:12px}
+#rbtools-app .blogger-workflow-meta{display:flex;flex-direction:column;gap:5px;margin-top:10px}
+@media(max-width:1000px){#rbtools-app .blogger-workflow-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){#rbtools-app .blogger-workflow-grid{grid-template-columns:1fr}}
+
 #rbtools-app .admin-blogger-setup{margin:10px 0}
 #rbtools-app .admin-blogger-panel select:disabled,#rbtools-app .admin-blogger-panel input:disabled{opacity:.62}
 #rbtools-app #rbtools-bloggerCurrentPost{margin-left:0;overflow-wrap:anywhere}
@@ -3134,7 +3162,7 @@ function adminGenerateHtml(setStatus=true){
     out='<div style="text-align: '+adminValidAlign(adminLeadAlign,"justify")+';">\n'+adminMainImageHtml(main)+'<strong>'+topHtml+'</strong></div>\n<br />\n<!--more-->\n<br />\n';
     out+=adminBlocks.map(adminBlockHtml).filter(Boolean).join("\n");
     if(adminSourcesHtml)out+="\n"+adminSourcesHtml;
-    if(rbGet("adminFooter").value==="author"&&author)out+='\n<hr />\n<div style="text-align: right;"><span style="font-size: 85%;"><em>'+esc(author)+'</em></span></div>';
+    if(rbGet("adminFooter").value==="author"&&author)out+='\n<hr align="center" />\n<div style="text-align: right;"><span style="font-size: 85%;"><em>'+esc(author)+'</em></span></div>';
   }
   rbGet("adminOutput").value=out;
   if(setStatus)rbGet("adminStatus").textContent=contentType==="static"?"Statikus oldal HTML-je frissítve.":"Végleges HTML frissítve.";
