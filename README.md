@@ -92,6 +92,9 @@ A Cikkadminban külön tartalomtípus választható: **Cikk**, **#nyúz / Hétv�
 - a képtári kártya szövegmezői kijelölhetők, mert a képek már kizárólag a miniatűrnél fogva húzhatók;
 - egérrel vagy billentyűzettel szabad szövegkijelölés és kiválasztott rész formázása;
 - hivatkozások beszúrása/szerkesztése külön, nem modális URL-szerkesztővel (Ctrl+K / ⌘K);
+- a WYSIWYG szövegformázó eszköztár **közvetlenül a szerkeszthető cikkfelület fölött**, görgetéskor is elérhető; a keresés, karakterpaletta és iframe-eszközök a cikkszöveg alatt kaptak helyet;
+- kijelölt szövegen jobb kattintással **helyi menü** nyílik (félkövér, dőlt, aláhúzott, áthúzott, link, másolás); a **Shift + jobb kattintás** meghagyja a böngésző saját menüjét;
+- új hivatkozásoknál alapértelmezett az **új ablakban/lapon megnyitás** (`target="_blank" rel="noopener"`), de az URL-panel jelölőnégyzetével azonos lap is választható; korábban létrehozott link szerkesztésekor a meglévő célbeállításból indulunk;
 - blokkok drag-and-drop rendezése kizárólag a jobb oldali ⠿ fogantyúnál, hogy a szöveg kijelölhető maradjon;
 - meglévő RegionalBahn Blogger HTML visszatöltése szerkesztésre;
 - haladó forráskonverzió a Cikkadminon belül: Markdown/plain text/DOCX/ODT/RTF/Google Dokumentum, profilok, presetek, RB-jelölések, közvetlen HTML-kimenet és előnézet;
