@@ -110,7 +110,9 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
     </div>
     <ol class="admin-quicksteps">
       <li><strong>Válassz tartalomtípust:</strong> cikk, #nyúz, podcast shownotes, InnoTrans vagy statikus oldal; igény szerint töltsd be a hozzá tartozó sablont.</li>
-      <li><strong>Új anyag:</strong> a legtöbb munkához írj közvetlenül a WYSIWYG-ben, vagy importálj Markdown/TXT/DOCX/ODT/RTF szöveget. Képes cikknél Bloggerben előbb töltsd fel a képeket egy draftba, majd nyisd meg azt itt.</li>
+      <li><strong>Cikkcím:</strong> a címet a külön, Blogger-szerű <strong>Cikk címe</strong> mezőbe írd. Nem lesz belőle megismételt törzsszöveg vagy automatikus lead.</li>
+      <li><strong>Főkép + valódi lead:</strong> a külön, bekeretezett bevezetőben válassz képet, vagy húzd oda a képtárból, és írd mellé a felvezetőt. A <code>&lt;!--more--&gt;</code> mindig a teljes lead után kerül.</li>
+      <li><strong>Új anyag:</strong> írj közvetlenül a WYSIWYG-ben, vagy importálj Markdown/TXT/DOCX/ODT/RTF szöveget. Képes cikknél előbb Bloggerben töltsd fel a képeket egy draftba, majd nyisd meg azt itt. A törzsszövegben a választóval <strong>H2–H5</strong> szintű alcímeket készíthetsz.</li>
       <li><strong>Haladó forráskonverzió:</strong> ha Google Dokumentumból dolgozol, régi RB-jelöléseket (<code>RB:IMAGE</code>, <code>RB:BOX</code>, <code>RB:SOURCES</code> stb.) használsz, profil/preset kell, vagy külön HTML-előnézetet szeretnél, nyisd le a Cikkadmin alján a <strong>Haladó forráskonverzió, Google Docs és RB-jelölések</strong> részt. A létrejött HTML egy gombbal visszatölthető a WYSIWYG-be.</li>
       <li><strong>Meglévő draft:</strong> kapcsolódj a Bloggerhez, válaszd ki a piszkozatot, majd <strong>Piszkozat megnyitása</strong>. A cím, címkék, szöveg, képek és iframe-ek betöltődnek.</li>
       <li><strong>Szerkesztés:</strong> a WYSIWYG-ben egérrel vagy billentyűzettel jelölj ki szöveget, majd használd a formázógombokat. <strong>Link:</strong> kijelölés után 🔗 Link vagy Ctrl+K, utána URL megadása a külön szerkesztősávban. A blokkot csak a jobb oldali <strong>⠿ fogantyúnál</strong> húzd. Használható továbbá felsorolás, igazítás, keretes, kép és iframe; az <strong>x² / x₂</strong> gomb valódi HTML-indexet készít.</li>
@@ -884,7 +886,13 @@ A következő cikk rövid ajánlója.</pre>
     <p>Ha a cikk nincs az API-n keresztül megnyitva, a <strong>Meglévő Blogger-cikk HTML-jének visszatöltése szerkesztésre</strong> részbe teljes HTML-fragmentum illeszthető vagy <code>.html</code> fájl tölthető. A parser felismeri a tipikus RegionalBahn leadet, képeket, képaláírásokat, H3/H4 címeket, kereteseket, iframe-eket és néhány speciális blokkot. Nem általános célú tökéletes HTML round-trip szerkesztő, ezért különösen régi vagy szokatlan kézi HTML-nél mindig ellenőrizd a végleges kimenetet.</p>
 
     <h3>10. A WYSIWYG szerkesztő felépítése</h3>
-    <p>A szerkesztő „papírján” a cím és a lead után következik a Blogger <code>&lt;!--more--&gt;</code> helye, majd a törzsszöveg blokkjai. A blokkok között kék beszúrási sávok vannak. A blokk jobb oldalán a <strong>↑</strong>, <strong>↓</strong> és <strong>×</strong> gombokkal mozgathatsz vagy törölhetsz; asztali böngészőben a jobb oldali ⠿ fogantyúnál megfogva húzással is átrendezheted őket.</p>
+    <ol>
+      <li><strong>Cikk címe:</strong> különálló, Blogger-szerű, egyszerű szövegmező. Az ide írt cím csak a Blogger-bejegyzés címe lesz, nem hoz létre H1-et vagy másik bekezdést a HTML-ben.</li>
+      <li><strong>Főkép + valódi lead:</strong> a WYSIWYG első, bekeretezett blokkja. Itt a képtárban már feltöltött képekből választhatod ki a 200 képpontos főképnek megfelelőt, majd közvetlenül szerkesztheted a valódi leadet. A képet a képtárból közvetlenül ide is húzhatod.</li>
+      <li><strong>&lt;!--more--&gt;:</strong> automatikusan a teljes főkép+lead blokk mögött marad. Régebbi, hibásan megkettőzött nyitóblokkok beolvasásakor a szerkesztő a valódi leadet próbálja visszaemelni, a fölösleges második képes bekezdést pedig eltávolítja.</li>
+      <li><strong>Törzsszöveg:</strong> külön szövegblokkokból áll. Az Alcím gomb mellett <strong>H2, H3, H4 vagy H5</strong> választható; a címhez tartozó H1 nem szerkesztendő törzsszövegként. Régi HTML-ben előforduló H1-es törzscímsort a visszaolvasó H2-es alcímként kezeli.</li>
+      <li><strong>Blokkmozgatás:</strong> a jobb oldali <strong>↑</strong>, <strong>↓</strong> és <strong>×</strong> gombokkal, illetve a <strong>⠿</strong> fogantyúval történhet. A kék beszúrási sávokba képek és más blokkok húzhatók.</li>
+    </ol>
     <p>Gyorsgombbal hozzáadható:</p>
     <ul>
       <li><strong>Bekezdés</strong></li>
@@ -995,13 +1003,13 @@ A következő cikk rövid ajánlója.</pre>
     <p>A keresési sárga kiemelés kizárólag vizuális szerkesztői réteg. <strong>Nem kerül bele a végleges Blogger HTML-be</strong>, és nem alakítja át a cikk szövegét. A <strong>Kiemelés törlése</strong> gomb üríti a keresőmezőt és eltávolítja a találatjelöléseket.</p>
     <p>Ha közben szerkeszteni kezded a szöveget, a program szükség esetén újraszámolja vagy eltávolítja a segédkiemelést, hogy a találatjelző ne váljon a tényleges HTML részévé. A keresés a WYSIWYG felületre szolgál; a külön forrás- vagy végleges HTML-textareákban a böngésző saját keresése használható.</p>
 
-    <h3>17. Képtár és főkép</h3>
-    <p>A <strong>Képtár</strong> minden beolvasott képhez külön kártyát ad. A képaláírás és a kredit közvetlenül szerkeszthető. A <strong>☆ Főkép</strong> gombbal kijelölt kép a cikk elején, a lead mellett jelenik meg. A normál képet a <strong>＋ Cikk végére</strong> gombbal vagy drag-and-drop módszerrel helyezd el.</p>
+    <h3>17. Képtár, főkép és lead</h3>
+    <p>A <strong>Képtár</strong> minden beolvasott képhez külön kártyát ad. A képaláírás és a kredit közvetlenül szerkeszthető. A főkép a képtár <strong>☆ Főkép</strong> gombjával, a bevezetőblokk saját képkiválasztójával vagy a kép bevezetőbe húzásával jelölhető ki. A valódi leadet ugyanebben a blokkban, a képtől jobbra szerkesztheted. A normál képeket a <strong>＋ Cikk végére</strong> gombbal vagy drag-and-drop módszerrel helyezd el.</p>
     <p>Ha egy kép a Blogger-draftban benne van, de a WYSIWYG-ben nem ott jelenik meg, ahol szeretnéd, ez nem igényel újrafeltöltést: a képtárból húzd át a kívánt helyre.</p>
 
     <h3>18. Blogger-címkék, cím, szerző és footer</h3>
     <ul>
-      <li><strong>Blogger-cím:</strong> a post címe.</li>
+      <li><strong>Blogger-cím:</strong> egy önálló, egyszerű szövegmező, a Blogger bejegyzés címe. Nem ismétlődik meg a HTML törzsében, és nem lehet véletlenül a lead első mondata.</li>
       <li><strong>Címkék / labels:</strong> vesszővel, pontosvesszővel vagy új sorral elválasztott címkék írhatók.</li>
       <li><strong>Szerző:</strong> a RegionalBahn HTML-footerhez használható; nem változtatja meg a Blogger-fiók tényleges szerzőségét.</li>
       <li><strong>Footer:</strong> a szerzői zárás ki- vagy bekapcsolható.</li>
