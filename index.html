@@ -118,7 +118,8 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
       <li><strong>Haladó forráskonverzió:</strong> ha Google Dokumentumból dolgozol, régi RB-jelöléseket (<code>RB:IMAGE</code>, <code>RB:BOX</code>, <code>RB:SOURCES</code> stb.) használsz, profil/preset kell, vagy külön HTML-előnézetet szeretnél, nyisd le a Cikkadmin alján a <strong>Haladó forráskonverzió, Google Docs és RB-jelölések</strong> részt. A létrejött HTML egy gombbal visszatölthető a WYSIWYG-be.</li>
       <li><strong>Blogger-piszkozatkezelés:</strong> a frissítés, piszkozat megnyitása, új helyi cikk, mentés, időzítés és piszkozatba visszaállítás most egyetlen, színkódolt <strong>Piszkozatkezelés</strong> csoportban található. A zöld gomb kizárólag piszkozatot ment. Az időzítés szerkesztői feladat, a Bloggerben történik.</li>
       <li><strong>Meglévő draft:</strong> kapcsolódj a Bloggerhez, válaszd ki a piszkozatot, majd <strong>Kiválasztott piszkozat megnyitása</strong>. A cím, címkék, szöveg, képek és iframe-ek betöltődnek.</li>
-      <li><strong>Szerkesztés:</strong> a WYSIWYG-ben egérrel vagy billentyűzettel jelölj ki szöveget, majd használd a formázógombokat. <strong>Link:</strong> kijelölés után 🔗 Link vagy Ctrl+K, utána URL megadása a külön szerkesztősávban. A blokkot csak a jobb oldali <strong>⠿ fogantyúnál</strong> húzd. Használható továbbá felsorolás, igazítás, keretes, kép és iframe; az <strong>x² / x₂</strong> gomb valódi HTML-indexet készít.</li>
+      <li><strong>Kétféle keretes:</strong> a „＋ Keretes” gomb mellett klasszikus vagy bal oldali, vastagabb sávval kiemelt szürke doboz választható. A külön Keretes fülön WYSIWYG és HTML-fül is rendelkezésre áll; a meglévő klasszikus dobozokat nem alakítjuk át automatikusan.</li>
+       <li><strong>Szerkesztés:</strong> a WYSIWYG-ben egérrel vagy billentyűzettel jelölj ki szöveget, majd használd a formázógombokat. <strong>Link:</strong> kijelölés után 🔗 Link vagy Ctrl+K, utána URL megadása a külön szerkesztősávban. A blokkot csak a jobb oldali <strong>⠿ fogantyúnál</strong> húzd. Használható továbbá felsorolás, igazítás, keretes, kép és iframe; az <strong>x² / x₂</strong> gomb valódi HTML-indexet készít.</li>
       <li><strong>Többsoros képaláírás:</strong> a képtár kártyáján a képaláírás többsoros mező, a WYSIWYG-ben pedig Enter vagy a <strong>↵ Sortörés</strong> gomb használható. Ha kell a fotós neve, jelöld be a <strong>Fotós neve külön sorban</strong> lehetőséget és add meg a nevet. A kimenetben egyetlen képaláírás lesz, az új sorok és a fotós neve <code>&lt;br /&gt;</code>-rel elválasztva.</li>
       <li><strong>Különleges jelek:</strong> nyisd le az <strong>Ω Különleges karakterek…</strong> panelt Unicode-jelekhez, emojihoz, Unicode felső/alsó indexhez és HTML-entitásokhoz. Kijelölt szövegnél a beszúrt jel vagy entitás <strong>lecseréli a kijelölést</strong>; a <code>&amp;nbsp;</code> rózsaszín szerkesztői jelölést kap.</li>
       <li><strong>Keresés:</strong> a <strong>Keresés a cikkben</strong> mező az aktuális WYSIWYG-szöveg találatait megszámolja és sárgával kiemeli. A kiemelés csak szerkesztési segédlet, nem kerül a Blogger HTML-be.</li>
@@ -284,6 +285,10 @@ További szöveg..."></textarea>
         <select id="rbtools-adminHeadingLevel" aria-label="Alcím szintje"><option value="h2">H2</option><option value="h3" selected>H3</option><option value="h4">H4</option><option value="h5">H5</option></select>
         <button id="rbtools-adminAddH3" type="button">＋ Alcím</button>
         <button id="rbtools-adminAddBox">＋ Keretes</button>
+        <select id="rbtools-adminNewBoxVariant" aria-label="Új keretes megjelenése" title="Válaszd ki, melyik keretes stílust készítsük el">
+          <option value="classic">Klasszikus szürke</option>
+          <option value="accent">Oldalsávos szürke</option>
+        </select>
         <button id="rbtools-adminAddIframe">＋ iframe</button>
         <button id="rbtools-adminAddRule">＋ Elválasztó</button>
       </div>
@@ -563,6 +568,17 @@ Források:
       <div class="field"><label>Képszélesség</label><select id="rbtools-boxImageWidth"><option value="600">600 px</option><option value="800">800 px</option><option value="100%">100%</option></select></div>
     </div>
     <div class="grid2" style="margin-top:10px">
+      <div class="field"><label for="rbtools-boxVariant">Keretes megjelenése</label><select id="rbtools-boxVariant">
+        <option value="classic">Klasszikus szürke keretes</option>
+        <option value="accent">Szürke keretes oldalsávval (Impresszum-szerű)</option>
+      </select></div>
+      <div class="field"><label for="rbtools-boxEditorMode">Szöveg szerkesztése</label><select id="rbtools-boxEditorMode">
+        <option value="visual">WYSIWYG (alapértelmezett)</option>
+        <option value="html">Közvetlen HTML</option>
+        <option value="markdown">Markdown / egyszerű szöveg</option>
+      </select></div>
+    </div>
+    <div class="grid2" style="margin-top:10px">
       <div class="field"><label>Keretes kép eredeti / nagy URL</label><input id="rbtools-boxImageFull" placeholder="https://…/s1600/kep.jpg"></div>
       <div class="field"><label>Keretes kép megjelenített URL</label><input id="rbtools-boxImageDisplay" placeholder="https://…/s600/kep.jpg"></div>
     </div>
@@ -573,9 +589,22 @@ Források:
     <p class="small" style="margin:8px 0 0">A kép teljesen opcionális. Ha csak az egyik kép-URL-t adod meg, a konverter azt használja a nagy és a megjelenített változathoz is. A bekezdések paddingje: első <code>15px 15px 5px</code>, közbenső <code>0px 15px 5px</code>, utolsó <code>0px 15px 15px</code>; egyetlen bekezdésnél <code>15px 15px 15px</code>.</p>
   </div>
 
+  <div class="panel rb-box-editor-zone" style="margin-top:10px">
+    <div class="toolbar rb-box-rich-toolbar" id="rbtools-boxVisualToolbar" role="toolbar" aria-label="Keretes WYSIWYG formázás">
+      <button type="button" data-box-format="bold"><b>B</b> Félkövér</button>
+      <button type="button" data-box-format="italic"><i>I</i> Dőlt</button>
+      <button type="button" data-box-format="underline"><u>U</u> Aláhúzott</button>
+      <button type="button" data-box-format="strikeThrough"><s>S</s> Áthúzott</button>
+      <button type="button" id="rbtools-boxFormatLink">🔗 Link</button>
+      <button type="button" data-box-format="unlink">⛓ Link törlése</button>
+    </div>
+    <div id="rbtools-boxVisual" class="rb-box-visual-editor" contenteditable="true" spellcheck="true" role="textbox" aria-multiline="true" aria-label="Keretes szöveg WYSIWYG szerkesztése"><p>Ide írhatod a keretes szövegét.</p></div>
+    <textarea id="rbtools-boxRichHtml" spellcheck="false" hidden aria-label="A keretes szöveg belső HTML-forrása"></textarea>
+    <p class="small">A WYSIWYG és a közvetlen HTML ugyanazt a szöveget szerkeszti. A Markdown-import változatlanul elérhető lent.</p>
+  </div>
   <div class="grid2">
-    <section class="card">
-      <div class="cardhead">Keretes szöveg bemenet</div>
+    <section class="card" id="rbtools-boxMarkdownCard" hidden>
+      <div class="cardhead">Markdown / egyszerű szöveg bemenet</div>
       <textarea id="rbtools-boxInput" spellcheck="false" placeholder="Első bekezdés.\n\nKözbenső bekezdés.\n\nUtolsó bekezdés."></textarea>
     </section>
     <section class="card">
@@ -606,9 +635,13 @@ Források:
             <option value="kk">Közvetlen Kocsi podcastarchívum</option>
             <option value="it">InnoTrans cikkarchívum</option>
             <option value="impresszum">Impresszum (HU / DE / EN)</option>
+            <option value="braking">Vasúti fékezés – sorozat</option>
+            <option value="zusi">Magyar Zusi – letöltések</option>
+            <option value="plain">Üres, egyszerű szöveges oldal</option>
           </select>
         </label>
         <button id="rbtools-pageStartTemplate" type="button">▣ Új, helyi sablon</button>
+        <button id="rbtools-pageUseLiveTemplate" type="button" disabled title="A kiválasztott eredeti /p/ oldal teljes, aktuális HTML-je, egy külön helyi másolatba betöltve.">↺ Friss sablon az eredeti Blogger-oldalból</button>
         <label class="collection-page-file-label">Sablon vagy HTML-fájl megnyitása
           <input id="rbtools-pageImportFile" type="file" accept=".html,.htm,.txt,text/html,text/plain">
         </label>
@@ -619,6 +652,7 @@ Források:
         <button id="rbtools-pageNewArticleQuick" type="button" disabled>📰＋ Új cikk</button>
         <button id="rbtools-pageNewImprintQuick" type="button" disabled>▣＋ Impresszum-rovat</button>
       </div>
+      <p class="small" id="rbtools-pageTemplateOrigin">A beépített Impresszum a legutóbb ismert verzió; a kézzel módosított élő oldal pontos tartalmához használd a „Friss sablon az eredeti Blogger-oldalból” gombot.</p>
       <p id="rbtools-pageTemplateHint" class="small">Nyisd meg az eredeti Blogger-oldalt vagy a két egyszerűsített HTML-sablon valamelyikét. Új helyi sablon soha nem írja felül automatikusan a Bloggeren meglévő oldalt.</p>
     </div>
     <div class="collection-page-actions">
@@ -951,6 +985,33 @@ A következő cikk rövid ajánlója.</pre>
 </section>
 
 <section id="rbtools-tab-help" class="tab">
+  <nav class="panel rb-help-toc" id="rbtools-helpTOC" aria-label="Súgó tartalomjegyzéke">
+    <h2>Súgó: tartalomjegyzék</h2>
+    <p>A témára kattintva közvetlenül a megfelelő lépésről lépésre útmutatóhoz ugorhatsz.</p>
+    <div id="rbtools-helpTOCLinks"></div>
+  </nav>
+  <div class="panel" id="rbtools-help-gyujtooldalak">
+    <h2>Gyűjtőoldalak: lépésről lépésre</h2>
+    <ol>
+      <li>A <strong>Gyűjtőoldalak</strong> fülön válaszd ki a kívánt típust: Közvetlen Kocsi, InnoTrans, aktuális Impresszum, Vasúti fékezés, Magyar Zusi vagy üres szöveges oldal.</li>
+      <li>Meglévő <code>/p/</code> oldal pontos szerkesztéséhez kapcsolódj a Bloggerhez, frissítsd az oldallistát, válaszd ki az oldalt, majd kattints a <strong>Megnyitás</strong> gombra. A rendszer az eredeti HTML-t tartja meg, a speciális gombokat és szkripteket külön zárolja.</li>
+      <li>A szerkesztőnek átadott, <strong>legfrissebb oldaltartalomból külön helyi mintát</strong> a „Friss sablon az eredeti Blogger-oldalból” gomb készít. Így a kézzel módosított Impresszum is pontosan a Blogger API-ban meglévő tartalommal használható. A beépített offline minták csupán kiindulási vázlatok, nem az élő oldal másolatai.</li>
+      <li>Új Közvetlen Kocsi- vagy InnoTrans-anyaghoz használd az <strong>Új év / Új adás / Új cikk</strong> gombokat. A két archívumban az évválasztó és az „Összes” gomb megmarad. A fékezés- és Zusi-sablonokban szerkeszthető szekciókat, linkeket és tartalomblokkokat kapsz.</li>
+      <li>Szerkeszd a fehér tartalmi blokkokat WYSIWYG-ben, a sötét jelzésű speciális HTML-t a program változtatás nélkül kezeli. Nyisd meg a <strong>Biztonságos előnézetet</strong>, szükség esetén töltsd le a teljes HTML-t.</li>
+      <li>Élő oldal mentése előtt <strong>ajánlott</strong> letölteni az eredeti HTML-t. Ha erről lemondasz, ezt külön jelölőnégyzettel kell megerősítened. A mentés előtt újabb szerverellenőrzés fut, a közzétett oldal módosítása azonnal látható lehet.</li>
+      <li>A mentés utáni ellenőrzés összeveti a Bloggerben található HTML-t az elküldött változattal és ellenőrzi a védett kódrészeket. Eltérésnél ellenőrizd az állapotsávot, ne ments rá automatikusan újra.</li>
+    </ol>
+  </div>
+  <div class="panel" id="rbtools-help-keretes">
+    <h2>Keretes: WYSIWYG és HTML használata</h2>
+    <ol>
+      <li>A <strong>Keretes</strong> fülön válaszd a <strong>Klasszikus szürke</strong> vagy az új, <strong>oldalsávos szürke</strong> megjelenést. Az utóbbi az Impresszum kiemelőelemének elvét használja a RegionalBahn megszokott keretesszíneivel.</li>
+      <li>Írd meg a címet, majd a <strong>WYSIWYG</strong> módban közvetlenül gépelj; a félkövér, dőlt, aláhúzott, áthúzott és linkgombok a kijelölt szövegen működnek.</li>
+      <li>A <strong>Közvetlen HTML</strong> mód ugyanannak a szövegnek a forrását mutatja, amelyet vissza is alakíthatsz WYSIWYG-be. A képet, fotóst és képaláírást külön mezőkkel adhatod meg.</li>
+      <li>Régi Markdown-/szövegfájl esetén válaszd a <strong>Markdown</strong> módot, töltsd be a forrást, majd konvertálj. Másik módra váltáskor ellenőrizd a generált HTML-t.</li>
+      <li>Az <strong>Előnézet</strong> és <strong>HTML másolása</strong> gombbal a kész keretes önállóan felhasználható. A Cikkadminban ugyanez a két stílus blokkonként választható, és a cikk HTML-jébe együtt kerül.</li>
+    </ol>
+  </div>
   <div class="panel help-admin-guide" id="rbtools-help-cikkadmin">
     <h2>Cikkadmin – teljes, lépésről lépésre használati útmutató</h2>
     <p><strong>Ha most használod először az RBToolst, ezt a fejezetet érdemes végigolvasni.</strong> A Cikkadmin a RegionalBahn egységes cikkes munkafelülete. A korábbi külön <strong>Szöveg → Blogger konverter</strong> megszűnt mint önálló fül, és teljes funkcionalitása a Cikkadmin <strong>Haladó forráskonverzió, Google Docs és RB-jelölések</strong> részébe került. Többek között ezekre használható:</p>
@@ -1069,7 +1130,7 @@ A következő cikk rövid ajánlója.</pre>
     <ul>
       <li><strong>Bekezdés</strong></li>
       <li><strong>Alcím</strong></li>
-      <li><strong>Keretes</strong></li>
+      <li><strong>Keretes:</strong> választható klasszikus és szürke oldalsávos változat; az új dobozoknál a „Keretes megjelenése” választó dönt. A meglévő klasszikus keretesek stílusa változatlan.</li>
       <li><strong>iframe</strong></li>
       <li><strong>Elválasztó</strong></li>
     </ul>
@@ -1098,7 +1159,8 @@ A következő cikk rövid ajánlója.</pre>
     </ul>
     <p>Először kattints abba a blokkba, amelyet igazítani szeretnél. Az igazítás működik normál bekezdésen, alcímen, leaden, keretes címén/törzsén és iframe-blokkon. A gomb nem csak vizuális előnézetet változtat, hanem a generált Blogger HTML megfelelő <code>text-align</code> értékét is.</p>
 
-    <h3>14. Keretes blokkok</h3>
+    <h3>14. Keretes blokkok: klasszikus és oldalsávos</h3>
+    <p>Új keretes beszúrásakor a <strong>Keretes megjelenése</strong> választón dönthetsz a klasszikus szürke és a bal oldali hangsúlyos sávval ellátott, ugyanúgy szürke változat között. A keretes saját vezérlőjével a típust később is átállíthatod. A külön <strong>Keretes</strong> fülön ugyanez a két forma WYSIWYG-ben és közvetlen HTML-ben is készíthető.</p>
     <p>A <strong>＋ Keretes</strong> új szürke RegionalBahn-dobozt hoz létre. A formázósor <strong>▣ Keretes</strong> gombja az aktuális szövegblokkot alakítja át keretessé. A keretes címe és törzse külön szerkeszthető, külön igazítható, és a képtárból kép húzható bele. A kép eltávolítható anélkül, hogy maga a keretes törlődne.</p>
 
     <h3>15. iframe és beágyazások</h3>
@@ -1779,6 +1841,16 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .collection-legacy-wrap .collection-legacy-body{padding:12px 0}
 @media(max-width:700px){#rbtools-app .collection-page-toolbar{top:0;max-height:40vh;overflow:auto}#rbtools-app .collection-page-actions>label{flex:1 1 100%}#rbtools-app .collection-page-actions select{flex:1}}
 
+#rbtools-app .rb-box-editor-zone{border:1px solid #7499b7}
+#rbtools-app .rb-box-rich-toolbar{margin-bottom:6px;gap:5px}
+#rbtools-app .rb-box-visual-editor{min-height:210px;max-height:65vh;overflow-y:auto;padding:14px 17px;border:2px solid #92b0ca;border-radius:8px;background:#fff;color:#16212b;line-height:1.6}
+#rbtools-app .rb-box-visual-editor:focus{outline:2px solid #3183bf}
+#rbtools-app #rbtools-boxRichHtml:not([hidden]){display:block;min-height:240px;width:100%;font:13px/1.5 Consolas,monospace}
+#rbtools-app .rb-help-toc{border:2px solid #5182aa;scroll-margin-top:20px}
+#rbtools-app .rb-help-toc a{display:inline-block;margin:4px 7px 4px 0;padding:6px 10px;background:var(--panel2);border-radius:5px}
+#rbtools-app #rbtools-help-gyujtooldalak,#rbtools-app #rbtools-help-keretes{scroll-margin-top:20px}
+#rbtools-app .admin-box-variant{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel2);font-size:12px}
+#rbtools-app .admin-box-variant select{max-width:240px;min-width:140px}
 </style>
 <script>
 (function(){
