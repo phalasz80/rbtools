@@ -303,6 +303,14 @@ function update(){
   view.raw.value=code;
   ["pageCopy","pageDownload","pagePreview","pageAddParagraph","pageAddHeading","pageAddRule","pageLink"].forEach(id=>get(id).disabled=!has||!state.tree.safe);
   view.title.disabled=!has;view.backup.disabled=!hasPage||state.saving;
+  const optOut=get("pageSkipBackup");
+  optOut.disabled=!hasPage||state.saving;
+  const choiceStatus=get("pageBackupChoiceStatus");
+  choiceStatus.textContent=!hasPage?"Csak meglévő Blogger-oldalnál szükséges dönteni.":state.backup
+    ?"✓ Az aktuálisan betöltött eredeti HTML-t már letöltötted. Mentés folytatható."
+    :optOut.checked
+      ?"⚠ Kifejezetten lemondtál a letöltésről. Mentés folytatható, de az eredeti fájl nem lesz nálad."
+      :"Válassz: töltsd le az eredeti HTML-t, VAGY kifejezetten jelöld be, hogy nem kéred.";
   get("pageProtection").textContent=has
     ?(audit.ok?"✓ A védett forráskódrészek sértetlenek: "+audit.count+
        " blokk, "+audit.scripts+" JavaScript, "+audit.buttons+" navigációs elem.":"⚠ Védett forráskód sérült: mentés tiltva.")
@@ -320,7 +328,9 @@ function update(){
   if(!bridge.isConnected()){message("A BLOGGER-KAPCSOLAT MEGSZAKADT",
     "A helyi szerkesztés megmarad ezen a lapon; újrakapcsolódás és mentés szükséges.","working");return;}
   if(changed){message("NEM MENTETT HELYI MÓDOSÍTÁSOK",
-    (state.backup?"✓ Az eredeti HTML-ről készült biztonsági mentés. ":"Előbb töltsd le az EREDETI HTML biztonsági mentését. ")+
+    (state.backup?"✓ Az eredeti HTML-t már letöltötted. ":
+      get("pageSkipBackup").checked?"⚠ Az eredeti HTML letöltéséről lemondtál. ":
+      "Az eredeti HTML letöltését javasoljuk; a lemondást külön be kell jelölni. ")+
     "A(z) "+state.loaded.title+" oldal tartalma a Bloggeren még nem módosult.","dirty");return;}
   const when=state.baseline?.updated?new Date(state.baseline.updated).toLocaleString("hu-HU"):"";
   message(state.baseline?.origin==="saved"?"MENTVE, A BLOGGEREN ELLENŐRIZVE":"BLOGGER-OLDAL BETÖLTVE",
@@ -387,7 +397,7 @@ function abandonCheck(){
 function loadHtml(html,{page=null,title="",origin="loaded"}={}){
   state.error="";state.critical=false;state.saving=false;state.tree=core.parse(html);
   state.loaded=page?{...page,blogId:view.blog.value,originalHtml:html}:null;
-  state.backup=false;view.title.value=title;
+  state.backup=false;get("pageSkipBackup").checked=false;view.title.value=title;
   state.baseline=page?{title,html,updated:page.updated||"",origin}:null;
   state.profile=presets.detect(html,(page?.url||"")+" "+title);
   get("pageTemplateMode").value=state.profile||"auto";
@@ -412,8 +422,12 @@ async function openPage(){
 }
 function backup(){
   if(!state.loaded)return;
-  bridge.download("RBTools_EREDETI_"+safeName(state.loaded.title)+"_"+state.loaded.id+".html",state.baseline.html);
-  state.backup=true;update();
+  try{
+    // A kritikus szerverhibát követően is az eredetileg beolvasott HTML tölthető le.
+    const source=state.critical?originalBackUpRaw():state.baseline.html;
+    bridge.download("RBTools_EREDETI_"+safeName(state.loaded.title)+"_"+state.loaded.id+".html",source);
+    state.backup=true;get("pageSkipBackup").checked=false;update();
+  }catch(error){message("AZ EREDETI HTML LETÖLTÉSE SIKERTELEN",error.message,"error");}
 }
 function exportHtml(){
   if(!state.tree)return;
@@ -575,12 +589,19 @@ async function savePage(){
   const html=currentHtml(),title=view.title.value.trim(),audit=core.audit(state.tree,html),page=state.loaded;
   if(!title){state.error="Az oldal címét nem lehet üresen menteni.";update();return;}
   if(!state.tree.safe||!audit.ok){state.error="Az eredeti speciális HTML-kód nem maradt hiánytalanul meg.";update();return;}
-  if(!state.backup){message("ELŐBB AZ EREDETI HTML BIZTONSÁGI MENTÉSE KÖVETKEZIK","Kattints az EREDETI HTML biztonsági mentése gombra. A fájl a későbbi visszaállításhoz szükséges.","dirty");return;}
+  const skippedBackup=!state.backup&&get("pageSkipBackup").checked;
+  if(!state.backup&&!skippedBackup){
+    message("VÁLASSZ BIZTONSÁGI MÁSOLATOT VAGY KIFEJEZETT LEMONDÁST",
+      "Az eredeti HTML letöltése ajánlott, de nem kötelező. Ha nélküle folytatod, pipáld be a „NEM kérem az eredeti HTML mentését” jelölőnégyzetet.","dirty");return;
+  }
   if(!bridge.isConnected()){state.error="Nincs aktív Google Blogger-kapcsolat.";update();return;}
   const live=String(page.status||"").toUpperCase()==="LIVE";
   const prompt="Blogger-statikus oldal frissítése:\n"+(page.url||page.title)+"\n\n"+
     (live?"AZ OLDAL NYILVÁNOS, A MENTÉS AZONNAL MÓDOSÍTJA AZ ÉLES /p/ OLDALT.\n\n":"")+
-    "Az eredeti HTML-fájl mentése megtörtént. Az egyedi évválasztó és JavaScript-kódot megőriztük.\n\nBiztosan mentesz?";
+    (skippedBackup
+      ?"FIGYELEM: KÜLÖN BEJELÖLTED, HOGY NEM KÉRED AZ EREDETI HTML LETÖLTÉSÉT.\n"
+      :"Az eredeti HTML-fájl letöltését választottad.\n")+
+    "A védett egyedi kódrészeket változatlanul küldjük tovább, majd ellenőrizzük a Blogger válaszát.\n\nBiztosan mentesz?";
   if(!window.confirm(prompt))return;
   state.saving=true;state.error="";update();
   const sent={html,title};
@@ -598,7 +619,8 @@ async function savePage(){
     if(!intact){
       const backupSource=originalBackUpRaw();
       state.critical=true;
-      state.error="A BLOGGER AZ EREDETI GOMB- VAGY JAVASCRIPT-KÓD EGY RÉSZÉT MÓDOSÍTOTTA / ELTÁVOLÍTOTTA. Azonnal ellenőrizd az élő oldalt! Az eredeti biztonsági mentés megmaradt.";
+      state.error="A BLOGGER AZ EREDETI GOMB- VAGY JAVASCRIPT-KÓD EGY RÉSZÉT MÓDOSÍTOTTA / ELTÁVOLÍTOTTA. Azonnal ellenőrizd az élő oldalt! "+
+        (state.backup?"A letöltött eredeti HTML-t őrizd meg.":"Nem kértél korábban letöltést: ezen a még megnyitott lapon az eredeti HTML most letölthető az EREDETI HTML gombbal.");
       state.baseline={title:verified.title||"",html:verified.content,updated:verified.updated||"",origin:"saved"};
       state.loaded={...page,...verified,blogId:page.blogId,originalHtml:backupSource};
       return;
@@ -617,7 +639,7 @@ async function savePage(){
     const backupSource=originalBackUpRaw();
     state.baseline={title:verified.title||sent.title,html:verified.content,updated:verified.updated||"",origin:"saved"};
     state.loaded={...page,...verified,blogId:page.blogId,originalHtml:backupSource};
-    state.backup=false; // every later live update needs a fresh backup
+    state.backup=false;get("pageSkipBackup").checked=false; // every later update requires a NEW backup decision
     view.info.textContent="Blogger Page ID: "+verified.id+" • "+verified.status+" • "+(verified.url||"");
   }catch(e){state.error=e.message||String(e);}
   finally{state.saving=false;update();}
@@ -643,6 +665,11 @@ view.blog.addEventListener("change",()=>{state.list=[];listPages();refreshConnec
 view.page.addEventListener("change",()=>{get("pageOpen").disabled=!view.page.value;});
 get("pageUseConverted").addEventListener("click",useConverted);
 get("pageBackup").addEventListener("click",backup);
+get("pageSkipBackup").addEventListener("change",()=>{
+  // Reversible opt-out. The checkbox itself is the only way to skip a download.
+  if(!state.critical)state.error="";
+  update();
+});
 get("pageDownload").addEventListener("click",exportHtml);
 get("pageCopy").addEventListener("click",()=>{
   const text=currentHtml();if(!text)return;
