@@ -4572,10 +4572,31 @@ function adminRepairLegacyLeadBlock(){
   if(!adminMainImageId){const img=adminAddImageFromElement(intro.anchor,"");if(img)adminMainImageId=img.id;}
   adminLeadHtml=intro.html;adminLeadAlign=intro.align;adminBlocks.shift();return true;
 }
+
+function adminReadAuthorFooter(nodes){
+ let i=nodes.length-1;
+ while(i>=0&&(nodes[i].nodeType===3&&!nodes[i].textContent.trim()||
+   nodes[i].nodeType===1&&nodes[i].tagName==="BR"))i--;
+ const last=nodes[i];
+ if(!last||last.nodeType!==1||!["DIV","P"].includes(last.tagName)||
+    !/text-align\s*:\s*right/i.test(last.getAttribute("style")||""))return null;
+ const em=last.querySelector("em"),span=em?.closest("span");
+ if(!em||!/85%|0\.85em/i.test(span?.getAttribute("style")||""))return null;
+ const value=(em.textContent||"").trim();if(!value)return null;
+ let h=i-1;
+ while(h>=0&&(nodes[h].nodeType===3&&!nodes[h].textContent.trim()||
+   nodes[h].nodeType===1&&nodes[h].tagName==="BR"))h--;
+ if(h<0||nodes[h].nodeType!==1||nodes[h].tagName!=="HR")return null;
+ nodes.splice(i,1);nodes.splice(h,1);
+ const compiled=/^Összeállította:\s*/i.test(value);
+ return {name:value.replace(/^Összeállította:\s*/i,""),mode:compiled?"compiled":"author"};
+}
+
 function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
   raw=String(raw||"").trim();if(!raw){rbGet("adminStatus").textContent="Nincs visszatöltendő HTML.";return;}
   const chosen=preserveCurrentMain?adminFindImage(adminMainImageId):null;
   adminBlocks=[];adminImages=chosen?[chosen]:[];adminSourcesHtml="";adminLeadHtml="";adminLeadAlign="justify";adminMainImageId=chosen?.id||null;
+  rbGet("adminAuthor").value="";rbGet("adminFooter").value="none";
   const titleDoc=new DOMParser().parseFromString(raw,"text/html").querySelector("title");
   if(titleDoc&&titleDoc.textContent.trim()&&!rbGet("adminTitle").value.trim())rbGet("adminTitle").value=titleDoc.textContent.trim();
   const parts=raw.split(/<!--\s*more\s*-->/i);
@@ -4591,6 +4612,8 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
     adminLeadHtml=preHtml;adminLeadAlign=preIntro?.align||adminAlignFromNode(preBold.closest("div"),"justify");
   }
   const tpl=document.createElement("template");tpl.innerHTML=post;const nodes=Array.from(tpl.content.childNodes);
+  const existingFooter=adminReadAuthorFooter(nodes);
+  if(existingFooter){rbGet("adminAuthor").value=existingFooter.name;rbGet("adminFooter").value=existingFooter.mode;}
   const incomingLive=!!tpl.content.querySelector('.rb-live-entry');
   if(incomingLive){
     rbGet("adminContentType").value="live";adminContentTypeChanged(false);
@@ -4636,10 +4659,6 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
       continue;
     }
     if(tag==="div"&&/Források:/i.test(text)&&n.querySelector("strong")){adminSourcesHtml=n.outerHTML+"\n<br />";continue;}
-    if(tag==="div"&&/text-align\s*:\s*right/i.test(n.getAttribute("style")||"")&&n.querySelector("em")){
-      let a=n.querySelector("em").textContent.trim().replace(/^Összeállította:\s*/i,"");if(a)rbGet("adminAuthor").value=a;rbGet("adminFooter").value="author";
-      if(adminBlocks.at(-1)?.type==="hr")adminBlocks.pop();continue;
-    }
     if(adminIsGrayNode(n)){i=adminImportBoxGroup(nodes,i)-1;continue;}
     if(tag==="div"&&n.classList.contains("separator")&&n.querySelector("img")){
       const {caption,lastIndex}=adminConsumeImageCaption(nodes,i);
