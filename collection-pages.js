@@ -622,6 +622,11 @@ async function savePage(){
   }catch(e){state.error=e.message||String(e);}
   finally{state.saving=false;update();}
 }
+get("pageConnect").addEventListener("click",()=>{
+  if(!bridge.isConnected())bridge.connect();
+  else refreshConnection();
+  setTimeout(refreshConnection,900);
+});
 get("pageTemplateMode").addEventListener("change",()=>{update();});
 get("pageStartTemplate").addEventListener("click",startLocalTemplate);
 get("pageImportFile").addEventListener("change",importHtmlFile);
@@ -631,11 +636,7 @@ get("pageNewArticleQuick").addEventListener("click",()=>{setArchiveDate();openQu
 get("pageNewImprintQuick").addEventListener("click",()=>{openQuick("pageImprintTools","pageImprintTitle");});
 get("pageYearInsert").addEventListener("click",insertYear);
 get("pageImprintInsert").addEventListener("click",insertImprintSection);
-get("pageConnect").addEventListener("click",()=>{
-  if(!bridge.isConnected())bridge.connect();
-  else refreshConnection();
-  setTimeout(refreshConnection,900);
-});
+
 get("pageFetch").addEventListener("click",fetchPages);
 get("pageOpen").addEventListener("click",openPage);
 view.blog.addEventListener("change",()=>{state.list=[];listPages();refreshConnection();});
