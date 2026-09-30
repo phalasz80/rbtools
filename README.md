@@ -192,3 +192,10 @@ Az RBTools kimenete a felhasználó által átadott `RegionalBahn_Blogger_CSS_op
 A változás érinti a Cikkadmin, a haladó Markdown/sima szöveges konverter, a képek, címsorok, podcast-beágyazások és az élő tudósítás HTML-kimenetét. A meglévő bejegyzések változatlanok maradnak. A visszaimportáló figyelmen kívül hagyja a `data-rbtools-theme` jelű stíluselemet, ezért nem lesz véletlen szerkeszthető szövegblokk. A statikus oldalak szerkesztése továbbra is külön, saját CSS-sel történik. A stílus csak akkor igazodik automatikusan, ha új HTML-t generálsz; a korábban publikált HTML visszamenőleges átalakítását nem végezzük.
 
 Visszaellenőrzés: `node tests/theme-compat.test.cjs`, majd az összes `tests/*.test.cjs`. A téma megváltoztatásakor a főszínt (`#0b5394`), a globális `h2` stílust, az Inter betűcsaládot és a Blogger saját képkeretezését újra össze kell vetni.
+
+
+## Cikkadmin: abbr és szerzői zárás (2026-09-30)
+
+A WYSIWYG formázósorában és a kijelölt szöveg helyi menüjében egyaránt elérhető az **ABBR** funkció. A kijelölt rövidítéshez külön panelen add meg a teljes feloldást: a kimenet `<abbr title="…">rövidítés</abbr>`. Meglévő abbr-re kattintva a title módosítható; a jelölés eltávolításakor a benne lévő szöveg megmarad. A helyi menü a Firefox jobb kattintásával összeomló kijelölését ugyanúgy menti, mint a linkeknél.
+
+A **Szerzők és cikkzárás** mezőcsoport közvetlenül a WYSIWYG alatt található. Itt sablontól függetlenül adhatók meg a nevek és a megjelenés: szerzők, **Összeállította:** vagy nincs szerzői footer. A normál és az összeállítói változat a korábbi RegionalBahn-szintaxist követi: középre helyezett `<hr>`, jobbra zárt, dőlt, 85%-os sor. Megnyitott cikk esetén kizárólag a szabványos, tényleges utolsó szerzői blokkot olvassuk vissza; hiánya esetén üres névvel, kikapcsolt footerrel indul, nem a korábban szerkesztett cikk adataival. A gyorstalpaló és a Súgó frissült; a Súgó fő fejezetei 0-tól 28-ig folyamatos számozást kaptak.

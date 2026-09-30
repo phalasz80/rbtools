@@ -129,6 +129,8 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;}
     <ol class="admin-quicksteps">
       <li><strong>Válassz tartalomtípust:</strong> cikk, #nyúz, podcast shownotes, InnoTrans, <strong>percről percre / élő tudósítás</strong> vagy statikus oldal; igény szerint töltsd be a hozzá tartozó sablont.</li>
       <li><strong>Témakompatibilitás:</strong> a RegionalBahn optimalizált Blogger-témájának Inter betűjét örököljük. Az új cikk-HTML a globális H2 widgetstílust külön kezeli, a képeket és podcastokat mobilon átméretezi, a Blogger saját képkeretét nem duplázza.</li>
+      <li><strong>Rövidítések:</strong> jelöld ki a rövidítés szövegét, kattints az <strong>ABBR</strong> gyorsgombra vagy válaszd a jobb kattintásos helyi menüt; add meg a teljes feloldást a <code>title</code> mezőben.</li>
+      <li><strong>Szerzők és #nyúz:</strong> a szerzőmező és a footer formája közvetlenül a WYSIWYG alatt található. Megnyitott piszkozatból a szabványos szerzői sor és az „Összeállította:” változat automatikusan visszatöltődik, de utána szabadon módosítható.</li>
       <li><strong>Percről percre:</strong> töltsd be az élő sablont, írd meg a leadet, majd az <strong>＋ Időbélyeges frissítés</strong> gombbal add hozzá az időpontot, helyszínt, tudósító nevét és a frissítés WYSIWYG-szövegét. A képtárból képet is húzhatsz a frissítésbe. Alapértelmezés szerint a legújabb bejegyzés alul jelenik meg, mint a 2020-as RegioJet-tudósításnál. Fordított sorrend is választható. Készülő frissítést ugyanabba a Blogger-piszkozatba ments vissza, az éles közzététel a szerkesztő dolga.</li>
       <li><strong>Cikkcím:</strong> a címet a külön, Blogger-szerű <strong>Cikk címe</strong> mezőbe írd. Nem lesz belőle megismételt törzsszöveg vagy automatikus lead.</li>
       <li><strong>Főkép + valódi lead:</strong> a külön, bekeretezett bevezetőben válassz képet, vagy húzd oda a képtárból, és írd mellé a felvezetőt. A <code>&lt;!--more--&gt;</code> mindig a teljes lead után kerül.</li>
@@ -267,12 +269,7 @@ További szöveg..."></textarea>
     <textarea id="rbtools-adminExistingHtml" class="admin-existing-source" spellcheck="false" placeholder="Illeszd be ide a már elkészült Blogger HTML-t."></textarea>
   </details>
 
-  <div class="panel">
-    <div class="grid2">
-      <div class="field"><label for="rbtools-adminAuthor">Szerző</label><input id="rbtools-adminAuthor" value="Halász Péter"></div>
-      <div class="field"><label for="rbtools-adminFooter">Footer</label><select id="rbtools-adminFooter"><option value="author">Szerző neve</option><option value="none">Nincs footer</option></select></div>
-    </div>
-  </div>
+
 
   <section class="card admin-library-card">
     <div class="cardhead admin-section-head">
@@ -320,6 +317,7 @@ További szöveg..."></textarea>
       <button id="rbtools-adminFmtUnderline" type="button" title="Aláhúzott"><u>U</u></button>
       <button id="rbtools-adminFmtStrike" type="button" title="Áthúzott"><s>S</s></button>
       <button id="rbtools-adminFmtLink" type="button" title="Kijelölt szöveghez hivatkozás hozzáadása vagy meglévő link szerkesztése (Ctrl+K)">🔗 Link</button>
+      <button id="rbtools-adminFmtAbbr" type="button" title="A kijelölt rövidítés teljes feloldása (abbr title)">ABBR</button>
       <button id="rbtools-adminFmtUnlink" type="button" title="Link eltávolítása">⛓ Link törlése</button>
       <button id="rbtools-adminFmtSup" type="button" title="Kijelölt szöveg felső indexbe: &lt;sup&gt;">x<sup>2</sup></button>
       <button id="rbtools-adminFmtSub" type="button" title="Kijelölt szöveg alsó indexbe: &lt;sub&gt;">x<sub>2</sub></button>
@@ -347,10 +345,32 @@ További szöveg..."></textarea>
       <button id="rbtools-adminLinkCancel" type="button">Mégse</button>
     </div>
 
+    <div id="rbtools-adminAbbrPanel" class="admin-link-panel" hidden>
+      <div class="admin-link-description"><strong>Rövidítés feloldása (&lt;abbr title=&quot;…&quot;&gt;)</strong>
+        <span id="rbtools-adminAbbrSelection" class="small"></span></div>
+      <label for="rbtools-adminAbbrTitle">Teljes feloldás (title)</label>
+      <input id="rbtools-adminAbbrTitle" type="text" placeholder="Például: Magyar Államvasutak" autocomplete="off">
+      <button id="rbtools-adminAbbrApply" type="button" class="primary">✓ Alkalmaz</button>
+      <button id="rbtools-adminAbbrRemove" type="button">abbr törlése</button>
+      <button id="rbtools-adminAbbrCancel" type="button">Mégse</button>
+    </div>
     </div><!-- sticky formatting and link tools -->
     <div id="rbtools-adminCanvas" class="admin-canvas">
       <div class="admin-empty">Tölts be vagy illessz be cikkszöveget, majd kattints a „Cikk felépítése” gombra.</div>
     </div>
+    <section class="admin-author-panel" aria-label="Szerzők és cikkzárás">
+      <h3>Szerzők és cikkzárás</h3>
+      <p class="small">A mezők a sablontól függetlenül szerkeszthetők. Meglévő Blogger-piszkozatból a tényleges szerzői láblécet olvassuk vissza, ha van.</p>
+      <div class="grid2">
+        <div class="field"><label for="rbtools-adminAuthor">Szerző(k) vagy összeállító(k)</label><input id="rbtools-adminAuthor" value="Halász Péter" autocomplete="off"></div>
+        <div class="field"><label for="rbtools-adminFooter">Cikkzárás formája</label><select id="rbtools-adminFooter">
+          <option value="author">Szerző(k) neve</option>
+          <option value="compiled">Összeállította: név</option>
+          <option value="none">Nincs szerzői footer</option>
+        </select></div>
+      </div>
+      <p class="small">A szerzői sor a cikk végén, külön vonal alatt, jobbra zárva, dőlten, 85%-os betűmérettel jelenik meg.</p>
+    </section>
     <div class="admin-editor-extra-heading">További szerkesztőeszközök: keresés, karakterek és iframe</div>
     <div class="admin-findbar" role="search" aria-label="Keresés a WYSIWYG cikkben">
       <label for="rbtools-adminFind"><strong>Keresés a cikkben</strong></label>
@@ -417,6 +437,7 @@ További szöveg..."></textarea>
       <button type="button" role="menuitem" data-admin-context-command="strikeThrough"><s>S</s><span>Áthúzott</span></button>
       <div class="admin-context-divider" role="separator"></div>
       <button type="button" role="menuitem" data-admin-context-command="link"><span aria-hidden="true">🔗</span><span>Hivatkozás beszúrása / szerkesztése</span><kbd>Ctrl+K</kbd></button>
+      <button type="button" role="menuitem" data-admin-context-command="abbr"><span>AB</span><span>Rövidítés (abbr) beszúrása / szerkesztése</span></button>
       <div class="admin-context-divider" role="separator"></div>
       <button type="button" role="menuitem" data-admin-context-command="copy"><span aria-hidden="true">⧉</span><span>Kijelölt szöveg másolása</span><kbd>Ctrl+C</kbd></button>
     </div>
@@ -1123,7 +1144,7 @@ A következő cikk rövid ajánlója.</pre>
     <p>Kapcsolódás után válaszd ki a blogot. A <strong>Piszkozat keresése</strong> mező cím vagy post ID alapján szűr. A <strong>Piszkozat</strong> listából válassz, majd <strong>Piszkozat megnyitása</strong>. A program betölti a címet, HTML-t, Blogger-címkéket, képeket, iframe-eket és a felismerhető szerkezeti blokkokat.</p>
     <p>A megnyitott bejegyzés post ID-ja megmarad. Ez a legfontosabb különbség a kézi HTML-importhoz képest: a későbbi <strong>Mentés Blogger-piszkozatba</strong> ugyanazt a draftot frissíti, nem készít új másolatot.</p>
 
-    <h3>8/A. Haladó forráskonverzió, Google Docs és RB-jelölések</h3>
+    <h3>9. Haladó forráskonverzió, Google Docs és RB-jelölések</h3>
     <p>A Cikkadmin alján található, lenyitható <strong>Haladó forráskonverzió, Google Docs és RB-jelölések</strong> rész tartalmazza mindazt, ami korábban a külön Szöveg → Blogger konverter fülön volt.</p>
     <ul>
       <li><strong>Profil:</strong> általános RegionalBahn-cikk, szekciós/gyártói szemle vagy #nyúz/heti hírösszefoglaló.</li>
@@ -1136,10 +1157,10 @@ A következő cikk rövid ajánlója.</pre>
     </ul>
     <p>A haladó konverter közvetlen HTML-kimenete önmagában is másolható vagy menthető. A közvetlen konverter is a RegionalBahn-szabvány szerinti <code>&lt;hr align="center" /&gt;</code> szerzői elválasztót használja. A képfeliratban megadott sortörések és a külön sorba írt <code>(fotó: …)</code> megmaradnak. Ha a WYSIWYG-be töltöd át, különösen a főkép és az összetett, több tudósítós footer ellenőrzése ajánlott, mert a vizuális visszafejtés a HTML szerkezetéből dolgozik.</p>
 
-    <h3>9. Régi vagy kézzel kapott HTML visszatöltése</h3>
+    <h3>10. Régi vagy kézzel kapott HTML visszatöltése</h3>
     <p>Ha a cikk nincs az API-n keresztül megnyitva, a <strong>Meglévő Blogger-cikk HTML-jének visszatöltése szerkesztésre</strong> részbe teljes HTML-fragmentum illeszthető vagy <code>.html</code> fájl tölthető. A parser felismeri a tipikus RegionalBahn leadet, képeket, képaláírásokat, H3/H4 címeket, kereteseket, az új strukturált élő frissítéseket, iframe-eket és néhány speciális blokkot. Nem általános célú tökéletes HTML round-trip szerkesztő, ezért különösen régi vagy szokatlan kézi HTML-nél mindig ellenőrizd a végleges kimenetet.</p>
 
-    <h3>10. A WYSIWYG szerkesztő felépítése</h3>
+    <h3>11. A WYSIWYG szerkesztő felépítése</h3>
     <ol>
       <li><strong>Cikk címe:</strong> különálló, Blogger-szerű, egyszerű szövegmező. Az ide írt cím csak a Blogger-bejegyzés címe lesz, nem hoz létre H1-et vagy másik bekezdést a HTML-ben.</li>
       <li><strong>Főkép + valódi lead:</strong> a WYSIWYG első, bekeretezett blokkja. Itt a képtárban már feltöltött képekből választhatod ki a 200 képpontos főképnek megfelelőt, majd közvetlenül szerkesztheted a valódi leadet. A képet a képtárból közvetlenül ide is húzhatod.</li>
@@ -1157,7 +1178,8 @@ A következő cikk rövid ajánlója.</pre>
     </ul>
     <p>A szövegblokkok közvetlenül gépelhetők, tehát nincs külön „szerkesztés” és „előnézet” mód.</p>
 
-    <h3>11. Szöveg kijelölése, formázása és hivatkozások</h3>
+    <h3>12. Szöveg kijelölése, formázása és hivatkozások</h3>
+    <p><strong>ABBR:</strong> a kijelölt rövidítéshez a gyorsgomb vagy a helyi menü azonos funkciója <code>&lt;abbr title="teljes jelentés"&gt;rövidítés&lt;/abbr&gt;</code> jelölést készít. A feloldás kötelező. Meglévő abbr-be kattintva a title módosítható, a jelölés a szöveg megtartásával eltávolítható. Firefoxban a jobb kattintás előtt rögzített kijelölést használja.</p>
     <ol>
       <li>Kattints a WYSIWYG-ben a leadbe, egy bekezdésbe, alcímbe vagy keretes szövegbe.</li>
       <li>Az egérrel húzva, dupla kattintással vagy a <strong>Shift + nyílbillentyűkkel</strong> jelöld ki a formázandó szöveget. A blokk bármely szövegrészén szabadon lehet kijelölni.</li>
@@ -1167,10 +1189,10 @@ A következő cikk rövid ajánlója.</pre>
     </ol>
     <p><strong>Fontos:</strong> a blokkokat most csak a jobb oldalukon megjelenő <strong>⠿ fogantyúnál</strong> lehet áthúzni; így a szövegen végzett egérhúzás nem kezd véletlen blokkmozgatást. A Blogger-cím külön, egyszerű szöveges mező, ezért a gazdag formázást a leadben és a törzsszövegben használd. A kijelölés és formázás jelenleg blokkon belül működik.</p>
 
-    <h3>12. Felsorolások</h3>
+    <h3>13. Felsorolások</h3>
     <p>A <strong>• Lista</strong> rendezetlen, az <strong>1. Lista</strong> számozott listát készít. A <strong>→ Behúzás</strong> és <strong>← Kihúzás</strong> többszintű listákhoz használható. Új lista készítésénél a kurzor legyen abban a szerkeszthető bekezdésben, amelyet listává akarsz alakítani. Már meglévő Blogger <code>&lt;ul&gt;</code>/<code>&lt;ol&gt;</code> elemeket az RBTools szerkeszthető szövegblokként próbál visszatölteni.</p>
 
-    <h3>13. Igazítás</h3>
+    <h3>14. Igazítás</h3>
     <p>A négy igazítási lehetőség:</p>
     <ul>
       <li><strong>balra</strong></li>
@@ -1180,11 +1202,11 @@ A következő cikk rövid ajánlója.</pre>
     </ul>
     <p>Először kattints abba a blokkba, amelyet igazítani szeretnél. Az igazítás működik normál bekezdésen, alcímen, leaden, keretes címén/törzsén és iframe-blokkon. A gomb nem csak vizuális előnézetet változtat, hanem a generált Blogger HTML megfelelő <code>text-align</code> értékét is.</p>
 
-    <h3>14. Keretes blokkok: klasszikus és oldalsávos</h3>
+    <h3>15. Keretes blokkok: klasszikus és oldalsávos</h3>
     <p>Új keretes beszúrásakor a <strong>Keretes megjelenése</strong> választón dönthetsz a klasszikus szürke és a bal oldali hangsúlyos sávval ellátott, ugyanúgy szürke változat között. A keretes saját vezérlőjével a típust később is átállíthatod. A külön <strong>Keretes</strong> fülön ugyanez a két forma WYSIWYG-ben és közvetlen HTML-ben is készíthető.</p>
     <p>A <strong>＋ Keretes</strong> új szürke RegionalBahn-dobozt hoz létre. A formázósor <strong>▣ Keretes</strong> gombja az aktuális szövegblokkot alakítja át keretessé. A keretes címe és törzse külön szerkeszthető, külön igazítható, és a képtárból kép húzható bele. A kép eltávolítható anélkül, hogy maga a keretes törlődne.</p>
 
-    <h3>14/B. Percről percre, folyamatos helyszíni tudósítás</h3>
+    <h3>16. Percről percre, folyamatos helyszíni tudósítás</h3>
     <p><strong>Illesztés a 2026-os optimalizált RegionalBahn CSS-hez:</strong> az Inter betűcsaládot a Blogger biztosítja. A téma globális H2-szabálya widgetcímekre készült, ezért a generált cikkcímsorok <code>rbtools-heading</code> osztállyal kapják a cikkhez illő formát. A képkeret marad a Blogger feladata, az RBTools csak a reszponzív szélességet biztosítja. Az új cikkbe írt, <code>data-rbtools-theme</code> jelű CSS a visszaimportáláskor nem lesz tartalmi blokk; a régi cikkeket nem írja át.</p>
     <p>Az új sablon alapját elsősorban a <a href="https://www.regionalbahn.hu/2020/07/regiojet-premier.html" target="_blank" rel="noopener">2020-as RegioJet-premier</a> adja: világos, egyszer szerkeszthető felvezető, majd időrendben különálló, időponttal, helyszínnel és a tudósító nevével ellátott frissítések. A <a href="https://www.regionalbahn.hu/2018/03/Budapest-Berlin-VDE8-percrol-percre.html" target="_blank" rel="noopener">2018-as Budapest–Berlin útibeszámolóból</a> az útvonal és az utazás folyamatos követésének szerkezetét, a <a href="https://www.regionalbahn.hu/2013/03/forradalmi-havazas.html" target="_blank" rel="noopener">2013-as havazásból</a> a fordított, legújabbat felül megjelenítő lehetőséget, a <a href="https://www.regionalbahn.hu/2016/12/eloben-bucsuzunk-westbahn-obb-intercity.html" target="_blank" rel="noopener">2016-os ÖBB InterCity-búcsúból</a> a személyes, út közben készülő beszámoló lehetőségét emeltük át. A régi fix szélességű betűk helyett a blog normál, jól olvasható betűkészletét használja.</p>
     <ol>
@@ -1199,26 +1221,26 @@ A következő cikk rövid ajánlója.</pre>
       <li>Újabb időpont hozzáadása előtt nyisd meg ugyanazt a Blogger-piszkozatot. Az RBTools az általa készített élő blokkokat azonosítja, megőrzi mélyhivatkozásaikat és újra szerkeszthető mezőkre bontja. Régebbi, kézzel írt HTML-oldalaknál külön ellenőrzés szükséges, mert azok nem feltétlenül az új struktúrát követik.</li>
     </ol>
     <p><strong>Szerkesztőségi ajánlás:</strong> az időpontokat a helyszínhez vagy a tudósításban meghatározott időzónához igazítsd, eltérő időzónák és többnapos közvetítés esetén ezt az olvasóknak is jelezd. Jelentős eseménynél lehetőleg közöld az elsődleges forrást, és különböztesd meg az előzetes információt a megerősített tényektől.</p>
-    <h3>15. iframe és beágyazások</h3>
+    <h3>17. iframe és beágyazások</h3>
     <p>Az iframe-mezőbe illeszd be a teljes <code>&lt;iframe …&gt;&lt;/iframe&gt;</code> kódot, majd kattints az <strong>iframe beszúrása</strong> gombra. A blokkban külön előnézet és több soros kódszerkesztő jelenik meg. A kód szerkesztése után az előnézet külön frissíthető. Meglévő draftnál például Facebook- vagy Spotify-embedet az RBTools külön iframe-blokként próbál felismerni.</p>
     <p>Ha a külső szolgáltató biztonsági szabályai miatt az iframe az RBTools előnézetében nem renderelődik, attól még a kód bekerülhet a Blogger HTML-be. Ilyenkor a végleges Blogger-előnézetet is ellenőrizd.</p>
 
-    <h3>16. Különleges karakterek, emoji, felső/alsó index, HTML-entitások és keresés</h3>
+    <h3>18. Különleges karakterek, emoji, felső/alsó index, HTML-entitások és keresés</h3>
     <p>Ez a rész akkor hasznos, amikor olyan jelet szeretnél beszúrni, amely nincs kéznél a billentyűzeten, tipográfiailag pontos karakter kell, felső/alsó indexet írsz, vagy egy nem látható HTML-karaktert akarsz biztosan kontrollálni. A funkciók a <strong>Vizuális cikkszerkesztő</strong> formázósora alatt találhatók.</p>
 
-    <h4>16.1. Először mindig döntsd el: beszúrás vagy csere?</h4>
+    <h4>18.1. Először mindig döntsd el: beszúrás vagy csere?</h4>
     <p>Ha csak a kurzor áll egy szerkeszthető szövegben, a karakter, emoji vagy entitás <strong>a kurzor helyére kerül</strong>. Ha előtte kijelölsz egy szót, számot vagy mondatrészt, a beszúrás <strong>lecseréli a teljes kijelölést</strong>. Ez tudatos működés, így például egy sima kötőjelet egy kattintással lecserélhetsz valódi mínuszjelre vagy nagykötőjelre.</p>
     <p>Ha a program azt jelzi, hogy előbb kattints szerkeszthető szövegrészbe, kattints vissza a címbe, leadbe, bekezdésbe, keretesbe vagy képaláírásba, állítsd oda a kurzort, illetve jelöld ki újra a cserélendő szöveget, majd használd a beszúrót.</p>
 
-    <h4>16.2. HTML felső index és alsó index: x² / x₂</h4>
+    <h4>18.2. HTML felső index és alsó index: x² / x₂</h4>
     <p>A formázósor <strong>x²</strong> gombja a kijelölt szöveget HTML <code>&lt;sup&gt;…&lt;/sup&gt;</code> elembe teszi, az <strong>x₂</strong> pedig <code>&lt;sub&gt;…&lt;/sub&gt;</code> elembe. Ez valódi formázás, tehát például a kijelölt <code>2</code> a végleges HTML-ben <code>&lt;sup&gt;2&lt;/sup&gt;</code> lesz. Ezt használd akkor, ha nem csak számjegyre van szükség, hanem teljes szó, rövidítés, mértékegység vagy vegyes karaktersor kerül indexbe.</p>
     <p><strong>Fontos különbség:</strong> a HTML <code>&lt;sup&gt;</code>/<code>&lt;sub&gt;</code> és a Unicode felső/alsó index <strong>nem ugyanaz</strong>. A HTML-tag vizuális formázás; a Unicode-változat önálló karakter, például <code>²</code> vagy <code>₅</code>.</p>
 
-    <h4>16.3. Unicode felső és alsó index</h4>
+    <h4>18.3. Unicode felső és alsó index</h4>
     <p>Az <strong>Ω Különleges karakterek…</strong> panelben külön gombsor található a Unicode felsőindex-számokhoz. Egy-egy gomb közvetlenül beszúrja például a <code>⁰ ¹ ² ³ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹</code> karaktereket. A <strong>Kijelölt szám → ⁰¹²³</strong> gomb a kijelölt normál számjegyeket Unicode felső indexre, a másik gomb alsó indexre alakítja.</p>
     <p>Az átalakítás a támogatott karaktereket cseréli le, a többit változatlanul hagyja. Ezért például a kijelölt <code>120</code> eredménye <code>¹²⁰</code>. Ha typográfiai indexelésre van szükséged teljes szöveggel, inkább az x²/x₂ HTML-gombokat használd.</p>
 
-    <h4>16.4. Tipográfiai és szerkesztőségi karakterek</h4>
+    <h4>18.4. Tipográfiai és szerkesztőségi karakterek</h4>
     <p>A karakterpaletta a RegionalBahn-szövegeknél gyakran szükséges jeleket teszi egy kattintásra elérhetővé:</p>
     <ul>
       <li>magyar idézőjelek: <code>„ ”</code>;</li>
@@ -1240,11 +1262,11 @@ A következő cikk rövid ajánlója.</pre>
     </ul>
     <p>Ha a palettában nincs benne, amit keresel, az <strong>Egyedi Unicode-karakter vagy szöveg</strong> mezőbe közvetlenül bemásolhatod, majd a <strong>Beszúrás / kijelölés cseréje</strong> gombbal használhatod.</p>
 
-    <h4>16.5. Emoji</h4>
+    <h4>18.5. Emoji</h4>
     <p>A <strong>Szabványos Unicode emoji</strong> rész közlekedési, szerkesztőségi és általános jelekből ad gyorsválogatást. Ezek nem képek és nem Blogger-specifikus kódok, hanem Unicode-karakterek. A kiválasztott emoji ugyanúgy a kurzorhoz kerül vagy lecseréli a kijelölést, mint bármely más különleges karakter.</p>
     <p>Az emoji tényleges kinézete operációs rendszerenként és böngészőnként eltérhet. A Bloggerbe a Unicode-karakter kerül, nem az RBToolsban látott konkrét grafikai rajz.</p>
 
-    <h4>16.6. HTML-entitások, különösen az &amp;nbsp;</h4>
+    <h4>18.6. HTML-entitások, különösen az &amp;nbsp;</h4>
     <p>A <strong>HTML-entitások</strong> gombsor több gyakori kódot kínál:</p>
     <ul>
       <li><code>&amp;nbsp;</code></li>
@@ -1265,15 +1287,15 @@ A következő cikk rövid ajánlója.</pre>
     <p>A beszúrt entitások a WYSIWYG-ben <strong>szerkesztői segédjelölést</strong> kapnak, hogy a láthatatlan vagy nehezen megkülönböztethető karakterek felismerhetők legyenek. A <code>&amp;nbsp;</code> külön <strong>rózsaszín</strong> jelölést kap; a többi innen beszúrt entitás lilás jelölést. Ezek a színek <strong>nem részei a cikknek</strong>: a végleges Blogger HTML generálásakor a jelölő elem eltűnik, és az eredeti entitás marad.</p>
     <p>A <code>&amp;nbsp;</code> nem törhető szóköz. Akkor használd, ha két elem között nem szeretnél sortörést, például egy szám és a hozzá tartozó mértékegység vagy más szorosan összetartozó elemek között. Ne használd normál szóköz általános helyettesítésére.</p>
 
-    <h4>16.7. Mi történik, ha hibás entitást írsz?</h4>
+    <h4>18.7. Mi történik, ha hibás entitást írsz?</h4>
     <p>Az egyedi mező csak szabályos <code>&amp;…;</code>, <code>&amp;#…;</code> vagy <code>&amp;#x…;</code> formát fogad el. Ha a kód szintaktikailag hibás vagy a böngésző nem tudja értelmezni, az RBTools nem szúrja be, hanem hibaüzenetet ír az állapotsávba. Ilyenkor ellenőrizd különösen a kezdő <code>&amp;</code> és a záró pontosvessző jelenlétét.</p>
 
-    <h4>16.8. Keresés az aktuális WYSIWYG-cikkben</h4>
+    <h4>18.8. Keresés az aktuális WYSIWYG-cikkben</h4>
     <p>A <strong>Keresés a cikkben</strong> mezőbe írj be egy szót vagy mondatrészt. A keresés gépelés közben lefut, a találatok száma a mező mellett jelenik meg, az előfordulások pedig <strong>sárga kiemelést</strong> kapnak a jelenleg megjelenített szerkeszthető WYSIWYG-tartalomban. A keresés kis- és nagybetűtől független.</p>
     <p>A keresési sárga kiemelés kizárólag vizuális szerkesztői réteg. <strong>Nem kerül bele a végleges Blogger HTML-be</strong>, és nem alakítja át a cikk szövegét. A <strong>Kiemelés törlése</strong> gomb üríti a keresőmezőt és eltávolítja a találatjelöléseket.</p>
     <p>Ha közben szerkeszteni kezded a szöveget, a program szükség esetén újraszámolja vagy eltávolítja a segédkiemelést, hogy a találatjelző ne váljon a tényleges HTML részévé. A keresés a WYSIWYG felületre szolgál; a külön forrás- vagy végleges HTML-textareákban a böngésző saját keresése használható.</p>
 
-    <h3>17. Képtár, főkép és lead</h3>
+    <h3>19. Képtár, főkép és lead</h3>
     <p>A <strong>Képtár</strong> minden beolvasott képhez külön kártyát ad. A képaláírás és a kredit közvetlenül szerkeszthető. Egy törzsszövegbeli kép képaláírását a WYSIWYG-ben közvetlenül vagy a képtári kártyán módosíthatod: mindkét hely ugyanazt az adatot szerkeszti, a végleges HTML-ben egyetlen képaláírás készül. Régi, kétszer szereplő, közvetlenül egymás utáni és azonos képaláírásokat a betöltő összevonja. A főkép a képtár <strong>☆ Főkép</strong> gombjával, a bevezetőblokk saját képkiválasztójával vagy a kép bevezetőbe húzásával jelölhető ki. A valódi leadet ugyanebben a blokkban, a képtől jobbra szerkesztheted. A normál képeket a <strong>＋ Cikk végére</strong> gombbal vagy drag-and-drop módszerrel helyezd el.</p>
     <p><strong>Többsoros képaláírás:</strong> a WYSIWYG-ben kattints a kép alatti szerkeszthető feliratra. Az <strong>Enter</strong> és a <strong>↵ Sortörés</strong> gomb is új sort hoz létre. A képtár kártyáján ugyanaz a képaláírás többsoros szövegmezőben szerkeszthető.</p>
     <ol>
@@ -1284,7 +1306,8 @@ A következő cikk rövid ajánlója.</pre>
     </ol>
     <p>A fotósorral együtt már importált régi képaláírást a betöltő igyekszik külön képaláírásra és opcionális fotósorra bontani. Ha egy kép a Blogger-draftban benne van, de a WYSIWYG-ben nem ott jelenik meg, ahol szeretnéd, ez nem igényel újrafeltöltést: a képtárból húzd át a kívánt helyre.</p>
 
-    <h3>18. Blogger-címkék, cím, szerző és footer</h3>
+    <h3>20. Blogger-címkék, cím, szerző és footer</h3>
+    <p><strong>A szerző(k) és a cikkzárás</strong> közvetlenül a WYSIWYG alatt található, függetlenül a választott cikksablontól. A <strong>Szerző(k) neve</strong>, <strong>Összeállította: név</strong> és <strong>Nincs footer</strong> változat között bármikor válthatsz. Régi piszkozat megnyitásakor az utolsó, valóban szabványos (vízszintes vonallal elválasztott, 85%-os dőlt, jobbra zárt) szerzői blokk adatait olvassuk vissza. Hiányzó footernél nem találgatunk: a mező üres, a footer kikapcsolt. Változtatáskor a végleges HTML azonnal frissül.</p>
     <ul>
       <li><strong>Blogger-cím:</strong> egy önálló, egyszerű szövegmező, a Blogger bejegyzés címe. Nem ismétlődik meg a HTML törzsében, és nem lehet véletlenül a lead első mondata.</li>
       <li><strong>Címkék / labels:</strong> vesszővel, pontosvesszővel vagy új sorral elválasztott címkék írhatók.</li>
@@ -1292,17 +1315,17 @@ A következő cikk rövid ajánlója.</pre>
       <li><strong>Footer:</strong> a szerzői zárás ki- vagy bekapcsolható. A RegionalBahn-szabvány szerint a szöveg után külön sorban <code>&lt;hr align="center" /&gt;</code> következik, majd egy jobbra zárt <code>&lt;div&gt;</code>-ben 85 százalékos betűmérettel és dőlt betűkkel a szerző vagy szerzők neve.</li>
     </ul>
 
-    <h3>19. Mentés Blogger-piszkozatba</h3>
+    <h3>21. Mentés Blogger-piszkozatba</h3>
     <p>A Blogger-csatlakozásnál a hat művelet immár egyetlen, színkódolt <strong>Piszkozatkezelés</strong> gombcsoportban van. A piszkozatlista frissítése után nyisd meg a kiválasztott anyagot, vagy indíts új helyi cikket. A <strong>zöld PISZKOZAT MENTÉSE A BLOGGERBE</strong> gomb nem publikálja az anyagot. Az időzítési gomb figyelmeztető színű: a szerkesztőségi rend szerint a tényleges időzítést a kijelölt szerkesztő a Blogger felületén végzi.</p>
     <p>Ha az anyag új és még nincs Blogger post ID-ja, a <strong>Mentés Blogger-piszkozatba</strong> új Blogger draftot hoz létre. Ha meglévő draftot nyitottál meg, ugyanazt a post ID-t frissíti. Mentés után figyeld a széles státuszsávot: zöld sikerüzenet esetén a Blogger API elfogadta a mentést.</p>
     <p>Ha bizonytalan vagy, mentés után nyisd meg vagy frissítsd a Blogger szerkesztőt is. Nagyobb átalakítás előtt jó gyakorlat egy külön tesztdrafton kipróbálni az új funkciót.</p>
 
-    <h3>20. Időzítés és visszaállítás piszkozatba</h3>
+    <h3>22. Időzítés és visszaállítás piszkozatba</h3>
     <p>Az <strong>Időzített publikálás</strong> mező biztonsági alapértéke <strong>2049. 12. 31. 23:59</strong>. Új helyi cikknél, draft megnyitásakor, normál Blogger-piszkozatmentés után és piszkozatba visszaállításkor az RBTools erre az értékre állítja a mezőt, hogy egy véletlen időzítés se eredményezzen közeli publikálást. A szerkesztőségi munkamenetben ezt az értéket ne módosítsd. Az alkalmazás technikailag továbbra is rendelkezik időzítési funkcióval és megerősítést kér, de azt a szerkesztőségi rend alapján nem kell használni: az időpontot kizárólag az illetékes szerkesztő állítja be a Blogger felületén. A <strong>Vissza piszkozatba</strong> gomb támogatott scheduled/live állapotból draftba állít vissza, és ismét visszateszi a 2049-es biztonsági alapértéket.</p>
     <p><strong style="color:#ff0000;">Az időzítés mindig az illetékes szerkesztő feladata a Blogger felületén, így időzítést ezen a felületen nem kell beállítani. Ha bármi kérdésed van, hogy mikor megy ki a cikked, fordulj Adorján Péterhez vagy Halász Péterhez!</strong></p>
     <p><strong>Azonnali Publish gomb nincs.</strong> Ez szándékos biztonsági döntés: az éles azonnali publikálás a Bloggerben marad. Az egyéni permalinket szintén a Blogger felületén kell beállítani.</p>
 
-    <h3>21. Statikus oldalak</h3>
+    <h3>23. Statikus oldalak</h3>
     <p>Statikus módot akkor válassz, ha nem bejegyzést, hanem Blogger <strong>Oldalt</strong> szerkesztesz. Három induló forma van:</p>
     <ul>
       <li><strong>évválasztó gombsor + Összes</strong>;</li>
@@ -1312,7 +1335,7 @@ A következő cikk rövid ajánlója.</pre>
     <p>A gombsoros sablon évszekciókat és kliensoldali szűrőlogikát készít; az egyszerű változat hosszú, folyamatos oldalhoz való.</p>
     <p>Statikus módban a Blogger-post mentés szándékosan le van tiltva, mert a Blogger API-s post és a Blogger „Oldalak” szerkesztése nem ugyanaz a munkamenet. A kész HTML-t másold a Blogger <strong>Oldalak</strong> megfelelő oldalának HTML-nézetébe.</p>
 
-    <h3>22. A széles állapotsáv olvasása</h3>
+    <h3>24. A széles állapotsáv olvasása</h3>
     <p>A fejlécben a nagy állapotsáv mindig a legutóbbi lényeges admin- vagy Blogger-műveletet mutatja:</p>
     <ul>
       <li><strong>Kék:</strong> információ.</li>
@@ -1323,13 +1346,13 @@ A következő cikk rövid ajánlója.</pre>
     </ul>
     <p>Ha valami „nem történik”, először ezt a sávot olvasd el, mert a legtöbb esetben ott van a következő szükséges lépés.</p>
 
-    <h3>23. Mi marad meg és mi veszhet el?</h3>
+    <h3>25. Mi marad meg és mi veszhet el?</h3>
     <p>A Bloggerbe sikeresen elmentett draft a Bloggerben megmarad. A WYSIWYG aktuális, még el nem mentett állapota viszont böngészőoldali munkamenet: egy véletlen oldalfrissítésnél elveszhet. Hosszabb szerkesztésnél ezért időnként ments Blogger-piszkozatba. Az OAuth token elvesztése nem törli a cikket, csak új Google-kapcsolódást igényel.</p>
 
-    <h3>24. Kézi tartalék munkamenet, ha az API éppen nem működik</h3>
+    <h3>26. Kézi tartalék munkamenet, ha az API éppen nem működik</h3>
     <p>Az RBTools API nélkül is használható. Szerkeszd meg a cikket, majd használd a <strong>Cím másolása</strong> és <strong>Végleges HTML másolása</strong> gombokat. Bloggerben nyisd meg a megfelelő draftot, a címet illeszd a címmezőbe, a HTML-t pedig a Blogger HTML-nézetébe. Ez teljes értékű vészút, tehát egy átmeneti Google API-hiba nem zárja el a szerkesztést.</p>
 
-    <h3>25. Gyors hibakeresési sorrend</h3>
+    <h3>27. Gyors hibakeresési sorrend</h3>
     <p>Ha valami nem működik, ebben a sorrendben haladj:</p>
     <ol>
       <li>Olvasd el a széles állapotsávot.</li>
@@ -1343,7 +1366,7 @@ A következő cikk rövid ajánlója.</pre>
       <li>Ha az API továbbra sem működik, használd a kézi cím + HTML munkamenetet, és jelezd a pontos hibaüzenetet.</li>
     </ol>
 
-    <h3>26. Amit soha ne adj meg</h3>
+    <h3>28. Amit soha ne adj meg</h3>
     <p>Az RBTools <strong>nem kér Google-jelszót</strong>, és nem kér <strong>OAuth Client Secretet</strong>. Ha ilyen adat beírását kérné valami, az nem a normál RBTools-munkamenet. A beépített OAuth Client ID önmagában nyilvános alkalmazásazonosító; a tényleges hozzáférést a Google által kiadott rövid életű token adja.</p>
   </div>
 
@@ -1678,6 +1701,8 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-paper-title:focus{border-color:#a1a1aa}
 #rbtools-app .admin-title-panel{margin-top:15px;border:1px solid var(--line);border-radius:11px}
 #rbtools-app .admin-title-panel>label{display:block;font-weight:800;font-size:15px;margin-bottom:8px}
+#rbtools-app .admin-author-panel{margin:12px 0 16px;padding:14px;border:2px solid var(--line);border-radius:10px;background:var(--panel2)}
+#rbtools-app .admin-author-panel h3{margin:0 0 8px;font-size:1.08rem}
 #rbtools-app .admin-title-panel input.admin-blogger-title{box-sizing:border-box;width:100%;border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--panel);font:700 25px/1.4 Arial,Helvetica,sans-serif}
 #rbtools-app .admin-title-panel input.admin-blogger-title:focus{outline:2px solid #b4d4f5;border-color:#478ce1}
 #rbtools-app .admin-heading-control{font-weight:700;font-size:13px}
@@ -3373,7 +3398,7 @@ function adminApplyTemplate(){
   if(type==="article"){
     rbGet("adminTitle").value="Cikk címe";adminLeadHtml="Lead / bevezető.";rbGet("adminFooter").value="author";
   }else if(type==="news"){
-    rbGet("adminTitle").value="Hétvégi gyors – ";adminLeadHtml="Lead szövege.";rbGet("adminAuthor").value="Összeállította: Adorján Péter";rbGet("adminFooter").value="author";
+    rbGet("adminTitle").value="Hétvégi gyors – ";adminLeadHtml="Lead szövege.";rbGet("adminAuthor").value="Adorján Péter";rbGet("adminFooter").value="compiled";
   }else if(type==="podcast"){
     rbGet("adminTitle").value="Podcast címe";adminLeadHtml="Podcast felvezető szövege.";rbGet("adminAuthor").value="RegionalBahn szerkesztőség";rbGet("adminFooter").value="author";
   }else if(type==="innotrans"){
@@ -3828,7 +3853,7 @@ function adminGenerateHtml(setStatus=true){
     }
     out+=adminBlocks.map(adminBlockHtml).filter(Boolean).join("\n");
     if(adminSourcesHtml)out+="\n"+adminSourcesHtml;
-    if(rbGet("adminFooter").value==="author"&&author)out+='\n<hr align="center" />\n<div style="text-align: right;"><span style="font-size: 85%;"><em>'+esc(author)+'</em></span></div>';
+    if(["author","compiled"].includes(rbGet("adminFooter").value)&&author)out+='\n<hr align="center" />\n<div style="text-align: right;"><span style="font-size: 85%;"><em>'+(rbGet("adminFooter").value==="compiled"?"Összeállította: ":"")+esc(author)+'</em></span></div>';
   }
   rbGet("adminOutput").value=out;
   if(contentType==="live"){
@@ -4381,6 +4406,56 @@ function adminLink(useSavedRange=false){
   rbGet("adminLinkUrl").focus();
   rbGet("adminLinkUrl").select();
 }
+
+let adminAbbrEditElement=null;
+function adminCloseAbbrPanel(restore=false){
+ rbGet("adminAbbrPanel").hidden=true;adminAbbrEditElement=null;
+ if(restore)adminRestoreRange();
+}
+function adminAbbr(useSavedRange=false){
+ if(!useSavedRange)adminRememberRange();
+ const r=adminSavedRange,root=r?adminEditableForRange(r):null;
+ if(!root||root.classList.contains("admin-paper-title")){
+   rbGet("adminStatus").textContent="Jelölj ki egy rövidítést a cikk szerkeszthető szövegében.";return;
+ }
+ const node=r.startContainer.nodeType===1?r.startContainer:r.startContainer.parentElement;
+ const existing=node?.closest?.("abbr");
+ adminAbbrEditElement=existing&&root.contains(existing)?existing:null;
+ if(r.collapsed&&!adminAbbrEditElement){
+   rbGet("adminStatus").textContent="Előbb jelöld ki a rövidítés szövegét.";return;
+ }
+ if(r.collapsed&&adminAbbrEditElement){
+   const full=document.createRange();full.selectNodeContents(adminAbbrEditElement);adminSavedRange=full.cloneRange();
+ }
+ rbGet("adminAbbrSelection").textContent="Kijelölés: "+(adminSavedRange.toString()||"");
+ rbGet("adminAbbrTitle").value=adminAbbrEditElement?.getAttribute("title")||"";
+ rbGet("adminAbbrRemove").disabled=!adminAbbrEditElement;
+ rbGet("adminLinkPanel").hidden=true;rbGet("adminAbbrPanel").hidden=false;rbGet("adminAbbrTitle").focus();
+}
+function adminApplyAbbr(){
+ const title=rbGet("adminAbbrTitle").value.trim();
+ if(!title){rbGet("adminStatus").textContent="A title mezőben add meg a rövidítés teljes jelentését.";rbGet("adminAbbrTitle").focus();return;}
+ if(!adminRestoreRange()){rbGet("adminStatus").textContent="Elveszett a kijelölés; jelöld ki újra a rövidítést.";return;}
+ if(adminAbbrEditElement?.isConnected)adminAbbrEditElement.setAttribute("title",title);
+ else{
+  const sel=window.getSelection(),r=sel?.rangeCount?sel.getRangeAt(0):null;
+  if(!r||r.collapsed||!r.toString().trim()){rbGet("adminStatus").textContent="Jelöld ki a rövidítés szövegét.";return;}
+  const item=document.createElement("abbr");item.setAttribute("title",title);
+  try{r.surroundContents(item);}
+  catch{
+   if(r.commonAncestorContainer?.parentElement?.closest?.("abbr")){rbGet("adminStatus").textContent="Jelöld ki a teljes meglévő rövidítést.";return;}
+   item.appendChild(r.extractContents());r.insertNode(item);
+  }
+  r.selectNodeContents(item);sel.removeAllRanges();sel.addRange(r);
+ }
+ adminSyncActiveEditable();adminCloseAbbrPanel();rbGet("adminStatus").textContent="abbr feloldás beszúrva.";
+}
+function adminRemoveAbbr(){
+ const item=adminAbbrEditElement;
+ if(!item?.isConnected||!adminRestoreRange())return;
+ item.replaceWith(...Array.from(item.childNodes));adminSyncActiveEditable();adminCloseAbbrPanel();
+ rbGet("adminStatus").textContent="abbr jelölés törölve, a szöveg megmaradt.";
+}
 function adminSetLinkTarget(anchor,newWindow){
   if(!anchor)return;
   if(newWindow){
@@ -4501,10 +4576,31 @@ function adminRepairLegacyLeadBlock(){
   if(!adminMainImageId){const img=adminAddImageFromElement(intro.anchor,"");if(img)adminMainImageId=img.id;}
   adminLeadHtml=intro.html;adminLeadAlign=intro.align;adminBlocks.shift();return true;
 }
+
+function adminReadAuthorFooter(nodes){
+ let i=nodes.length-1;
+ while(i>=0&&(nodes[i].nodeType===3&&!nodes[i].textContent.trim()||
+   nodes[i].nodeType===1&&nodes[i].tagName==="BR"))i--;
+ const last=nodes[i];
+ if(!last||last.nodeType!==1||!["DIV","P"].includes(last.tagName)||
+    !/text-align\s*:\s*right/i.test(last.getAttribute("style")||""))return null;
+ const em=last.querySelector("em"),span=em?.closest("span");
+ if(!em||!/85%|0\.85em/i.test(span?.getAttribute("style")||""))return null;
+ const value=(em.textContent||"").trim();if(!value)return null;
+ let h=i-1;
+ while(h>=0&&(nodes[h].nodeType===3&&!nodes[h].textContent.trim()||
+   nodes[h].nodeType===1&&nodes[h].tagName==="BR"))h--;
+ if(h<0||nodes[h].nodeType!==1||nodes[h].tagName!=="HR")return null;
+ nodes.splice(i,1);nodes.splice(h,1);
+ const compiled=/^Összeállította:\s*/i.test(value);
+ return {name:value.replace(/^Összeállította:\s*/i,""),mode:compiled?"compiled":"author"};
+}
+
 function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
   raw=String(raw||"").trim();if(!raw){rbGet("adminStatus").textContent="Nincs visszatöltendő HTML.";return;}
   const chosen=preserveCurrentMain?adminFindImage(adminMainImageId):null;
   adminBlocks=[];adminImages=chosen?[chosen]:[];adminSourcesHtml="";adminLeadHtml="";adminLeadAlign="justify";adminMainImageId=chosen?.id||null;
+  rbGet("adminAuthor").value="";rbGet("adminFooter").value="none";
   const titleDoc=new DOMParser().parseFromString(raw,"text/html").querySelector("title");
   if(titleDoc&&titleDoc.textContent.trim()&&!rbGet("adminTitle").value.trim())rbGet("adminTitle").value=titleDoc.textContent.trim();
   const parts=raw.split(/<!--\s*more\s*-->/i);
@@ -4520,6 +4616,8 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
     adminLeadHtml=preHtml;adminLeadAlign=preIntro?.align||adminAlignFromNode(preBold.closest("div"),"justify");
   }
   const tpl=document.createElement("template");tpl.innerHTML=post;const nodes=Array.from(tpl.content.childNodes);
+  const existingFooter=adminReadAuthorFooter(nodes);
+  if(existingFooter){rbGet("adminAuthor").value=existingFooter.name;rbGet("adminFooter").value=existingFooter.mode;}
   const incomingLive=!!tpl.content.querySelector('.rb-live-entry');
   if(incomingLive){
     rbGet("adminContentType").value="live";adminContentTypeChanged(false);
@@ -4565,10 +4663,6 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
       continue;
     }
     if(tag==="div"&&/Források:/i.test(text)&&n.querySelector("strong")){adminSourcesHtml=n.outerHTML+"\n<br />";continue;}
-    if(tag==="div"&&/text-align\s*:\s*right/i.test(n.getAttribute("style")||"")&&n.querySelector("em")){
-      let a=n.querySelector("em").textContent.trim().replace(/^Összeállította:\s*/i,"");if(a)rbGet("adminAuthor").value=a;rbGet("adminFooter").value="author";
-      if(adminBlocks.at(-1)?.type==="hr")adminBlocks.pop();continue;
-    }
     if(adminIsGrayNode(n)){i=adminImportBoxGroup(nodes,i)-1;continue;}
     if(tag==="div"&&n.classList.contains("separator")&&n.querySelector("img")){
       const {caption,lastIndex}=adminConsumeImageCaption(nodes,i);
@@ -4623,6 +4717,8 @@ function adminClear(){
 rbGet("adminContentType").addEventListener("change",()=>adminContentTypeChanged(true));
 rbGet("adminStaticLayout").addEventListener("change",()=>{rbGet("adminTemplateHint").textContent=ADMIN_TEMPLATE_HINTS.static+" Kiválasztott forma: "+rbGet("adminStaticLayout").selectedOptions[0].textContent+".";});
 rbGet("adminLoadTemplate").addEventListener("click",adminApplyTemplate);
+rbGet("adminAuthor").addEventListener("input",()=>adminGenerateHtml(false));
+rbGet("adminFooter").addEventListener("change",()=>adminGenerateHtml(false));
 rbGet("adminAddLive").addEventListener("click",adminAddLiveUpdate);
 rbGet("adminLiveAddToolbar").addEventListener("click",adminAddLiveUpdate);
 adminContentTypeChanged(false);
@@ -4644,12 +4740,13 @@ rbGet("adminAddIframe").addEventListener("click",()=>{rbGet("adminIframeInput").
 rbGet("adminInsertIframe").addEventListener("click",adminInsertIframeFromInput);
 rbGet("adminClearIframeInput").addEventListener("click",()=>{rbGet("adminIframeInput").value="";rbGet("adminIframeInput").focus();});
 rbGet("adminAddRule").addEventListener("click",()=>{adminBlocks.push({id:adminUid("b"),type:"hr"});adminRenderCanvas();adminGenerateHtml();});
-for(const id of ["adminFmtBold","adminFmtItalic","adminFmtUnderline","adminFmtStrike","adminFmtLink","adminFmtUnlink","adminFmtSup","adminFmtSub","adminFmtBox","adminFmtUl","adminFmtOl","adminFmtIndent","adminFmtOutdent","adminAlignLeft","adminAlignCenter","adminAlignRight","adminAlignJustify"])rbGet(id).addEventListener("mousedown",e=>e.preventDefault());
+for(const id of ["adminFmtBold","adminFmtItalic","adminFmtUnderline","adminFmtStrike","adminFmtLink","adminFmtAbbr","adminFmtUnlink","adminFmtSup","adminFmtSub","adminFmtBox","adminFmtUl","adminFmtOl","adminFmtIndent","adminFmtOutdent","adminAlignLeft","adminAlignCenter","adminAlignRight","adminAlignJustify"])rbGet(id).addEventListener("mousedown",e=>e.preventDefault());
 rbGet("adminFmtBold").addEventListener("click",()=>adminExec("bold"));
 rbGet("adminFmtItalic").addEventListener("click",()=>adminExec("italic"));
 rbGet("adminFmtUnderline").addEventListener("click",()=>adminExec("underline"));
 rbGet("adminFmtStrike").addEventListener("click",()=>adminExec("strikeThrough"));
 rbGet("adminFmtLink").addEventListener("click",adminLink);
+rbGet("adminFmtAbbr").addEventListener("click",()=>adminAbbr());
 rbGet("adminCanvas").addEventListener("mousedown",adminCaptureRightClick,true);
 rbGet("adminCanvas").addEventListener("contextmenu",adminContextMenuAt,true);
 rbGet("adminContextMenu").querySelectorAll("[data-admin-context-command]").forEach(btn=>{
@@ -4660,6 +4757,7 @@ rbGet("adminContextMenu").querySelectorAll("[data-admin-context-command]").forEa
     adminHideContextMenu();
     if(selected)adminSavedRange=selected;
     if(action==="link")adminLink(true);
+    else if(action==="abbr")adminAbbr(true);
     else if(action==="copy")copyToClipboard(selected?.toString()||"",rbGet("adminStatus"),"Kijelölt szöveg másolva.");
     else adminExec(action,null,true);
   });
@@ -4687,6 +4785,13 @@ rbGet("adminCanvas").addEventListener("scroll",adminHideContextMenu,{passive:tru
 window.addEventListener("scroll",adminHideContextMenu,{passive:true});
 window.addEventListener("resize",adminHideContextMenu);
 rbGet("adminLinkApply").addEventListener("click",adminApplyLink);
+rbGet("adminAbbrApply").addEventListener("click",adminApplyAbbr);
+rbGet("adminAbbrRemove").addEventListener("click",adminRemoveAbbr);
+rbGet("adminAbbrCancel").addEventListener("click",()=>adminCloseAbbrPanel(true));
+rbGet("adminAbbrTitle").addEventListener("keydown",e=>{
+  if(e.key==="Enter"){e.preventDefault();adminApplyAbbr();}
+  if(e.key==="Escape"){e.preventDefault();adminCloseAbbrPanel(true);}
+});
 rbGet("adminLinkCancel").addEventListener("click",()=>adminCloseLinkPanel(true));
 rbGet("adminLinkUrl").addEventListener("keydown",e=>{
   if(e.key==="Enter"){e.preventDefault();adminApplyLink();}

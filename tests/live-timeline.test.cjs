@@ -89,6 +89,6 @@ for(const call of [
  "adminContentTypeChanged(false)","rbGet(\"adminLiveValidation\").textContent"])
  assert.ok(ui.includes(call),"Missing export/editor/import workflow: "+call);
 assert.ok(ui.includes('<option value="live">Percről percre / élő tudósítás</option>'));
-assert.ok(ui.includes("14/B. Percről percre"));
+assert.ok(ui.includes("16. Percről percre"));
 assert.ok(ui.includes("Percről percre:</strong>"));
 console.log("RBTools live: dates, chronology, reporter/location, correction, rich copy, deep link, parse and editor wiring PASS");
