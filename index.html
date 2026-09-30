@@ -452,8 +452,9 @@ További szöveg..."></textarea>
       <div class="field"><label>Főkép 200 px URL</label><input id="rbtools-thumb" placeholder="FOKEP_KIS_URL"></div>
       <div class="field"><label>Főkép eredeti URL</label><input id="rbtools-full" placeholder="FOKEP_NAGY_URL"></div>
     </div>
-    <div class="grid2" style="margin-top:10px">
+    <div class="grid3" style="margin-top:10px">
       <div class="field"><label>Főkép title / kredit</label><input id="rbtools-credit" placeholder="fotó: © Név • www.RegionalBahn.hu"></div>
+      <div class="field"><label>Főkép leírása (csak alt, nem látható képaláírás)</label><textarea id="rbtools-mainCaption" rows="2" placeholder="Írd le, mit ábrázol a kép. Enter vagy &lt;br&gt;: új sor."></textarea></div>
       <div class="field"><label>HTML-fájlnév alapja</label><input id="rbtools-filenameBase" placeholder="Automatikusan a címből"></div>
     </div>
     <div id="rbtools-reporterFields" class="grid3 hidden" style="margin-top:10px">
@@ -1689,7 +1690,7 @@ function rbImageHtml(a,boxed=false){
     :"text-align: center;";
   const titleAttr=credit?` title="${esc(credit,true)}"`:"";
   const tail=boxed?"":"\n<br />";
-  const alt=adminCleanCaptionText(caption.caption).replace(/\n/g," ");
+  const alt=rbImageAltText(caption.caption,credit,caption.photoName);
   return `<div class="separator" style="${sepStyle}"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}" width="600" alt="${esc(alt,true)}" /></a></div>\n<div style="${capStyle}">${adminCaptionHtml(caption)}</div>${tail}`;
 }
 
@@ -1711,10 +1712,11 @@ function rbBoxHtml(title,text,imageAttrs=null,mode="markdown"){
   const paras=rbBoxParagraphsHtml(text,mode);if(paras)out.push(paras);
   if(imageAttrs&&(imageAttrs.full||imageAttrs.display)){
     const full=imageAttrs.full||imageAttrs.display,display=imageAttrs.display||imageAttrs.full,credit=imageAttrs.credit||"",caption=imageAttrs.caption||"",width=imageAttrs.width||"600";
+    const captionParts=adminCaptionParts(caption,credit);
     const titleAttr=credit?` title="${esc(credit,true)}"`:"";
     const widthAttr=width==="100%"?' style="max-width: 100%; width: 100%; height: auto;"':` width="${esc(width,true)}"`;
-    out.push(`<div class="separator" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}"${widthAttr} alt="${esc(caption,true)}" /></a></div>`);
-    out.push(`<div style="background-color: #c3c3c3; padding: 0px 15px 15px; text-align: center;">${fmt(caption)}</div>`);
+    out.push(`<div class="separator" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}"${widthAttr} alt="${esc(rbImageAltText(captionParts.caption,credit,captionParts.photoName),true)}" /></a></div>`);
+    out.push(`<div style="background-color: #c3c3c3; padding: 0px 15px 15px; text-align: center;">${adminCaptionHtml(captionParts)}</div>`);
   }
   return out.join("\n");
 }
@@ -1874,7 +1876,7 @@ function convertArticleMarkdown(md){
 
   const rbMain=getMarker(body,"MAIN_IMAGE");
   if(rbMain){
-    const a=parseAttrs(rbMain[1]);if(a.thumb)rbGet("thumb").value=a.thumb;if(a.full)rbGet("full").value=a.full;if(a.credit)rbGet("credit").value=a.credit;
+    const a=parseAttrs(rbMain[1]);if(a.thumb)rbGet("thumb").value=a.thumb;if(a.full)rbGet("full").value=a.full;if(a.credit)rbGet("credit").value=a.credit;if(Object.hasOwn(a,"caption"))rbGet("mainCaption").value=a.caption;
     body=body.replace(rbMain[0],"").trim();
   }
 
@@ -1895,7 +1897,7 @@ function convertArticleMarkdown(md){
 
   const titleAttr=credit?` title="${esc(credit,true)}"`:"";
   const bodyHtml=bodyToHtml(body);
-  return `<div style="text-align: justify;">\n<a href="${esc(full,true)}" style="clear: left; float: left; padding: 0px 1em 1em 0px;"${titleAttr}><img src="${esc(thumb,true)}" width="200" alt="" /></a><strong>${inlineMd(topText)}</strong></div>\n<br />\n<!--more-->\n<br />\n${bodyHtml}${bodyHtml?"\n":""}${src.html}${footerHtml()}`;
+  return `<div style="text-align: justify;">\n<a href="${esc(full,true)}" style="clear: left; float: left; padding: 0px 1em 1em 0px;"${titleAttr}><img src="${esc(thumb,true)}" width="200" alt="${esc(rbImageAltText(rbGet("mainCaption").value,credit),true)}" /></a><strong>${inlineMd(topText)}</strong></div>\n<br />\n<!--more-->\n<br />\n${bodyHtml}${bodyHtml?"\n":""}${src.html}${footerHtml()}`;
 }
 function plainInline(s){
   return esc(String(s??"")).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1">$1</a>');
@@ -1922,7 +1924,7 @@ function convertArticlePlainText(text){
   }
   let topText=mode==="title"?title:lead;if(!topText)topText=title||lead;
   const titleAttr=credit?` title="${esc(credit,true)}"`:"";
-  return `<div style="text-align: justify;">\n<a href="${esc(full,true)}" style="clear: left; float: left; padding: 0px 1em 1em 0px;"${titleAttr}><img src="${esc(thumb,true)}" width="200" alt="" /></a><strong>${plainInline(topText)}</strong></div>\n<br />\n<!--more-->\n<br />\n${bodyHtml}${bodyHtml?"\n":""}${footerHtml()}`;
+  return `<div style="text-align: justify;">\n<a href="${esc(full,true)}" style="clear: left; float: left; padding: 0px 1em 1em 0px;"${titleAttr}><img src="${esc(thumb,true)}" width="200" alt="${esc(rbImageAltText(rbGet("mainCaption").value,credit),true)}" /></a><strong>${plainInline(topText)}</strong></div>\n<br />\n<!--more-->\n<br />\n${bodyHtml}${bodyHtml?"\n":""}${footerHtml()}`;
 }
 function convertArticleInput(text){
   const mode=rbGet("sourceMode")?.value||"markdown";
@@ -1976,7 +1978,7 @@ rbGet("preset").addEventListener("change",e=>{
   }
   updateReporterFields();if(rbGet("mdInput").value.trim())doConvertArticle();
 });
-for(const id of ["author","thumb","full","credit","footerIntro","reporters","footerOutro"]){
+for(const id of ["author","thumb","full","credit","mainCaption","footerIntro","reporters","footerOutro"]){
   rbGet(id).addEventListener("input",()=>{if(rbGet("mdInput").value.trim())doConvertArticle();});
 }
 rbGet("convertArticle").addEventListener("click",doConvertArticle);
@@ -1998,7 +2000,7 @@ rbGet("downloadArticle").addEventListener("click",()=>{
   downloadText(base+".html",text);rbGet("articleStatus").textContent="HTML fájl elmentve.";
 });
 rbGet("clearArticle").addEventListener("click",()=>{
-  rbGet("mdInput").value="";rbGet("articleOutput").value="";rbGet("title").value="";rbGet("thumb").value="";rbGet("full").value="";rbGet("credit").value="";rbGet("googleDocUrl").value="";
+  rbGet("mdInput").value="";rbGet("articleOutput").value="";rbGet("title").value="";rbGet("thumb").value="";rbGet("full").value="";rbGet("credit").value="";rbGet("mainCaption").value="";rbGet("googleDocUrl").value="";
   rbGet("articlePreviewFrame").srcdoc="";rbGet("sourceMode").value="auto";rbGet("articleStatus").textContent="Törölve.";
 });
 /* ---------- MD / DOCX / Google Dokumentum import ---------- */
@@ -3011,6 +3013,41 @@ function adminCaptionParts(raw,credit=""){
     captionPhoto:!!photoLine
   };
 }
+function rbImageAltText(rawCaption,rawCredit="",rawPhotoName=""){
+  // An alt attribute is plain text. Render caption line breaks as screen-reader-friendly
+  // semicolon pauses, never literal <br> tags; the editorial credit uses +++.
+  const caption=adminCleanCaptionText(rawCaption)
+    .split("\n")
+    .map(line=>line.replace(/<[^>]*>/g,"")
+      .replace(/\[([^\]]+)\]\(https?:\/\/[^)]+\)/g,"$1")
+      .replace(/\*\*|~~|\+\+/g,"")
+      .replace(/\s+/g," ").trim())
+    .filter(line=>line&&!/^képaláírás$/i.test(line))
+    .join("; ");
+  const explicit=String(rawPhotoName||"").trim()
+    .replace(/^\(?\s*fotó\s*:\s*/i,"").replace(/\)\s*$/,"");
+  let credit="";
+  if(explicit)credit="fotó: "+explicit;
+  else{
+    const raw=String(rawCredit||"").trim();
+    if(raw){
+      const tagged=raw.match(/^(fotó|foto|forrás|source|quelle)\s*:\s*(.*)$/i);
+      const name=(tagged?tagged[2]:raw).replace(/^©\s*/,"").split(/\s*[•|]\s*/)[0].trim();
+      if(name)credit=(tagged&&/^fotó|foto$/i.test(tagged[1])?"fotó: ":"forrás: ")+name;
+    }
+  }
+  return caption+(caption&&credit?" +++ ":"")+credit;
+}
+function rbCaptionFromAlt(rawAlt){
+  const alt=String(rawAlt||"").trim();
+  if(!alt)return {caption:"",credit:""};
+  const match=alt.match(/^(.*?)\s*\+\+\+\s*(.*?)$/s);
+  if(!match){
+    return /^(?:fotó|forrás|source|quelle)\s*:/i.test(alt)
+      ?{caption:"",credit:alt}:{caption:alt,credit:""};
+  }
+  return {caption:match[1].split(/;\s+/).join("\n").trim(),credit:match[2].trim()};
+}
 function adminCaptionHtml(img,{includePhoto=true}={}){
   const text=adminCleanCaptionText(img?.caption||"");
   const textHtml=text.split("\n").map(line=>inlineMd(line)).join("<br />");
@@ -3074,10 +3111,12 @@ function adminAddImageFromElement(holder,caption="",forceCredit=""){
   const full=(a.getAttribute("href")||display).trim();
   if(!display&&!full)return null;
   let item=adminImages.find(x=>(x.full||"")==full&&(x.display||"")==display);
-  const detectedCredit=forceCredit||(a.getAttribute("title")||"").trim();
-  const parts=adminCaptionParts(caption,detectedCredit);
+  const altParts=rbCaptionFromAlt(img.getAttribute("alt")||"");
+  const detectedCredit=forceCredit||(a.getAttribute("title")||"").trim()||altParts.credit;
+  const inputCaption=caption||altParts.caption;
+  const parts=adminCaptionParts(inputCaption,detectedCredit);
   if(item){
-    if(caption){
+    if(inputCaption){
       item.caption=parts.caption||"";
       if(parts.captionPhoto){item.captionPhoto=true;item.photoName=parts.photoName;}
     }
@@ -3089,7 +3128,7 @@ function adminAddImageFromElement(holder,caption="",forceCredit=""){
     id:adminUid("img"),
     full:full||display,
     display:display||full,
-    credit:detectedCredit||"fotó: © Halász Péter • www.RegionalBahn.hu",
+    credit:detectedCredit||"",
     caption:parts.caption||"KÉPaláírás",
     captionPhoto:parts.captionPhoto,
     photoName:parts.photoName||"",
@@ -3163,20 +3202,20 @@ function adminBuildFromSource(){
   rbGet("adminStatus").textContent=adminBlocks.length+" szövegblokk felépítve. A cikk vizuálisan szerkeszthető.";
 }
 function adminImageBodyHtml(img){
-  const attrs=[];
+  const attrs=[],alt=rbImageAltText(img.caption,img.credit,img.photoName);
   for(const a of img.attrs||[]){
     if(a.name.toLowerCase()==="src")continue;
-    if(a.name.toLowerCase()==="alt"){attrs.push('alt="'+esc(adminCleanCaptionText(img.caption).replace(/\n/g," "),true)+'"');continue;}
+    if(a.name.toLowerCase()==="alt"){attrs.push('alt="'+esc(alt,true)+'"');continue;}
     attrs.push(a.name+'="'+esc(a.value,true)+'"');
   }
-  if(!attrs.some(x=>/^alt=/.test(x)))attrs.unshift('alt="'+esc(adminCleanCaptionText(img.caption).replace(/\n/g," "),true)+'"');
+  if(!attrs.some(x=>/^alt=/.test(x)))attrs.unshift('alt="'+esc(alt,true)+'"');
   attrs.push('src="'+esc(img.display,true)+'"');
   return '<div class="separator" style="clear: both; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img '+attrs.join(" ")+' /></a></div>\n'
     +'<div style="text-align: center;">'+adminCaptionHtml(img)+'</div>\n<br />';
 }
 function adminMainImageHtml(img){
   if(!img)return "";
-  return '<a href="'+esc(img.full||img.display,true)+'" style="clear: left; float: left; padding: 0px 1em 1em 0px;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="200" alt="" /></a>';
+  return '<a href="'+esc(img.full||img.display,true)+'" style="clear: left; float: left; padding: 0px 1em 1em 0px;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="200" alt="'+esc(rbImageAltText(img.caption,img.credit,img.photoName),true)+'" /></a>';
 }
 function adminBoxBodyParts(html){
   const t=document.createElement("template");t.innerHTML=String(html||"");
@@ -3201,7 +3240,7 @@ function adminBoxHtml(block){
   });
   const img=adminFindImage(block.imageId);
   if(img){
-    out.push('<div class="separator" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="600" alt="'+esc(adminCleanCaptionText(img.caption).replace(/\n/g," "),true)+'" /></a></div>');
+    out.push('<div class="separator" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="600" alt="'+esc(rbImageAltText(img.caption,img.credit,img.photoName),true)+'" /></a></div>');
     out.push('<div style="background-color: #c3c3c3; padding: 0px 15px 15px; text-align: center;">'+adminCaptionHtml(img)+'</div>');
   }
   return out.join("\n");
@@ -3368,7 +3407,7 @@ function adminImageBlockElement(block){
   const img=adminFindImage(block.imageId),wrap=document.createElement("div");wrap.className="admin-image-block";
   if(!img){wrap.textContent="A kép már nincs a képtárban.";return wrap;}
   const a=document.createElement("a");a.href=img.full||img.display||"#";a.target="_blank";a.rel="noopener";
-  const pic=document.createElement("img");pic.src=img.display||"";pic.alt="";a.appendChild(pic);wrap.appendChild(a);
+  const pic=document.createElement("img");pic.src=img.display||"";pic.alt=rbImageAltText(img.caption,img.credit,img.photoName);a.appendChild(pic);wrap.appendChild(a);
   wrap.appendChild(adminCaptionEditor(img));
   const cr=document.createElement("div");cr.className="admin-image-credit";cr.textContent=img.credit||"";wrap.appendChild(cr);
   return wrap;
@@ -3386,7 +3425,7 @@ function adminBoxElement(block){
   adminTrackEditable(body,()=>{block.html=body.innerHTML;});wrap.appendChild(body);
   const img=adminFindImage(block.imageId);
   if(img){
-    const p=document.createElement("div");p.className="admin-box-image";const im=document.createElement("img");im.src=img.display||"";im.alt="";p.appendChild(im);
+    const p=document.createElement("div");p.className="admin-box-image";const im=document.createElement("img");im.src=img.display||"";im.alt=rbImageAltText(img.caption,img.credit,img.photoName);p.appendChild(im);
     p.appendChild(adminCaptionEditor(img));
     const rm=document.createElement("button");rm.type="button";rm.className="admin-box-image-remove";rm.textContent="× Kép kivétele a keretesből";rm.addEventListener("click",()=>{block.imageId=null;adminRenderCanvas();adminGenerateHtml();});p.appendChild(rm);wrap.appendChild(p);
   }else{
@@ -3452,7 +3491,7 @@ function adminRenderCanvas(){
     const main=adminFindImage(adminMainImageId);
     if(main){
       const a=document.createElement("a");a.className="admin-main-thumb";a.href=main.full||main.display||"#";a.target="_blank";a.rel="noopener";
-      const image=document.createElement("img");image.src=main.display||"";image.alt="";a.appendChild(image);shell.appendChild(a);
+      const image=document.createElement("img");image.src=main.display||"";image.alt=rbImageAltText(main.caption,main.credit,main.photoName);a.appendChild(image);shell.appendChild(a);
     }
     const lead=document.createElement("div");lead.className="admin-lead admin-editable";lead.contentEditable="true";lead.spellcheck=true;
     lead.dataset.adminSpecial="lead";lead.dataset.placeholder="A valódi leadet ide írd, ne a cikk címét.";
@@ -3501,7 +3540,7 @@ function adminRenderImageLibrary(){
     thumb.title="Kép áthúzása a WYSIWYG bevezetőjébe vagy kék beszúrási sávjára";
     thumb.addEventListener("dragstart",e=>{tile.classList.add("dragging");e.dataTransfer.setData("application/x-rbtools-image",img.id);e.dataTransfer.setData("text/plain","RBIMAGE:"+img.id);e.dataTransfer.effectAllowed="copyMove";});
     thumb.addEventListener("dragend",()=>tile.classList.remove("dragging"));
-    const im=document.createElement("img");im.src=img.display||"";im.alt="";im.draggable=false;thumb.appendChild(im);
+    const im=document.createElement("img");im.src=img.display||"";im.alt=rbImageAltText(img.caption,img.credit,img.photoName);im.draggable=false;thumb.appendChild(im);
     const fields=document.createElement("div");fields.className="admin-image-fields";
     const makeInput=(name,value,onInput)=>{const l=document.createElement("label");l.textContent=name;const x=document.createElement("input");x.value=value||"";x.addEventListener("input",()=>onInput(x.value));x.addEventListener("change",()=>{adminRenderCanvas();adminGenerateHtml();});l.appendChild(x);return l;};
     const captionLabel=document.createElement("label");captionLabel.textContent="Képaláírás (Enter: új sor)";
@@ -4217,7 +4256,7 @@ function nearbyImageCaption(separator){
   let n=separator.nextElementSibling;
   if(!n)return "";
   if(n.matches("div:not(.separator)") && /text-align\s*:\s*center/i.test(n.getAttribute("style")||"")){
-    return (n.textContent||"").trim();
+    return adminCaptionNodeText(n);
   }
   return "";
 }
@@ -4226,13 +4265,14 @@ function itemFromImageContainer(container,captionHint=""){
   const img=container.querySelector("img");
   if(!link||!img)return null;
   const title=(link.getAttribute("title")||"").trim();
-  const detectedCaption=captionHint.trim();
+  const detectedCaption=adminCleanCaptionText(captionHint);
+  const altParts=rbCaptionFromAlt(img.getAttribute("alt")||"");
   return {
     full:(link.getAttribute("href")||img.getAttribute("src")||"").trim(),
     display:(img.getAttribute("src")||"").trim(),
     attrs:collectImageAttrs(img),
-    credit:title||imageCredit(),
-    caption:detectedCaption||imageDefaultCaption(),
+    credit:title||altParts.credit||imageCredit(),
+    caption:detectedCaption||altParts.caption||imageDefaultCaption(),
     customCredit:!!title,
     customCaption:!!detectedCaption
   };
@@ -4258,18 +4298,22 @@ function parseImageSource(raw){
   return items.length;
 }
 function imageItemHtml(item){
+  const caption=adminCaptionParts(item.caption||"",item.credit||"");
+  const alt=rbImageAltText(caption.caption,item.credit,caption.photoName);
   const attrs=[];
-  let hasSrc=false;
+  let hasSrc=false,hasAlt=false;
   for(const a of item.attrs){
     const low=a.name.toLowerCase();
     if(low==="src"){attrs.push('src="'+esc(item.display,true)+'"');hasSrc=true;continue;}
+    if(low==="alt"){attrs.push('alt="'+esc(alt,true)+'"');hasAlt=true;continue;}
     attrs.push(a.name+'="'+esc(a.value,true)+'"');
   }
   if(!hasSrc)attrs.push('src="'+esc(item.display,true)+'"');
+  if(!hasAlt)attrs.unshift('alt="'+esc(alt,true)+'"');
   const full=item.full||item.display||"";
   const title=item.credit?' title="'+esc(item.credit,true)+'"':"";
   return '<div class="separator" style="clear: both; text-align: center;"><a href="'+esc(full,true)+'" style="padding: 0px 1em;"'+title+'><img '+attrs.join(" ")+' /></a></div>\n'
-    +'<div style="text-align: center;">'+inlineMd(item.caption||"")+'</div>\n<br />';
+    +'<div style="text-align: center;">'+adminCaptionHtml(caption)+'</div>\n<br />';
 }
 function renderImagesOutput(setStatus=true){
   const html=imageEditorItems.map(imageItemHtml).join("\n");
