@@ -13,6 +13,7 @@ const view={
 };
 const state={list:[],loaded:null,tree:null,baseline:null,backup:false,saving:false,error:"",
   active:null,savedRange:null,linkAnchor:null,lastState:"",critical:false};
+const knownYearSections=new Map();
 function message(title,detail="",kind="idle"){
   const key=kind+"|"+title+"|"+detail;
   if(key===state.lastState)return;
@@ -117,10 +118,33 @@ function renderNode(node,siblings){
   input.__rbPageNode=node;input.__rbPageSiblings=siblings;
   return block;
 }
+function refreshYearSections(){
+  const picker=get("pageEntrySection"),last=picker.value;
+  knownYearSections.clear();
+  picker.replaceChildren(new Option("Az aktuálisan szerkesztett blokk után","current"));
+  function visit(nodes){
+    for(const node of nodes){
+      if(node.kind==="container"){
+        const match=node.prefix.match(/data-rb-(?:static-)?section\s*=\s*["']?([^"'\s>]+)/i)
+          ||node.prefix.match(/\bdata-year\s*=\s*["']?([^"'\s>]+)/i);
+        if(match){
+          const id="section-"+knownYearSections.size;
+          knownYearSections.set(id,node.children);
+          const op=new Option("A(z) "+match[1]+" évblokk elejére (új tétel)",id);
+          picker.appendChild(op);
+        }
+        visit(node.children);
+      }
+    }
+  }
+  if(state.tree)visit(state.tree.nodes);
+  if(knownYearSections.has(last)||last==="current")picker.value=last;
+}
 function render(){
   view.canvas.replaceChildren();
   if(!state.tree){const h=document.createElement("div");h.className="admin-empty";h.textContent="Nyiss meg egy meglévő Blogger-oldalt, vagy add át a Markdown-konverter HTML-kimenetét.";view.canvas.append(h);return;}
   state.tree.nodes.forEach(node=>view.canvas.appendChild(renderNode(node,state.tree.nodes)));
+  refreshYearSections();
   state.active=null;state.savedRange=null;
 }
 function update(){
@@ -268,6 +292,58 @@ function insertBlock(tag,value){
   const matching=Array.from(view.canvas.querySelectorAll(".collection-page-editable")).find(el=>el.__rbPageNode===newNode);
   matching?.focus();
 }
+function escapeEntry(raw){
+  return String(raw||"").replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function entryNode(tag,html,style){
+  const open="<"+tag+' style="'+style+'">';
+  return {kind:"leaf",tag,original:"",prefix:open,suffix:"</"+tag+">",
+    inner:html,value:html,edited:true};
+}
+function insertEntry(){
+  if(!state.tree?.safe)return;
+  const title=get("pageEntryTitle").value.trim(),date=get("pageEntryDate").value.trim(),
+    url=get("pageEntryUrl").value.trim(),summary=get("pageEntrySummary").value.trim();
+  if(!title||!date||!url||!summary){
+    message("HIÁNYZÓ CIKKAJÁNLÓ-ADATOK",
+      "A cím, dátum, teljes hivatkozás és rövid leírás megadása egyaránt szükséges.","working");return;
+  }
+  try{const p=new URL(url);if(!["https:","http:"].includes(p.protocol))throw Error();}
+  catch{message("HIBÁS CIKKHIVATKOZÁS","A Tovább linkhez teljes http(s) URL szükséges.","error");return;}
+  const parts=[
+    entryNode("h3",escapeEntry(title),"text-align: center;"),
+    entryNode("div","|","text-align: center;"),
+    entryNode("h3",escapeEntry(date),"text-align: center;"),
+    entryNode("div",escapeEntry(summary).replace(/\r?\n/g,"<br />")+
+      '&nbsp;<a href="'+escapeEntry(url)+'">Tovább »</a>',"text-align: justify;")
+  ];
+  const selected=get("pageEntrySection").value;
+  let collection=knownYearSections.get(selected);
+  let index=0;
+  if(collection){
+    // Newest article goes after the year header but before existing articles.
+    const year=collection.findIndex(n=>n.kind==="leaf"&&n.tag==="h3");
+    index=year<0?0:year+1;
+    while(index<collection.length&&collection[index].kind==="raw"&&!collection[index].original.trim())index++;
+  }else{
+    const el=state.active,arr=el?.__rbPageSiblings;
+    collection=arr||state.tree.nodes;
+    const activeIndex=arr?arr.indexOf(el.__rbPageNode):-1;
+    index=activeIndex<0?collection.length:activeIndex+1;
+  }
+  collection.splice(index,0,...parts);
+  render();update();
+  get("pageEntryTitle").value="";
+  get("pageEntryDate").value="";
+  get("pageEntryUrl").value="";
+  get("pageEntrySummary").value="";
+  const focus=Array.from(view.canvas.querySelectorAll(".collection-page-editable"))
+    .find(el=>el.__rbPageNode===parts[0]);
+  focus?.focus();
+  message("ÚJ AJÁNLÓ HELYILEG BESZÚRVA",
+    "A teljes bejegyzés a kiválasztott helyre került. Ellenőrizd az elrendezést, majd szükség esetén mentsd az eredeti Blogger-oldalra.","dirty");
+}
 function format(command){
   if(!restore()){message("JELÖLD KI A SZÖVEGET","Kattints a WYSIWYG-be, jelölj ki egy szövegrészt, és válaszd a formázást.","working");return;}
   document.execCommand(command,false,null);
@@ -411,6 +487,7 @@ get("pageLinkUrl").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventD
 get("pageAddParagraph").addEventListener("click",()=>insertBlock("div","Új bekezdés."));
 get("pageAddHeading").addEventListener("click",()=>insertBlock("h3","Új alcím"));
 get("pageAddRule").addEventListener("click",()=>insertBlock("hr",""));
+get("pageEntryInsert").addEventListener("click",insertEntry);
 const badge=root.querySelector("#rbtools-bloggerConnectionBadge");
 if(badge)new MutationObserver(refreshConnection).observe(badge,{childList:true,subtree:true});
 window.addEventListener("focus",refreshConnection);
