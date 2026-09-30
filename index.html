@@ -2088,7 +2088,7 @@ function rbImageHtml(a,boxed=false){
   const titleAttr=credit?` title="${esc(credit,true)}"`:"";
   const tail=boxed?"":"\n<br />";
   const alt=rbImageAltText(caption.caption,credit,caption.photoName);
-  return `<div class="separator rbtools-image" style="${sepStyle}"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}" width="600" alt="${esc(alt,true)}" /></a></div>\n<div class="rbtools-caption" style="${capStyle}">${adminCaptionHtml(caption)}</div>${tail}`;
+  return `<div class="separator rbtools-image" style="${sepStyle}"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}" width="600" style="max-width:100%;height:auto;" alt="${esc(alt,true)}" /></a></div>\n<div class="rbtools-caption" style="${capStyle}">${adminCaptionHtml(caption)}</div>${tail}`;
 }
 
 function rbBoxParagraphsHtml(text,mode="markdown"){
@@ -3755,6 +3755,7 @@ function adminImageBodyHtml(img){
     attrs.push(a.name+'="'+esc(a.value,true)+'"');
   }
   if(!attrs.some(x=>/^alt=/.test(x)))attrs.unshift('alt="'+esc(alt,true)+'"');
+  if(!(img.attrs||[]).some(a=>a.name.toLowerCase()==="style"))attrs.push('style="max-width:100%;height:auto;"');
   attrs.push('src="'+esc(img.display,true)+'"');
   return '<div class="separator rbtools-image" style="clear: both; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img '+attrs.join(" ")+' /></a></div>\n'
     +'<div class="rbtools-caption" style="text-align: center;">'+adminCaptionHtml(img)+'</div>\n<br />';
@@ -5184,6 +5185,7 @@ function imageItemHtml(item){
   }
   if(!hasSrc)attrs.push('src="'+esc(item.display,true)+'"');
   if(!hasAlt)attrs.unshift('alt="'+esc(alt,true)+'"');
+  if(!item.attrs.some(a=>a.name.toLowerCase()==="style"))attrs.push('style="max-width:100%;height:auto;"');
   const full=item.full||item.display||"";
   const title=item.credit?' title="'+esc(item.credit,true)+'"':"";
   return '<div class="separator rbtools-image" style="clear: both; text-align: center;"><a href="'+esc(full,true)+'" style="padding: 0px 1em;"'+title+'><img '+attrs.join(" ")+' /></a></div>\n'
