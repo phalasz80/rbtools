@@ -1017,7 +1017,7 @@ A következő cikk rövid ajánlója.</pre>
     <p><strong>Többsoros képaláírás:</strong> a WYSIWYG-ben kattints a kép alatti szerkeszthető feliratra. Az <strong>Enter</strong> és a <strong>↵ Sortörés</strong> gomb is új sort hoz létre. A képtár kártyáján ugyanaz a képaláírás többsoros szövegmezőben szerkeszthető.</p>
     <ol>
       <li>Írd be a képaláírást. Több sort is használhatsz, ezek a kész HTML-ben <code>&lt;br /&gt;</code> elválasztást kapnak.</li>
-      <li>Ha a képaláírás alatt külön sorban kéred a fotóst, jelöld be a <strong>Fotós neve a képaláírás új sorában</strong> opciót, és add meg a nevet, például <strong>Halász Péter</strong>.</li>
+      <li>Ha a képaláírás alatt külön sorban kéred a fotóst, jelöld be a <strong>Fotós neve a képaláírás új sorában</strong> opciót, és add meg a nevet, például <strong>Halász Péter</strong>. A program kizárólag akkor ajánl fel automatikus nevet, ha az a kép eredeti kreditjéből egyértelműen kiolvasható.</li>
       <li>A kész kimenet egyetlen képaláírásblokkon belül, a felirat mögött tartalmazza: <code>&lt;br /&gt;(fotó: Halász Péter)</code>. Kikapcsolt jelölőnégyzet esetén nem jelenik meg ez a sor.</li>
       <li>A képaláírás alatti opcionális fotósor nem azonos a kép <code>title</code> attribútumában szereplő <strong>kredittel</strong>; a kettő külön állítható.</li>
     </ol>
@@ -1519,7 +1519,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v31";
+const RBTOOLS_VERSION="pages-v32";
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -3092,7 +3092,7 @@ function adminAddImageFromElement(holder,caption="",forceCredit=""){
     credit:detectedCredit||"fotó: © Halász Péter • www.RegionalBahn.hu",
     caption:parts.caption||"KÉPaláírás",
     captionPhoto:parts.captionPhoto,
-    photoName:parts.photoName||"Halász Péter",
+    photoName:parts.photoName||"",
     attrs:adminImageAttrs(img)
   };
   adminImages.push(item);return item;
@@ -3666,16 +3666,17 @@ function adminImportBoxGroup(nodes,start){
     if(n.nodeType===1&&n.tagName==="BR"){i++;continue;}
     if(!adminIsGrayNode(n))break;group.push(n);i++;
   }
-  let title="",imageId=null,captionNode=null,body=[];
+  let title="",imageId=null,body=[];
   for(let gi=0;gi<group.length;gi++){
     const n=group[gi];
     if(n.classList.contains("separator")&&n.querySelector("img")){
-      const next=group[gi+1];const cap=next&&!next.classList.contains("separator")?(next.textContent||"").trim():"";
-      const image=adminAddImageFromElement(n,cap);if(image)imageId=image.id;if(cap){captionNode=next;gi++;}continue;
+      const {caption,lastIndex}=adminConsumeImageCaption(group,gi);
+      const image=adminAddImageFromElement(n,caption);if(image)imageId=image.id;
+      gi=lastIndex;continue;
     }
     const centered=/text-align\s*:\s*center/i.test(n.getAttribute("style")||"");
     if(!title&&centered&&n.querySelector("strong")){title=n.querySelector("strong").innerHTML;continue;}
-    if(n!==captionNode)body.push(n.innerHTML);
+    body.push(n.innerHTML);
   }
   const titleNode=group.find(n=>/text-align\s*:\s*center/i.test(n.getAttribute?.("style")||"")&&n.querySelector?.("strong"));
   const bodyNode=group.find(n=>n!==titleNode&&!n.classList?.contains("separator"));
