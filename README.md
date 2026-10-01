@@ -230,3 +230,10 @@ A `#nyúz` munkamenetben a sablon és a közvetlen forrásbetöltés egyaránt k
 A generált cikk-HTML többé nem tartalmaz külön `<style>` elemet. A címsorok, reszponzív képek és beágyazások szükséges formázását az RBTools érvényes inline stílusokkal állítja elő, így a Blogger bejegyzésszerkesztőjében nem jelenik meg a korábbi segéd-CSS mint hibás/tiltott kód. A már korábban elmentett `data-rbtools-theme` stílusblokkokat a visszaimportálás továbbra is felismeri és figyelmen kívül hagyja.
 
 Az Interre egységesített előnézeti HTML-ben a több szóból álló fallback betűcsaládok idézőjelezése is javítva lett: nem törhetik meg a `style="..."` attribútumot. A v47 #nyúz blokk-helyreállítása változatlanul megmarad.
+
+
+## #nyúz mentő parser (pages-v49)
+
+A Cikkadmin most már a korábban hibásan mentett #nyúz HTML-t is helyre tudja állítani, amikor egy teljes hírtörzs, kép, iframe vagy elválasztó egy H2–H5 elem belsejébe csúszott. A parser a címsor első valódi inline részét leválasztja, a blokk-elemeket külön szerkeszthető egységekké bontja, és a `Város | Ország – …` mintájú szöveget hírtörzsnek ismeri fel. A hiányzó hírcímhez szerkeszthető, de üresen nem mentett `Hír cím` helyőrző készül.
+
+A #nyúz cím/lead visszaolvasása is javult: ha a cím és a valódi lead a `<!--more-->` mögé csúszott, a program a címet nem teszi a törzsbe, a következő megfelelő blokkot pedig visszaemeli leadnek. A meglévő helyes címsorokat és a későbbi v47–v48 javításokat változatlanul megőrzi.
