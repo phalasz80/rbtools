@@ -66,7 +66,16 @@ for(const [kind,html] of Object.entries(results)){
   }else{
     assert.ok(html.includes(kind==="Cikkadmin keretes kép"?"Éjszaka":"Éjszakai fények"),
       kind+": hiányzó látható képaláírás");
+    assert.ok(!html.includes('class="rbtools-caption"'),kind+": régi képaláírás-osztály maradt");
+    assert.ok(!/font-size\s*:\s*(?:90%|\.9em)/i.test(html),kind+": 90%-os képaláírás maradt");
+    assert.ok(!/color\s*:\s*#0b5394/i.test(html),kind+": kék képaláírás maradt");
   }
+}
+for(const kind of ["Cikkadmin kép","haladó RB:IMAGE","képkód-eszköz"]){
+  assert.ok(results[kind].includes('<div style="text-align: center;">'),
+    kind+": nem a RegionalBahn középre zárt normál caption-kódját használja");
+  assert.ok(results[kind].includes('</div>\n<br />'),
+    kind+": a képaláírás után hiányzik a külön <br />");
 }
 const escaping=api.adminMainImageHtml({...img,caption:'A "vasút" & a város'});
 assert.ok(escaping.includes("A &quot;vasút&quot; &amp; a város"),"Nem biztonságos alt attribútum.");
