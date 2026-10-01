@@ -206,3 +206,13 @@ A **Szerzők és cikkzárás** mezőcsoport közvetlenül a WYSIWYG alatt talál
 A fejlécben található `JS: aktív • pages-v43 ↗` verziójelzés kattintható: új lapon megnyitja a `/release-notes.html` önálló változásnaplót. A dátumozott kiadási napló a GitHub által egyértelműen azonosítható v29, v37–v43 kiadásokat fedi le; az ennél régebbi és köztes fejlesztések nem kapnak bizonytalanul visszavetített verziószámot. A következő kiadásoknál a fájlt és a `RBTOOLS_VERSION` azonosítót együtt kell frissíteni.
 
 A Súgó tartalomjegyzéke az archívumokhoz hasonló, billentyűzettel is használható témagombokat és **Összes** lehetőséget kínál. Alapértelmezésben a Cikkadmin látható, azon belül külön fejezetgombokkal. Mélyhivatkozás vagy hashváltozás esetén a keresett fejezet szülőtémáját automatikusan megnyitja. A Gyűjtőoldalak útmutatója a részletes Cikkadmin-szakasz után következik.
+
+
+## Képaláírás-szabvány (pages-v44)
+
+A normál cikkképek látható képaláírása **nem kap külön Blogger-jellegű színt vagy 90%-os méretet**. A szabványos kimenet egyszerű, középre zárt, normál méretű szöveg:
+
+`<div style="text-align: center;">KÉPaláírás</div>`
+`<br />`
+
+A szöveg a cikk normál szövegszínét örökli. Ez a Cikkadmin normál képblokkjára, a haladó `RB:IMAGE` kimenetre és a Képkódok eszközre egyaránt érvényes. A főkép továbbra sem kap látható képaláírást. A keretes blokkok képaláírása a keretes saját szürke hátterét örökölheti, de ott sincs külön kék vagy csökkentett betűméret.
