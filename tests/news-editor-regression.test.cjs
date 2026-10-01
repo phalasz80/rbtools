@@ -27,5 +27,17 @@ const normalize=fn("adminNormalizeNewsParagraphHtml");
 const normalizeNews=new Function(normalize+"return adminNormalizeNewsParagraphHtml;")();
 assert.equal(normalizeNews("<strong>Wien [Bécs] | Ausztria – Teljes törzsszöveg <a href=\"#\">linkkel</a>.</strong>"),"<strong>Wien [Bécs] | Ausztria</strong> – Teljes törzsszöveg <a href=\"#\">linkkel</a>.");
 assert.equal(normalizeNews("<strong>Csak félkövér cím, nincs helymegjelölés</strong>"),"<strong>Csak félkövér cím, nincs helymegjelölés</strong>");
+
+assert.match(src,/function adminNewsInlineFragmentHtml\(/);
+assert.match(src,/function adminLooksLikeNewsBodyHtml\(/);
+assert.match(src,/function adminRepairMalformedNewsHeadings\(/);
+assert.match(load,/adminRepairMalformedNewsHeadings\(tpl\.content\)/);
+assert.match(load,/recoveredHeadings/);
+assert.match(load,/postText===title&&title&&\(!hasMore\|\|looksLikeNews\)/);
+assert.match(load,/adminNewsInlineFragmentHtml\(n\)/);
+assert.match(load,/adminRepairMalformedNewsHeadings\(temp\)/);
+const htmlToBlocks=fn("adminHtmlToBlocks");
+assert.match(htmlToBlocks,/adminNewsInlineFragmentHtml\(node\)/);
+assert.match(htmlToBlocks,/adminRepairMalformedNewsHeadings\(temp\)/);
 assert.ok(src.includes('const RBTOOLS_VERSION="pages-v49"'));
 console.log("v40 editor typography + #nyúz titles and justified bodies: PASS");
