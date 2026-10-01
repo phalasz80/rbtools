@@ -11,7 +11,7 @@ const css=style();
 assert.match(css,/<style data-rbtools-theme="regionalbahn-inter-2026">/);
 assert.match(css,/\.rbtools-heading\{font-family:inherit!important/);
 assert.match(css,/text-transform:none!important/);
-assert.match(css,/\.rbtools-caption\{color:#0b5394/);
+assert.ok(!css.includes(".rbtools-caption{"),"Caption must inherit normal article text styling");
 assert.match(css,/@media\(max-width:600px\)/);
 assert.doesNotMatch(css,/@font-face|@import/i,"Do not duplicate Blogger's embedded Inter");
 assert.doesNotMatch(css,/\.post-body\s*\{/,"Never overwrite the site-wide article style");
@@ -23,7 +23,7 @@ assert.match(extract("adminBlockHtml"),/class="rbtools-heading"/);
 assert.match(extract("adminBlockHtml"),/class="rbtools-embed"/);
 assert.match(extract("adminMainImageHtml"),/class="rbtools-main-image"/);
 assert.match(extract("adminImageBodyHtml"),/class="separator rbtools-image"/);
-assert.match(extract("adminImageBodyHtml"),/class="rbtools-caption"/);
+assert.match(extract("adminImageBodyHtml"),/<div style="text-align: center;">/);
 for(const name of ["convertArticleMarkdown","convertArticlePlainText"]){
  const source=extract(name);
  assert.ok(source.includes("rbThemePostCss()"),name+" must carry the portable post style");
