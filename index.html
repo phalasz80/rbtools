@@ -1285,6 +1285,7 @@ A következő cikk rövid ajánlója.</pre>
     <p>Ha közben szerkeszteni kezded a szöveget, a program szükség esetén újraszámolja vagy eltávolítja a segédkiemelést, hogy a találatjelző ne váljon a tényleges HTML részévé. A keresés a WYSIWYG felületre szolgál; a külön forrás- vagy végleges HTML-textareákban a böngésző saját keresése használható.</p>
 
     <h3>19. Képtár, főkép és lead</h3>
+    <p><strong>Képaláírás-szabvány:</strong> a normál cikkképek felirata egyszerű, normál méretű, a cikk szövegszínét öröklő középre zárt blokk: <code>&lt;div style="text-align: center;"&gt;KÉPaláírás&lt;/div&gt;</code>, utána külön <code>&lt;br /&gt;</code>. Az RBTools nem alkalmaz külön kék vagy 90%-os Blogger-jellegű képaláírás-stílust.</p>
     <p>A <strong>Képtár</strong> minden beolvasott képhez külön kártyát ad. A képaláírás és a kredit közvetlenül szerkeszthető. Egy törzsszövegbeli kép képaláírását a WYSIWYG-ben közvetlenül vagy a képtári kártyán módosíthatod: mindkét hely ugyanazt az adatot szerkeszti, a végleges HTML-ben egyetlen képaláírás készül. Régi, kétszer szereplő, közvetlenül egymás utáni és azonos képaláírásokat a betöltő összevonja. A főkép a képtár <strong>☆ Főkép</strong> gombjával, a bevezetőblokk saját képkiválasztójával vagy a kép bevezetőbe húzásával jelölhető ki. A valódi leadet ugyanebben a blokkban, a képtől jobbra szerkesztheted. A normál képeket a <strong>＋ Cikk végére</strong> gombbal vagy drag-and-drop módszerrel helyezd el.</p>
     <p><strong>Többsoros képaláírás:</strong> a WYSIWYG-ben kattints a kép alatti szerkeszthető feliratra. Az <strong>Enter</strong> és a <strong>↵ Sortörés</strong> gomb is új sort hoz létre. A képtár kártyáján ugyanaz a képaláírás többsoros szövegmezőben szerkeszthető.</p>
     <ol>
@@ -1947,11 +1948,11 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-box-variant{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel2);font-size:12px}
 #rbtools-app .admin-box-variant select{max-width:240px;min-width:140px}
 </style>
-<script src="/live-timeline.js?v=42"></script>
+<script src="/live-timeline.js?v=44"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v43";
+const RBTOOLS_VERSION="pages-v44";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
 const RBAPP = document.getElementById("rbtools-app");
@@ -2124,7 +2125,7 @@ function rbImageHtml(a,boxed=false){
   const titleAttr=credit?` title="${esc(credit,true)}"`:"";
   const tail=boxed?"":"\n<br />";
   const alt=rbImageAltText(caption.caption,credit,caption.photoName);
-  return `<div class="separator rbtools-image" style="${sepStyle}"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}" width="600" style="max-width:100%;height:auto;" alt="${esc(alt,true)}" /></a></div>\n<div class="rbtools-caption" style="${capStyle}">${adminCaptionHtml(caption)}</div>${tail}`;
+  return `<div class="separator rbtools-image" style="${sepStyle}"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}" width="600" style="max-width:100%;height:auto;" alt="${esc(alt,true)}" /></a></div>\n<div style="${capStyle}">${adminCaptionHtml(caption)}</div>${tail}`;
 }
 
 function rbBoxParagraphsHtml(text,mode="markdown"){
@@ -2327,7 +2328,6 @@ function rbThemePostCss(){
  '.rbtools-lead{display:flow-root;line-height:1.5;overflow-wrap:anywhere}'+
  '.rbtools-main-image img,.rbtools-image img,.rb-live-media img{max-width:100%!important;height:auto!important;box-sizing:border-box}'+
  '.rbtools-image,.rbtools-image a{max-width:100%;box-sizing:border-box}'+
- '.rbtools-caption{color:#0b5394;font-size:.9em;line-height:1.45;overflow-wrap:anywhere}'+
  '.rbtools-embed iframe{max-width:100%;border:0}'+
  '.rb-live-entry{font-family:inherit;overflow-wrap:anywhere;scroll-margin-top:1rem}'+
  '.rb-live-entry .rb-live-copy{font-family:inherit;line-height:1.55}'+
@@ -3794,7 +3794,7 @@ function adminImageBodyHtml(img){
   if(!(img.attrs||[]).some(a=>a.name.toLowerCase()==="style"))attrs.push('style="max-width:100%;height:auto;"');
   attrs.push('src="'+esc(img.display,true)+'"');
   return '<div class="separator rbtools-image" style="clear: both; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img '+attrs.join(" ")+' /></a></div>\n'
-    +'<div class="rbtools-caption" style="text-align: center;">'+adminCaptionHtml(img)+'</div>\n<br />';
+    +'<div style="text-align: center;">'+adminCaptionHtml(img)+'</div>\n<br />';
 }
 function adminMainImageHtml(img){
   if(!img)return "";
@@ -5305,7 +5305,7 @@ function imageItemHtml(item){
   const full=item.full||item.display||"";
   const title=item.credit?' title="'+esc(item.credit,true)+'"':"";
   return '<div class="separator rbtools-image" style="clear: both; text-align: center;"><a href="'+esc(full,true)+'" style="padding: 0px 1em;"'+title+'><img '+attrs.join(" ")+' /></a></div>\n'
-    +'<div class="rbtools-caption" style="text-align: center;">'+adminCaptionHtml(caption)+'</div>\n<br />';
+    +'<div style="text-align: center;">'+adminCaptionHtml(caption)+'</div>\n<br />';
 }
 function renderImagesOutput(setStatus=true){
   const html=imageEditorItems.map(imageItemHtml).join("\n");
