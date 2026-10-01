@@ -3738,7 +3738,14 @@ function adminHtmlToBlocks(html){
     }
     if(node.matches?.('.rb-live-navigation'))continue; // regenerated from current timestamps
     if(tag==="hr"){blocks.push({id:adminUid("b"),type:"hr"});continue;}
-    if(/^h[2-5]$/.test(tag)){blocks.push({id:adminUid("b"),type:tag,html:node.innerHTML,align:adminAlignFromNode(node,"center")});continue;}
+    if(/^h[2-5]$/.test(tag)){
+      const inline=adminNewsInlineFragmentHtml(node);
+      if(rbGet("adminContentType")?.value==="news"&&(adminLooksLikeNewsBodyHtml(inline)||node.querySelector("div,p,hr,iframe,ul,ol,table,aside,h1,h2,h3,h4,h5,h6"))){
+        const temp=document.createElement("div");temp.appendChild(node.cloneNode(true));adminRepairMalformedNewsHeadings(temp);
+        const recovered=adminHtmlToBlocks(temp.innerHTML);recovered.forEach(b=>blocks.push(b));continue;
+      }
+      blocks.push({id:adminUid("b"),type:tag,html:node.innerHTML,align:adminAlignFromNode(node,"center")});continue;
+    }
     if(tag==="h1"){blocks.push({id:adminUid("b"),type:"h2",html:node.innerHTML,align:adminAlignFromNode(node,"center")});continue;}
     if(tag==="div"&&node.classList.contains("separator")){
       const {caption,lastIndex}=adminConsumeImageCaption(nodes,i);
