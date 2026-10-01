@@ -237,3 +237,8 @@ Az Interre egységesített előnézeti HTML-ben a több szóból álló fallback
 A Cikkadmin most már a korábban hibásan mentett #nyúz HTML-t is helyre tudja állítani, amikor egy teljes hírtörzs, kép, iframe vagy elválasztó egy H2–H5 elem belsejébe csúszott. A parser a címsor első valódi inline részét leválasztja, a blokk-elemeket külön szerkeszthető egységekké bontja, és a `Város | Ország – …` mintájú szöveget hírtörzsnek ismeri fel. A hiányzó hírcímhez szerkeszthető, de üresen nem mentett `Hír cím` helyőrző készül.
 
 A #nyúz cím/lead visszaolvasása is javult: ha a cím és a valódi lead a `<!--more-->` mögé csúszott, a program a címet nem teszi a törzsbe, a következő megfelelő blokkot pedig visszaemeli leadnek. A meglévő helyes címsorokat és a későbbi v47–v48 javításokat változatlanul megőrzi.
+
+
+## #nyúz hírcím-párosítás (pages-v50)
+
+A Cikkadmin a forrásból visszaépített #nyúz híreknél most már külön védi a valódi hírcímet: ha a `Város | Ország – …` törzs előtt H2–H5 cím található, azt megtartja, és ugyanahhoz a hírhez párosítja még akkor is, ha közéjük kép, iframe vagy technikai HTML-blokk került. `<hr>` elemen nem lép át, így egy előző hír címét nem társítja tévesen a következő törzshöz. Az üres `Hír cím` helyőrző kizárólag akkor jelenik meg, ha a jelenlegi forrásban ténylegesen nincs visszanyerhető cím.
