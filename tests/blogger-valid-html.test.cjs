@@ -1,0 +1,14 @@
+"use strict";
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const src=fs.readFileSync(path.join(__dirname,"..","index.html"),"utf8");
+const fn=name=>{const a=src.indexOf("function "+name+"("),b=src.indexOf("\nfunction ",a+10);assert.ok(a>=0&&b>a,name);return src.slice(a,b)};
+assert.ok(!src.includes('<style data-rbtools-theme="regionalbahn-inter-2026">'));
+for(const name of ["adminGenerateHtml","convertArticleMarkdown","convertArticlePlainText"])assert.ok(!fn(name).includes("rbThemePostCss()"),name);
+const postStyle=new Function(fn("rbThemePostCss")+"return rbThemePostCss;")();
+assert.equal(postStyle(),"");
+assert.doesNotMatch(src,/style="[^"]*Inter,"Segoe UI Symbol"/);
+assert.match(fn("adminBlockHtml"),/font-family: inherit/);
+assert.match(fn("adminMainImageHtml"),/max-width:100%/);
+assert.match(fn("adminImageBodyHtml"),/class="separator"/);
+assert.ok(src.includes('const RBTOOLS_VERSION="pages-v48"'));
+console.log("Blogger-safe generated HTML and valid font quoting: PASS");

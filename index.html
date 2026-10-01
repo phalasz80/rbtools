@@ -15,7 +15,7 @@
 <meta name="referrer" content="no-referrer">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
-html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;}
+html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;}
 @media (prefers-color-scheme:dark){html,body{background:#101114;}}
 </style>
 </head>
@@ -1201,7 +1201,7 @@ A következő cikk rövid ajánlója.</pre>
     <p>A <strong>＋ Keretes</strong> új szürke RegionalBahn-dobozt hoz létre. A formázósor <strong>▣ Keretes</strong> gombja az aktuális szövegblokkot alakítja át keretessé. A keretes címe és törzse külön szerkeszthető, külön igazítható, és a képtárból kép húzható bele. A kép eltávolítható anélkül, hogy maga a keretes törlődne.</p>
 
     <h3>16. Percről percre, folyamatos helyszíni tudósítás</h3>
-    <p><strong>Illesztés a 2026-os optimalizált RegionalBahn CSS-hez:</strong> az Inter betűcsaládot a Blogger biztosítja. A téma globális H2-szabálya widgetcímekre készült, ezért a generált cikkcímsorok <code>rbtools-heading</code> osztállyal kapják a cikkhez illő formát. A képkeret marad a Blogger feladata, az RBTools csak a reszponzív szélességet biztosítja. Az új cikkbe írt, <code>data-rbtools-theme</code> jelű CSS a visszaimportáláskor nem lesz tartalmi blokk; a régi cikkeket nem írja át.</p>
+    <p><strong>Illesztés a 2026-os optimalizált RegionalBahn CSS-hez:</strong> az Inter betűcsaládot a Blogger biztosítja. A téma globális H2-szabálya widgetcímekre készült, ezért a generált cikkcímsorok <code>rbtools-heading</code> osztállyal kapják a cikkhez illő formát. A képkeret marad a Blogger feladata, az RBTools csak a reszponzív szélességet biztosítja. A cikk HTML-jébe az RBTools nem ír külön <code>&lt;style&gt;</code> elemet; a szükséges formázást Blogger-kompatibilis inline stílusokkal és a blog saját témájával oldja meg.</p>
     <p>Az új sablon alapját elsősorban a <a href="https://www.regionalbahn.hu/2020/07/regiojet-premier.html" target="_blank" rel="noopener">2020-as RegioJet-premier</a> adja: világos, egyszer szerkeszthető felvezető, majd időrendben különálló, időponttal, helyszínnel és a tudósító nevével ellátott frissítések. A <a href="https://www.regionalbahn.hu/2018/03/Budapest-Berlin-VDE8-percrol-percre.html" target="_blank" rel="noopener">2018-as Budapest–Berlin útibeszámolóból</a> az útvonal és az utazás folyamatos követésének szerkezetét, a <a href="https://www.regionalbahn.hu/2013/03/forradalmi-havazas.html" target="_blank" rel="noopener">2013-as havazásból</a> a fordított, legújabbat felül megjelenítő lehetőséget, a <a href="https://www.regionalbahn.hu/2016/12/eloben-bucsuzunk-westbahn-obb-intercity.html" target="_blank" rel="noopener">2016-os ÖBB InterCity-búcsúból</a> a személyes, út közben készülő beszámoló lehetőségét emeltük át. A régi fix szélességű betűk helyett a blog normál, jól olvasható betűkészletét használja.</p>
     <ol>
       <li>Nyisd meg a <strong>Cikkadmin</strong> fület, a <strong>Tartalomtípus</strong> listában válaszd a <strong>Percről percre / élő tudósítás</strong> típust, majd kattints a <strong>Sablon betöltése</strong> gombra. Ez csak akkor írja felül a cikket, ha a változtatást megerősítetted; a meglévő képtár és Blogger-hozzárendelés megmarad.</li>
@@ -1478,14 +1478,14 @@ A következő cikk rövid ajánlója.</pre>
 }
 #rbtools-app, #rbtools-app *{box-sizing:border-box}
 #rbtools-app{scroll-behavior:smooth}
-#rbtools-app{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif}
+#rbtools-app{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif}
 #rbtools-app header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(9px);border-bottom:1px solid var(--line)}
 #rbtools-app .header-inner{max-width:1600px;margin:auto;padding:18px 22px 12px}
 #rbtools-app .header-top{display:flex;align-items:flex-start;gap:16px}
 #rbtools-app .header-copy{min-width:0;flex:1}
 #rbtools-app .header-status-row{display:flex;align-items:stretch;gap:10px;width:100%;margin-top:8px}
 #rbtools-app .header-main-status{flex:1 1 auto;min-width:0;margin:0}
-#rbtools-app .rbtools-runtime-panel{flex:0 0 15%;max-width:15%;min-width:150px;min-height:58px;margin:0!important;border:1px solid var(--line);border-radius:11px;padding:10px 12px!important;display:flex!important;align-items:center;justify-content:center;text-align:center;white-space:normal;overflow-wrap:anywhere;font:700 12px/1.35 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif!important;background:var(--panel2)!important}
+#rbtools-app .rbtools-runtime-panel{flex:0 0 15%;max-width:15%;min-width:150px;min-height:58px;margin:0!important;border:1px solid var(--line);border-radius:11px;padding:10px 12px!important;display:flex!important;align-items:center;justify-content:center;text-align:center;white-space:normal;overflow-wrap:anywhere;font:700 12px/1.35 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif!important;background:var(--panel2)!important}
 #rbtools-app .theme-row{display:flex;justify-content:flex-end;align-items:center;min-height:42px;margin-top:10px}
 #rbtools-app .theme-toggle{white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:650;width:132px;min-width:132px}
 #rbtools-app h1{font-size:25px;margin:0 0 4px}
@@ -1506,7 +1506,7 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .intro,#rbtools-app .note{color:var(--muted);margin:0 0 10px}
 #rbtools-app .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
 #rbtools-app .status{margin-left:auto;color:var(--muted);font-size:13px}
-#rbtools-app .admin-statusbar{display:flex;gap:12px;align-items:flex-start;width:100%;min-height:58px;margin:0;padding:12px 15px;border:1px solid transparent;border-radius:11px;font:14px/1.45 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;white-space:normal;overflow-wrap:anywhere}
+#rbtools-app .admin-statusbar{display:flex;gap:12px;align-items:flex-start;width:100%;min-height:58px;margin:0;padding:12px 15px;border:1px solid transparent;border-radius:11px;font:14px/1.45 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;white-space:normal;overflow-wrap:anywhere}
 #rbtools-app .admin-statusbar-icon{flex:0 0 auto;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800}
 #rbtools-app .admin-statusbar-copy{min-width:0;flex:1}
 #rbtools-app .admin-statusbar-copy strong{display:block;margin-bottom:2px}
@@ -1581,12 +1581,12 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .image-editor-actions button{padding:5px 8px;min-width:34px}
 #rbtools-app .image-editor-preview{padding:14px;text-align:center;background:#fff;color:#111}
 #rbtools-app .image-editor-preview img{display:block;max-width:100%;width:auto;height:auto;max-height:520px;margin:0 auto 10px}
-#rbtools-app .image-live-caption{min-height:34px;padding:7px 9px;border:1px dashed #a1a1aa;border-radius:7px;text-align:center;font:14px/1.5 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;outline:none;white-space:pre-wrap;overflow-wrap:anywhere}
+#rbtools-app .image-live-caption{min-height:34px;padding:7px 9px;border:1px dashed #a1a1aa;border-radius:7px;text-align:center;font:14px/1.5 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;outline:none;white-space:pre-wrap;overflow-wrap:anywhere}
 #rbtools-app .image-live-caption:focus{border-style:solid;border-color:#52525b;box-shadow:0 0 0 2px rgba(82,82,91,.12)}
 #rbtools-app .image-live-caption:empty:before{content:attr(data-placeholder);color:#888}
 #rbtools-app .image-editor-meta{padding:10px;display:grid;gap:8px}
 #rbtools-app .image-editor-meta label{display:grid;gap:4px;color:var(--muted);font-size:11px}
-#rbtools-app .image-editor-meta input{width:100%;font:13px/1.4 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);padding:7px 8px}
+#rbtools-app .image-editor-meta input{width:100%;font:13px/1.4 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);padding:7px 8px}
 #rbtools-app .image-editor-meta details{margin:0}
 #rbtools-app .image-url-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 #rbtools-app .image-output-card{margin-top:14px}
@@ -1614,7 +1614,7 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .blogger-action-schedule{background:#fff0f1;color:#8c1727;border-color:#e9a0a9}
 #rbtools-app .blogger-action-revert{background:#fff3db;color:#704713;border-color:#e8c484}
 #rbtools-app .blogger-workflow-button:disabled{opacity:.43;box-shadow:none;cursor:not-allowed}
-#rbtools-app .blogger-save-indicator{display:flex;align-items:center;gap:12px;margin:15px 0 9px;padding:13px 15px;border:2px solid;border-radius:10px;font:14px/1.45 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+#rbtools-app .blogger-save-indicator{display:flex;align-items:center;gap:12px;margin:15px 0 9px;padding:13px 15px;border:2px solid;border-radius:10px;font:14px/1.45 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.12)}
 #rbtools-app .blogger-save-indicator-icon{flex:0 0 36px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:23px;font-weight:900}
 #rbtools-app .blogger-save-indicator-copy{display:flex;flex-direction:column;gap:4px;min-width:0;overflow-wrap:anywhere}
 #rbtools-app .blogger-save-indicator-copy strong{font-size:17px;font-weight:900;letter-spacing:.3px}
@@ -1647,16 +1647,16 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-image-thumb img{max-width:100%;max-height:164px;width:auto;height:auto}
 #rbtools-app .admin-image-fields{padding:9px;display:grid;gap:7px}
 #rbtools-app .admin-image-fields label{display:grid;gap:3px;font-size:11px;color:var(--muted)}
-#rbtools-app .admin-image-fields input{width:100%;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);padding:6px 7px;font:13px/1.4 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif}
-#rbtools-app .admin-image-fields textarea{width:100%;min-height:64px;resize:vertical;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);padding:7px;font:13px/1.45 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif}
+#rbtools-app .admin-image-fields input{width:100%;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);padding:6px 7px;font:13px/1.4 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif}
+#rbtools-app .admin-image-fields textarea{width:100%;min-height:64px;resize:vertical;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);padding:7px;font:13px/1.45 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif}
 #rbtools-app .admin-gallery-photo-toggle{display:flex!important;align-items:center;gap:7px;color:var(--ink)!important;font-size:12px!important}
 #rbtools-app .admin-gallery-photo-toggle input{width:auto!important;flex:0 0 auto}
 #rbtools-app .admin-caption-editor{max-width:100%;min-width:0}
 #rbtools-app .admin-caption-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;margin:6px 0}
 #rbtools-app .admin-caption-tools button{padding:4px 9px;font-size:12px}
 #rbtools-app .admin-caption-photo-toggle{display:inline-flex;align-items:center;gap:6px;color:#334155;font-size:12px;font-weight:600;cursor:pointer}
-#rbtools-app .admin-caption-photo-name{width:min(230px,100%);min-width:135px;padding:5px 8px;font:12px/1.5 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;border:1px solid #b5c4d6;border-radius:6px;background:#fff;color:#111}
-#rbtools-app .admin-caption-photo-preview{text-align:center;font:12px/1.5 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;color:#475569}
+#rbtools-app .admin-caption-photo-name{width:min(230px,100%);min-width:135px;padding:5px 8px;font:12px/1.5 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;border:1px solid #b5c4d6;border-radius:6px;background:#fff;color:#111}
+#rbtools-app .admin-caption-photo-preview{text-align:center;font:12px/1.5 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;color:#475569}
 #rbtools-app .admin-caption-photo-preview[hidden]{display:none}
 
 #rbtools-app .admin-image-buttons{display:flex;flex-wrap:wrap;gap:6px}
@@ -1682,7 +1682,7 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-char-tools>summary{font-weight:800}
 #rbtools-app .admin-char-section{margin-top:12px}
 #rbtools-app .admin-char-grid{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
-#rbtools-app .admin-char-grid button{min-width:38px;padding:6px 8px;background:var(--panel);font:16px/1.2 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif}
+#rbtools-app .admin-char-grid button{min-width:38px;padding:6px 8px;background:var(--panel);font:16px/1.2 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif}
 #rbtools-app .admin-char-grid button:hover{background:var(--soft)}
 #rbtools-app .admin-char-grid button small{display:block;font-size:9px;color:var(--muted);font-weight:400}
 #rbtools-app .admin-emoji-grid button{font-size:21px}
@@ -1703,19 +1703,19 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-iframe-preview{min-height:72px;padding:8px;border:1px dashed #b7b7b7;border-radius:7px;background:#fff;overflow:auto}
 #rbtools-app .admin-iframe-preview iframe{max-width:100%}
 #rbtools-app .admin-iframe-code{width:100%;min-height:120px;height:120px;resize:vertical;border:1px solid #c7c7c7;border-radius:7px;padding:9px;background:#f7f7f7;color:#111;font:12px/1.45 Consolas,"Courier New",monospace;white-space:pre-wrap;overflow-wrap:anywhere}
-#rbtools-app .admin-iframe-note{font:12px/1.4 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;color:#666}
+#rbtools-app .admin-iframe-note{font:12px/1.4 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;color:#666}
 #rbtools-app .admin-canvas{margin-top:12px;background:#fff;color:#111;border:1px solid var(--line);border-radius:11px;padding:20px;min-height:620px;height:70vh;resize:vertical;overflow:auto}
-#rbtools-app .admin-paper-title{font:700 27px/1.2 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;margin:0 0 14px;padding:7px 9px;border:1px dashed transparent;border-radius:7px;outline:none}
+#rbtools-app .admin-paper-title{font:700 27px/1.2 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;margin:0 0 14px;padding:7px 9px;border:1px dashed transparent;border-radius:7px;outline:none}
 #rbtools-app .admin-paper-title:focus{border-color:#a1a1aa}
 #rbtools-app .admin-title-panel{margin-top:15px;border:1px solid var(--line);border-radius:11px}
 #rbtools-app .admin-title-panel>label{display:block;font-weight:800;font-size:15px;margin-bottom:8px}
 #rbtools-app .admin-author-panel{margin:12px 0 16px;padding:14px;border:2px solid var(--line);border-radius:10px;background:var(--panel2)}
 #rbtools-app .admin-author-panel h3{margin:0 0 8px;font-size:1.08rem}
-#rbtools-app .admin-title-panel input.admin-blogger-title{box-sizing:border-box;width:100%;border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--panel);font:700 25px/1.4 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif}
+#rbtools-app .admin-title-panel input.admin-blogger-title{box-sizing:border-box;width:100%;border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--panel);font:700 25px/1.4 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif}
 #rbtools-app .admin-title-panel input.admin-blogger-title:focus{outline:2px solid #b4d4f5;border-color:#478ce1}
 #rbtools-app .admin-heading-control{font-weight:700;font-size:13px}
-#rbtools-app .admin-h2{font:700 23px/1.35 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;text-align:center}
-#rbtools-app .admin-h5{font:700 15px/1.35 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;text-align:center}
+#rbtools-app .admin-h2{font:700 23px/1.35 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;text-align:center}
+#rbtools-app .admin-h5{font:700 15px/1.35 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;text-align:center}
 #rbtools-app .admin-lead-panel{border:2px solid #81b4ea;border-radius:11px;background:var(--panel);color:var(--ink);padding:13px 15px;margin:10px 0 16px}
 #rbtools-app .admin-lead-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding:0 0 9px}
 #rbtools-app .admin-lead-image-picker{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:10px 0}
@@ -1734,7 +1734,7 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-dropzone{height:13px;margin:2px 0;border:1px dashed transparent;border-radius:7px;transition:.12s;position:relative}
 #rbtools-app .admin-dropzone:after{content:"";position:absolute;left:8%;right:8%;top:5px;border-top:2px solid #bfdbfe;opacity:.55}
 #rbtools-app .admin-dropzone.dragover{height:34px;background:#eff6ff;border-color:#60a5fa}
-#rbtools-app .admin-dropzone.dragover:after{content:"Ide kerül";border:0;top:7px;text-align:center;color:#2563eb;font:12px/1.5 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;opacity:1}
+#rbtools-app .admin-dropzone.dragover:after{content:"Ide kerül";border:0;top:7px;text-align:center;color:#2563eb;font:12px/1.5 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;opacity:1}
 #rbtools-app .admin-block{position:relative;border:1px solid transparent;border-radius:9px;padding:10px 44px 10px 10px;margin:1px 0;transition:.12s;background:#fff}
 #rbtools-app .admin-block:hover,#rbtools-app .admin-block:focus-within{border-color:#d4d4d8;background:#fafafa}
 #rbtools-app .admin-block.dragging{opacity:.4}
@@ -1767,13 +1767,13 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-lead-panel .admin-lead:empty:before{color:var(--muted)}
 #rbtools-app .admin-lead-panel .admin-lead::selection,#rbtools-app .admin-lead-panel .admin-lead *::selection{background:#73acfb;color:#111}
 
-#rbtools-app .admin-p{text-align:justify;font:16px/1.55 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif}
-#rbtools-app .admin-h3{text-align:center;font:700 20px/1.35 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif}
-#rbtools-app .admin-h4{text-align:center;font:700 17px/1.35 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif}
+#rbtools-app .admin-p{text-align:justify;font:16px/1.55 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif}
+#rbtools-app .admin-h3{text-align:center;font:700 20px/1.35 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif}
+#rbtools-app .admin-h4{text-align:center;font:700 17px/1.35 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif}
 #rbtools-app .admin-image-block{text-align:center}
 #rbtools-app .admin-image-block img{max-width:100%;width:auto;height:auto;max-height:650px}
-#rbtools-app .admin-caption{margin-top:7px;text-align:center;font:14px/1.5 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif}
-#rbtools-app .admin-image-credit{margin-top:5px;color:#666;font:11px/1.4 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif}
+#rbtools-app .admin-caption{margin-top:7px;text-align:center;font:14px/1.5 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif}
+#rbtools-app .admin-image-credit{margin-top:5px;color:#666;font:11px/1.4 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif}
 #rbtools-app .admin-raw-block{overflow:auto}
 #rbtools-app .admin-raw-block table{max-width:100%}
 #rbtools-app .admin-box{background:#c3c3c3;border-radius:4px;overflow:hidden}
@@ -1848,7 +1848,7 @@ A következő cikk rövid ajánlója.</pre>
 @media (max-width:900px){#rbtools-app .header-status-row{flex-direction:column}#rbtools-app .rbtools-runtime-panel{flex:0 0 auto;max-width:none;width:100%;min-width:0;min-height:44px}}
 @media (max-width:700px){#rbtools-app .header-top{flex-direction:column}#rbtools-app .theme-row{justify-content:flex-start}#rbtools-app .theme-toggle{align-self:auto}}
 
-#rbtools-app{width:100%;max-width:none;margin:0;padding:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;border-radius:12px;overflow:visible;isolation:isolate}
+#rbtools-app{width:100%;max-width:none;margin:0;padding:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;border-radius:12px;overflow:visible;isolation:isolate}
 #rbtools-app .rbtools-runtime{color:var(--muted)}
 #rbtools-app .rbtools-runtime.ok{color:#14532d;background:#e8f7ee!important;border-color:#a7ddb9!important}
 #rbtools-app .rbtools-runtime.err{color:#7f1d1d;background:#fdecec!important;border-color:#efb0b0!important}
@@ -1913,13 +1913,13 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .collection-page-entry-grid label,#rbtools-app .collection-page-entry-summary{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700}
 #rbtools-app .collection-page-entry-grid input,#rbtools-app .collection-page-entry-grid select{max-width:none;width:100%;min-width:0}
 #rbtools-app .collection-page-entry-summary{margin:10px 0}
-#rbtools-app .collection-page-entry-summary textarea{font:14px/1.5 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;height:85px;min-height:85px;resize:vertical;border:1px solid var(--line);border-radius:7px;padding:8px}
+#rbtools-app .collection-page-entry-summary textarea{font:14px/1.5 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;height:85px;min-height:85px;resize:vertical;border:1px solid var(--line);border-radius:7px;padding:8px}
 @media(max-width:720px){#rbtools-app .collection-page-entry-grid{grid-template-columns:1fr}}
 #rbtools-app .collection-page-canvas{max-height:72vh;min-height:220px;overflow:auto;background:#fafcff;color:#15253d;border:1px solid #9ab6d6;border-radius:10px;padding:16px;resize:vertical}
 #rbtools-app .collection-page-shell{padding:7px;border:1px dashed transparent;border-radius:5px;margin:3px 0}
 #rbtools-app .collection-page-shell:focus-within{border-color:#5b99cc;background:#edf5ff}
 #rbtools-app .collection-page-shell .collection-page-shell{margin-left:5px}
-#rbtools-app .collection-page-block-label{font:11px/1.45 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;color:#667992;margin-bottom:3px}
+#rbtools-app .collection-page-block-label{font:11px/1.45 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;color:#667992;margin-bottom:3px}
 #rbtools-app .collection-page-editable{color:#101b2c;min-height:25px;outline:1px dashed #bbd1e7;border-radius:5px;padding:6px;line-height:1.55;overflow-wrap:anywhere;background:#fff}
 #rbtools-app .collection-page-editable:focus{outline:2px solid #2d7dc9}
 #rbtools-app .collection-page-editable a{color:#0750a2;text-decoration:underline}
@@ -1955,11 +1955,11 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-box-variant{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel2);font-size:12px}
 #rbtools-app .admin-box-variant select{max-width:240px;min-width:140px}
 </style>
-<script src="/live-timeline.js?v=47"></script>
+<script src="/live-timeline.js?v=48"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v47";
+const RBTOOLS_VERSION="pages-v48";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
 const RBAPP = document.getElementById("rbtools-app");
@@ -2132,7 +2132,7 @@ function rbImageHtml(a,boxed=false){
   const titleAttr=credit?` title="${esc(credit,true)}"`:"";
   const tail=boxed?"":"\n<br />";
   const alt=rbImageAltText(caption.caption,credit,caption.photoName);
-  return `<div class="separator rbtools-image" style="${sepStyle}"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}" width="600" style="max-width:100%;height:auto;" alt="${esc(alt,true)}" /></a></div>\n<div style="${capStyle}">${adminCaptionHtml(caption)}</div>${tail}`;
+  return `<div class="separator" style="${sepStyle}"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}" width="600" style="max-width:100%;height:auto;" alt="${esc(alt,true)}" /></a></div>\n<div style="${capStyle}">${adminCaptionHtml(caption)}</div>${tail}`;
 }
 
 function rbBoxParagraphsHtml(text,mode="markdown"){
@@ -2174,7 +2174,7 @@ function rbBoxHtml(title,text,imageAttrs=null,mode="markdown",variant="classic")
     const captionParts=adminCaptionParts(caption,credit);
     const titleAttr=credit?` title="${esc(credit,true)}"`:"";
     const widthAttr=width==="100%"?' style="max-width: 100%; width: 100%; height: auto;"':` width="${esc(width,true)}"`;
-    out.push(`<div class="separator rbtools-image" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}"${widthAttr} alt="${esc(rbImageAltText(captionParts.caption,credit,captionParts.photoName),true)}" /></a></div>`);
+    out.push(`<div class="separator" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="${esc(full,true)}" style="padding: 0px 1em;"${titleAttr}><img src="${esc(display,true)}"${widthAttr} alt="${esc(rbImageAltText(captionParts.caption,credit,captionParts.photoName),true)}" /></a></div>`);
     out.push(`<div style="background-color: #c3c3c3; padding: 0px 15px 15px; text-align: center;">${adminCaptionHtml(captionParts)}</div>`);
   }
   const classic=out.join("\n");return variant==="accent"?rbBoxAccentWrap(classic):classic;
@@ -2329,19 +2329,7 @@ function footerHtml(){
 }
 
 /* RBTools post-only CSS for RegionalBahn's optimized Inter Blogger theme. */
-function rbThemePostCss(){
- return '<style data-rbtools-theme="regionalbahn-inter-2026">'+
- '.rbtools-heading{font-family:inherit!important;font-size:1.35em!important;font-weight:700!important;line-height:1.35!important;text-transform:none!important;color:inherit!important;margin:1.1em 0 .6em!important}'+
- '.rbtools-lead{display:flow-root;line-height:1.5;overflow-wrap:anywhere}'+
- '.rbtools-main-image img,.rbtools-image img,.rb-live-media img{max-width:100%!important;height:auto!important;box-sizing:border-box}'+
- '.rbtools-image,.rbtools-image a{max-width:100%;box-sizing:border-box}'+
- '.rbtools-embed iframe{max-width:100%;border:0}'+
- '.rb-live-entry{font-family:inherit;overflow-wrap:anywhere;scroll-margin-top:1rem}'+
- '.rb-live-entry .rb-live-copy{font-family:inherit;line-height:1.55}'+
- '.rb-box-accent{border-left-color:#0b5394!important}'+
- '@media(max-width:600px){.rbtools-lead{text-align:left!important}.rbtools-main-image{float:none!important;display:block;max-width:100%;padding:0 0 .75em!important}.rbtools-main-image img{width:auto!important;max-width:100%!important}.rb-live-entry{padding-right:.25em!important}.rbtools-heading{font-size:1.2em!important}.rbtools-embed iframe{width:100%}}'+
- '</style>';
-}
+function rbThemePostCss(){return "";}
 function convertArticleMarkdown(md){
   md=String(md||"").replace(/\r\n/g,"\n");
   const profile=rbGet("profile").value, topMode=rbGet("topTextMode").value;
@@ -2366,7 +2354,7 @@ function convertArticleMarkdown(md){
   if(profile==="news"){
     const newsLead=lead||title;
     const bodyHtml=newsBodyToHtml(body);
-    return `<div style="text-align: justify;"><strong>${inlineMd(newsLead)}</strong></div>\n<br />\n<!--more-->\n<br />\n${rbThemePostCss()}\n${bodyHtml}${bodyHtml?"\n":""}${src.html}${footerHtml()}`;
+    return `<div style="text-align: justify;"><strong>${inlineMd(newsLead)}</strong></div>\n<br />\n<!--more-->\n<br />\n\n${bodyHtml}${bodyHtml?"\n":""}${src.html}${footerHtml()}`;
   }
 
   let mode=topMode;if(mode==="auto")mode=profile==="sectioned"?"title":"lead";
@@ -2375,7 +2363,7 @@ function convertArticleMarkdown(md){
 
   const titleAttr=credit?` title="${esc(credit,true)}"`:"";
   const bodyHtml=bodyToHtml(body);
-  return `<div style="text-align: justify;">\n<a href="${esc(full,true)}" style="clear: left; float: left; padding: 0px 1em 1em 0px;"${titleAttr}><img src="${esc(thumb,true)}" width="200" alt="${esc(rbImageAltText(rbGet("mainCaption").value,credit),true)}" /></a><strong>${inlineMd(topText)}</strong></div>\n<br />\n<!--more-->\n<br />\n${rbThemePostCss()}\n${bodyHtml}${bodyHtml?"\n":""}${src.html}${footerHtml()}`;
+  return `<div style="text-align: justify;">\n<a href="${esc(full,true)}" style="clear: left; float: left; padding: 0px 1em 1em 0px;"${titleAttr}><img src="${esc(thumb,true)}" width="200" alt="${esc(rbImageAltText(rbGet("mainCaption").value,credit),true)}" /></a><strong>${inlineMd(topText)}</strong></div>\n<br />\n<!--more-->\n<br />\n\n${bodyHtml}${bodyHtml?"\n":""}${src.html}${footerHtml()}`;
 }
 function plainInline(s){
   return esc(String(s??"")).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1">$1</a>');
@@ -2398,11 +2386,11 @@ function convertArticlePlainText(text){
   const bodyHtml=plainBodyToHtml(blocks.join("\n\n"));
   if(profile==="news"){
     const newsLead=lead||title;
-    return `<div style="text-align: justify;"><strong>${plainInline(newsLead)}</strong></div>\n<br />\n<!--more-->\n<br />\n${rbThemePostCss()}\n${bodyHtml}${bodyHtml?"\n":""}${footerHtml()}`;
+    return `<div style="text-align: justify;"><strong>${plainInline(newsLead)}</strong></div>\n<br />\n<!--more-->\n<br />\n\n${bodyHtml}${bodyHtml?"\n":""}${footerHtml()}`;
   }
   let topText=mode==="title"?title:lead;if(!topText)topText=title||lead;
   const titleAttr=credit?` title="${esc(credit,true)}"`:"";
-  return `<div style="text-align: justify;">\n<a href="${esc(full,true)}" style="clear: left; float: left; padding: 0px 1em 1em 0px;"${titleAttr}><img src="${esc(thumb,true)}" width="200" alt="${esc(rbImageAltText(rbGet("mainCaption").value,credit),true)}" /></a><strong>${plainInline(topText)}</strong></div>\n<br />\n<!--more-->\n<br />\n${rbThemePostCss()}\n${bodyHtml}${bodyHtml?"\n":""}${footerHtml()}`;
+  return `<div style="text-align: justify;">\n<a href="${esc(full,true)}" style="clear: left; float: left; padding: 0px 1em 1em 0px;"${titleAttr}><img src="${esc(thumb,true)}" width="200" alt="${esc(rbImageAltText(rbGet("mainCaption").value,credit),true)}" /></a><strong>${plainInline(topText)}</strong></div>\n<br />\n<!--more-->\n<br />\n\n${bodyHtml}${bodyHtml?"\n":""}${footerHtml()}`;
 }
 function convertArticleInput(text){
   const mode=rbGet("sourceMode")?.value||"markdown";
@@ -2466,7 +2454,7 @@ rbGet("copyArticleHtml").addEventListener("click",()=>copyToClipboard(rbGet("art
 rbGet("previewArticle").addEventListener("click",()=>{
   if(!rbGet("articleOutput").value)doConvertArticle();
   const frame=rbGet("articlePreviewFrame");
-  frame.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}</style></head><body>${rbGet("articleOutput").value}<footer style="max-width:1400px;margin:18px auto 30px;padding:0 16px;color:#777;font:12px/1.5 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;text-align:center">
+  frame.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}</style></head><body>${rbGet("articleOutput").value}<footer style="max-width:1400px;margin:18px auto 30px;padding:0 16px;color:#777;font:12px/1.5 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;text-align:center">
   RegionalBahn Tools · <a href="/privacy.html">Adatkezelési tájékoztató</a> · <a href="/terms.html">Használati feltételek</a>
 </footer>
 </body></html>`;
@@ -3804,12 +3792,12 @@ function adminImageBodyHtml(img){
   if(!attrs.some(x=>/^alt=/.test(x)))attrs.unshift('alt="'+esc(alt,true)+'"');
   if(!(img.attrs||[]).some(a=>a.name.toLowerCase()==="style"))attrs.push('style="max-width:100%;height:auto;"');
   attrs.push('src="'+esc(img.display,true)+'"');
-  return '<div class="separator rbtools-image" style="clear: both; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img '+attrs.join(" ")+' /></a></div>\n'
+  return '<div class="separator" style="clear: both; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img '+attrs.join(" ")+' /></a></div>\n'
     +'<div style="text-align: center;">'+adminCaptionHtml(img)+'</div>\n<br />';
 }
 function adminMainImageHtml(img){
   if(!img)return "";
-  return '<a class="rbtools-main-image" href="'+esc(img.full||img.display,true)+'" style="clear: left; float: left; padding: 0px 1em 1em 0px;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="200" alt="'+esc(rbImageAltText(img.caption,img.credit,img.photoName),true)+'" /></a>';
+  return '<a href="'+esc(img.full||img.display,true)+'" style="clear: left; float: left; padding: 0px 1em 1em 0px; max-width:100%; box-sizing:border-box;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="200" style="max-width:100%; height:auto; box-sizing:border-box;" alt="'+esc(rbImageAltText(img.caption,img.credit,img.photoName),true)+'" /></a>';
 }
 function adminBoxBodyParts(html){
   const t=document.createElement("template");t.innerHTML=String(html||"");
@@ -3834,14 +3822,14 @@ function adminBoxHtml(block){
   });
   const img=adminFindImage(block.imageId);
   if(img){
-    out.push('<div class="separator rbtools-image" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="600" alt="'+esc(rbImageAltText(img.caption,img.credit,img.photoName),true)+'" /></a></div>');
+    out.push('<div class="separator" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="600" alt="'+esc(rbImageAltText(img.caption,img.credit,img.photoName),true)+'" /></a></div>');
     out.push('<div style="background-color: #c3c3c3; padding: 0px 15px 15px; text-align: center;">'+adminCaptionHtml(img)+'</div>');
   }
   const classic=out.join("\n");return block.variant==="accent"?rbBoxAccentWrap(classic):classic;
 }
 function adminBlockHtml(b){
   if(b.type==="p")return '<div style="text-align: '+adminValidAlign(b.align,"justify")+';">'+adminNormalizeInlineHtml(b.html)+'</div>\n<br />';
-  if(["h2","h3","h4","h5"].includes(b.type)){const headingHtml=adminNormalizeInlineHtml(b.html);if(!headingHtml.trim())return "";return '<'+b.type+' class="rbtools-heading" style="text-align: '+adminValidAlign(b.align,"center")+';'+(b.type==="h2"?"font-family:inherit;font-size:1.35em;font-weight:700;text-transform:none;color:inherit;":"")+'>'+headingHtml+'</'+b.type+'>\n<br />';}
+  if(["h2","h3","h4","h5"].includes(b.type)){const headingHtml=adminNormalizeInlineHtml(b.html);if(!headingHtml.trim())return "";return '<'+b.type+' style="text-align: '+adminValidAlign(b.align,"center")+'; font-family: inherit; '+(b.type==="h2"?"font-size:1.35em; ":"")+'font-weight:700; line-height:1.35; text-transform:none; color:inherit; margin:1.1em 0 .6em;">'+headingHtml+'</'+b.type+'>\n<br />';}
   if(b.type==="hr")return '<hr />';
   if(b.type==="image"){const img=adminFindImage(b.imageId);return img?adminImageBodyHtml(img):"";}
   if(b.type==="box")return adminBoxHtml(b);
@@ -3850,7 +3838,7 @@ function adminBlockHtml(b){
       const image=adminFindImage(id);return image?adminImageBodyHtml(image):"";
     }
   });
-  if(b.type==="iframe"){const html=adminNormalizeIframeHtml(b.html);return html?'<div class="rbtools-embed" style="text-align: '+adminValidAlign(b.align,"justify")+';">'+html+'</div>\n<br />':"";}
+  if(b.type==="iframe"){const html=adminNormalizeIframeHtml(b.html);return html?'<div style="text-align: '+adminValidAlign(b.align,"justify")+'; max-width:100%; overflow:auto;">'+html+'</div>\n<br />':"";}
   if(b.type==="raw")return String(b.html||"")+(b.noBreak?"\n":"\n<br />");
   return "";
 }
@@ -3864,7 +3852,7 @@ function adminGenerateHtml(setStatus=true){
     if(adminRepairLegacyLeadBlock())adminRenderCanvas();
     const topHtml=adminNormalizeInlineHtml(adminLeadHtml);
     const main=adminFindImage(adminMainImageId);
-    out='<div class="rbtools-lead" style="text-align: '+adminValidAlign(adminLeadAlign,"justify")+';">\n'+adminMainImageHtml(main)+'<strong>'+topHtml+'</strong></div>\n<br />\n<!--more-->\n<br />\n'+rbThemePostCss()+'\n';
+    out='<div style="text-align: '+adminValidAlign(adminLeadAlign,"justify")+'; display: flow-root; line-height: 1.5; overflow-wrap: anywhere;">\n'+adminMainImageHtml(main)+'<strong>'+topHtml+'</strong></div>\n<br />\n<!--more-->\n<br />\n';
     if(contentType==="live"){
       const last=LIVE_TIMELINE.latest(adminBlocks);
       if(last&&LIVE_TIMELINE.safeAnchor(last.anchor)){
@@ -4997,7 +4985,7 @@ rbGet("refreshBoxHtml").addEventListener("click",()=>{
   doConvertBox();
   const details=rbGet("boxPreviewFrame").closest("details");
   if(details?.open){
-    rbGet("boxPreviewFrame").srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}</style></head><body>${rbGet("boxOutput").value}</body></html>`;
+    rbGet("boxPreviewFrame").srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}</style></head><body>${rbGet("boxOutput").value}</body></html>`;
   }
   if(rbGet("boxOutput").value)rbGet("boxStatus").textContent="HTML frissítve a jelenlegi forrásszövegből.";
 });
@@ -5007,7 +4995,7 @@ rbGet("boxInput").addEventListener("input",()=>{
 rbGet("copyBoxHtml").addEventListener("click",()=>copyToClipboard(rbGet("boxOutput").value,rbGet("boxStatus"),"Keretes HTML vágólapra másolva."));
 rbGet("previewBox").addEventListener("click",()=>{
   if(!rbGet("boxOutput").value)doConvertBox();
-  const f=rbGet("boxPreviewFrame");f.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}</style></head><body>${rbGet("boxOutput").value}</body></html>`;f.closest("details").open=true;
+  const f=rbGet("boxPreviewFrame");f.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}</style></head><body>${rbGet("boxOutput").value}</body></html>`;f.closest("details").open=true;
 });
 rbGet("downloadBox").addEventListener("click",()=>{if(!rbGet("boxOutput").value)doConvertBox();if(rbGet("boxOutput").value)downloadText("regionalbahn-keretes.html",rbGet("boxOutput").value);});
 rbGet("clearBox").addEventListener("click",()=>{rbGet("boxVisual").innerHTML="";rbGet("boxRichHtml").value="";
@@ -5128,7 +5116,7 @@ rbGet("tableCaption").addEventListener("input",()=>{if(!renderDocxTableCache()&&
 rbGet("tableHeader").addEventListener("change",()=>{if(!renderDocxTableCache()&&(rbGet("tableInput").value.trim()||tableMatrix.length))doConvertTable();});
 rbGet("convertTable").addEventListener("click",()=>{if(!renderDocxTableCache())doConvertTable();});
 rbGet("copyTableHtml").addEventListener("click",()=>copyToClipboard(rbGet("tableOutput").value,rbGet("tableStatus"),"Táblázat HTML vágólapra másolva."));
-rbGet("previewTable").addEventListener("click",()=>{if(!rbGet("tableOutput").value){if(!renderDocxTableCache())doConvertTable();}const f=rbGet("tablePreviewFrame");f.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:15px/1.45 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;padding:20px;color:#111}table{font:inherit}</style></head><body>${rbGet("tableOutput").value}</body></html>`;f.closest("details").open=true;});
+rbGet("previewTable").addEventListener("click",()=>{if(!rbGet("tableOutput").value){if(!renderDocxTableCache())doConvertTable();}const f=rbGet("tablePreviewFrame");f.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:15px/1.45 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;padding:20px;color:#111}table{font:inherit}</style></head><body>${rbGet("tableOutput").value}</body></html>`;f.closest("details").open=true;});
 rbGet("downloadTable").addEventListener("click",()=>{if(!rbGet("tableOutput").value){if(!renderDocxTableCache())doConvertTable();}if(rbGet("tableOutput").value)downloadText("regionalbahn-tablazat.html",rbGet("tableOutput").value);});
 rbGet("clearTable").addEventListener("click",()=>{tableMatrix=[];xlsxWorkbookCache=null;docxTableCache=null;rbGet("tableInput").value="";rbGet("tableOutput").value="";rbGet("tableCaption").value="";rbGet("xlsxSheet").innerHTML='<option value="">Első munkalap</option>';rbGet("tablePreviewFrame").srcdoc="";rbGet("tableStatus").textContent="Törölve.";});
 
@@ -5270,7 +5258,7 @@ rbGet("downloadCollection").addEventListener("click",()=>{doConvertCollection();
 rbGet("previewCollection").addEventListener("click",()=>{
   if(!rbGet("collectionOutput").value)doConvertCollection();
   const frame=rbGet("collectionPreviewFrame");
-  frame.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}</style></head><body>${rbGet("collectionOutput").value}</body></html>`;
+  frame.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}</style></head><body>${rbGet("collectionOutput").value}</body></html>`;
   frame.closest("details").open=true;
 });
 rbGet("clearCollection").addEventListener("click",()=>{rbGet("collectionInput").value="";rbGet("collectionOutput").value="";rbGet("collectionTitle").value="";rbGet("collectionPreviewFrame").srcdoc="";rbGet("collectionStatus").textContent="Törölve.";});
@@ -5364,7 +5352,7 @@ function imageItemHtml(item){
   if(!item.attrs.some(a=>a.name.toLowerCase()==="style"))attrs.push('style="max-width:100%;height:auto;"');
   const full=item.full||item.display||"";
   const title=item.credit?' title="'+esc(item.credit,true)+'"':"";
-  return '<div class="separator rbtools-image" style="clear: both; text-align: center;"><a href="'+esc(full,true)+'" style="padding: 0px 1em;"'+title+'><img '+attrs.join(" ")+' /></a></div>\n'
+  return '<div class="separator" style="clear: both; text-align: center;"><a href="'+esc(full,true)+'" style="padding: 0px 1em;"'+title+'><img '+attrs.join(" ")+' /></a></div>\n'
     +'<div style="text-align: center;">'+adminCaptionHtml(caption)+'</div>\n<br />';
 }
 function renderImagesOutput(setStatus=true){
@@ -5524,7 +5512,7 @@ function repairHtmlFragment(src){
 rbGet("checkHtml").addEventListener("click",()=>renderHtmlIssues(lintHtml(rbGet("htmlCheckInput").value)));
 rbGet("repairHtml").addEventListener("click",()=>{const fixed=repairHtmlFragment(rbGet("htmlCheckInput").value);rbGet("htmlCheckOutput").value=fixed;renderHtmlIssues(lintHtml(fixed));rbGet("htmlCheckStatus").textContent+=" Javított változat elkészült.";});
 rbGet("copyCheckedHtml").addEventListener("click",()=>copyToClipboard(rbGet("htmlCheckOutput").value||rbGet("htmlCheckInput").value,rbGet("htmlCheckStatus"),"HTML vágólapra másolva."));
-rbGet("previewCheckedHtml").addEventListener("click",()=>{const html=rbGet("htmlCheckOutput").value||rbGet("htmlCheckInput").value;const f=rbGet("htmlCheckPreviewFrame");f.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Inter,"Segoe UI Symbol","Segoe UI Emoji",Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}table{max-width:100%}</style></head><body>${html}</body></html>`;f.closest("details").open=true;});
+rbGet("previewCheckedHtml").addEventListener("click",()=>{const html=rbGet("htmlCheckOutput").value||rbGet("htmlCheckInput").value;const f=rbGet("htmlCheckPreviewFrame");f.srcdoc=`<!doctype html><html><head><meta charset="utf-8"><style>body{font:16px/1.55 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 20px;color:#111}img{max-width:100%;height:auto}a{color:#0645ad}table{max-width:100%}</style></head><body>${html}</body></html>`;f.closest("details").open=true;});
 rbGet("clearHtmlCheck").addEventListener("click",()=>{rbGet("htmlCheckInput").value="";rbGet("htmlCheckOutput").value="";rbGet("htmlIssues").innerHTML="";rbGet("htmlCheckPreviewFrame").srcdoc="";rbGet("htmlCheckStatus").textContent="Törölve.";});
 
 /* ---------- Unicode stílusok ---------- */
