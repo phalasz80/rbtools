@@ -27,5 +27,5 @@ const normalize=fn("adminNormalizeNewsParagraphHtml");
 const normalizeNews=new Function(normalize+"return adminNormalizeNewsParagraphHtml;")();
 assert.equal(normalizeNews("<strong>Wien [Bécs] | Ausztria – Teljes törzsszöveg <a href=\"#\">linkkel</a>.</strong>"),"<strong>Wien [Bécs] | Ausztria</strong> – Teljes törzsszöveg <a href=\"#\">linkkel</a>.");
 assert.equal(normalizeNews("<strong>Csak félkövér cím, nincs helymegjelölés</strong>"),"<strong>Csak félkövér cím, nincs helymegjelölés</strong>");
-assert.ok(src.includes('const RBTOOLS_VERSION="pages-v48"'));
+assert.ok(src.includes('const RBTOOLS_VERSION="pages-v49"'));
 console.log("v40 editor typography + #nyúz titles and justified bodies: PASS");
