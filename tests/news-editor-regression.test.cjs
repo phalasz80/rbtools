@@ -17,7 +17,7 @@ assert.match(load,/\^Hétvégi gyors\\b/i);
 assert.match(load,/newsMode&&centered&&onlyStrong&&!looksLikeNewsBody/);
 assert.match(load,/type:"h3".*align:"center"/s);
 assert.match(load,/align:newsMode\?"justify":adminAlignFromNode/);
-assert.match(load,/if\(rbGet\("adminContentType"\)\.value==="news"\)\{\s*adminBlocks\.forEach\(block=>\{if\(block\.type==="p"\)block\.align="justify";\}\)/s);
+assert.match(load,/if\(rbGet\("adminContentType"\)\.value==="news"\)adminRepairNewsBlocks\(\)/);
 assert.match(src,/function adminNormalizeNewsParagraphHtml\(/);
 assert.match(src,/function adminRepairNewsBlocks\(/);
 assert.match(src,/placeholder:"Hír cím"/);
