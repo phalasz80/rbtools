@@ -3713,9 +3713,6 @@ function adminParseImages(raw){
     for(const img of imgs)adminAddImageFromElement(img.closest("a"),"");
   }
   if(adminMainImageId&&!adminImages.some(x=>x.id===adminMainImageId))adminMainImageId=null;
-  if(rbGet("adminContentType").value==="news"){
-    adminBlocks.forEach(block=>{if(block.type==="p")block.align="justify";});
-  }
   adminRenderImageLibrary();adminRenderCanvas();adminGenerateHtml(false);
   rbGet("adminStatus").textContent=adminImages.length?adminImages.length+" kép beolvasva a képtárba.":"Nem találtam Blogger-képkódot.";
 }
@@ -4712,6 +4709,9 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
       adminBlocks.push({id:adminUid("b"),type:"p",html:n.innerHTML,align:newsMode?"justify":adminAlignFromNode(n,"justify")});continue;
     }
     adminBlocks.push({id:adminUid("b"),type:"raw",html:n.outerHTML});
+  }
+  if(rbGet("adminContentType").value==="news"){
+    adminBlocks.forEach(block=>{if(block.type==="p")block.align="justify";});
   }
   adminRenderImageLibrary();adminRenderCanvas();adminGenerateHtml(false);
   rbGet("adminStatus").textContent="Meglévő HTML visszatöltve: "+adminBlocks.length+" törzsblokk, "+adminImages.length+" kép; a főkép és a lead a <!--more--> előtt, közös blokkban van."+
