@@ -223,3 +223,10 @@ A szöveg a cikk normál szövegszínét örökli. Ez a Cikkadmin normál képbl
 A WYSIWYG vászon szerkesztői tipográfiája visszatért a v39–v40 körüli viselkedéshez: fehér vászon, fekete szöveg, Arial-alapú 16 px/1,55 törzsszöveg. Ez **csak a szerkesztő felületre** vonatkozik; a Bloggerhez generált HTML továbbra is megtartja a később bevezetett, optimalizált RegionalBahn-témához illeszkedő Inter-kompatibilitást, reszponzív képeket, élő tudósítási elemeket és a többi új funkciót.
 
 A `#nyúz` munkamenetben a sablon és a közvetlen forrásbetöltés egyaránt külön H3 hírcím + sorkizárt hírtörzs szerkezetet használ. Régi HTML visszaolvasásakor a középre zárt, kizárólag félkövér címet tartalmazó legacy div H3 hírcímmé alakul; a normál hírtörzs bekezdéseit a program sorkizártra normalizálja. Már elmentett HTML-ből fizikailag hiányzó hírcímet a program nem talál ki.
+
+
+## Blogger-kompatibilis HTML (pages-v48)
+
+A generált cikk-HTML többé nem tartalmaz külön `<style>` elemet. A címsorok, reszponzív képek és beágyazások szükséges formázását az RBTools érvényes inline stílusokkal állítja elő, így a Blogger bejegyzésszerkesztőjében nem jelenik meg a korábbi segéd-CSS mint hibás/tiltott kód. A már korábban elmentett `data-rbtools-theme` stílusblokkokat a visszaimportálás továbbra is felismeri és figyelmen kívül hagyja.
+
+Az Interre egységesített előnézeti HTML-ben a több szóból álló fallback betűcsaládok idézőjelezése is javítva lett: nem törhetik meg a `style="..."` attribútumot. A v47 #nyúz blokk-helyreállítása változatlanul megmarad.
