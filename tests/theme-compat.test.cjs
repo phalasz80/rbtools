@@ -7,27 +7,25 @@ function extract(name){
  return index.slice(start,end);
 }
 const style=new Function(extract("rbThemePostCss")+"\nreturn rbThemePostCss;")();
-const css=style();
-assert.match(css,/<style data-rbtools-theme="regionalbahn-inter-2026">/);
-assert.match(css,/\.rbtools-heading\{font-family:inherit!important/);
-assert.match(css,/text-transform:none!important/);
-assert.ok(!css.includes(".rbtools-caption{"),"Caption must inherit normal article text styling");
-assert.match(css,/@media\(max-width:600px\)/);
-assert.doesNotMatch(css,/@font-face|@import/i,"Do not duplicate Blogger's embedded Inter");
-assert.doesNotMatch(css,/\.post-body\s*\{/,"Never overwrite the site-wide article style");
-assert.doesNotMatch(css,/\.post-body\s+img\s*\{/,"Never suppress native Blogger image framing");
-assert.match(extract("adminGenerateHtml"),/rbThemePostCss\(\)/);
-assert.match(extract("adminLoadExistingHtml"),/tag==="style"&&n\.hasAttribute\("data-rbtools-theme"\)/);
-assert.match(extract("adminHtmlToBlocks"),/tag==="style"&&node\.hasAttribute\("data-rbtools-theme"\)/);
-assert.match(extract("adminBlockHtml"),/class="rbtools-heading"/);
-assert.match(extract("adminBlockHtml"),/class="rbtools-embed"/);
-assert.match(extract("adminMainImageHtml"),/class="rbtools-main-image"/);
-assert.match(extract("adminImageBodyHtml"),/class="separator rbtools-image"/);
-assert.match(extract("adminImageBodyHtml"),/<div style="text-align: center;">/);
-for(const name of ["convertArticleMarkdown","convertArticlePlainText"]){
+assert.equal(style(),"","Blogger post HTML must not contain a style element");
+for(const name of ["adminGenerateHtml","convertArticleMarkdown","convertArticlePlainText"]){
  const source=extract(name);
- assert.ok(source.includes("rbThemePostCss()"),name+" must carry the portable post style");
+ assert.ok(!source.includes("rbThemePostCss()"),name+" must not inject post-level CSS");
 }
+assert.match(extract("adminLoadExistingHtml"),/tag==="style"&&n\.hasAttribute\("data-rbtools-theme"\)/,
+ "Legacy posts containing the old RBTools style block must still import cleanly");
+assert.match(extract("adminHtmlToBlocks"),/tag==="style"&&node\.hasAttribute\("data-rbtools-theme"\)/);
+const blocks=extract("adminBlockHtml");
+assert.doesNotMatch(blocks,/class="rbtools-heading"/);
+assert.doesNotMatch(blocks,/class="rbtools-embed"/);
+assert.match(blocks,/font-family: inherit/);
+assert.match(blocks,/line-height:1\.35/);
+assert.match(extract("adminMainImageHtml"),/max-width:100%/);
+assert.doesNotMatch(extract("adminMainImageHtml"),/class="rbtools-main-image"/);
+assert.match(extract("adminImageBodyHtml"),/class="separator"/);
+assert.doesNotMatch(extract("adminImageBodyHtml"),/rbtools-image/);
+assert.match(extract("adminImageBodyHtml"),/<div style="text-align: center;">/);
+assert.ok(!index.includes('<style data-rbtools-theme="regionalbahn-inter-2026">'));
 assert.match(index,/Témakompatibilitás:/);
-assert.match(index,/Illesztés a 2026-os optimalizált RegionalBahn CSS-hez/);
-console.log("RegionalBahn optimized Inter theme: generation, responsive media, import and docs PASS");
+assert.match(index,/nem ír külön <code>&lt;style&gt;<\/code> elemet/);
+console.log("Blogger-safe theme compatibility: inline styles only, no post-level style element: PASS");
