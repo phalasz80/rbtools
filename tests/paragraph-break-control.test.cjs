@@ -16,7 +16,7 @@ assert.match(fn("adminTrackEditable"),/insertLineBreak/);
 assert.match(fn("adminBlockControls"),/BR ×/);
 assert.match(fn("adminBlockControls"),/BR ✓/);
 assert.match(fn("adminBlockControls"),/block\.breakAfter=block\.breakAfter===false/);
-assert.match(fn("adminBlockHtml"),/b\.breakAfter===false\?"":"\\n<br \\/>"/);
+assert.ok(fn("adminBlockHtml").includes('b.breakAfter===false?"":"\\n<br />"'));
 assert.match(fn("adminHtmlToBlocks"),/breakAfter:adminNodeHasBreakAfter\(nodes,i\)/);
 assert.match(fn("adminLoadExistingHtml"),/breakAfter:adminNodeHasBreakAfter\(nodes,i\)/);
 assert.ok(src.includes('const RBTOOLS_VERSION="pages-v51"'));
