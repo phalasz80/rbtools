@@ -242,3 +242,10 @@ A #nyúz cím/lead visszaolvasása is javult: ha a cím és a valódi lead a `<!
 ## #nyúz hírcím-párosítás (pages-v50)
 
 A Cikkadmin a forrásból visszaépített #nyúz híreknél most már külön védi a valódi hírcímet: ha a `Város | Ország – …` törzs előtt H2–H5 cím található, azt megtartja, és ugyanahhoz a hírhez párosítja még akkor is, ha közéjük kép, iframe vagy technikai HTML-blokk került. `<hr>` elemen nem lép át, így egy előző hír címét nem társítja tévesen a következő törzshöz. Az üres `Hír cím` helyőrző kizárólag akkor jelenik meg, ha a jelenlegi forrásban ténylegesen nincs visszanyerhető cím.
+
+
+## Bekezdésblokkok és egyedi <br />-köz (pages-v51)
+
+A Cikkadmin normál kenyérszövegében az **Enter** új önálló `<div style="text-align: justify;">…</div>` blokkot nyit a kurzornál. A **Shift+Enter** továbbra is csak sortörést hoz létre ugyanazon a blokkon belül. A felső bekezdésgomb neve ezért **＋ Új bekezdésblokk** lett, és aktív blokk esetén közvetlenül utána szúr be.
+
+Minden kenyérszövegblokk saját **BR ✓ / BR ×** kapcsolót kap. A **BR ✓** azt jelenti, hogy az adott `</div>` után külön `<br />` kerül a Blogger HTML-be; a **BR ×** közvetlenül egymás mellé engedi a következő blokkot. Ez nem globális beállítás, hanem blokkonként külön állítható. Meglévő HTML visszaolvasásakor az RBTools megőrzi a ténylegesen meglévő vagy hiányzó `<br />` mintát.
