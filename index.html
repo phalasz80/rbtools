@@ -133,6 +133,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,'Segoe U
       <li><strong>Válassz tartalomtípust:</strong> cikk, #nyúz, podcast shownotes, InnoTrans, <strong>percről percre / élő tudósítás</strong> vagy statikus oldal; igény szerint töltsd be a hozzá tartozó sablont.</li>
       <li><strong>Témakompatibilitás:</strong> a RegionalBahn optimalizált Blogger-témájának Inter betűjét örököljük. Az új cikk-HTML a globális H2 widgetstílust külön kezeli, a képeket és podcastokat mobilon átméretezi, a Blogger saját képkeretét nem duplázza.</li>
       <li><strong>Rövidítések:</strong> jelöld ki a rövidítés szövegét, kattints az <strong>ABBR</strong> gyorsgombra vagy válaszd a jobb kattintásos helyi menüt; add meg a teljes feloldást a <code>title</code> mezőben.</li>
+      <li><strong>#nyúz lead-szabvány:</strong> a Blogger címe kizárólag a külön Cikk címe mezőben van. A <code>&lt;!--more--&gt;</code> előtt egyetlen közös <code>&lt;strong&gt;</code> blokk tartalmazza a valódi leadet és közvetlenül utána a „Még kell:” listát; ezek nem kerülnek külön törzsblokkokba.</li>
       <li><strong>Szerzők és #nyúz:</strong> a szerzőmező és a footer formája közvetlenül a WYSIWYG alatt található. Megnyitott piszkozatból a szabványos szerzői sor és az „Összeállította:” változat automatikusan visszatöltődik, de utána szabadon módosítható.</li>
       <li><strong>Percről percre:</strong> töltsd be az élő sablont, írd meg a leadet, majd az <strong>＋ Időbélyeges frissítés</strong> gombbal add hozzá az időpontot, helyszínt, tudósító nevét és a frissítés WYSIWYG-szövegét. A képtárból képet is húzhatsz a frissítésbe. Alapértelmezés szerint a legújabb bejegyzés alul jelenik meg, mint a 2020-as RegioJet-tudósításnál. Fordított sorrend is választható. Készülő frissítést ugyanabba a Blogger-piszkozatba ments vissza, az éles közzététel a szerkesztő dolga.</li>
       <li><strong>Cikkcím:</strong> a címet a külön, Blogger-szerű <strong>Cikk címe</strong> mezőbe írd. Nem lesz belőle megismételt törzsszöveg vagy automatikus lead.</li>
@@ -1956,11 +1957,11 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-box-variant{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel2);font-size:12px}
 #rbtools-app .admin-box-variant select{max-width:240px;min-width:140px}
 </style>
-<script src="/live-timeline.js?v=51"></script>
+<script src="/live-timeline.js?v=52"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v51";
+const RBTOOLS_VERSION="pages-v52";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
 const RBAPP = document.getElementById("rbtools-app");
@@ -3352,7 +3353,7 @@ function adminTemplateBlocks(type,staticLayout){
     ];
   }
   if(type==="news"){
-    const out=[p('<strong>Még kell:<ul><li>Hír X (by MM)</li><li>Hír X (by MM)</li></ul></strong>')];
+    const out=[];
     for(let i=0;i<10;i++){out.push(h("Hír cím"),p("<strong>Város | Ország</strong> – Hír szövege"),hr());}
     return out;
   }
@@ -3405,7 +3406,9 @@ function adminApplyTemplate(){
   if(type==="article"){
     rbGet("adminTitle").value="Cikk címe";adminLeadHtml="Lead / bevezető.";rbGet("adminFooter").value="author";
   }else if(type==="news"){
-    rbGet("adminTitle").value="Hétvégi gyors – ";adminLeadHtml="Lead szövege.";rbGet("adminAuthor").value="Adorján Péter";rbGet("adminFooter").value="compiled";
+    rbGet("adminTitle").value="Hétvégi gyors – ";
+    adminLeadHtml='Lead szövege.<br /><br />Még kell:<ul><li>Hír X (by MM)</li><li>Hír X (by MM)</li></ul>';
+    rbGet("adminAuthor").value="Adorján Péter";rbGet("adminFooter").value="compiled";
   }else if(type==="podcast"){
     rbGet("adminTitle").value="Podcast címe";adminLeadHtml="Podcast felvezető szövege.";rbGet("adminAuthor").value="RegionalBahn szerkesztőség";rbGet("adminFooter").value="author";
   }else if(type==="innotrans"){
@@ -4792,6 +4795,94 @@ function adminRepairMalformedNewsHeadings(root){
   return repaired;
 }
 
+
+function adminNewsNodeInnerWithoutOuterStrong(node){
+  if(!node||node.nodeType!==1)return "";
+  const children=Array.from(node.childNodes).filter(n=>!(n.nodeType===3&&!n.textContent.trim()));
+  if(children.length===1&&children[0].nodeType===1&&["STRONG","B"].includes(children[0].tagName)){
+    return children[0].innerHTML.trim();
+  }
+  return node.innerHTML.trim();
+}
+function adminNewsChecklistNode(node){
+  if(!node||node.nodeType!==1||!["DIV","P"].includes(node.tagName))return false;
+  const text=(node.textContent||"").replace(/\s+/g," ").trim();
+  return /^Még kell\s*:/i.test(text)&&!!node.querySelector("ul,ol");
+}
+function adminNewsPreludeCandidate(node){
+  if(!node||node.nodeType!==1||!["DIV","P"].includes(node.tagName))return false;
+  if(node.classList.contains("separator")||node.querySelector("iframe,table"))return false;
+  return !!(node.textContent||"").trim();
+}
+function adminNewsRemoveNodeAndAdjacentBreaks(nodes,index){
+  if(index<0||index>=nodes.length)return;
+  nodes.splice(index,1);
+  while(index<nodes.length){
+    const n=nodes[index];
+    if(n?.nodeType===3&&!n.textContent.trim()){nodes.splice(index,1);continue;}
+    if(n?.nodeType===1&&n.tagName==="BR"){nodes.splice(index,1);continue;}
+    break;
+  }
+}
+function adminRecoverNewsPrelude(nodes,title){
+  let changed=false;
+  const comparableTitle=adminComparableText(title);
+  const nextIndex=()=>{
+    for(let i=0;i<nodes.length;i++){
+      const n=nodes[i];
+      if(n.nodeType===3&&!n.textContent.trim())continue;
+      if(n.nodeType===1&&n.tagName==="BR")continue;
+      return i;
+    }
+    return -1;
+  };
+
+  // 1) A Blogger külön címmezőjével azonos, törzsbe csúszott címblokkot eltávolítjuk.
+  let i=nextIndex();
+  if(i>=0&&adminNewsPreludeCandidate(nodes[i])){
+    const candidateText=(nodes[i].textContent||"").replace(/\s+/g," ").trim();
+    const candidateComparable=adminComparableText(candidateText);
+    const currentTitle=rbGet("adminTitle").value.trim();
+    const isSameTitle=!!comparableTitle&&candidateComparable===comparableTitle;
+    const isRecoverableNewsTitle=!currentTitle&&/^Hétvégi gyors\b/i.test(candidateText);
+    if(isRecoverableNewsTitle)rbGet("adminTitle").value=candidateText;
+    if(isSameTitle||isRecoverableNewsTitle){
+      adminNewsRemoveNodeAndAdjacentBreaks(nodes,i);changed=true;
+    }
+  }
+
+  // 2) Ha a valódi lead a <!--more--> mögé csúszott, emeljük vissza.
+  i=nextIndex();
+  if(i>=0&&adminNewsPreludeCandidate(nodes[i])&&!adminNewsChecklistNode(nodes[i])){
+    const html=adminNewsNodeInnerWithoutOuterStrong(nodes[i]);
+    const text=adminComparableText(html);
+    if(html&&text!==comparableTitle&&!adminLooksLikeNewsBodyHtml(html)){
+      if(!adminLeadHtml||adminComparableText(adminLeadHtml)===comparableTitle){
+        adminLeadHtml=html;adminLeadAlign=adminAlignFromNode(nodes[i],"justify");
+        adminNewsRemoveNodeAndAdjacentBreaks(nodes,i);changed=true;
+      }else if(adminComparableText(adminLeadHtml)===text){
+        adminNewsRemoveNodeAndAdjacentBreaks(nodes,i);changed=true;
+      }
+    }
+  }
+
+  // 3) A "Még kell:" lista ugyanabba a lead <strong>...</strong> tartalomba kerül.
+  i=nextIndex();
+  if(i>=0&&adminNewsChecklistNode(nodes[i])){
+    const checklist=adminNewsNodeInnerWithoutOuterStrong(nodes[i]);
+    if(checklist){
+      const current=String(adminLeadHtml||"").trim();
+      const currentText=adminComparableText(current);
+      const checklistText=adminComparableText(checklist);
+      if(!currentText.includes(checklistText)){
+        adminLeadHtml=current?(current+"<br /><br />"+checklist):checklist;
+      }
+      adminNewsRemoveNodeAndAdjacentBreaks(nodes,i);changed=true;
+    }
+  }
+  return changed;
+}
+
 function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
   raw=String(raw||"").trim();if(!raw){rbGet("adminStatus").textContent="Nincs visszatöltendő HTML.";return;}
   const chosen=preserveCurrentMain?adminFindImage(adminMainImageId):null;
@@ -4820,6 +4911,7 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
   }
   const recoveredHeadings=looksLikeNews?adminRepairMalformedNewsHeadings(tpl.content):0;
   if(recoveredHeadings)nodes=Array.from(tpl.content.childNodes);
+  const recoveredPrelude=looksLikeNews?adminRecoverNewsPrelude(nodes,rbGet("adminTitle").value):false;
   const existingFooter=adminReadAuthorFooter(nodes);
   if(existingFooter){rbGet("adminAuthor").value=existingFooter.name;rbGet("adminFooter").value=existingFooter.mode;}
   const incomingLive=!!tpl.content.querySelector('.rb-live-entry');
@@ -4832,7 +4924,7 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
     rbGet("adminContentType").value="article";adminContentTypeChanged(false);
   }
   const postIntro=adminFirstLegacyIntro(nodes),postText=postIntro?adminComparableText(postIntro.html):"";
-  const promote=!!postIntro&&(!adminLeadHtml||preIsTitle);
+  const promote=!!postIntro&&!looksLikeNews&&(!adminLeadHtml||preIsTitle);
   const duplicate=!!postIntro&&!!adminLeadHtml&&adminComparableText(adminLeadHtml)===postText;
   if(promote){
     if(!adminMainImageId){const img=adminAddImageFromElement(postIntro.anchor,"");if(img)adminMainImageId=img.id;}
@@ -4904,7 +4996,7 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
   }
   if(rbGet("adminContentType").value==="news")adminRepairNewsBlocks();
   adminRenderImageLibrary();adminRenderCanvas();adminGenerateHtml(false);
-  rbGet("adminStatus").textContent="Meglévő HTML visszatöltve: "+adminBlocks.length+" törzsblokk, "+adminImages.length+" kép"+(recoveredHeadings?", "+recoveredHeadings+" hibás #nyúz H-címsor szétszedve":"")+"; a főkép és a lead a <!--more--> előtt, közös blokkban van."+
+  rbGet("adminStatus").textContent="Meglévő HTML visszatöltve: "+adminBlocks.length+" törzsblokk, "+adminImages.length+" kép"+(recoveredHeadings?", "+recoveredHeadings+" hibás #nyúz H-címsor szétszedve":"")+(recoveredPrelude?", #nyúz cím/lead/Még kell előszoba helyreállítva":"")+"; a főkép és a lead a <!--more--> előtt, közös blokkban van."+
     (incomingLive?" A percről percre frissítéseket külön, időbélyeges szerkesztőelemekként azonosítottuk.":"")
     +(!adminLeadHtml?" Töltsd ki a valódi leadet.":"");
 }

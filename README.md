@@ -249,3 +249,10 @@ A Cikkadmin a forrásból visszaépített #nyúz híreknél most már külön v�
 A Cikkadmin normál kenyérszövegében az **Enter** új önálló `<div style="text-align: justify;">…</div>` blokkot nyit a kurzornál. A **Shift+Enter** továbbra is csak sortörést hoz létre ugyanazon a blokkon belül. A felső bekezdésgomb neve ezért **＋ Új bekezdésblokk** lett, és aktív blokk esetén közvetlenül utána szúr be.
 
 Minden kenyérszövegblokk saját **BR ✓ / BR ×** kapcsolót kap. A **BR ✓** azt jelenti, hogy az adott `</div>` után külön `<br />` kerül a Blogger HTML-be; a **BR ×** közvetlenül egymás mellé engedi a következő blokkot. Ez nem globális beállítás, hanem blokkonként külön állítható. Meglévő HTML visszaolvasásakor az RBTools megőrzi a ténylegesen meglévő vagy hiányzó `<br />` mintát.
+
+
+## #nyúz cím, lead és „Még kell” blokk (pages-v52)
+
+A #nyúz / Hétvégi gyors sablonban a Blogger címe kizárólag a külön címmezőben szerepel. A cikk HTML-jének elején a valódi lead és a **„Még kell:”** lista ugyanabba az első, közös `<strong>...</strong>` leadblokkba kerül a `<!--more-->` elé. A „Még kell” ezért nem külön kenyérszövegblokk többé.
+
+Meglévő, korábban hibásan mentett #nyúz HTML visszaolvasásakor az RBTools felismeri a törzsbe csúszott, a Blogger-címmezővel azonos címet és eltávolítja onnan. A következő leadet és a „Még kell” listát visszaemeli és egyesíti a leadbe. Ha a címmező üres, de a törzs elején felismerhető `Hétvégi gyors …` cím található, azt a program visszaállítja a külön címmezőbe.
