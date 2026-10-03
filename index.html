@@ -4839,8 +4839,16 @@ function adminRecoverNewsPrelude(nodes,title){
 
   // 1) A Blogger külön címmezőjével azonos, törzsbe csúszott címblokkot eltávolítjuk.
   let i=nextIndex();
-  if(i>=0&&adminNewsPreludeCandidate(nodes[i])&&comparableTitle&&adminComparableText(nodes[i].textContent)===comparableTitle){
-    adminNewsRemoveNodeAndAdjacentBreaks(nodes,i);changed=true;
+  if(i>=0&&adminNewsPreludeCandidate(nodes[i])){
+    const candidateText=(nodes[i].textContent||"").replace(/\s+/g," ").trim();
+    const candidateComparable=adminComparableText(candidateText);
+    const currentTitle=rbGet("adminTitle").value.trim();
+    const isSameTitle=!!comparableTitle&&candidateComparable===comparableTitle;
+    const isRecoverableNewsTitle=!currentTitle&&/^Hétvégi gyors\b/i.test(candidateText);
+    if(isRecoverableNewsTitle)rbGet("adminTitle").value=candidateText;
+    if(isSameTitle||isRecoverableNewsTitle){
+      adminNewsRemoveNodeAndAdjacentBreaks(nodes,i);changed=true;
+    }
   }
 
   // 2) Ha a valódi lead a <!--more--> mögé csúszott, emeljük vissza.
