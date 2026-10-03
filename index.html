@@ -298,7 +298,7 @@ További szöveg..."></textarea>
         <p class="small" style="margin:3px 0 0">Szöveget szabadon kijelölhetsz és formázhatsz, a kijelölésen jobb kattintással helyi formázómenüt is kapsz (Shift + jobb kattintás: böngészőmenü). Az eszköztár a cikkszöveg felett marad. A blokkok csak a jobb oldali ⠿ fogantyúnál húzhatók, a kék beszúrási sávokra pedig kép vagy blokk dobható. A szerkesztő függőlegesen átméretezhető az alsó pereménél.</p>
       </div>
       <div class="toolbar" style="margin:0">
-        <button id="rbtools-adminAddParagraph">＋ Bekezdés</button>
+        <button id="rbtools-adminAddParagraph" type="button" title="Új önálló kenyérszövegblokk: &lt;div style=&quot;text-align: justify;&quot;&gt;…&lt;/div&gt;">＋ Új bekezdésblokk</button>
         <label for="rbtools-adminHeadingLevel" class="admin-heading-control">Alcím</label>
         <select id="rbtools-adminHeadingLevel" aria-label="Alcím szintje"><option value="h2">H2</option><option value="h3" selected>H3</option><option value="h4">H4</option><option value="h5">H5</option></select>
         <button id="rbtools-adminAddH3" type="button">＋ Alcím</button>
@@ -311,6 +311,7 @@ További szöveg..."></textarea>
         <button id="rbtools-adminAddIframe">＋ iframe</button>
         <button id="rbtools-adminAddRule">＋ Elválasztó</button>
       </div>
+      <div class="small admin-paragraph-hint"><strong>Bekezdések:</strong> Enter = új önálló <code>&lt;div style="text-align: justify;"&gt;</code> blokk · Shift+Enter = sortörés ugyanabban a blokkban · a kenyérszöveg-blokkok jobb oldalán a <strong>BR ✓ / BR ×</strong> gombbal külön-külön dönthető el, legyen-e utánuk <code>&lt;br /&gt;</code>.</div>
     </div>
     <div class="admin-format-shell">
     <div class="admin-formatbar" role="toolbar" aria-label="Szövegformázás">
@@ -1955,11 +1956,11 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-box-variant{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel2);font-size:12px}
 #rbtools-app .admin-box-variant select{max-width:240px;min-width:140px}
 </style>
-<script src="/live-timeline.js?v=50"></script>
+<script src="/live-timeline.js?v=51"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v50";
+const RBTOOLS_VERSION="pages-v51";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
 const RBAPP = document.getElementById("rbtools-app");
@@ -3213,7 +3214,7 @@ let adminSavedRange=null;
 let adminRightClickSnapshot=null;
 let adminSelectionLocked=false;
 const adminUid=prefix=>prefix+"-"+(++adminSeq);
-adminBlocks.push({id:adminUid("b"),type:"p",html:"",align:"justify"});
+adminBlocks.push({id:adminUid("b"),type:"p",html:"",align:"justify",breakAfter:true});
 
 function adminValidAlign(v,fallback="justify"){
   v=String(v||"").toLowerCase();
@@ -3330,7 +3331,7 @@ function adminStaticYearSection(year){
     +'<hr /></div>';
 }
 function adminTemplateBlocks(type,staticLayout){
-  const p=(html,align="justify")=>({id:adminUid("b"),type:"p",html,align});
+  const p=(html,align="justify")=>({id:adminUid("b"),type:"p",html,align,breakAfter:true});
   const h=(html)=>({id:adminUid("b"),type:"h3",html,align:"center"});
   const hr=()=>({id:adminUid("b"),type:"hr"});
   const raw=(html,noBreak=false)=>({id:adminUid("b"),type:"raw",html,noBreak});
@@ -3722,6 +3723,61 @@ function adminLiveFromNode(element){
     }
   });
 }
+
+function adminNodeHasBreakAfter(nodes,index){
+  for(let j=index+1;j<nodes.length;j++){
+    const n=nodes[j];
+    if(n.nodeType===3&&!n.textContent.trim())continue;
+    return n.nodeType===1&&n.tagName==="BR";
+  }
+  return false;
+}
+function adminInsertParagraphAfter(index,html="",breakAfter=true){
+  const block={id:adminUid("b"),type:"p",html,align:"justify",breakAfter:breakAfter!==false};
+  const at=Math.max(0,Math.min(adminBlocks.length,index+1));
+  adminBlocks.splice(at,0,block);
+  return block;
+}
+function adminFocusBlockStart(id){
+  requestAnimationFrame(()=>{
+    const el=RBAPP.querySelector('.admin-editable[data-admin-block-id="'+CSS.escape(id)+'"]');
+    if(!el)return;
+    el.focus();
+    const r=document.createRange();r.selectNodeContents(el);r.collapse(true);
+    const sel=window.getSelection();sel.removeAllRanges();sel.addRange(r);
+    adminActiveEditable=el;adminSavedRange=r.cloneRange();
+  });
+}
+function adminSplitTextBlockAtCaret(el){
+  const id=el?.dataset?.adminBlockId;
+  const index=adminBlocks.findIndex(b=>b.id===id);
+  if(index<0)return false;
+  const block=adminBlocks[index];
+  if(!(block.type==="p"||["h2","h3","h4","h5"].includes(block.type)))return false;
+  const sel=window.getSelection();
+  if(!sel?.rangeCount)return false;
+  const range=sel.getRangeAt(0);
+  if(!(el===range.commonAncestorContainer||el.contains(range.commonAncestorContainer)))return false;
+
+  const left=document.createRange();left.selectNodeContents(el);left.setEnd(range.startContainer,range.startOffset);
+  const right=document.createRange();right.selectNodeContents(el);right.setStart(range.endContainer,range.endOffset);
+  const box=document.createElement("div"),tail=document.createElement("div");
+  box.appendChild(left.cloneContents());tail.appendChild(right.cloneContents());
+  const oldBreak=block.breakAfter!==false;
+  block.html=adminNormalizeInlineHtml(box.innerHTML);
+  if(block.type==="p")block.breakAfter=true;
+  const next=adminInsertParagraphAfter(index,adminNormalizeInlineHtml(tail.innerHTML),oldBreak);
+  adminRenderCanvas();adminGenerateHtml(false);adminFocusBlockStart(next.id);
+  rbGet("adminStatus").textContent='Új önálló bekezdésblokk nyílt. A két <div> közti <br /> az első blokk BR gombjával állítható.';
+  return true;
+}
+function adminInsertParagraphAfterActive(){
+  const id=adminActiveEditable?.dataset?.adminBlockId;
+  const index=id?adminBlocks.findIndex(b=>b.id===id):-1;
+  const block=adminInsertParagraphAfter(index>=0?index:adminBlocks.length-1,"",true);
+  adminRenderCanvas();adminGenerateHtml(false);adminFocusBlockStart(block.id);
+  rbGet("adminStatus").textContent='Új önálló, sorkizárt bekezdésblokk beszúrva.';
+}
 function adminHtmlToBlocks(html){
   const tpl=document.createElement("template");tpl.innerHTML=html||"";
   const blocks=[],nodes=Array.from(tpl.content.childNodes);
@@ -3758,8 +3814,8 @@ function adminHtmlToBlocks(html){
       const ib=adminMakeIframeBlock(node.innerHTML,adminAlignFromNode(node,"justify"));if(ib)blocks.push(ib);else blocks.push({id:adminUid("b"),type:"raw",html:node.outerHTML});continue;
     }
     if(tag==="iframe"){const ib=adminMakeIframeBlock(node.outerHTML,"justify");if(ib)blocks.push(ib);continue;}
-    if(tag==="ul"||tag==="ol"){blocks.push({id:adminUid("b"),type:"p",html:node.outerHTML,align:"justify"});continue;}
-    if(tag==="div"){blocks.push({id:adminUid("b"),type:"p",html:node.innerHTML,align:adminAlignFromNode(node,"justify")});continue;}
+    if(tag==="ul"||tag==="ol"){blocks.push({id:adminUid("b"),type:"p",html:node.outerHTML,align:"justify",breakAfter:adminNodeHasBreakAfter(nodes,i)});continue;}
+    if(tag==="div"){blocks.push({id:adminUid("b"),type:"p",html:node.innerHTML,align:adminAlignFromNode(node,"justify"),breakAfter:adminNodeHasBreakAfter(nodes,i)});continue;}
     blocks.push({id:adminUid("b"),type:"raw",html:node.outerHTML});
   }
   return blocks;
@@ -3835,7 +3891,7 @@ function adminBoxHtml(block){
   const classic=out.join("\n");return block.variant==="accent"?rbBoxAccentWrap(classic):classic;
 }
 function adminBlockHtml(b){
-  if(b.type==="p")return '<div style="text-align: '+adminValidAlign(b.align,"justify")+';">'+adminNormalizeInlineHtml(b.html)+'</div>\n<br />';
+  if(b.type==="p")return '<div style="text-align: '+adminValidAlign(b.align,"justify")+';">'+adminNormalizeInlineHtml(b.html)+'</div>'+(b.breakAfter===false?"":"\n<br />");
   if(["h2","h3","h4","h5"].includes(b.type)){const headingHtml=adminNormalizeInlineHtml(b.html);if(!headingHtml.trim())return "";return '<'+b.type+' style="text-align: '+adminValidAlign(b.align,"center")+'; font-family: inherit; '+(b.type==="h2"?"font-size:1.35em; ":"")+'font-weight:700; line-height:1.35; text-transform:none; color:inherit; margin:1.1em 0 .6em;">'+headingHtml+'</'+b.type+'>\n<br />';}
   if(b.type==="hr")return '<hr />';
   if(b.type==="image"){const img=adminFindImage(b.imageId);return img?adminImageBodyHtml(img):"";}
@@ -3901,7 +3957,14 @@ function adminBlockControls(block){
     e.dataTransfer.effectAllowed="move";
   });
   handle.addEventListener("dragend",()=>handle.closest(".admin-block")?.classList.remove("dragging"));
-  box.append(handle,mk("↑","Feljebb",()=>adminMoveBlock(block.id,-1)),mk("↓","Lejjebb",()=>adminMoveBlock(block.id,1)),mk("×","Blokk törlése",()=>adminRemoveBlock(block.id)));
+  box.append(handle,mk("↑","Feljebb",()=>adminMoveBlock(block.id,-1)),mk("↓","Lejjebb",()=>adminMoveBlock(block.id,1)));
+  if(block.type==="p"){
+    const gap=mk(block.breakAfter===false?"BR ×":"BR ✓",
+      block.breakAfter===false?"Nincs <br /> e kenyérszövegblokk után. Kattints a bekapcsoláshoz.":"Van <br /> e kenyérszövegblokk után. Kattints a kikapcsoláshoz.",
+      ()=>{block.breakAfter=block.breakAfter===false;adminRenderCanvas();adminGenerateHtml();});
+    gap.className="admin-gap-toggle";box.appendChild(gap);
+  }
+  box.appendChild(mk("×","Blokk törlése",()=>adminRemoveBlock(block.id)));
   return box;
 }
 function adminTrackEditable(el,onInput){
@@ -3910,7 +3973,20 @@ function adminTrackEditable(el,onInput){
   el.addEventListener("touchend",()=>requestAnimationFrame(adminRememberRange));
   el.addEventListener("keydown",e=>{
     if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.isComposing&&e.key.toLowerCase()==="k"){
-      e.preventDefault();adminRememberRange();adminLink();
+      e.preventDefault();adminRememberRange();adminLink();return;
+    }
+    if(e.key==="Enter"&&!e.isComposing&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&el.dataset.adminBlockId){
+      const block=adminBlocks.find(b=>b.id===el.dataset.adminBlockId);
+      if(block&&(block.type==="p"||["h2","h3","h4","h5"].includes(block.type))){
+        e.preventDefault();
+        if(e.shiftKey){
+          const ok=document.execCommand("insertLineBreak",false,null);
+          if(!ok)adminInsertNodeAtSelection(document.createElement("br"));
+          adminSyncActiveEditable();adminRememberRange();
+        }else{
+          adminRememberRange();adminSplitTextBlockAtCaret(el);
+        }
+      }
     }
   });
   el.addEventListener("input",()=>{if(adminSearchFallbackMarks.length)adminClearSearchHighlights(false);onInput();adminRememberRange();adminGenerateHtml(false);});
@@ -4813,7 +4889,7 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
       const ib=adminMakeIframeBlock(n.innerHTML,adminAlignFromNode(n,"justify"));if(ib)adminBlocks.push(ib);else adminBlocks.push({id:adminUid("b"),type:"raw",html:n.outerHTML});continue;
     }
     if(tag==="iframe"){const ib=adminMakeIframeBlock(n.outerHTML,"justify");if(ib)adminBlocks.push(ib);continue;}
-    if(tag==="ul"||tag==="ol"){adminBlocks.push({id:adminUid("b"),type:"p",html:n.outerHTML,align:"justify"});continue;}
+    if(tag==="ul"||tag==="ol"){adminBlocks.push({id:adminUid("b"),type:"p",html:n.outerHTML,align:"justify",breakAfter:adminNodeHasBreakAfter(nodes,i)});continue;}
     if(tag==="div"){
       const newsMode=rbGet("adminContentType").value==="news";
       const centered=adminAlignFromNode(n,"justify")==="center";
@@ -4822,7 +4898,7 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
       if(newsMode&&centered&&onlyStrong&&!looksLikeNewsBody){
         adminBlocks.push({id:adminUid("b"),type:"h3",html:n.querySelector("strong,b").innerHTML,align:"center"});continue;
       }
-      adminBlocks.push({id:adminUid("b"),type:"p",html:n.innerHTML,align:newsMode?"justify":adminAlignFromNode(n,"justify")});continue;
+      adminBlocks.push({id:adminUid("b"),type:"p",html:n.innerHTML,align:newsMode?"justify":adminAlignFromNode(n,"justify"),breakAfter:adminNodeHasBreakAfter(nodes,i)});continue;
     }
     adminBlocks.push({id:adminUid("b"),type:"raw",html:n.outerHTML});
   }
@@ -4878,7 +4954,7 @@ rbGet("adminCopyTitle").addEventListener("click",()=>copyToClipboard(rbGet("admi
 rbGet("adminCopyHtml").addEventListener("click",()=>copyToClipboard(rbGet("adminOutput").value,rbGet("adminStatus"),"Végleges HTML vágólapra másolva."));
 rbGet("adminDownload").addEventListener("click",()=>{adminGenerateHtml(false);if(rbGet("adminOutput").value)downloadText((slugify(rbGet("adminTitle").value)||"regionalbahn-cikk")+".html",rbGet("adminOutput").value);});
 rbGet("adminClear").addEventListener("click",adminClear);
-rbGet("adminAddParagraph").addEventListener("click",()=>{adminBlocks.push({id:adminUid("b"),type:"p",html:"Új bekezdés",align:"justify"});adminRenderCanvas();adminGenerateHtml();});
+rbGet("adminAddParagraph").addEventListener("click",adminInsertParagraphAfterActive);
  rbGet("adminAddH3").addEventListener("click",()=>{const level=rbGet("adminHeadingLevel").value;adminBlocks.push({id:adminUid("b"),type:/^h[2-5]$/.test(level)?level:"h3",html:"Új alcím",align:"center"});adminRenderCanvas();adminGenerateHtml();});
 rbGet("adminAddBox").addEventListener("click",()=>{adminBlocks.push({id:adminUid("b"),type:"box",title:"Keretes cím",html:"Keretes szöveg.",imageId:null,titleAlign:"center",bodyAlign:"justify",variant:rbGet("adminNewBoxVariant").value});adminRenderCanvas();adminGenerateHtml();});
 rbGet("adminAddIframe").addEventListener("click",()=>{rbGet("adminIframeInput").focus();rbGet("adminStatus").textContent="Illeszd be az iframe kódját, majd kattints az „iframe beszúrása” gombra.";});
