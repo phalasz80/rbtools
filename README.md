@@ -263,3 +263,10 @@ Meglévő, korábban hibásan mentett #nyúz HTML visszaolvasásakor az RBTools 
 A Cikkadmin WYSIWYG alatti **Szerzők és cikkzárás** panelje az egyetlen hiteles forrás a cikk végi szerzői/összeállítói sorhoz. Ide csak a neveket kell beírni; az **Összeállította:** előtagot a cikkzárás típusa adja hozzá. A generátor a mező elejéről az esetleg kézzel beírt `Összeállította:` előtagot is levágja, ezért nem keletkezhet `Összeállította: Összeállította: …`.
 
 Meglévő cikk vagy #nyúz visszaolvasásakor az RBTools a végén maradt régi, 85%-os dőlt footereket ismételten eltávolítja. A klasszikus jobbra zárt változat mellett a régi, balra/sorkizártra maradt `Összeállította:` blokkot is felismeri, ha előtte szabványos elválasztó áll. Ha több ilyen footer rakódott egymásra, mind eltűnik a törzsből; a legutolsó felismerhető footer adatai töltődnek vissza a mezőbe, és mentéskor egyetlen szabványos footer készül.
+
+
+## HTML-takarítás és kompaktabb WYSIWYG (pages-v54)
+
+Az RBTools fő HTML-kimenetei egységes, konzervatív tisztítást kapnak: a Cikkadmin, a haladó cikkkonverter, a keretesek, a táblázat- és gyűjtőoldal-konverter, valamint a képkód-eszköz ugyanazokat a szabályokat használja. A tisztító eltávolítja a ProseMirror/Tiptap (`data-pm-*`), TinyMCE (`data-mce-*`), Slate, Grammarly, CKEditor és hasonló szerkesztői metaadatokat, a már használaton kívüli RBTools-segédosztályokat és az attribútum nélküli, pusztán technikai `span` burkokat. Egy már blokk-szintű RegionalBahn-`div` egyetlen, attribútum nélküli belső `p` eleme szintén kibomlik. A valódi vizuális és szemantikai elemek – linkek, `strong`, `em`, `abbr`, `sup`, `sub`, képek, iframe-ek, táblázatok és érdemi inline style-ok – változatlanul megmaradnak.
+
+A WYSIWYG szerkesztőben a blokkok közötti vizuális hézag kisebb lett. Ez kizárólag szerkesztőfelületi változás: a Blogger-oldalon a kenyérszövegblokkok közötti tényleges `<br />` továbbra is a v51-ben bevezetett blokkonkénti **BR ✓ / BR ×** kapcsolóval szabályozható.
