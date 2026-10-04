@@ -17,5 +17,5 @@ assert.match(load,/adminRecoverNewsPrelude\(nodes,rbGet\("adminTitle"\)\.value\)
 assert.match(load,/const promote=!!postIntro&&!looksLikeNews/);
 const gen=fn("adminGenerateHtml");
 assert.match(gen,/<strong>'\+topHtml\+'<\/strong><\/div>\\n<br \/>\\n<!--more-->/);
-assert.ok(src.includes('const RBTOOLS_VERSION="pages-v52"'));
+assert.ok(src.includes('const RBTOOLS_VERSION="pages-v53"'));
 console.log("#nyúz title stays in Blogger field; lead + checklist stay together before more: PASS");
