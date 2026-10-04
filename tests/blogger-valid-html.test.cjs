@@ -7,7 +7,8 @@ for(const name of ["adminGenerateHtml","convertArticleMarkdown","convertArticleP
 const postStyle=new Function(fn("rbThemePostCss")+"return rbThemePostCss;")();
 assert.equal(postStyle(),"");
 assert.doesNotMatch(src,/style="[^"]*Inter,"Segoe UI Symbol"/);
-assert.match(fn("adminBlockHtml"),/font-family: inherit/);
+assert.match(fn("adminBlockHtml"),/style="text-align: /);
+assert.doesNotMatch(fn("adminBlockHtml"),/font-family: inherit/);
 assert.match(fn("adminMainImageHtml"),/max-width:100%/);
 assert.match(fn("adminImageBodyHtml"),/class="separator"/);
 assert.ok(src.includes('const RBTOOLS_VERSION="pages-v54"'));
