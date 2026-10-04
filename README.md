@@ -272,3 +272,9 @@ Az RBTools fő HTML-kimenetei egységes, konzervatív tisztítást kapnak: a Cik
 A WYSIWYG szerkesztőben a blokkok közötti vizuális hézag kisebb lett. Ez kizárólag szerkesztőfelületi változás: a Blogger-oldalon a kenyérszövegblokkok közötti tényleges `<br />` továbbra is a v51-ben bevezetett blokkonkénti **BR ✓ / BR ×** kapcsolóval szabályozható.
 
 Példa: `<div style="text-align: justify;"><p data-pm-slice="1 1 []"><span>Szöveg</span></p></div>` → `<div style="text-align: justify;">Szöveg</div>`. A tisztító nem módosít érdemi vizuális formázást.
+
+## Címsorok minimális HTML-kimenete (pages-v55)
+
+A Cikkadmin és a közös HTML-tisztító a H1–H6 címsorokat alapértelmezés szerint középre zártan kezeli. A Bloggerhez készülő címsor HTML-je csak az igazítást tartja meg inline stílusként, például: `<h3 style="text-align: center;">Cím</h3>`. A korábbi `font-family`, `font-weight`, `line-height`, `text-transform`, `color`, `margin` és hasonló, a Blogger témájára tartozó tipográfiai deklarációk kikerülnek.
+
+A szándékos eltérés megmarad: balra, jobbra vagy sorkizártra állított címsor esetén a megfelelő `text-align` kerül a kimenetbe. A Blogger CSS-t ez a változás nem módosítja.
