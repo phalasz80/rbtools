@@ -7,6 +7,9 @@ assert.match(clean,/data-\(\?:pm\|mce\|slate\|gramm\|cke\|lexical\|prosemirror\)
 assert.match(clean,/contenteditable\$/);
 assert.match(clean,/spellcheck\$/);
 for(const cls of ["rbtools-caption","rbtools-image","rbtools-main-image","rbtools-heading","rbtools-embed"])assert.ok(clean.includes('"'+cls+'"'));
+assert.match(clean,/querySelectorAll\("h1,h2,h3,h4,h5,h6"\)/);
+assert.match(clean,/text-align\\s\*:\\s\*\(left\|center\|right\|justify\)/);
+assert.match(clean,/el\.setAttribute\("style","text-align: "\+align\+";"\)/);
 assert.match(clean,/querySelectorAll\("span"\)/);
 assert.match(clean,/div > p/);
 assert.match(clean,/meaningful\.length===1&&meaningful\[0\]===p/);

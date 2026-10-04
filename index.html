@@ -131,7 +131,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,'Segoe U
     </div>
     <ol class="admin-quicksteps">
       <li><strong>Válassz tartalomtípust:</strong> cikk, #nyúz, podcast shownotes, InnoTrans, <strong>percről percre / élő tudósítás</strong> vagy statikus oldal; igény szerint töltsd be a hozzá tartozó sablont.</li>
-      <li><strong>Témakompatibilitás:</strong> a RegionalBahn optimalizált Blogger-témájának Inter betűjét örököljük. Az új cikk-HTML a globális H2 widgetstílust külön kezeli, a képeket és podcastokat mobilon átméretezi, a Blogger saját képkeretét nem duplázza.</li>
+      <li><strong>Témakompatibilitás:</strong> a RegionalBahn Blogger-témájának tipográfiáját örököljük. A H1–H6 címsorok alapértelmezés szerint középre zártak; az RBTools a cikk-HTML-ben csak a tényleges igazítást tartja meg inline stílusként. A képeket és podcastokat mobilon átméretezi, a Blogger saját képkeretét nem duplázza.</li>
       <li><strong>Rövidítések:</strong> jelöld ki a rövidítés szövegét, kattints az <strong>ABBR</strong> gyorsgombra vagy válaszd a jobb kattintásos helyi menüt; add meg a teljes feloldást a <code>title</code> mezőben.</li>
       <li><strong>#nyúz lead-szabvány:</strong> a Blogger címe kizárólag a külön Cikk címe mezőben van. A <code>&lt;!--more--&gt;</code> előtt egyetlen közös <code>&lt;strong&gt;</code> blokk tartalmazza a valódi leadet és közvetlenül utána a „Még kell:” listát; ezek nem kerülnek külön törzsblokkokba.</li>
       <li><strong>Szerzők és #nyúz:</strong> a szerzőmező és a footer formája közvetlenül a WYSIWYG alatt található. Megnyitott piszkozatból a szabványos szerzői sor és az „Összeállította:” változat automatikusan visszatöltődik, de utána szabadon módosítható.</li>
@@ -1203,7 +1203,7 @@ A következő cikk rövid ajánlója.</pre>
     <p>A <strong>＋ Keretes</strong> új szürke RegionalBahn-dobozt hoz létre. A formázósor <strong>▣ Keretes</strong> gombja az aktuális szövegblokkot alakítja át keretessé. A keretes címe és törzse külön szerkeszthető, külön igazítható, és a képtárból kép húzható bele. A kép eltávolítható anélkül, hogy maga a keretes törlődne.</p>
 
     <h3>16. Percről percre, folyamatos helyszíni tudósítás</h3>
-    <p><strong>Illesztés a 2026-os optimalizált RegionalBahn CSS-hez:</strong> az Inter betűcsaládot a Blogger biztosítja. A téma globális H2-szabálya widgetcímekre készült, ezért a generált cikkcímsorok <code>rbtools-heading</code> osztállyal kapják a cikkhez illő formát. A képkeret marad a Blogger feladata, az RBTools csak a reszponzív szélességet biztosítja. A cikk HTML-jébe az RBTools nem ír külön <code>&lt;style&gt;</code> elemet; a szükséges formázást Blogger-kompatibilis inline stílusokkal és a blog saját témájával oldja meg.</p>
+    <p><strong>Illesztés a RegionalBahn Blogger-témájához:</strong> a betűcsaládot és a címsorok tipográfiáját a Blogger biztosítja. A H1–H6 címsorok alapértelmezett igazítása középre zárt; a generált cikk-HTML-ben az RBTools csak a szükséges <code>text-align</code> értéket tartja meg. Ha egy címsort tudatosan balra, jobbra vagy sorkizártra állítasz, ez az eltérés megmarad. A képkeret marad a Blogger feladata, az RBTools csak a reszponzív szélességet biztosítja. A cikk HTML-jébe az RBTools nem ír külön <code>&lt;style&gt;</code> elemet.</p>
     <p>Az új sablon alapját elsősorban a <a href="https://www.regionalbahn.hu/2020/07/regiojet-premier.html" target="_blank" rel="noopener">2020-as RegioJet-premier</a> adja: világos, egyszer szerkeszthető felvezető, majd időrendben különálló, időponttal, helyszínnel és a tudósító nevével ellátott frissítések. A <a href="https://www.regionalbahn.hu/2018/03/Budapest-Berlin-VDE8-percrol-percre.html" target="_blank" rel="noopener">2018-as Budapest–Berlin útibeszámolóból</a> az útvonal és az utazás folyamatos követésének szerkezetét, a <a href="https://www.regionalbahn.hu/2013/03/forradalmi-havazas.html" target="_blank" rel="noopener">2013-as havazásból</a> a fordított, legújabbat felül megjelenítő lehetőséget, a <a href="https://www.regionalbahn.hu/2016/12/eloben-bucsuzunk-westbahn-obb-intercity.html" target="_blank" rel="noopener">2016-os ÖBB InterCity-búcsúból</a> a személyes, út közben készülő beszámoló lehetőségét emeltük át. A régi fix szélességű betűk helyett a blog normál, jól olvasható betűkészletét használja.</p>
     <ol>
       <li>Nyisd meg a <strong>Cikkadmin</strong> fület, a <strong>Tartalomtípus</strong> listában válaszd a <strong>Percről percre / élő tudósítás</strong> típust, majd kattints a <strong>Sablon betöltése</strong> gombra. Ez csak akkor írja felül a cikket, ha a változtatást megerősítetted; a meglévő képtár és Blogger-hozzárendelés megmarad.</li>
@@ -3451,6 +3451,17 @@ function rbCleanGeneratedHtml(html){
     if(el.getAttribute("style")!=null&&!el.getAttribute("style").trim())el.removeAttribute("style");
   });
 
+  // Headings are centered by default. Keep only their intentional alignment;
+  // editor/theme typography belongs to the Blogger theme, not to article HTML.
+  t.content.querySelectorAll("h1,h2,h3,h4,h5,h6").forEach(el=>{
+    const style=el.getAttribute("style")||"";
+    const m=style.match(/text-align\s*:\s*(left|center|right|justify)/i);
+    const raw=String(m?.[1]||el.getAttribute("align")||"center").toLowerCase();
+    const align=["left","center","right","justify"].includes(raw)?raw:"center";
+    el.removeAttribute("align");
+    el.setAttribute("style","text-align: "+align+";");
+  });
+
   // Attribute-free spans are purely structural/editor noise.
   Array.from(t.content.querySelectorAll("span")).reverse().forEach(el=>{
     if(el.attributes.length===0)el.replaceWith(...Array.from(el.childNodes));
@@ -3940,7 +3951,7 @@ function adminBoxHtml(block){
 }
 function adminBlockHtml(b){
   if(b.type==="p")return '<div style="text-align: '+adminValidAlign(b.align,"justify")+';">'+adminNormalizeInlineHtml(b.html)+'</div>'+(b.breakAfter===false?"":"\n<br />");
-  if(["h2","h3","h4","h5"].includes(b.type)){const headingHtml=adminNormalizeInlineHtml(b.html);if(!headingHtml.trim())return "";return '<'+b.type+' style="text-align: '+adminValidAlign(b.align,"center")+'; font-family: inherit; '+(b.type==="h2"?"font-size:1.35em; ":"")+'font-weight:700; line-height:1.35; text-transform:none; color:inherit; margin:1.1em 0 .6em;">'+headingHtml+'</'+b.type+'>\n<br />';}
+  if(["h2","h3","h4","h5"].includes(b.type)){const headingHtml=adminNormalizeInlineHtml(b.html);if(!headingHtml.trim())return "";return '<'+b.type+' style="text-align: '+adminValidAlign(b.align,"center")+';">'+headingHtml+'</'+b.type+'>\n<br />';}
   if(b.type==="hr")return '<hr />';
   if(b.type==="image"){const img=adminFindImage(b.imageId);return img?adminImageBodyHtml(img):"";}
   if(b.type==="box")return adminBoxHtml(b);
