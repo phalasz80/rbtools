@@ -256,3 +256,10 @@ Minden kenyérszövegblokk saját **BR ✓ / BR ×** kapcsolót kap. A **BR ✓*
 A #nyúz / Hétvégi gyors sablonban a Blogger címe kizárólag a külön címmezőben szerepel. A cikk HTML-jének elején a valódi lead és a **„Még kell:”** lista ugyanabba az első, közös `<strong>...</strong>` leadblokkba kerül a `<!--more-->` elé. A „Még kell” ezért nem külön kenyérszövegblokk többé.
 
 Meglévő, korábban hibásan mentett #nyúz HTML visszaolvasásakor az RBTools felismeri a törzsbe csúszott, a Blogger-címmezővel azonos címet és eltávolítja onnan. A következő leadet és a „Még kell” listát visszaemeli és egyesíti a leadbe. Ha a címmező üres, de a törzs elején felismerhető `Hétvégi gyors …` cím található, azt a program visszaállítja a külön címmezőbe.
+
+
+## Egyetlen hiteles szerzői footer (pages-v53)
+
+A Cikkadmin WYSIWYG alatti **Szerzők és cikkzárás** panelje az egyetlen hiteles forrás a cikk végi szerzői/összeállítói sorhoz. Ide csak a neveket kell beírni; az **Összeállította:** előtagot a cikkzárás típusa adja hozzá. A generátor a mező elejéről az esetleg kézzel beírt `Összeállította:` előtagot is levágja, ezért nem keletkezhet `Összeállította: Összeállította: …`.
+
+Meglévő cikk vagy #nyúz visszaolvasásakor az RBTools a végén maradt régi, 85%-os dőlt footereket ismételten eltávolítja. A klasszikus jobbra zárt változat mellett a régi, balra/sorkizártra maradt `Összeállította:` blokkot is felismeri, ha előtte szabványos elválasztó áll. Ha több ilyen footer rakódott egymásra, mind eltűnik a törzsből; a legutolsó felismerhető footer adatai töltődnek vissza a mezőbe, és mentéskor egyetlen szabványos footer készül.
