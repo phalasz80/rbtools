@@ -1733,17 +1733,17 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-lead:focus{border-style:solid;border-color:#71717a}
 #rbtools-app .admin-more{clear:both;border-top:1px dashed #aaa;margin:12px 0 18px;position:relative}
 #rbtools-app .admin-more:after{content:"<!--more-->";position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#fff;padding:0 8px;color:#777;font:11px/1.5 Consolas,"Courier New",monospace}
-#rbtools-app .admin-dropzone{height:13px;margin:2px 0;border:1px dashed transparent;border-radius:7px;transition:.12s;position:relative}
-#rbtools-app .admin-dropzone:after{content:"";position:absolute;left:8%;right:8%;top:5px;border-top:2px solid #bfdbfe;opacity:.55}
+#rbtools-app .admin-dropzone{height:7px;margin:0;border:1px dashed transparent;border-radius:7px;transition:.12s;position:relative}
+#rbtools-app .admin-dropzone:after{content:"";position:absolute;left:8%;right:8%;top:2px;border-top:1px solid #bfdbfe;opacity:.42}
 #rbtools-app .admin-dropzone.dragover{height:34px;background:#eff6ff;border-color:#60a5fa}
 #rbtools-app .admin-dropzone.dragover:after{content:"Ide kerül";border:0;top:7px;text-align:center;color:#2563eb;font:12px/1.5 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;opacity:1}
-#rbtools-app .admin-block{position:relative;border:1px solid transparent;border-radius:9px;padding:10px 44px 10px 10px;margin:1px 0;transition:.12s;background:#fff}
+#rbtools-app .admin-block{position:relative;border:1px solid transparent;border-radius:9px;padding:5px 44px 5px 7px;margin:0;transition:.12s;background:#fff}
 #rbtools-app .admin-block:hover,#rbtools-app .admin-block:focus-within{border-color:#d4d4d8;background:#fafafa}
 #rbtools-app .admin-block.dragging{opacity:.4}
 #rbtools-app .admin-block-controls{position:absolute;right:6px;top:6px;display:flex;flex-direction:column;gap:4px;opacity:.22;transition:.12s}
 #rbtools-app .admin-block:hover .admin-block-controls,#rbtools-app .admin-block:focus-within .admin-block-controls{opacity:1}
 #rbtools-app .admin-block-controls button{padding:2px 6px;min-width:28px;font-size:12px;background:#fff;color:#222;border-color:#d4d4d8}
-#rbtools-app .admin-editable{outline:none;border:1px dashed transparent;border-radius:6px;padding:3px 5px;min-height:28px;user-select:text;-webkit-user-select:text;cursor:text}
+#rbtools-app .admin-editable{outline:none;border:1px dashed transparent;border-radius:6px;padding:2px 4px;min-height:24px;user-select:text;-webkit-user-select:text;cursor:text}
 #rbtools-app .admin-canvas [contenteditable="true"]{user-select:text;-webkit-user-select:text;cursor:text}
 #rbtools-app .admin-canvas [contenteditable="true"]::selection,#rbtools-app .admin-canvas [contenteditable="true"] *::selection{background:#86b7ff;color:#111}
 #rbtools-app .admin-drag-handle{display:flex;align-items:center;justify-content:center;cursor:grab!important;user-select:none;-webkit-user-select:none;touch-action:none;font-weight:900;font-size:17px!important}
@@ -1957,11 +1957,11 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-box-variant{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel2);font-size:12px}
 #rbtools-app .admin-box-variant select{max-width:240px;min-width:140px}
 </style>
-<script src="/live-timeline.js?v=53"></script>
+<script src="/live-timeline.js?v=54"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v53";
+const RBTOOLS_VERSION="pages-v54";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
 const RBAPP = document.getElementById("rbtools-app");
@@ -2401,7 +2401,7 @@ function convertArticleInput(text){
 }
 function doConvertArticle(){
   if(!rbGet("mdInput").value.trim()){rbGet("articleOutput").value="";rbGet("articleStatus").textContent="Nincs bemenet.";return;}
-  try{rbGet("articleOutput").value=convertArticleInput(rbGet("mdInput").value);rbGet("articleStatus").textContent="Kész.";}
+  try{rbGet("articleOutput").value=rbCleanGeneratedHtml(convertArticleInput(rbGet("mdInput").value));rbGet("articleStatus").textContent="Kész.";}
   catch(e){console.error(e);rbGet("articleStatus").textContent="Hiba: "+e.message;}
 }
 function adminOpenAdvancedOutput(){
@@ -3430,8 +3430,53 @@ function adminDecodeEntity(entity){
   const ta=document.createElement("textarea");ta.innerHTML=String(entity||"");return ta.value;
 }
 function adminEntityToken(entity,index){return "RBENTTOKEN"+index+"ZXQ";}
-function adminNormalizeInlineHtml(html){
+
+function rbCleanGeneratedHtml(html){
   const t=document.createElement("template");t.innerHTML=String(html||"");
+
+  // Editor-only metadata from ProseMirror/Tiptap, TinyMCE, Slate, Grammarly and CKEditor.
+  t.content.querySelectorAll("*").forEach(el=>{
+    for(const a of Array.from(el.attributes)){
+      const n=a.name.toLowerCase();
+      if(/^(?:data-(?:pm|mce|slate|gramm|cke|lexical|prosemirror)(?:-|$)|data-gramm|contenteditable$|spellcheck$)/i.test(n)){
+        el.removeAttribute(a.name);
+      }
+    }
+    if(el.hasAttribute("class")){
+      const keep=(el.getAttribute("class")||"").split(/\s+/).filter(Boolean).filter(c=>
+        !["rbtools-caption","rbtools-image","rbtools-main-image","rbtools-heading","rbtools-embed"].includes(c)
+      );
+      if(keep.length)el.setAttribute("class",keep.join(" "));else el.removeAttribute("class");
+    }
+    if(el.getAttribute("style")!=null&&!el.getAttribute("style").trim())el.removeAttribute("style");
+  });
+
+  // Attribute-free spans are purely structural/editor noise.
+  Array.from(t.content.querySelectorAll("span")).reverse().forEach(el=>{
+    if(el.attributes.length===0)el.replaceWith(...Array.from(el.childNodes));
+  });
+
+  // A sole, attribute-free <p> inside an already block-level RegionalBahn div adds no semantics.
+  Array.from(t.content.querySelectorAll("div > p")).reverse().forEach(p=>{
+    if(p.attributes.length)return;
+    const parent=p.parentElement;
+    if(!parent)return;
+    const meaningful=Array.from(parent.childNodes).filter(n=>!(n.nodeType===3&&!n.textContent.trim()));
+    if(meaningful.length===1&&meaningful[0]===p)p.replaceWith(...Array.from(p.childNodes));
+  });
+
+  // Remove empty inline wrappers, but never links, media or line breaks.
+  Array.from(t.content.querySelectorAll("strong,em,b,i,span")).reverse().forEach(el=>{
+    if(el.attributes.length)return;
+    if(el.textContent.trim()||el.querySelector("img,br,iframe,svg"))return;
+    el.remove();
+  });
+
+  return t.innerHTML.trim();
+}
+
+function adminNormalizeInlineHtml(html){
+  const t=document.createElement("template");t.innerHTML=rbCleanGeneratedHtml(html);
   const entityCodes=[];
   t.content.querySelectorAll(".rb-special-entity[data-rb-entity]").forEach(el=>{
     const entity=el.getAttribute("data-rb-entity")||"";
@@ -3442,7 +3487,7 @@ function adminNormalizeInlineHtml(html){
   t.content.querySelectorAll("b").forEach(el=>{const n=document.createElement("strong");n.innerHTML=el.innerHTML;el.replaceWith(n);});
   t.content.querySelectorAll("i").forEach(el=>{const n=document.createElement("em");n.innerHTML=el.innerHTML;el.replaceWith(n);});
   t.content.querySelectorAll("*").forEach(el=>Array.from(el.attributes).forEach(a=>{if(/^on/i.test(a.name))el.removeAttribute(a.name);}));
-  let out=t.innerHTML.trim();
+  let out=rbCleanGeneratedHtml(t.innerHTML);
   entityCodes.forEach((entity,i)=>{out=out.split(adminEntityToken(entity,i)).join(entity);});
   return out;
 }
@@ -3818,7 +3863,7 @@ function adminHtmlToBlocks(html){
     }
     if(tag==="iframe"){const ib=adminMakeIframeBlock(node.outerHTML,"justify");if(ib)blocks.push(ib);continue;}
     if(tag==="ul"||tag==="ol"){blocks.push({id:adminUid("b"),type:"p",html:node.outerHTML,align:"justify",breakAfter:adminNodeHasBreakAfter(nodes,i)});continue;}
-    if(tag==="div"){blocks.push({id:adminUid("b"),type:"p",html:node.innerHTML,align:adminAlignFromNode(node,"justify"),breakAfter:adminNodeHasBreakAfter(nodes,i)});continue;}
+    if(tag==="div"){blocks.push({id:adminUid("b"),type:"p",html:adminNormalizeInlineHtml(node.innerHTML),align:adminAlignFromNode(node,"justify"),breakAfter:adminNodeHasBreakAfter(nodes,i)});continue;}
     blocks.push({id:adminUid("b"),type:"raw",html:node.outerHTML});
   }
   return blocks;
@@ -3931,7 +3976,7 @@ function adminGenerateHtml(setStatus=true){
     if(adminSourcesHtml)out+="\n"+adminSourcesHtml;
     if(["author","compiled"].includes(rbGet("adminFooter").value)&&author)out+='\n<hr align="center" />\n<div style="text-align: right;"><span style="font-size: 85%;"><em>'+(rbGet("adminFooter").value==="compiled"?"Összeállította: ":"")+esc(author)+'</em></span></div>';
   }
-  rbGet("adminOutput").value=out;
+  rbGet("adminOutput").value=rbCleanGeneratedHtml(out);
   if(contentType==="live"){
     const updates=adminBlocks.filter(b=>b.type==="live");
     const missing=updates.filter(b=>!LIVE_TIMELINE.validTime(b.time));
@@ -4732,8 +4777,10 @@ function adminReadAuthorFooter(nodes){
  let h=i-1;
  while(h>=0&&(nodes[h].nodeType===3&&!nodes[h].textContent.trim()||
    nodes[h].nodeType===1&&nodes[h].tagName==="BR"))h--;
- if(h<0||nodes[h].nodeType!==1||nodes[h].tagName!=="HR")return null;
- nodes.splice(i,1);nodes.splice(h,1);
+ const hasRule=h>=0&&nodes[h].nodeType===1&&nodes[h].tagName==="HR";
+ if(!hasRule&&!compiled)return null;
+ nodes.splice(i,1);
+ if(hasRule)nodes.splice(h,1);
  return {name:value.replace(/^Összeállította:\s*/i,"").trim(),mode:compiled?"compiled":"author"};
 }
 
@@ -4993,7 +5040,7 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
       if(newsMode&&centered&&onlyStrong&&!looksLikeNewsBody){
         adminBlocks.push({id:adminUid("b"),type:"h3",html:n.querySelector("strong,b").innerHTML,align:"center"});continue;
       }
-      adminBlocks.push({id:adminUid("b"),type:"p",html:n.innerHTML,align:newsMode?"justify":adminAlignFromNode(n,"justify"),breakAfter:adminNodeHasBreakAfter(nodes,i)});continue;
+      adminBlocks.push({id:adminUid("b"),type:"p",html:adminNormalizeInlineHtml(n.innerHTML),align:newsMode?"justify":adminAlignFromNode(n,"justify"),breakAfter:adminNodeHasBreakAfter(nodes,i)});continue;
     }
     adminBlocks.push({id:adminUid("b"),type:"raw",html:n.outerHTML});
   }
@@ -5159,8 +5206,8 @@ function doConvertBox(){
  const title=rbGet("boxTitle").value.trim(),img=boxImageAttrs();
  if(!text.trim()&&!title&&!img){rbGet("boxOutput").value="";rbGet("boxStatus").textContent="Nincs bemenet.";return;}
  try{
-   rbGet("boxOutput").value=mode==="markdown"?
-     rbBoxHtml(title,text,img,currentBoxMode(),variant):rbBoxRichHtml(title,text,img,variant);
+   rbGet("boxOutput").value=rbCleanGeneratedHtml(mode==="markdown"?
+     rbBoxHtml(title,text,img,currentBoxMode(),variant):rbBoxRichHtml(title,text,img,variant));
    rbGet("boxStatus").textContent="Kész: "+(variant==="accent"?"oldalsávos":"klasszikus")+" keretes.";
  }catch(e){console.error(e);rbGet("boxStatus").textContent="Hiba: "+e.message;}
 }
@@ -5288,7 +5335,7 @@ function tableHtmlFromCurrent(){
   return tableRowsToHtml(rows,rbGet("tableHeader").value==="yes",rbGet("tableCaption").value.trim(),[],"plain");
 }
 function doConvertTable(){
-  try{const html=tableHtmlFromCurrent();rbGet("tableOutput").value=html;rbGet("tableStatus").textContent=html?"Kész.":"Nincs feldolgozható táblázat.";}
+  try{const html=rbCleanGeneratedHtml(tableHtmlFromCurrent());rbGet("tableOutput").value=html;rbGet("tableStatus").textContent=html?"Kész.":"Nincs feldolgozható táblázat.";}
   catch(e){console.error(e);rbGet("tableStatus").textContent="Hiba: "+e.message;}
 }
 function colLettersToIndex(ref){let n=0;for(const ch of String(ref||"").toUpperCase()){if(ch<"A"||ch>"Z")break;n=n*26+(ch.charCodeAt(0)-64);}return Math.max(0,n-1);}
@@ -5493,7 +5540,7 @@ function convertCollectionMarkdown(md){
 function doConvertCollection(){
   const md=rbGet("collectionInput").value;
   if(!md.trim()){rbGet("collectionOutput").value="";rbGet("collectionStatus").textContent="Nincs bemenet.";return;}
-  try{rbGet("collectionOutput").value=convertCollectionMarkdown(md);rbGet("collectionStatus").textContent="Kész.";}
+  try{rbGet("collectionOutput").value=rbCleanGeneratedHtml(convertCollectionMarkdown(md));rbGet("collectionStatus").textContent="Kész.";}
   catch(e){console.error(e);rbGet("collectionStatus").textContent="Hiba: "+e.message;}
 }
 function setCollectionExample(kind){
@@ -5613,7 +5660,7 @@ function imageItemHtml(item){
     +'<div style="text-align: center;">'+adminCaptionHtml(caption)+'</div>\n<br />';
 }
 function renderImagesOutput(setStatus=true){
-  const html=imageEditorItems.map(imageItemHtml).join("\n");
+  const html=rbCleanGeneratedHtml(imageEditorItems.map(imageItemHtml).join("\n"));
   rbGet("imageOutput").value=html;
   const count=imageEditorItems.length;
   rbGet("imageVisualCount").textContent=count+" kép";
