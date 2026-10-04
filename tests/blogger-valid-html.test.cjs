@@ -10,5 +10,5 @@ assert.doesNotMatch(src,/style="[^"]*Inter,"Segoe UI Symbol"/);
 assert.match(fn("adminBlockHtml"),/font-family: inherit/);
 assert.match(fn("adminMainImageHtml"),/max-width:100%/);
 assert.match(fn("adminImageBodyHtml"),/class="separator"/);
-assert.ok(src.includes('const RBTOOLS_VERSION="pages-v53"'));
+assert.ok(src.includes('const RBTOOLS_VERSION="pages-v54"'));
 console.log("Blogger-safe generated HTML and valid font quoting: PASS");
