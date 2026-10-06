@@ -278,3 +278,9 @@ Példa: `<div style="text-align: justify;"><p data-pm-slice="1 1 []"><span>Szöv
 A Cikkadmin és a közös HTML-tisztító a H1–H6 címsorokat alapértelmezés szerint középre zártan kezeli. A Bloggerhez készülő címsor HTML-je csak az igazítást tartja meg inline stílusként, például: `<h3 style="text-align: center;">Cím</h3>`. A korábbi `font-family`, `font-weight`, `line-height`, `text-transform`, `color`, `margin` és hasonló, a Blogger témájára tartozó tipográfiai deklarációk kikerülnek.
 
 A szándékos eltérés megmarad: balra, jobbra vagy sorkizártra állított címsor esetén a megfelelő `text-align` kerül a kimenetbe. A Blogger CSS-t ez a változás nem módosítja.
+
+## Formázás nélküli beillesztés (pages-v56)
+
+A Cikkadmin WYSIWYG kijelölt szöveges helyi menüjében két új művelet érhető el. A **Beillesztés formázás nélkül** a jelenlegi vágólap szövegét tiszta szövegként illeszti a kijelölt rész helyére. A **Vágólap-előzményekből formázás nélkül** egy egyszeri tiszta beillesztést készít elő: ezután a Windows **Win+V** paneljén kiválasztott szöveg formázás nélkül kerül be.
+
+A böngészők biztonsági modellje nem engedi, hogy egy weboldal programból megnyissa a Windows vágólap-előzményeit, ezért a Win+V panelt továbbra is a felhasználó nyitja meg. A tisztítás csak a következő beillesztési eseményre vonatkozik, nem módosítja tartósan a normál Ctrl+V működését.

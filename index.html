@@ -445,6 +445,9 @@ További szöveg..."></textarea>
       <button type="button" role="menuitem" data-admin-context-command="abbr"><span>AB</span><span>Rövidítés (abbr) beszúrása / szerkesztése</span></button>
       <div class="admin-context-divider" role="separator"></div>
       <button type="button" role="menuitem" data-admin-context-command="copy"><span aria-hidden="true">⧉</span><span>Kijelölt szöveg másolása</span><kbd>Ctrl+C</kbd></button>
+      <div class="admin-context-divider" role="separator"></div>
+      <button type="button" role="menuitem" data-admin-context-command="pastePlain"><span aria-hidden="true">▣</span><span>Beillesztés formázás nélkül</span><kbd>Ctrl+Shift+V</kbd></button>
+      <button type="button" role="menuitem" data-admin-context-command="pasteHistoryPlain"><span aria-hidden="true">▤</span><span>Vágólap-előzményekből formázás nélkül</span><kbd>Win+V</kbd></button>
     </div>
   </div>
 
@@ -1176,6 +1179,7 @@ A következő cikk rövid ajánlója.</pre>
 
     <h3>12. Szöveg kijelölése, formázása és hivatkozások</h3>
     <p><strong>ABBR:</strong> a kijelölt rövidítéshez a gyorsgomb vagy a helyi menü azonos funkciója <code>&lt;abbr title="teljes jelentés"&gt;rövidítés&lt;/abbr&gt;</code> jelölést készít. A feloldás kötelező. Meglévő abbr-be kattintva a title módosítható, a jelölés a szöveg megtartásával eltávolítható. Firefoxban a jobb kattintás előtt rögzített kijelölést használja.</p>
+    <p><strong>Formázás nélküli beillesztés:</strong> a helyi menü <strong>Beillesztés formázás nélkül</strong> pontja a jelenlegi vágólap szövegét minden HTML- és karakterformázás nélkül illeszti be. A <strong>Vágólap-előzményekből formázás nélkül</strong> pont előkészíti a következő beillesztést; ezután nyomd meg a <strong>Win+V</strong> billentyűket és válaszd ki a kívánt elemet. A böngésző biztonsági okból nem tudja maga megnyitni a Windows vágólap-előzményeit, de a kiválasztott szöveget az RBTools a beillesztési eseménynél lecsupaszítja.</p>
     <ol>
       <li>Kattints a WYSIWYG-ben a leadbe, egy bekezdésbe, alcímbe vagy keretes szövegbe.</li>
       <li>Az egérrel húzva, dupla kattintással vagy a <strong>Shift + nyílbillentyűkkel</strong> jelöld ki a formázandó szöveget. A blokk bármely szövegrészén szabadon lehet kijelölni.</li>
@@ -1957,11 +1961,11 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-box-variant{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel2);font-size:12px}
 #rbtools-app .admin-box-variant select{max-width:240px;min-width:140px}
 </style>
-<script src="/live-timeline.js?v=55"></script>
+<script src="/live-timeline.js?v=56"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v55";
+const RBTOOLS_VERSION="pages-v56";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
 const RBAPP = document.getElementById("rbtools-app");
@@ -3214,6 +3218,7 @@ let adminActiveEditable=null;
 let adminSavedRange=null;
 let adminRightClickSnapshot=null;
 let adminSelectionLocked=false;
+let adminPlainPastePending=null;
 const adminUid=prefix=>prefix+"-"+(++adminSeq);
 adminBlocks.push({id:adminUid("b"),type:"p",html:"",align:"justify",breakAfter:true});
 
@@ -4553,6 +4558,77 @@ function adminSyncActiveEditable(){
   adminActiveEditable.dispatchEvent(new Event("input",{bubbles:true}));
   adminRememberRange();
 }
+function adminPlainPasteTarget(){
+  const editable=adminActiveEditable,range=adminSavedRange?.cloneRange();
+  return editable?.isConnected&&range&&adminEditableForRange(range)===editable?{editable,range}:null;
+}
+function adminPlainTextFromClipboardData(data){
+  const plain=data?.getData?.("text/plain");
+  if(plain)return plain;
+  const html=data?.getData?.("text/html");
+  if(!html)return "";
+  const t=document.createElement("template");t.innerHTML=html;
+  return t.content.textContent||"";
+}
+function adminInsertPlainText(text){
+  text=String(text??"").replace(/\r\n?/g,"\n");
+  if(!text)return false;
+  if(!adminRestoreRange()){
+    rbGet("adminStatus").textContent="Nem találom a beillesztés helyét a WYSIWYG-ben.";
+    return false;
+  }
+  const sel=window.getSelection();if(!sel?.rangeCount)return false;
+  const r=sel.getRangeAt(0);r.deleteContents();
+  const frag=document.createDocumentFragment();let last=null;
+  text.split("\n").forEach((part,i)=>{
+    if(i){const br=document.createElement("br");frag.appendChild(br);last=br;}
+    if(part){const node=document.createTextNode(part);frag.appendChild(node);last=node;}
+  });
+  if(!last)return false;
+  r.insertNode(frag);r.setStartAfter(last);r.collapse(true);
+  sel.removeAllRanges();sel.addRange(r);adminSavedRange=r.cloneRange();
+  adminSyncActiveEditable();return true;
+}
+async function adminPastePlainFromClipboard(){
+  const target=adminPlainPasteTarget();
+  if(!target){
+    rbGet("adminStatus").textContent="Jelölj ki szöveget vagy helyezd a kurzort egy szerkeszthető WYSIWYG-blokkba.";
+    return;
+  }
+  try{
+    if(!navigator.clipboard?.readText)throw Error("Clipboard API unavailable");
+    const text=await navigator.clipboard.readText();
+    adminActiveEditable=target.editable;adminSavedRange=target.range.cloneRange();
+    if(!text){rbGet("adminStatus").textContent="A vágólap nem tartalmaz beilleszthető szöveget.";return;}
+    if(adminInsertPlainText(text))rbGet("adminStatus").textContent="Beillesztve formázás nélkül.";
+  }catch(err){
+    adminPlainPastePending=target;
+    adminActiveEditable=target.editable;adminSavedRange=target.range.cloneRange();adminRestoreRange();
+    rbGet("adminStatus").textContent="A böngésző nem engedte a közvetlen vágólap-olvasást. Nyomj Ctrl+V-t; a következő beillesztést az RBTools formázás nélkül teszi be.";
+  }
+}
+function adminArmClipboardHistoryPlainPaste(){
+  const target=adminPlainPasteTarget();
+  if(!target){
+    rbGet("adminStatus").textContent="Jelölj ki szöveget vagy helyezd a kurzort egy szerkeszthető WYSIWYG-blokkba.";
+    return;
+  }
+  adminPlainPastePending=target;
+  adminActiveEditable=target.editable;adminSavedRange=target.range.cloneRange();adminRestoreRange();
+  rbGet("adminStatus").textContent="Nyomd meg a Win+V billentyűket, majd válassz a Windows vágólap-előzményeiből. A következő beillesztés formázás nélkül kerül a cikkbe.";
+}
+function adminHandlePlainPaste(event){
+  const pending=adminPlainPastePending;if(!pending)return;
+  adminPlainPastePending=null;
+  event.preventDefault();event.stopPropagation();
+  const text=adminPlainTextFromClipboardData(event.clipboardData);
+  if(!text){
+    rbGet("adminStatus").textContent="A kiválasztott vágólapelem nem tartalmaz beilleszthető szöveget.";
+    return;
+  }
+  adminActiveEditable=pending.editable;adminSavedRange=pending.range.cloneRange();
+  if(adminInsertPlainText(text))rbGet("adminStatus").textContent="Beillesztve a vágólap-előzményekből, formázás nélkül.";
+}
 function adminExec(command,value=null,useSavedRange=false){
   // Right-click menu actions use the pre-mousedown snapshot, not Firefox's collapsed caret.
   if(!useSavedRange)adminRememberRange();
@@ -5133,9 +5209,12 @@ rbGet("adminContextMenu").querySelectorAll("[data-admin-context-command]").forEa
     if(action==="link")adminLink(true);
     else if(action==="abbr")adminAbbr(true);
     else if(action==="copy")copyToClipboard(selected?.toString()||"",rbGet("adminStatus"),"Kijelölt szöveg másolva.");
+    else if(action==="pastePlain")adminPastePlainFromClipboard();
+    else if(action==="pasteHistoryPlain")adminArmClipboardHistoryPlainPaste();
     else adminExec(action,null,true);
   });
 });
+rbGet("adminCanvas").addEventListener("paste",adminHandlePlainPaste,true);
 rbGet("adminContextMenu").addEventListener("keydown",event=>{
   const menu=rbGet("adminContextMenu");
   const buttons=Array.from(menu.querySelectorAll('button[role="menuitem"]'));

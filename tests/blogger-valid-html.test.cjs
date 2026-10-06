@@ -11,5 +11,5 @@ assert.match(fn("adminBlockHtml"),/style="text-align: /);
 assert.doesNotMatch(fn("adminBlockHtml"),/font-family: inherit/);
 assert.match(fn("adminMainImageHtml"),/max-width:100%/);
 assert.match(fn("adminImageBodyHtml"),/class="separator"/);
-assert.ok(src.includes('const RBTOOLS_VERSION="pages-v55"'));
+assert.ok(src.includes('const RBTOOLS_VERSION="pages-v56"'));
 console.log("Blogger-safe generated HTML and valid font quoting: PASS");

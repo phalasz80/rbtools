@@ -21,6 +21,8 @@ const at=x=>html.indexOf(x);
 assert.ok(at('class="admin-formatbar"')<at('id="rbtools-adminCanvas"'));
 assert.ok(at('id="rbtools-adminCanvas"')<at('id="rbtools-adminFind"'));
 assert.ok(at('id="rbtools-adminCanvas"')<at('id="rbtools-adminIframeInput"'));
+assert.ok(at('data-admin-context-command="copy"')<at('data-admin-context-command="pastePlain"'));
+assert.ok(at('data-admin-context-command="pastePlain"')<at('data-admin-context-command="pasteHistoryPlain"'));
 assert.ok(html.includes(".admin-format-shell{position:sticky"));
 assert.ok(html.includes('id="rbtools-adminLinkNewWindow" type="checkbox" checked'));
 // Firefox collapses the live range after mousedown. Capture selection before that.
@@ -60,6 +62,13 @@ const withoutCapture=new Function("editor","menu","canvas","windowMock",`
 )(editor,menu,canvas,windowMock);
 e=event(300,300);withoutCapture(e);
 assert.equal(e.prevented,false);assert.equal(menu.hidden,true);
+assert.match(fn("adminPastePlainFromClipboard"),/navigator\.clipboard\?\.readText/);
+assert.match(fn("adminArmClipboardHistoryPlainPaste"),/Win\+V/);
+assert.match(fn("adminHandlePlainPaste"),/clipboardData/);
+assert.match(fn("adminInsertPlainText"),/createTextNode/);
+assert.match(html,/addEventListener\("paste",adminHandlePlainPaste,true\)/);
+const plainReader=new Function(fn("adminPlainTextFromClipboardData")+"return adminPlainTextFromClipboardData;")();
+assert.equal(plainReader({getData:type=>type==="text/plain"?"<b>Nyers szöveg</b>":""}),"<b>Nyers szöveg</b>");
 for(const newWindow of [true,false]){
  const a=newAnchor(),root={anchors:[],querySelectorAll:()=>root.anchors};
  const ui={adminLinkUrl:{value:"https://regionalbahn.hu",focus(){}},
@@ -80,4 +89,4 @@ for(const newWindow of [true,false]){
  assert.equal(a.getAttribute("rel"),newWindow?"noopener":null);
  assert.equal(sync,1);assert.equal(close,1);
 }
-console.log("RBTools editor regressions passed: toolbar, context menu, link targets.");
+console.log("RBTools editor regressions passed: toolbar, context menu, plain paste, link targets.");
