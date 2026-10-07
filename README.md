@@ -284,3 +284,9 @@ A szándékos eltérés megmarad: balra, jobbra vagy sorkizártra állított cí
 A Cikkadmin WYSIWYG kijelölt szöveges helyi menüjében két új művelet érhető el. A **Beillesztés formázás nélkül** a jelenlegi vágólap szövegét tiszta szövegként illeszti a kijelölt rész helyére. A **Vágólap-előzményekből formázás nélkül** egy egyszeri tiszta beillesztést készít elő: ezután a Windows **Win+V** paneljén kiválasztott szöveg formázás nélkül kerül be.
 
 A böngészők biztonsági modellje nem engedi, hogy egy weboldal programból megnyissa a Windows vágólap-előzményeit, ezért a Win+V panelt továbbra is a felhasználó nyitja meg. A tisztítás csak a következő beillesztési eseményre vonatkozik, nem módosítja tartósan a normál Ctrl+V működését.
+
+## Google OAuth production-előkészítés (pages-v57)
+
+A Google Auth Platform production/verifikációs követelményeihez az RBTools főoldala állandóan és könnyen elérhetően linkeli a `/privacy.html` adatkezelési tájékoztatót és a `/terms.html` használati feltételeket. A Blogger-kapcsolat panel külön, látható adatvédelmi értesítést tartalmaz arról, hogy az OAuth-jogosultság kizárólag a felhasználó által elérhető Blogger-tartalmak szerkesztésére szolgál, az access token pedig csak az aktuális böngészőmunkamenet memóriájában marad.
+
+Az adatkezelési tájékoztató külön rögzíti a Google API Services User Data Policy és Limited Use elveinek megfelelő felhasználást. A Google Auth Platform Branding oldalhoz használt URL-ek: homepage `https://tools.regionalbahn.hu/`, privacy policy `https://tools.regionalbahn.hu/privacy.html`, terms `https://tools.regionalbahn.hu/terms.html`.

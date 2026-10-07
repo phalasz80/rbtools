@@ -166,6 +166,11 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,'Segoe U
       </div>
       <span id="rbtools-bloggerConnectionBadge" class="badge">Nincs kapcsolat</span>
     </div>
+    <div class="admin-privacy-notice" role="note" aria-label="Google-adatok és adatvédelem">
+      <strong>Google-adatok és adatvédelem:</strong>
+      az RBTools a Google Blogger-hozzáférést kizárólag az általad elérhető blogok és bejegyzések megnyitására, létrehozására, szerkesztésére, címkézésére és a felületen kezdeményezett Blogger-műveletekre használja. Az OAuth hozzáférési token csak az aktuális böngészőmunkamenet memóriájában marad.
+      <a href="/privacy.html" target="_blank" rel="noopener">Adatkezelési tájékoztató ↗</a>
+    </div>
 
     <details id="rbtools-bloggerSetupDetails" class="admin-blogger-setup">
       <summary>Google API / OAuth beállítások (általában nem kell módosítani)</summary>
@@ -1459,6 +1464,12 @@ A következő cikk rövid ajánlója.</pre>
 </section>
 </div>
 
+<footer id="rbtools-siteFooter" class="rbtools-site-footer">
+  <strong>RegionalBahn Tools</strong>
+  <span>A RegionalBahn.hu böngészőben futó szerkesztői eszköztára, Blogger-piszkozatok és cikkek szerkesztéséhez.</span>
+  <span><a href="/privacy.html">Adatkezelési tájékoztató</a> · <a href="/terms.html">Használati feltételek</a></span>
+</footer>
+
 <div id="rbtools-toast" class="toast">Vágólapra másolva</div>
 </div>
 <style>
@@ -1606,6 +1617,12 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-quicksteps strong{font-weight:750}
 #rbtools-app .admin-blogger-panel{border-left:4px solid var(--line)}
 #rbtools-app .admin-blogger-panel.connected{border-left-color:var(--ok)}
+#rbtools-app .admin-privacy-notice{margin:10px 0 12px;padding:10px 12px;border:1px solid #9ab8d3;border-left:4px solid #0b5394;border-radius:7px;background:#edf6ff;color:var(--ink);font-size:13px;line-height:1.55}
+#rbtools-app .admin-privacy-notice a{font-weight:700;color:#0750a2}
+#rbtools-app .rbtools-site-footer{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 12px;max-width:1400px;margin:18px auto 30px;padding:14px 16px;border-top:1px solid var(--line);color:var(--muted);font:12px/1.5 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;text-align:center}
+#rbtools-app .rbtools-site-footer a{color:#0750a2;font-weight:650}
+#rbtools-app[data-theme="dark"] .admin-privacy-notice{background:#112d45;border-color:#426b8e;color:#eaf3fb}
+#rbtools-app[data-theme="dark"] .admin-privacy-notice a,#rbtools-app[data-theme="dark"] .rbtools-site-footer a{color:#8bc9ff}
 #rbtools-app .blogger-workflow{margin:16px 0 5px;border:2px solid #73a4cf;border-radius:12px;padding:14px;background:var(--panel2)}
 #rbtools-app .blogger-workflow-heading{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:11px}
 #rbtools-app .blogger-workflow-heading>strong{font-size:17px}
@@ -1961,11 +1978,11 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-box-variant{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel2);font-size:12px}
 #rbtools-app .admin-box-variant select{max-width:240px;min-width:140px}
 </style>
-<script src="/live-timeline.js?v=56"></script>
+<script src="/live-timeline.js?v=57"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v56";
+const RBTOOLS_VERSION="pages-v57";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
 const RBAPP = document.getElementById("rbtools-app");

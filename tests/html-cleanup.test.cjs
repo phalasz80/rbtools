@@ -23,5 +23,5 @@ assert.match(fn("doConvertCollection"),/rbCleanGeneratedHtml/);
 assert.match(fn("renderImagesOutput"),/rbCleanGeneratedHtml/);
 assert.match(src,/#rbtools-app \.admin-dropzone\{height:7px;margin:0/);
 assert.match(src,/#rbtools-app \.admin-block\{[^}]*padding:5px 44px 5px 7px;margin:0/);
-assert.ok(src.includes('const RBTOOLS_VERSION="pages-v56"'));
+assert.ok(src.includes('const RBTOOLS_VERSION="pages-v57"'));
 console.log("Conservative HTML cleanup + compact WYSIWYG spacing: PASS");

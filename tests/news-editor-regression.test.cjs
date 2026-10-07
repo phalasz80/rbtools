@@ -42,5 +42,5 @@ assert.match(load,/adminRepairMalformedNewsHeadings\(temp\)/);
 const htmlToBlocks=fn("adminHtmlToBlocks");
 assert.match(htmlToBlocks,/adminNewsInlineFragmentHtml\(node\)/);
 assert.match(htmlToBlocks,/adminRepairMalformedNewsHeadings\(temp\)/);
-assert.ok(src.includes('const RBTOOLS_VERSION="pages-v56"'));
+assert.ok(src.includes('const RBTOOLS_VERSION="pages-v57"'));
 console.log("v40 editor typography + #nyúz titles and justified bodies: PASS");
