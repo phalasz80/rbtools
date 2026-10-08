@@ -138,6 +138,7 @@ function sync(){
   const isCurrent=state.live&&String(bridge.currentPostId())===String(state.live.source.id)&&
     String(bridge.blogId())===String(state.live.blogId);
   const dirty=isCurrent&&!bridge.sameEditor(state.live.editor,bridge.snapshot());
+  const revert=el("bloggerRevertPost");if(revert&&isCurrent)revert.disabled=true;
   el("publishedBackup").disabled=!isCurrent||state.saving;
   el("publishedCompare").disabled=!isCurrent||state.saving;
   el("publishedSave").disabled=!isCurrent||!dirty||!state.backup||state.saving||state.uncertain||
@@ -150,7 +151,7 @@ function sync(){
   else{badge.textContent="PUBLIKÁLT CIKK · nincs új változás";badge.dataset.state="ok";}
 }
 async function requestList(token=""){
-  const f=inputs(),blogId=bridge.blogId(),seq=++state.seq;
+  const f=token&&state.filters?state.filters:inputs(),blogId=bridge.blogId(),seq=++state.seq;
   if(!bridge.connected()||!blogId)throw Error("Előbb kapcsolódj a Bloggerhez.");
   state.busy=true;sync();report("Publikált cikkek keresése…");
   try{
@@ -192,9 +193,11 @@ async function openPost(postId,fromPath=false){
   if(!bridge.connected()||!bridge.blogId())throw Error("Nincs aktív Blogger-kapcsolat.");
   if(!bridge.confirmDiscard())return;
   const blogId=bridge.blogId();
+  state.live=null;state.backup=false;
   state.busy=true;sync();report("Éles cikk letöltése és HTML-vizsgálata…");
   try{
     const post=await getPost(blogId,postId);
+    if(String(post.id||"")!==String(postId))throw Error("Eltérő Blogger-bejegyzésazonosító.");
     if(String(post.status||"").toLowerCase()!=="live")throw Error("A kiválasztott bejegyzés nem publikált. A piszkozatot a Piszkozatkezelésben nyisd meg.");
     if(blogId!==bridge.blogId())throw Error("Közben másik blogot választottál.");
     bridge.loadPost(post);
@@ -302,6 +305,6 @@ for(const [id,handler] of [
 el("publishedResults").addEventListener("change",sync);
 el("publishedUrl").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();openUrl();}});
 el("publishedQuery").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();search();}});
-root.RBTOOLS_PUBLISHED=Object.freeze({sync,reset});
+root.RBTOOLS_PUBLISHED=Object.freeze({sync,reset,hasLive:()=>!!state.live});
 renderItems();sync();
 })(typeof window!=="undefined"?window:globalThis);
