@@ -2249,6 +2249,9 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-image-url-actions{display:flex;flex-wrap:wrap;gap:9px;justify-content:end}
 #rbtools-app .admin-image-url-error{color:#b42332;font-weight:650}
 @media(max-width:650px){#rbtools-app .rb-blogger-global{display:block}#rbtools-app .rb-blogger-global .toolbar{margin:9px 0}}
+
+/* A feltételesen megjelenő éles jóváhagyási mezők inline flex-stílusa nem írhatja felül a hidden attribútumot. */
+#rbtools-app #rbtools-publishedUnsafeDialog [hidden]{display:none!important}
 </style>
 <script src="/live-timeline.js?v=59"></script>
 <script src="/corrector-core.js?v=59"></script>
@@ -6954,7 +6957,7 @@ window.RBTOOLS_PAGE_BRIDGE=Object.freeze({
 
 })();
 </script>
-<script src="/published-posts.js?v=66"></script>
+<script src="/published-posts.js?v=66a"></script>
 <script src="/collection-page-core.js?v=42"></script>
 <script src="/archive-presets.js?v=42"></script>
 <script src="/page-starters.js?v=42"></script>
