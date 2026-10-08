@@ -80,13 +80,13 @@
 
     if(lang==="hu-HU"){
       const rules=[
-        [/\bmindíg\b/giu,"A „mindig” rövid i-vel írandó.","mindig","HU_MINDIG"],
-        [/\bmuszály\b/giu,"A helyes alak: muszáj.","muszáj","HU_MUSZAJ"],
-        [/\blessz\b/giu,"A helyes alak: lesz.","lesz","HU_LESZ"],
-        [/\bhelyesírás\s+ellenőrző\b/giu,"A jelöletlen birtokos összetétel kötőjeles alakja: helyesírás-ellenőrző.","helyesírás-ellenőrző","HU_HELYESIRAS_ELLENORZO"]
+        [/(?<![\p{L}\p{N}_])mindíg(?![\p{L}\p{N}_])/giu,"A „mindig” rövid i-vel írandó.","mindig","HU_MINDIG"],
+        [/(?<![\p{L}\p{N}_])muszály(?![\p{L}\p{N}_])/giu,"A helyes alak: muszáj.","muszáj","HU_MUSZAJ"],
+        [/(?<![\p{L}\p{N}_])lessz(?![\p{L}\p{N}_])/giu,"A helyes alak: lesz.","lesz","HU_LESZ"],
+        [/(?<![\p{L}\p{N}_])helyesírás\s+ellenőrző(?![\p{L}\p{N}_])/giu,"A jelöletlen birtokos összetétel kötőjeles alakja: helyesírás-ellenőrző.","helyesírás-ellenőrző","HU_HELYESIRAS_ELLENORZO"]
       ];
       for(const [re,msg,repl,id] of rules)addRegex(out,text,re,msg,repl,id);
-      addRegex(out,text,/\b(20\d{2})\s+(január|február|március|április|május|június|július|augusztus|szeptember|október|november|december)\b/giu,
+      addRegex(out,text,/(?<![\p{L}\p{N}_])(20\d{2})\s+(január|február|március|április|május|június|július|augusztus|szeptember|október|november|december)(?![\p{L}\p{N}_])/giu,
         "Az évszám után pont kell a magyar keltezésben.",m=>m[1]+". "+m[2],"HU_DATE_YEAR_DOT","warning","dátum");
     }
     if(lang==="de-DE"){
