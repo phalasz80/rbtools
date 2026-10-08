@@ -42,8 +42,8 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,'Segoe U
       <button id="rbtools-themeToggle" class="theme-toggle" type="button" aria-pressed="false" title="Világos és sötét mód váltása">Sötét mód</button>
     </div>
     <nav class="tabs rb-primary-nav" aria-label="RBTools főmenü">
-      <button class="tabbtn active" data-tab="admin" type="button">1. Cikkadmin</button>
-      <button id="rbtools-toolsMenuToggle" class="rbtools-top-level" type="button" aria-expanded="false" aria-controls="rbtools-toolsSubnav">2. További eszközök</button>
+      <button class="tabbtn active" data-tab="admin" type="button">Cikkadmin</button>
+      <button id="rbtools-toolsMenuToggle" class="rbtools-top-level" type="button" aria-expanded="false" aria-controls="rbtools-toolsSubnav">További eszközök</button>
     </nav>
     <nav id="rbtools-toolsSubnav" class="tabs rbtools-tools-subnav" aria-label="További eszközök almenüi" hidden>
       <button class="tabbtn" data-tab="boxed" type="button">Keretes</button>
@@ -60,9 +60,9 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,'Segoe U
 <div class="rbtools-shell-main">
 <section id="rbtools-tab-admin" class="tab active" data-editor-mode="guide">
   <nav class="rb-admin-subnav" aria-label="Cikkadmin almenü">
-    <button class="rb-admin-subtab active" data-admin-view="guide" aria-current="page" type="button">1.1 Gyorstalpaló</button>
-    <button class="rb-admin-subtab" data-admin-view="draft" type="button">1.2 Új bejegyzés indítása / piszkozat szerkesztése</button>
-    <button class="rb-admin-subtab" data-admin-view="live" type="button">1.3 Éles cikk szerkesztése / frissítése</button>
+    <button class="rb-admin-subtab active" data-admin-view="guide" aria-current="page" type="button">Gyorstalpaló</button>
+    <button class="rb-admin-subtab" data-admin-view="draft" type="button">Új bejegyzés / piszkozat szerkesztése</button>
+    <button class="rb-admin-subtab" data-admin-view="live" type="button">Éles cikk szerkesztése / frissítése</button>
   </nav>
   <div id="rbtools-adminModeBanner" class="rb-admin-mode-banner" data-mode="guide" role="status" aria-live="polite">
     <strong>GYORSTALPALÓ · A CIKKADMIN KEZDŐLAPJA</strong>
@@ -164,6 +164,18 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,'Segoe U
       <li><strong>Statikus oldal:</strong> a kész HTML-t másold a Blogger oldal HTML-nézetébe. Választható évválasztó gombsoros vagy egyszerű, ömlesztett sablon.</li>
       <li>A széles <strong>állapotsáv</strong> mindig jelzi, hogy éppen betöltés, mentés, sikeres művelet, figyelmeztetés vagy hiba történt.</li>
     </ol>
+
+    <div class="admin-api-limits" role="note">
+      <h3>Mit kell továbbra is a Blogger saját felületén intézni?</h3>
+      <p>A Blogger API v3 nem a teljes Blogger kezelőfelülete. A támogatott bejegyzésműveleteken túl vannak olyan feladatok, amelyekhez a Blogger szükséges:</p>
+      <ul>
+        <li><strong>Egyéni permalink:</strong> az egyéni bejegyzés-URL-t a Blogger szerkesztőjében állítsd be, lehetőleg még az első közzététel előtt. A Posts API nem kínál dokumentált, megbízható permalink-módosító funkciót.</li>
+        <li><strong>Új képfájl feltöltése:</strong> a Blogger API v3 nem tartalmaz általános médiaképfeltöltő végpontot. A képet a Bloggerben töltsd fel, a kapott URL-t viszont itt használhatod vagy cserélheted.</li>
+        <li><strong>Téma, elrendezés, widget, átirányítások, blogbeállítások:</strong> ezek nem a Cikkadmin bejegyzésszerkesztési műveletei.</li>
+        <li><strong>Első publikálás és időzítés:</strong> a Blogger API technikailag támogat ilyen műveleteket, de a RegionalBahn szerkesztőségi rendje szerint ezeket az illetékes szerkesztő a Bloggerben végzi. Ez munkafolyamatbeli döntés, nem API-tilalom.</li>
+        <li><strong>Fiókhoz tartozó szerző és jogosultságok:</strong> a HTML-láblécbe írt szerző nem módosítja a Blogger-fiók szerzőazonosítóját.</li>
+      </ul>
+    </div>
     <div class="admin-help-callout">
       <strong>Első használat vagy hiba esetén:</strong>
       a <a href="#rbtools-help-cikkadmin" id="rbtools-adminHelpLink">Súgó részletes Cikkadmin-fejezete</a>
@@ -528,6 +540,30 @@ További szöveg..."></textarea>
         <button id="rbtools-adminClearIframeInput" type="button">× Mező ürítése</button>
       </div>
     </div>
+
+    <dialog id="rbtools-adminImageUrlDialog" class="admin-image-url-dialog" aria-labelledby="rbtools-adminImageUrlHeading">
+      <div class="admin-image-url-body">
+        <h3 id="rbtools-adminImageUrlHeading">Kép URL-jeinek cseréje</h3>
+        <p class="small">A képaláírás, kredit és fotósnév nem változik. Ugyanazon kép minden cikkbeli előfordulása frissül.</p>
+        <img id="rbtools-adminImageUrlPreview" class="admin-image-url-preview" alt="Aktuális kép előnézete">
+        <label for="rbtools-adminImageUrlFull">Nagy kép URL-je (például /s1920/...)
+          <input id="rbtools-adminImageUrlFull" type="url" spellcheck="false" placeholder="https://blogger.googleusercontent.com/.../s1920/kep.jpg">
+        </label>
+        <label for="rbtools-adminImageUrlSmall">Kis kép URL-je (normál képhez például /s600/...)
+          <input id="rbtools-adminImageUrlSmall" type="url" spellcheck="false">
+        </label>
+        <label class="admin-image-url-auto" for="rbtools-adminImageUrlAuto">
+          <input id="rbtools-adminImageUrlAuto" type="checkbox" checked>
+          <span>Automatikusan készítse a Blogger-kép kis méretű változatát. A leadképnél s200, törzsképnél s600 lesz használva.</span>
+        </label>
+        <p class="small">Automatikus méretezés csak felismerhető Blogger/Google CDN-URL-nél működik. Más szolgáltatónál add meg a kis kép linkjét is. Új képfájl feltöltése a Blogger saját felületén történik.</p>
+        <p id="rbtools-adminImageUrlError" class="admin-image-url-error" role="alert" hidden></p>
+        <div class="admin-image-url-actions">
+          <button id="rbtools-adminImageUrlCancel" type="button">Mégse</button>
+          <button id="rbtools-adminImageUrlApply" class="primary" type="button">✓ Képlinkek cseréje</button>
+        </div>
+      </div>
+    </dialog>
     <div id="rbtools-adminContextMenu" class="admin-context-menu" role="menu" aria-label="Kijelölt szöveg helyi formázása" hidden>
       <button type="button" role="menuitem" data-admin-context-command="bold"><strong>B</strong><span>Félkövér</span><kbd>Ctrl+B</kbd></button>
       <button type="button" role="menuitem" data-admin-context-command="italic"><em>I</em><span>Dőlt</span><kbd>Ctrl+I</kbd></button>
@@ -1400,6 +1436,7 @@ A következő cikk rövid ajánlója.</pre>
     </ol>
     <p>A fotósorral együtt már importált régi képaláírást a betöltő igyekszik külön képaláírásra és opcionális fotósorra bontani. Ha egy kép a Blogger-draftban benne van, de a WYSIWYG-ben nem ott jelenik meg, ahol szeretnéd, ez nem igényel újrafeltöltést: a képtárból húzd át a kívánt helyre.</p>
 
+    <p><strong>Kép URL-jének cseréje:</strong> kattints a képre jobb egérgombbal (ez a leadkép esetén is működik), vagy válaszd a Képtár „Kép URL-jeinek cseréje” gombját. A nagy Blogger-kép linkjéből a program felismerhető méretjelölés esetén automatikusan s600-as törzsképet és s200-as leadképet képez. Egyéb URL-eknél külön kis és nagy képlinket kell megadni. A fotósnév, képkomment, képaláírás és a kép cikkbeli helye változatlan.</p>
     <h3>20. Blogger-címkék, cím, szerző és footer</h3>
     <p><strong>A szerző(k) és a cikkzárás</strong> közvetlenül a WYSIWYG alatt található, függetlenül a választott cikksablontól. A <strong>Szerző(k) neve</strong>, <strong>Összeállította: név</strong> és <strong>Nincs footer</strong> változat között bármikor válthatsz. Régi piszkozat megnyitásakor az utolsó, valóban szabványos (vízszintes vonallal elválasztott, 85%-os dőlt, jobbra zárt) szerzői blokk adatait olvassuk vissza. Hiányzó footernél nem találgatunk: a mező üres, a footer kikapcsolt. Változtatáskor a végleges HTML azonnal frissül.</p>
     <ul>
@@ -1419,6 +1456,13 @@ A következő cikk rövid ajánlója.</pre>
     <p><strong style="color:#ff0000;">Az időzítés mindig az illetékes szerkesztő feladata a Blogger felületén, így időzítést ezen a felületen nem kell beállítani. Ha bármi kérdésed van, hogy mikor megy ki a cikked, fordulj Adorján Péterhez vagy Halász Péterhez!</strong></p>
     <p><strong>Azonnali Publish gomb nincs.</strong> Ez szándékos biztonsági döntés: az éles azonnali publikálás a Bloggerben marad. Az egyéni permalinket szintén a Blogger felületén kell beállítani.</p>
 
+
+    <h3>Blogger API korlátai és az RBTools tudatos szerkesztői szabályai</h3>
+    <p><strong>Blogger API-val megoldható:</strong> bejegyzés létrehozása piszkozatként, keresése, megnyitása, valamint címének, címkéinek és HTML-jének módosítása. Publikált cikk is frissíthető ugyanazzal a post ID-val, nem kell piszkozatba visszaállítani.</p>
+    <p><strong>A Bloggerben intézendő:</strong> egyéni permalink/állandó hivatkozás beállítása; képfájl tényleges feltöltése a Blogger tárhelyére; téma, elrendezés, widgetek, blog- és felhasználóbeállítások. A Blogger API v3 nem dokumentál megbízható permalink-átírást és nem kínál általános Blogger-képfeltöltő végpontot.</p>
+    <p><strong>Szerkesztőségi korlátozás, nem API-tilalom:</strong> az első publikálás és az időzítés technikailag API-ból is lehetséges, de a RegionalBahn belső munkarendje szerint a Bloggerben történik az illetékes szerkesztő által. Az RBToolsban a már publikált cikk célzott javítása külön, védett funkció.</p>
+    <p><strong>Képlinkek egyszerű cseréje:</strong> jobb kattintás a WYSIWYG-képen vagy a leadkép miniatűrjén → Kép URL-jeinek cseréje; illetve a Képtár megfelelő gombja. Google/Blogger-képlinknél a felismerhető <code>/s1920/</code> vagy más méretszegmens átírható <code>/s600/</code> és <code>/s200/</code> méretre. Nem támogatott képszolgáltatónál a kis és a nagy URL-t külön add meg. A képaláírás, kredit és fotósnév változatlan marad; a kép valamennyi előfordulása frissül.</p>
+    <p>Elsődleges dokumentáció: <a href="https://developers.google.com/blogger/docs/3.0/reference/" target="_blank" rel="noopener">Blogger API v3 referencia ↗</a> és <a href="https://developers.google.com/blogger/docs/3.0/using" target="_blank" rel="noopener">Bejegyzések és PATCH-frissítés ↗</a>.</p>
     <h3>23. Statikus oldalak</h3>
     <p>Statikus módot akkor válassz, ha nem bejegyzést, hanem Blogger <strong>Oldalt</strong> szerkesztesz. Három induló forma van:</p>
     <ul>
@@ -2179,13 +2223,34 @@ A következő cikk rövid ajánlója.</pre>
   #rbtools-app .rb-editor-html-hub{padding:11px}
   #rbtools-app .rb-editor-media .admin-image-library{max-height:460px}
 }
+
+#rbtools-app .rb-blogger-global{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 14px;margin:0 0 14px;border:1px solid var(--line);border-left:5px solid #74869b;border-radius:10px;background:var(--panel2)}
+#rbtools-app .rb-blogger-global.connected{border-left-color:#15803d}
+#rbtools-app .rb-blogger-global>strong{font-weight:800}
+#rbtools-app .rb-blogger-global .toolbar{margin:0;flex:1 1 430px}
+#rbtools-app .rb-blogger-global .field{flex:0 1 280px}
+#rbtools-app .rb-blogger-global #rbtools-bloggerStatus{white-space:normal;min-width:145px}
+#rbtools-app .admin-api-limits{background:var(--panel2);border:1px solid var(--line);border-left:5px solid #bf8c39;border-radius:10px;margin:14px 0;padding:12px 15px}
+#rbtools-app .admin-api-limits ul{padding-left:23px}
+#rbtools-app .admin-api-limits li{margin:6px 0}
+#rbtools-app .admin-image-url-dialog{max-height:90vh;width:min(580px,94vw);padding:0;border:1px solid var(--line);border-radius:12px;box-shadow:0 15px 50px #0005;background:var(--panel);color:var(--ink)}
+#rbtools-app .admin-image-url-dialog::backdrop{background:#0009}
+#rbtools-app .admin-image-url-body{padding:18px;display:grid;gap:11px}
+#rbtools-app .admin-image-url-body h3{margin:0}
+#rbtools-app .admin-image-url-body label:not(.admin-image-url-auto){display:grid;gap:5px;font-weight:650}
+#rbtools-app .admin-image-url-body label input[type="url"]{width:100%;font-weight:400}
+#rbtools-app .admin-image-url-auto{display:flex;align-items:start;gap:8px;line-height:1.45}
+#rbtools-app .admin-image-url-preview{max-height:170px;max-width:100%;object-fit:contain;border:1px solid var(--line);border-radius:8px}
+#rbtools-app .admin-image-url-actions{display:flex;flex-wrap:wrap;gap:9px;justify-content:end}
+#rbtools-app .admin-image-url-error{color:#b42332;font-weight:650}
+@media(max-width:650px){#rbtools-app .rb-blogger-global{display:block}#rbtools-app .rb-blogger-global .toolbar{margin:9px 0}}
 </style>
 <script src="/live-timeline.js?v=59"></script>
 <script src="/corrector-core.js?v=59"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v62";
+const RBTOOLS_VERSION="pages-v63";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 const CORRECTOR=window.RBTOOLS_CORRECTOR;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
@@ -2375,6 +2440,25 @@ function rbIntegrateEditorTools(workspace){
   return true;
 }
 
+
+function rbMoveBloggerConnectionBar(admin){
+  const panel=admin.querySelector(".admin-blogger-panel"),tabs=admin.querySelector(".rb-admin-subnav");
+  if(!panel||!tabs)return;
+  const toolbar=Array.from(panel.children).find(x=>x.classList.contains("toolbar")&&x.querySelector("#rbtools-bloggerConnect"));
+  const blogField=panel.querySelector(".grid3 > .field:first-child");
+  if(!toolbar||!blogField)return;
+  const bar=document.createElement("section");
+  bar.className="rb-blogger-global";bar.setAttribute("aria-label","Állandó Blogger-kapcsolat");
+  bar.innerHTML='<strong>Blogger API-kapcsolat</strong><span id="rbtools-bloggerTopBadge" class="badge">Nincs kapcsolat</span>';
+  bar.append(toolbar,blogField);
+  const settings=document.createElement("button");settings.type="button";settings.textContent="⚙ API-beállítások";
+  settings.addEventListener("click",()=>{
+    rbSetAdminView("draft");const d=rbGet("bloggerSetupDetails");
+    if(d){d.open=true;d.scrollIntoView({behavior:"smooth",block:"center"});}
+  });
+  bar.appendChild(settings);tabs.after(bar);
+}
+
 function rbInitAdminViews(){
   const admin=rbGet("tab-admin");
   if(!admin)return;
@@ -2390,6 +2474,7 @@ function rbInitAdminViews(){
     else workspace.appendChild(child);
   }
   admin.append(guide,workspace);
+  rbMoveBloggerConnectionBar(admin);
   rbIntegrateEditorTools(workspace);
   // Only Blogger status/record selection changes; all editing tools are the SAME nodes.
   for(const id of ["bloggerDraftSearch","bloggerDraftSelect","bloggerSchedule"])
@@ -2400,11 +2485,11 @@ function rbInitAdminViews(){
   const entry=document.createElement("div");
   entry.className="rb-admin-guide-intro";
   entry.innerHTML='<div class="rb-admin-guide-action" data-mode="draft">'+
-    '<h3>1.2 Új bejegyzés / piszkozat</h3>'+
+    '<h3>Új bejegyzés / piszkozat</h3>'+
     '<p>Új cikk indítása, piszkozat megnyitása, képek és WYSIWYG-szerkesztés, mentés publikálás nélkül.</p>'+
     '<button type="button" data-admin-go="draft">Új bejegyzés vagy piszkozat →</button></div>'+
     '<div class="rb-admin-guide-action" data-mode="live">'+
-    '<h3>1.3 Éles cikk szerkesztése</h3>'+
+    '<h3>Éles cikk szerkesztése</h3>'+
     '<p>Korábban megjelent cikkek keresése és javítása. Előzetes egyeztetés szükséges Adorján Péterrel és/vagy Halász Péterrel.</p>'+
     '<button type="button" data-admin-go="live">Publikált cikk szerkesztése →</button></div>';
   guide.prepend(entry);
@@ -3397,6 +3482,9 @@ function bloggerConnected(){return !!bloggerAccessToken&&Date.now()<bloggerToken
 function bloggerSetUi(){
   const connected=bloggerConnected();
   rbGet("bloggerConnectionBadge").textContent=connected?"Kapcsolódva":"Nincs kapcsolat";
+  const topBadge=rbGet("bloggerTopBadge");
+  if(topBadge)topBadge.textContent=connected?"● Kapcsolódva":"● Nincs kapcsolat";
+  topBadge?.closest(".rb-blogger-global")?.classList.toggle("connected",connected);
   rbGet("bloggerDisconnect").disabled=!connected;
   rbGet("bloggerRefreshBlogs").disabled=!connected;
   rbGet("bloggerBlogSelect").disabled=!connected;
@@ -4544,6 +4632,71 @@ function adminBuildFromSource(){
   adminRenderCanvas();adminGenerateHtml();
   rbGet("adminStatus").textContent=adminBlocks.length+" szövegblokk felépítve. A cikk vizuálisan szerkeszthető.";
 }
+
+function rbImageUrlSafe(value){
+  try{const u=new URL(String(value||"").trim());return ["https:","http:"].includes(u.protocol)&&!!u.hostname;}
+  catch{return false;}
+}
+function rbBloggerSizeVariant(value,size){
+  if(!Number.isSafeInteger(size)||size<32||size>4096||!rbImageUrlSafe(value))return "";
+  const url=new URL(String(value).trim()),host=url.hostname.toLowerCase();
+  if(!(host==="blogger.googleusercontent.com"||/^(?:\d+\.)?bp\.blogspot\.com$/.test(host)||/^lh\d+\.googleusercontent\.com$/.test(host)))return "";
+  const before=url.pathname;
+  url.pathname=url.pathname.replace(/\/(?:s\d{2,5}|w\d{2,5}(?:-h\d{2,5})?|h\d{2,5}(?:-w\d{2,5})?)(?:-[a-z0-9-]+)?(?=\/)/i,"/s"+size);
+  if(url.pathname===before)url.pathname=url.pathname.replace(/=(?:s\d{2,5}|w\d{2,5}(?:-h\d{2,5})?|h\d{2,5}(?:-w\d{2,5})?)(?:-[a-z0-9-]+)?$/i,"=s"+size);
+  return url.pathname===before?"":url.toString();
+}
+let adminImageDialogId="";
+function adminOpenImageUrls(id){
+  const img=adminFindImage(id);if(!img)return;
+  adminHideContextMenu();
+  adminImageDialogId=id;
+  rbGet("adminImageUrlFull").value=img.full||img.display||"";
+  rbGet("adminImageUrlSmall").value=img.display||"";
+  rbGet("adminImageUrlAuto").checked=true;
+  rbGet("adminImageUrlError").hidden=true;
+  rbGet("adminImageUrlPreview").src=img.display||img.full||"";
+  adminRefreshImageUrlAuto();
+  rbGet("adminImageUrlDialog").showModal();
+}
+function adminRefreshImageUrlAuto(){
+  const full=rbGet("adminImageUrlFull").value.trim();
+  const variant=rbBloggerSizeVariant(full,600);
+  const auto=rbGet("adminImageUrlAuto");
+  const small=rbGet("adminImageUrlSmall");
+  if(auto.checked&&!variant)auto.checked=false;
+  small.disabled=auto.checked;
+  if(auto.checked)small.value=variant;
+}
+function adminApplyImageUrls(){
+  const img=adminFindImage(adminImageDialogId),error=rbGet("adminImageUrlError");
+  if(!img){error.hidden=false;error.textContent="A kép már nincs a képtárban.";return;}
+  const full=rbGet("adminImageUrlFull").value.trim();
+  const small=rbGet("adminImageUrlSmall").value.trim();
+  if(!rbImageUrlSafe(full)||!rbImageUrlSafe(small)){
+    error.hidden=false;error.textContent="Mind a nagy, mind a kis kép linkjének érvényes http(s) URL-nek kell lennie. Más kiszolgáló esetén add meg külön a kis képlinket.";return;
+  }
+  img.full=full;img.display=small;
+  // A régi srcset különben a korábbi képre mutathatna.
+  img.attrs=Array.isArray(img.attrs)?img.attrs.filter(x=>!["srcset","sizes","data-src","data-srcset"].includes(String(x.name||"").toLowerCase())):[];
+  rbGet("adminImageUrlDialog").close();adminImageDialogId="";
+  adminRenderImageLibrary();adminRenderCanvas();adminGenerateHtml();
+  rbGet("adminStatus").textContent="A kép URL-je megváltozott; képaláírás és kredit megőrizve. Blogger-mentés még szükséges.";
+}
+function adminImageContextClick(event){
+  if(event.shiftKey)return;
+  const target=event.target?.closest?.("img");
+  if(!target||!rbGet("adminCanvas").contains(target))return;
+  let id=target.dataset.rbImageId;
+  if(!adminFindImage(id)){
+    const url=target.getAttribute("src")||"";
+    id=adminImages.find(img=>img.display===url||img.full===url)?.id||"";
+  }
+  if(!id)return;
+  event.preventDefault();event.stopImmediatePropagation();
+  adminOpenImageUrls(id);
+}
+
 function rbCanonicalImageTag(item,{display="",alt="",forceWidth=null,style="max-width:100%;height:auto;"}={}){
   const source=Array.isArray(item?.attrs)?item.attrs:[];
   const attrs=[],seen=new Set();
@@ -4551,7 +4704,7 @@ function rbCanonicalImageTag(item,{display="",alt="",forceWidth=null,style="max-
   let hasAlt=false,hasSrc=false,hasWidth=false;
   for(const a of source){
     const name=String(a?.name||"").trim(),low=name.toLowerCase();
-    if(!name||seen.has(low)||low==="style"||low==="border"||/^on/i.test(low))continue;
+    if(!name||seen.has(low)||low==="style"||low==="border"||low==="srcset"||low==="sizes"||/^on/i.test(low))continue;
     seen.add(low);
     if(low==="alt"){attrs.push('alt="'+esc(alt,true)+'"');hasAlt=true;continue;}
     if(low==="src"){attrs.push('src="'+esc(src||a.value||"",true)+'"');hasSrc=true;continue;}
@@ -4578,7 +4731,7 @@ function adminMainImageHtml(img){
   if(!img)return "";
   const alt=rbImageAltText(img.caption,img.credit,img.photoName);
   const imageTag=rbCanonicalImageTag(img,{
-    display:img.display,alt,forceWidth:200,
+    display:rbBloggerSizeVariant(img.full||img.display,200)||img.display,alt,forceWidth:200,
     style:"max-width:100%; height:auto; box-sizing:border-box;"
   });
   return '<a href="'+esc(img.full||img.display,true)+'" style="clear: left; float: left; padding: 0px 1em 1em 0px; max-width:100%; box-sizing:border-box;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'>'+imageTag+'</a>';
@@ -4860,7 +5013,7 @@ function adminImageBlockElement(block){
   const img=adminFindImage(block.imageId),wrap=document.createElement("div");wrap.className="admin-image-block";
   if(!img){wrap.textContent="A kép már nincs a képtárban.";return wrap;}
   const a=document.createElement("a");a.href=img.full||img.display||"#";a.target="_blank";a.rel="noopener";
-  const pic=document.createElement("img");pic.src=img.display||"";pic.alt=rbImageAltText(img.caption,img.credit,img.photoName);a.appendChild(pic);wrap.appendChild(a);
+  const pic=document.createElement("img");pic.src=img.display||"";pic.dataset.rbImageId=img.id;pic.alt=rbImageAltText(img.caption,img.credit,img.photoName);a.appendChild(pic);wrap.appendChild(a);
   wrap.appendChild(adminCaptionEditor(img));
   const cr=document.createElement("div");cr.className="admin-image-credit";cr.textContent=img.credit||"";wrap.appendChild(cr);
   return wrap;
@@ -4884,7 +5037,7 @@ function adminBoxElement(block){
   adminTrackEditable(body,()=>{block.html=body.innerHTML;});wrap.appendChild(body);
   const img=adminFindImage(block.imageId);
   if(img){
-    const p=document.createElement("div");p.className="admin-box-image";const im=document.createElement("img");im.src=img.display||"";im.alt=rbImageAltText(img.caption,img.credit,img.photoName);p.appendChild(im);
+    const p=document.createElement("div");p.className="admin-box-image";const im=document.createElement("img");im.src=img.display||"";im.dataset.rbImageId=img.id;im.alt=rbImageAltText(img.caption,img.credit,img.photoName);p.appendChild(im);
     p.appendChild(adminCaptionEditor(img));
     const rm=document.createElement("button");rm.type="button";rm.className="admin-box-image-remove";rm.textContent="× Kép kivétele a keretesből";rm.addEventListener("click",()=>{block.imageId=null;adminRenderCanvas();adminGenerateHtml();});p.appendChild(rm);wrap.appendChild(p);
   }else{
@@ -5041,7 +5194,7 @@ function adminRenderCanvas(){
     const main=adminFindImage(adminMainImageId);
     if(main){
       const a=document.createElement("a");a.className="admin-main-thumb";a.href=main.full||main.display||"#";a.target="_blank";a.rel="noopener";
-      const image=document.createElement("img");image.src=main.display||"";image.alt=rbImageAltText(main.caption,main.credit,main.photoName);a.appendChild(image);shell.appendChild(a);
+      const image=document.createElement("img");image.src=rbBloggerSizeVariant(main.full||main.display,200)||main.display||"";image.dataset.rbImageId=main.id;image.alt=rbImageAltText(main.caption,main.credit,main.photoName);a.appendChild(image);shell.appendChild(a);
     }
     const lead=document.createElement("div");lead.className="admin-lead admin-editable";lead.contentEditable="true";lead.spellcheck=true;
     lead.dataset.adminSpecial="lead";lead.dataset.placeholder="A valódi leadet ide írd, ne a cikk címét.";
@@ -5091,7 +5244,8 @@ function adminRenderImageLibrary(){
     thumb.title="Kép áthúzása a WYSIWYG bevezetőjébe vagy kék beszúrási sávjára";
     thumb.addEventListener("dragstart",e=>{tile.classList.add("dragging");e.dataTransfer.setData("application/x-rbtools-image",img.id);e.dataTransfer.setData("text/plain","RBIMAGE:"+img.id);e.dataTransfer.effectAllowed="copyMove";});
     thumb.addEventListener("dragend",()=>tile.classList.remove("dragging"));
-    const im=document.createElement("img");im.src=img.display||"";im.alt=rbImageAltText(img.caption,img.credit,img.photoName);im.draggable=false;thumb.appendChild(im);
+    const im=document.createElement("img");im.src=img.display||"";im.dataset.rbImageId=img.id;im.alt=rbImageAltText(img.caption,img.credit,img.photoName);im.draggable=false;thumb.appendChild(im);
+    thumb.addEventListener("contextmenu",e=>{if(e.shiftKey)return;e.preventDefault();adminOpenImageUrls(img.id);});
     const fields=document.createElement("div");fields.className="admin-image-fields";
     const makeInput=(name,value,onInput)=>{const l=document.createElement("label");l.textContent=name;const x=document.createElement("input");x.value=value||"";x.addEventListener("input",()=>onInput(x.value));x.addEventListener("change",()=>{adminRenderCanvas();adminGenerateHtml();});l.appendChild(x);return l;};
     const captionLabel=document.createElement("label");captionLabel.textContent="Képaláírás (Enter: új sor)";
@@ -5114,7 +5268,8 @@ function adminRenderImageLibrary(){
     const buttons=document.createElement("div");buttons.className="admin-image-buttons";
     const addBtn=document.createElement("button");addBtn.type="button";addBtn.textContent="＋ Cikk végére";addBtn.addEventListener("click",()=>adminInsertImageAt(img.id,adminBlocks.length));
     const mainBtn=document.createElement("button");mainBtn.type="button";mainBtn.textContent=img.id===adminMainImageId?"★ Főkép":"☆ Főkép";mainBtn.addEventListener("click",()=>{adminMainImageId=adminMainImageId===img.id?null:img.id;adminRepairLegacyLeadBlock();adminRenderImageLibrary();adminRenderCanvas();adminGenerateHtml();});
-    buttons.append(addBtn,mainBtn);fields.appendChild(buttons);tile.append(thumb,fields);host.appendChild(tile);
+    const urls=document.createElement("button");urls.type="button";urls.className="admin-edit-image-urls";urls.textContent="🔗 Kép URL-jeinek cseréje";urls.addEventListener("click",()=>adminOpenImageUrls(img.id));
+    buttons.append(addBtn,mainBtn,urls);fields.appendChild(buttons);tile.append(thumb,fields);host.appendChild(tile);
   });
 }
 function adminQuickBox(){
@@ -5858,6 +6013,12 @@ rbGet("adminFmtUnderline").addEventListener("click",()=>adminExec("underline"));
 rbGet("adminFmtStrike").addEventListener("click",()=>adminExec("strikeThrough"));
 rbGet("adminFmtLink").addEventListener("click",adminLink);
 rbGet("adminFmtAbbr").addEventListener("click",()=>adminAbbr());
+rbGet("adminImageUrlFull").addEventListener("input",adminRefreshImageUrlAuto);
+rbGet("adminImageUrlAuto").addEventListener("change",adminRefreshImageUrlAuto);
+rbGet("adminImageUrlApply").addEventListener("click",adminApplyImageUrls);
+rbGet("adminImageUrlCancel").addEventListener("click",()=>rbGet("adminImageUrlDialog").close());
+rbGet("adminImageUrlDialog").addEventListener("close",()=>{adminImageDialogId="";});
+rbGet("adminCanvas").addEventListener("contextmenu",adminImageContextClick,true);
 rbGet("adminCanvas").addEventListener("mousedown",adminCaptureRightClick,true);
 rbGet("adminCanvas").addEventListener("contextmenu",adminContextMenuAt,true);
 rbGet("adminContextMenu").querySelectorAll("[data-admin-context-command]").forEach(btn=>{
