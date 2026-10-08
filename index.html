@@ -228,6 +228,32 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,'Segoe U
         <span class="small">Az <strong>egyéni permalinket</strong> a Blogger szerkesztőjében állítsd be.</span>
       </div>
     </section>
+
+    <section class="blogger-published" aria-label="Publikált Blogger-cikkek">
+      <div class="admin-section-head"><div><h2 style="margin:0">Publikált cikkek keresése és szerkesztése</h2><p class="small">6000 cikkhez: keresés, dátumszűrés, címkék, lapozás vagy közvetlen URL.</p></div><span id="rbtools-publishedLiveState" class="badge">Nincs éles cikk megnyitva</span></div>
+      <div class="grid2">
+        <div class="field"><label for="rbtools-publishedQuery">Keresőkifejezés (cím vagy szöveg)</label><input id="rbtools-publishedQuery" placeholder="FLIRT, InnoTrans, Berlin…"></div>
+        <div class="field"><label for="rbtools-publishedLabels">Blogger-címkék</label><input id="rbtools-publishedLabels" placeholder="Németország"></div>
+      </div>
+      <div class="grid3">
+        <div class="field"><label for="rbtools-publishedStart">Megjelent ettől</label><input id="rbtools-publishedStart" type="date"></div>
+        <div class="field"><label for="rbtools-publishedEnd">Megjelent eddig</label><input id="rbtools-publishedEnd" type="date"></div>
+        <div class="field"><label for="rbtools-publishedOrder">Rendezés</label><select id="rbtools-publishedOrder"><option value="published">Megjelenés (legújabb elöl)</option><option value="updated">Legutóbbi változtatás</option></select></div>
+      </div>
+      <div class="toolbar"><button id="rbtools-publishedSearch" class="primary" type="button" disabled>⌕ Publikált cikkek keresése</button><button id="rbtools-publishedPrev" type="button" disabled>← Előző 50</button><button id="rbtools-publishedNext" type="button" disabled>Következő 50 →</button><span id="rbtools-publishedCount" class="small">0 találat</span></div>
+      <p class="small">Üres keresőkifejezésnél a Blogger a dátumot és a címkéket a teljes archívumban szűri. Szöveges keresésnél a dátum/címke a visszaadott találatokon belül érvényesül; ez nem teljes, kombinált szerveroldali keresés.</p>
+      <div class="field"><label for="rbtools-publishedResults">Publikált találatok (cím · dátum · post ID)</label><select id="rbtools-publishedResults" size="6" disabled><option value="">Előbb keress a cikkek között</option></select></div>
+      <div class="toolbar"><button id="rbtools-publishedOpen" type="button" class="primary" disabled>▤ Kiválasztott éles cikk megnyitása a Cikkadminban</button></div>
+      <div class="grid2"><div class="field"><label for="rbtools-publishedUrl">Közvetlen cikk-URL</label><input type="url" id="rbtools-publishedUrl" placeholder="https://www.regionalbahn.hu/2026/10/cikk.html"></div><div class="field"><label for="rbtools-publishedUrlOpen">Megnyitás URL alapján</label><button id="rbtools-publishedUrlOpen" type="button" disabled>↗ Publikált cikk megnyitása</button></div></div>
+      <div id="rbtools-publishedStatus" class="published-status small" role="status" aria-live="polite">Csatlakozás után keress a megjelent cikkek között.</div>
+      <div class="published-save-section">
+        <strong>Védett éles mentés</strong>
+        <p class="small">Mentés előtt kötelező az eredeti HTML letöltése. Az éles frissítés külön megerősítést kér, ellenőrzi a Blogger változásait, és nem vonja vissza a publikálást.</p>
+        <div class="toolbar"><button id="rbtools-publishedBackup" type="button" disabled>⇩ Eredeti HTML mentése</button><button id="rbtools-publishedCompare" type="button" disabled>≠ HTML összevetése</button><button id="rbtools-publishedSave" type="button" class="published-save-button" disabled>⚠ PUBLIKÁLT CIKK ÉLES FRISSÍTÉSE</button></div>
+        <p id="rbtools-publishedBackupInfo" class="small"></p>
+        <details><summary>Eredeti és szerkesztett HTML összehasonlítása</summary><p class="small" id="rbtools-publishedDiffInfo">Nyiss meg egy publikált cikket.</p><div class="grid2"><div class="field"><label for="rbtools-publishedSource">Eredeti HTML</label><textarea id="rbtools-publishedSource" rows="10" readonly spellcheck="false"></textarea></div><div class="field"><label for="rbtools-publishedEdited">Szerkesztett HTML</label><textarea id="rbtools-publishedEdited" rows="10" readonly spellcheck="false"></textarea></div></div></details>
+      </div>
+    </section>
   </div>
 
   <div class="grid2 admin-import-grid">
@@ -2052,13 +2078,26 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app #rbtools-help-gyujtooldalak,#rbtools-app #rbtools-help-keretes{scroll-margin-top:20px}
 #rbtools-app .admin-box-variant{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel2);font-size:12px}
 #rbtools-app .admin-box-variant select{max-width:240px;min-width:140px}
+
+#rbtools-app .blogger-published{margin-top:20px;padding-top:18px;border-top:2px solid #9dacc0;display:flex;flex-direction:column;gap:12px}
+#rbtools-app .blogger-published .field{min-width:0}
+#rbtools-app .blogger-published select[size]{min-height:150px;width:100%;font-size:13px}
+#rbtools-app .published-status{border:1px solid #9cb7d0;border-radius:8px;padding:10px;background:#e9f2fc;color:#17385d}
+#rbtools-app .published-status[data-state="ok"]{background:#e7f7ec;color:#165b32}
+#rbtools-app .published-status[data-state="error"]{background:#fff0f0;color:#8c1727}
+#rbtools-app .published-save-section{border:2px solid #d5a160;border-radius:10px;padding:14px;background:var(--panel2,#faf9f6);display:flex;flex-direction:column;gap:8px}
+#rbtools-app .published-save-button{background:#8c1727;color:#fff;border-color:#751426;font-weight:800}
+#rbtools-app .published-save-button:disabled{opacity:.45}
+#rbtools-app #rbtools-publishedLiveState[data-state="danger"]{background:#fae5e5;color:#8c1727}
+#rbtools-app #rbtools-publishedLiveState[data-state="warn"]{background:#fff0c9;color:#764b00}
+#rbtools-app #rbtools-publishedLiveState[data-state="ok"]{background:#e4f5ea;color:#165b32}
 </style>
 <script src="/live-timeline.js?v=59"></script>
 <script src="/corrector-core.js?v=59"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v59";
+const RBTOOLS_VERSION="pages-v60";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 const CORRECTOR=window.RBTOOLS_CORRECTOR;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
@@ -6408,6 +6447,7 @@ window.RBTOOLS_PAGE_BRIDGE=Object.freeze({
 
 })();
 </script>
+<script src="/published-posts.js?v=60"></script>
 <script src="/collection-page-core.js?v=42"></script>
 <script src="/archive-presets.js?v=42"></script>
 <script src="/page-starters.js?v=42"></script>
