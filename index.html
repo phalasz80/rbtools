@@ -165,6 +165,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,'Segoe U
       <li>A széles <strong>állapotsáv</strong> mindig jelzi, hogy éppen betöltés, mentés, sikeres művelet, figyelmeztetés vagy hiba történt.</li>
       <li><strong>Szöveg és link pótlása együtt:</strong> a WYSIWYG-ben visszaállított hivatkozás az apró szövegjavítással együtt célzottan menthető. Ha a link az eredeti cikkben már szerepel, megmarad és nem duplázódik; ha új és egyértelmű, az RBTools csak az érintett szövegrészt linkeli. Más HTML-eltérés esetén külön, jelölőnégyzetes éles felülírási jóváhagyás szükséges.</li>
       <li><strong>Betöltéskori HTML-eltérés:</strong> ha az eredeti Blogger-cikk és a WYSIWYG automatikusan előállított HTML-je különbözik, azt az RBTools figyelmeztetésként jelzi és lehetővé teszi a kifejezett, kockázatos éles felülírást akkor is, ha még nem módosítottál kézzel. A teljes felülírás linkeket, képeket vagy más elemeket tüntethet el, ezért az eredeti HTML biztonsági mentése javasolt. Kizárólag cím/címke javításánál az eredeti HTML nem módosul.</li>
+      <li><strong>Éles cikknél nincs sablon:</strong> csak a Bloggerből visszaolvasott, publikált cikk szerkeszthető. A szerző neve és a szerzői footer zárolt; mentéskor változatlanul az eredeti szerzői HTML kerül vissza. Az ismeretlen, nem biztonságosan felismerhető szerzői zárás megakadályozza a tartalmi felülírást.</li>
       <li><strong>Éles mentés jóváhagyása:</strong> a publikált cikk bármely változtatása esetén a mentőgomb megnyitja a kötelező jóváhagyó ablakot. Ebben a szerkesztőségi egyeztetés, szükség esetén a veszteséges HTML-felülírás, valamint a biztonsági másolat letöltése vagy mellőzése külön nyilatkozattal kezelhető. A Mégse semmit nem módosít.</li>
       <li><strong>Éles cikk javítása:</strong> ha a WYSIWYG régi HTML-részeket nem tud veszteségmentesen visszaolvasni, a biztosan beazonosítható apró szövegjavítást az RBTools az EREDETI HTML-ben vezeti át. A többi link és képkód változatlan marad. Ha ez nem lehetséges, külön <strong>jelölőnégyzetes éles felülírási ablak</strong> mutatja az eltéréseket. Csak a pipa, az éles jóváhagyás és a végső megerősítés után történhet teljes HTML-csere. A Mégse nem küld Blogger-módosítást.</li>
     </ol>
@@ -1467,6 +1468,7 @@ A következő cikk rövid ajánlója.</pre>
     <p><strong>Szerkesztőségi korlátozás, nem API-tilalom:</strong> az első publikálás és az időzítés technikailag API-ból is lehetséges, de a RegionalBahn belső munkarendje szerint a Bloggerben történik az illetékes szerkesztő által. Az RBToolsban a már publikált cikk célzott javítása külön, védett funkció.</p>
     <p><strong>Képlinkek egyszerű cseréje:</strong> jobb kattintás a WYSIWYG-képen vagy a leadkép miniatűrjén → Kép URL-jeinek cseréje; illetve a Képtár megfelelő gombja. Google/Blogger-képlinknél a felismerhető <code>/s1920/</code> vagy más méretszegmens átírható <code>/s600/</code> és <code>/s200/</code> méretre. Nem támogatott képszolgáltatónál a kis és a nagy URL-t külön add meg. A képaláírás, kredit és fotósnév változatlan marad; a kép valamennyi előfordulása frissül.</p>
     <p>Elsődleges dokumentáció: <a href="https://developers.google.com/blogger/docs/3.0/reference/" target="_blank" rel="noopener">Blogger API v3 referencia ↗</a> és <a href="https://developers.google.com/blogger/docs/3.0/using" target="_blank" rel="noopener">Bejegyzések és PATCH-frissítés ↗</a>.</p>
+    <p><strong>Éles cikk visszaolvasása és változatlan szerzők:</strong> kizárólag a Blogger API-ból visszaolvasott, publikált cikk szerkeszthető. Sablon, új helyi alap, külső cikkszöveg és HTML-visszatöltés nem használható. Az eredeti szerző neve és cikkzárás-formátuma zárolt; az eredeti HTML-lábléc a végleges éles kódba kerül vissza. Nem ellenőrizhető régi szerzői láblécnél a tartalom felülírása leáll. A Blogger szerzőazonosítója nincs a PATCH-ben, a mentés előtti és utáni ellenőrzés vizsgálja.</p>
     <p><strong>Betöltéskori HTML-eltérés és tudatos felülírás:</strong> ha az eredeti Blogger-cikkből a WYSIWYG már a megnyitás során eltérő HTML-t épít, a különbséget a felület kijelzi. Ez akkor is külön kockázatos teljes éles felülírásként menthető, ha a szerkesztő még nem írt bele, de a nyilatkozati ablakban a teljes felülírás veszélyét is el kell fogadni. Mentés előtt mindenképpen célszerű az eredeti HTML-t lementeni, mert linkek, képek, beágyazások vagy más részek eltűnhetnek. Ha csak a cím vagy címkék módosulnak, az eredeti HTML érintetlen marad.</p>
     <p><strong>Szöveg- és hivatkozásjavítás:</strong> a WYSIWYG-ben utólag helyreállított linket az RBTools összeveti az eredeti Blogger-HTML-lel. Ha már benne van, csak megőrzi; ha egyértelműen új, célzottan szúrja be. Ez az egyedi, rövid szövegjavítással együtt is használható. A mentés megerősítésekor az érintett linkszöveg és URL is megjelenik. Kétes linkelhelyezés, linktörlés vagy egyéb HTML-szerkezeti változás esetén a külön jelölőnégyzetes teljes felülírási jóváhagyás lép életbe.</p>
     <p><strong>Régi éles cikk célzott javítása:</strong> az RBTools a WYSIWYG-ben elvégzett rövid szövegjavítást először az eredeti, Bloggerből letöltött HTML-ben próbálja meg egyértelműen beazonosítani, és csak ott módosítja. Ezzel elkerülhető, hogy egy hibásan importált linket vagy egyedi HTML-blokkot véletlenül kitöröljön. Nem egyértelmű módosításnál az RBTools külön párbeszédablakban tételesen felsorolja a lehetséges veszteségeket. Teljes felülírás csak az önálló kockázatvállaló jelölőnégyzet, az éles jóváhagyás és az utolsó mentési megerősítés után történik. A Mégse nem módosítja a Bloggerben szereplő bejegyzést.</p>
@@ -2254,13 +2256,26 @@ A következő cikk rövid ajánlója.</pre>
 
 /* A feltételesen megjelenő éles jóváhagyási mezők inline flex-stílusa nem írhatja felül a hidden attribútumot. */
 #rbtools-app #rbtools-publishedUnsafeDialog [hidden]{display:none!important}
+
+#rbtools-app #rbtools-tab-admin[data-editor-mode="live"] .admin-template-panel,
+#rbtools-app #rbtools-tab-admin[data-editor-mode="live"] .rb-editor-text-import,
+#rbtools-app #rbtools-tab-admin[data-editor-mode="live"] .rb-editor-image-import,
+#rbtools-app #rbtools-tab-admin[data-editor-mode="live"] .rb-editor-html-import,
+#rbtools-app #rbtools-tab-admin[data-editor-mode="live"] .admin-integrated-converter,
+#rbtools-app #rbtools-tab-admin[data-editor-mode="live"] #rbtools-adminClear{display:none!important}
+#rbtools-app #rbtools-tab-admin[data-editor-mode="live"]:not([data-live-loaded="true"]) .admin-editor-panel,
+#rbtools-app #rbtools-tab-admin[data-editor-mode="live"]:not([data-live-loaded="true"]) .rb-editor-html-hub{display:none!important}
+#rbtools-app .rb-live-readback-notice{display:none;padding:12px 15px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}
+#rbtools-app #rbtools-tab-admin[data-editor-mode="live"]:not([data-live-loaded="true"]) .rb-live-readback-notice{display:block}
+#rbtools-app .rb-live-author-lock{padding:10px;border:1px solid #bd914a;border-radius:8px;font-weight:650}
+#rbtools-app .rb-live-author-lock[hidden]{display:none!important}
 </style>
 <script src="/live-timeline.js?v=59"></script>
 <script src="/corrector-core.js?v=59"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v67";
+const RBTOOLS_VERSION="pages-v68";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 const CORRECTOR=window.RBTOOLS_CORRECTOR;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
@@ -2325,6 +2340,14 @@ function rbSetAdminView(view){
   }
   if(view!=="guide")rbLastEditingMode=view;
   admin.dataset.editorMode=view;
+  const isLive=view==="live";
+  admin.dataset.liveLoaded=isLive&&window.RBTOOLS_PUBLISHED?.hasLive?.()?"true":"false";
+  for(const id of ["adminAuthor","adminFooter"]){
+    const field=rbGet(id);
+    if(field){field.disabled=isLive;field.setAttribute("aria-readonly",String(isLive));}
+  }
+  const authorNotice=admin.querySelector(".rb-live-author-lock");
+  if(authorNotice)authorNotice.hidden=!isLive;
   rbGet("adminGuidePage").hidden=view!=="guide";
   rbGet("adminSharedWorkspace").hidden=view==="guide";
   admin.querySelectorAll(".rb-admin-subtab").forEach(button=>{
@@ -2339,7 +2362,7 @@ function rbSetAdminView(view){
     draft:["ÚJ BEJEGYZÉS / PISZKOZAT SZERKESZTÉSE",
       "PISZKOZAT MÓD. Új cikk indítása, illetve nem publikált Blogger-piszkozat szerkesztése. A zöld mentés nem publikálja a cikket."],
     live:["ÉLES, PUBLIKÁLT CIKK SZERKESZTÉSE",
-      "FIGYELEM: AZ ÉLES MENTÉS AZONNAL MÓDOSÍTJA A PUBLIKÁLT CIKKET! Mielőtt bárki szerkeszteni kezdene, egyeztessen Adorján Péterrel és/vagy Halász Péterrel!"]
+      "KIZÁRÓLAG A BLOGGERBŐL VISSZAOLVASOTT PUBLIKÁLT CIKK SZERKESZTHETŐ. Nincs sablon, nincs új helyi cikkszöveg. A szerző neve és a cikkzárás nem változtatható. Egyeztess Adorján Péterrel és/vagy Halász Péterrel!"]
   };
   const [headline,detail]=labels[view],banner=rbGet("adminModeBanner");
   banner.dataset.mode=view;
@@ -2489,6 +2512,14 @@ function rbInitAdminViews(){
   // Only Blogger status/record selection changes; all editing tools are the SAME nodes.
   for(const id of ["bloggerDraftSearch","bloggerDraftSelect","bloggerSchedule"])
     rbGet(id)?.closest(".field")?.classList.add("rb-admin-draft-only");
+  const hint=document.createElement("p");
+  hint.className="rb-live-readback-notice";
+  hint.textContent="Éles cikknél nincs sablon vagy kiinduló szöveg. A Bloggerből nyiss meg egy már megjelent cikket a keresővel vagy a legutóbbi 20 cikk listájából.";
+  workspace.querySelector(".admin-editor-panel")?.before(hint);
+  const authorInfo=document.createElement("p");
+  authorInfo.className="rb-live-author-lock";
+  authorInfo.textContent="Szerzői védelem: a Bloggerből visszaolvasott eredeti szerzői cikkzárás éles frissítéskor nem módosulhat, még teljes HTML-felülírással sem.";
+  authorInfo.hidden=true;workspace.querySelector(".admin-author-panel")?.append(authorInfo);
   const ribbon=document.createElement("div");
   ribbon.id="rbtools-adminEditorModeRibbon";ribbon.className="rb-admin-editor-ribbon";
   workspace.querySelector(".admin-editor-panel")?.before(ribbon);
@@ -3623,7 +3654,7 @@ async function bloggerOpenDraft(){
   rbGet("adminTitle").value=post.title||"";
   rbGet("bloggerLabels").value=Array.isArray(post.labels)?post.labels.join(", "):"";
   rbGet("adminSource").value="";rbGet("adminImageSource").value="";rbGet("adminExistingHtml").value=post.content||"";
-  adminLoadExistingHtml(post.content||"");
+  adminLoadExistingHtml(post.content||"",{fromPublishedBlogger:true});
   rbGet("adminTitle").value=post.title||rbGet("adminTitle").value;
   adminRenderCanvas();adminGenerateHtml(false);bloggerPostMeta();bloggerSetSafeSchedule();
   bloggerKnownSnapshot={...bloggerLocalSnapshot(),origin:"loaded",when:post.updated||""};
@@ -3922,6 +3953,9 @@ function adminTemplateBlocks(type,staticLayout){
   return [p("")];
 }
 function adminApplyTemplate(){
+  if(rbGet("tab-admin")?.dataset.editorMode==="live"){
+    rbGet("adminStatus").textContent="Éles cikkhez nem választható sablon.";return;
+  }
   const type=rbGet("adminContentType").value,staticLayout=rbGet("adminStaticLayout").value;
   if(adminHasMeaningfulContent()&&!window.confirm("A sablon lecseréli a jelenlegi címet, leadet és tartalmi blokkokat. A képtár és a Blogger-bejegyzés hozzárendelése megmarad. Folytatod?"))return;
   adminSourcesHtml="";adminLeadAlign="justify";adminActiveEditable=null;adminSavedRange=null;
@@ -5842,7 +5876,10 @@ function adminRecoverNewsPrelude(nodes,title){
   return changed;
 }
 
-function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
+function adminLoadExistingHtml(raw,{preserveCurrentMain=false,fromPublishedBlogger=false}={}){
+  if(rbGet("tab-admin")?.dataset.editorMode==="live"&&!fromPublishedBlogger){
+    rbGet("adminStatus").textContent="Éles cikk csak a Blogger API-ból visszaolvasható; külső HTML nem tölthető be.";return;
+  }
   raw=String(raw||"").trim();if(!raw){rbGet("adminStatus").textContent="Nincs visszatöltendő HTML.";return;}
   const chosen=preserveCurrentMain?adminFindImage(adminMainImageId):null;
   adminBlocks=[];adminImages=chosen?[chosen]:[];adminSourcesHtml="";adminLeadHtml="";adminLeadAlign="justify";adminMainImageId=chosen?.id||null;
@@ -5998,17 +6035,26 @@ rbGet("adminAddLive").addEventListener("click",adminAddLiveUpdate);
 rbGet("adminLiveAddToolbar").addEventListener("click",adminAddLiveUpdate);
 adminContentTypeChanged(false);
 correctorInit();
-rbGet("adminBuild").addEventListener("click",adminBuildFromSource);
+rbGet("adminBuild").addEventListener("click",()=>{
+  if(rbGet("tab-admin")?.dataset.editorMode==="live"){rbGet("adminStatus").textContent="Éles cikk nem építhető külső szövegből.";return;}
+  adminBuildFromSource();
+});
 rbGet("adminParseImages").addEventListener("click",()=>adminParseImages(rbGet("adminImageSource").value));
 rbGet("adminInsertAllImages").addEventListener("click",adminInsertAllImages);
 rbGet("adminTextFile").addEventListener("change",e=>{adminLoadTextFile(e.target.files&&e.target.files[0]);e.target.value="";});
 rbGet("adminImageFile").addEventListener("change",async e=>{const file=e.target.files&&e.target.files[0];if(file){rbGet("adminImageSource").value=await file.text();adminParseImages(rbGet("adminImageSource").value);}e.target.value="";});
 rbGet("adminExistingFile").addEventListener("change",async e=>{const file=e.target.files&&e.target.files[0];if(file){rbGet("adminExistingHtml").value=await file.text();adminLoadExistingHtml(rbGet("adminExistingHtml").value,{preserveCurrentMain:!!adminMainImageId});}e.target.value="";});
- rbGet("adminLoadExisting").addEventListener("click",()=>adminLoadExistingHtml(rbGet("adminExistingHtml").value,{preserveCurrentMain:!!adminMainImageId}));
+ rbGet("adminLoadExisting").addEventListener("click",()=>{
+  if(rbGet("tab-admin")?.dataset.editorMode==="live"){rbGet("adminStatus").textContent="Éles cikkbe külső HTML nem tölthető vissza.";return;}
+  adminLoadExistingHtml(rbGet("adminExistingHtml").value,{preserveCurrentMain:!!adminMainImageId});
+});
 rbGet("adminCopyTitle").addEventListener("click",()=>copyToClipboard(rbGet("adminTitle").value,rbGet("adminStatus"),"Cím vágólapra másolva."));
 rbGet("adminCopyHtml").addEventListener("click",()=>copyToClipboard(rbGet("adminOutput").value,rbGet("adminStatus"),"Végleges HTML vágólapra másolva."));
 rbGet("adminDownload").addEventListener("click",()=>{adminGenerateHtml(false);if(rbGet("adminOutput").value)downloadText((slugify(rbGet("adminTitle").value)||"regionalbahn-cikk")+".html",rbGet("adminOutput").value);});
-rbGet("adminClear").addEventListener("click",adminClear);
+rbGet("adminClear").addEventListener("click",()=>{
+  if(rbGet("tab-admin")?.dataset.editorMode==="live"){rbGet("adminStatus").textContent="Éles szerkesztőben nem indítható új helyi cikk.";return;}
+  adminClear();
+});
 rbGet("adminAddParagraph").addEventListener("click",adminInsertParagraphAfterActive);
  rbGet("adminAddH3").addEventListener("click",()=>{const level=rbGet("adminHeadingLevel").value;adminBlocks.push({id:adminUid("b"),type:/^h[2-5]$/.test(level)?level:"h3",html:"Új alcím",align:"center"});adminRenderCanvas();adminGenerateHtml();});
 rbGet("adminAddBox").addEventListener("click",()=>{adminBlocks.push({id:adminUid("b"),type:"box",title:"Keretes cím",html:"Keretes szöveg.",imageId:null,titleAlign:"center",bodyAlign:"justify",variant:rbGet("adminNewBoxVariant").value});adminRenderCanvas();adminGenerateHtml();});
@@ -6959,7 +7005,7 @@ window.RBTOOLS_PAGE_BRIDGE=Object.freeze({
 
 })();
 </script>
-<script src="/published-posts.js?v=67"></script>
+<script src="/published-posts.js?v=68"></script>
 <script src="/collection-page-core.js?v=42"></script>
 <script src="/archive-presets.js?v=42"></script>
 <script src="/page-starters.js?v=42"></script>

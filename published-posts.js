@@ -58,7 +58,7 @@ function sameRemote(a,b){
     equalLabels(a.labels,b.labels)&&
     String(a.updated||"")===String(b.updated||"")&&
     String(a.published||"")===String(b.published||"")&&
-    String(a.url||"")===String(b.url||"");
+    String(a.url||"")===String(b.url||"")&&sameBloggerAuthor(a,b);
 }
 function auditHtml(original,edited,compareText=false){
   const issues=[];
@@ -91,6 +91,43 @@ function auditHtml(original,edited,compareText=false){
   return issues;
 }
 function backupChoiceSatisfied(downloaded,acknowledged){return !!downloaded||!!acknowledged;}
+
+function liveAuthorFooter(raw){
+  const source=String(raw||""),lower=source.toLowerCase();
+  let result=null;
+  for(const tag of ["div","p"]){
+    const at=lower.lastIndexOf("<"+tag);
+    if(at<0)continue;
+    const fragment=source.slice(at);
+    const matches=new RegExp("^<"+tag+"\\b[^>]*>[\\s\\S]*?<\\/"+tag+">\\s*$","i");
+    if(!matches.test(fragment)||fragment.length>5000||
+      !/<em\b[^>]*>[\s\S]*?<\/em>/i.test(fragment)||
+      !/font-size\s*:\s*(?:85\s*%|0\.85\s*em)/i.test(fragment)||
+      !/(?:text-align\s*:\s*right|Összeállította\s*:)/i.test(fragment))continue;
+    const preceding=source.slice(0,at),separator=preceding.match(/\s*<hr\b[^>]*\/?>\s*$/i);
+    const start=separator?at-separator[0].length:at;
+    if(!result||start>result.start)result={start,html:source.slice(start)};
+  }
+  if(result)return result;
+  if(/(?:Összeállította\s*:|(?:85\s*%|0\.85\s*em)[\s\S]{0,200}<em\b)/i.test(source.slice(-1800)))
+    throw Error("A cikk szerzői lábléce nem biztonságosan felismerhető; szerzőváltozás kizárása érdekében a törzs mentése nem engedélyezett.");
+  return null;
+}
+function preserveLiveAuthor(original,edited){
+  const author=liveAuthorFooter(original),replacement=liveAuthorFooter(edited);
+  let html=replacement?String(edited).slice(0,replacement.start):String(edited||"");
+  if(author)html=html.replace(/\s*$/,"")+author.html;
+  const result=liveAuthorFooter(html);
+  if(!!author!==!!result||(author&&result&&author.html!==result.html))
+    throw Error("Az eredeti szerzői lábléc változatlan megőrzése nem igazolható; az éles mentés leáll.");
+  return html;
+}
+function sameBloggerAuthor(a,b){
+  if(!a?.author||!b?.author)return !a?.author&&!b?.author;
+  return String(a.author.id||"")===String(b.author.id||"")&&
+    String(a.author.displayName||"")===String(b.author.displayName||"");
+}
+
 
 function rbTextView(html){
   if(typeof DOMParser==="undefined")return null;
@@ -293,7 +330,7 @@ function approvedLive(ack,unsafeMode,unsafeAck,backupExists,backupAck){
   return !!ack&&(!unsafeMode||!!unsafeAck)&&(!!backupExists||!!backupAck);
 }
 
-const core={postPath,listParams,searchParams,searchLocalFilter,sameRemote,equalLabels,auditHtml,backupChoiceSatisfied,planLivePatch,surgicalTextPatch,surgicalRichPatch,rbInsertUniqueLink,fallbackLivePlan,approvedLive};
+const core={postPath,listParams,searchParams,searchLocalFilter,sameRemote,equalLabels,auditHtml,backupChoiceSatisfied,planLivePatch,surgicalTextPatch,surgicalRichPatch,rbInsertUniqueLink,fallbackLivePlan,approvedLive,liveAuthorFooter,preserveLiveAuthor,sameBloggerAuthor};
 if(typeof module==="object"&&module.exports)module.exports=core;
 root.RBTOOLS_PUBLISHED_CORE=core;
 if(!root.document||!root.RBTOOLS_PUBLISHED_BRIDGE)return;
@@ -498,6 +535,8 @@ function sync(){
     String(bridge.blogId())===String(state.live.blogId);
   const now=isCurrent?bridge.snapshot():null;
   const dirty=isCurrent&&!bridge.sameEditor(state.live.editor,now);
+  const view=doc.querySelector("#rbtools-tab-admin");
+  if(view)view.dataset.liveLoaded=isCurrent&&!!state.live?"true":"false";
   let plan=null,planError="";
   if(isCurrent){
     try{plan=planLivePatch(state.live.source,state.live.editor,now,state.live.issues);}
@@ -718,6 +757,13 @@ async function saveLive(){
     bridge.prepareOutput();sent=bridge.snapshot();
     try{plan=planLivePatch(live.source,live.editor,sent,live.issues);}
     catch(e){plan=fallbackLivePlan(live.source,live.editor,sent,e);}
+    if(Object.hasOwn(plan.body,"content")){
+      // Az eredeti szerzőt a kockázatos teljes felülírás jóváhagyása sem írhatja át.
+      plan.body.content=preserveLiveAuthor(live.source.content||"",plan.body.content);
+      if(plan.body.content===String(live.source.content||""))delete plan.body.content;
+      plan.bodyChanged=Object.hasOwn(plan.body,"content");
+      plan.hasChanges=Object.keys(plan.body).length>0;
+    }
     if(!plan.hasChanges)return report(plan.mode==="already-live"?
       "A visszaállított hivatkozás már szerepel az eredeti, élő cikkben; nincs új mentendő tartalom.":
       "A publikált cikkhez képest nincs új módosítás.","info");
@@ -757,7 +803,8 @@ async function saveLive(){
       String(verified.url||"")!==String(live.source.url||"")||
       String(verified.content||"")!==String(Object.hasOwn(payload,"content")?payload.content:live.source.content||"")||
       String(verified.title||"")!==String(Object.hasOwn(payload,"title")?payload.title:live.source.title||"")||
-      !equalLabels(verified.labels,Object.hasOwn(payload,"labels")?payload.labels:live.source.labels)){
+      !equalLabels(verified.labels,Object.hasOwn(payload,"labels")?payload.labels:live.source.labels)||
+      !sameBloggerAuthor(live.source,verified)){
       throw Error("A Blogger módosította a címet, HTML-t, címkéket, URL-t, dátumot vagy állapotot. Az éles eredményt kézzel ellenőrizni kell.");
     }
     live.source=verified;live.editor=sent;
