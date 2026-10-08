@@ -41,21 +41,33 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,'Segoe U
     <div class="theme-row">
       <button id="rbtools-themeToggle" class="theme-toggle" type="button" aria-pressed="false" title="Világos és sötét mód váltása">Sötét mód</button>
     </div>
-    <nav class="tabs" aria-label="Eszközök">
-      <button class="tabbtn active" data-tab="admin">Cikkadmin</button>
-      <button class="tabbtn" data-tab="boxed">Keretes</button>
-      <button class="tabbtn" data-tab="collections">Gyűjtőoldalak</button>
-      <button class="tabbtn" data-tab="tables">Táblázatok</button>
-      <button class="tabbtn" data-tab="images">Képkódok</button>
-      <button class="tabbtn" data-tab="htmlcheck">HTML ellenőrző</button>
-      <button class="tabbtn" data-tab="unicode">Unicode stílusok</button>
-      <button class="tabbtn" data-tab="help">Súgó</button>
+    <nav class="tabs rb-primary-nav" aria-label="RBTools főmenü">
+      <button class="tabbtn active" data-tab="admin" type="button">1. Cikkadmin</button>
+      <button id="rbtools-toolsMenuToggle" class="rbtools-top-level" type="button" aria-expanded="false" aria-controls="rbtools-toolsSubnav">2. További eszközök</button>
+    </nav>
+    <nav id="rbtools-toolsSubnav" class="tabs rbtools-tools-subnav" aria-label="További eszközök almenüi" hidden>
+      <button class="tabbtn" data-tab="boxed" type="button">Keretes</button>
+      <button class="tabbtn" data-tab="collections" type="button">Gyűjtőoldalak</button>
+      <button class="tabbtn" data-tab="tables" type="button">Táblázatok</button>
+      <button class="tabbtn" data-tab="images" type="button">Képkódok</button>
+      <button class="tabbtn" data-tab="htmlcheck" type="button">HTML ellenőrző</button>
+      <button class="tabbtn" data-tab="unicode" type="button">Unicode stílusok</button>
+      <button class="tabbtn" data-tab="help" type="button">Súgó</button>
     </nav>
   </div>
 </div>
 
 <div class="rbtools-shell-main">
-<section id="rbtools-tab-admin" class="tab active">
+<section id="rbtools-tab-admin" class="tab active" data-editor-mode="guide">
+  <nav class="rb-admin-subnav" aria-label="Cikkadmin almenü">
+    <button class="rb-admin-subtab active" data-admin-view="guide" aria-current="page" type="button">1.1 Gyorstalpaló</button>
+    <button class="rb-admin-subtab" data-admin-view="draft" type="button">1.2 Új bejegyzés indítása / piszkozat szerkesztése</button>
+    <button class="rb-admin-subtab" data-admin-view="live" type="button">1.3 Éles cikk szerkesztése / frissítése</button>
+  </nav>
+  <div id="rbtools-adminModeBanner" class="rb-admin-mode-banner" data-mode="guide" role="status" aria-live="polite">
+    <strong>GYORSTALPALÓ · A CIKKADMIN KEZDŐLAPJA</strong>
+    <p>Az új bejegyzések és a publikált cikkek két külön munkafolyamatban, ugyanazzal a szerkesztővel kezelhetők.</p>
+  </div>
   <div class="panel admin-hero">
     <div>
       <h2>RBTools Cikkadmin</h2>
@@ -2091,13 +2103,57 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app #rbtools-publishedLiveState[data-state="danger"]{background:#fae5e5;color:#8c1727}
 #rbtools-app #rbtools-publishedLiveState[data-state="warn"]{background:#fff0c9;color:#764b00}
 #rbtools-app #rbtools-publishedLiveState[data-state="ok"]{background:#e4f5ea;color:#165b32}
+
+/* Egységes Cikkadmin-munkaterület, világos piszkozat/éles választóval */
+#rbtools-app .rbtools-tools-subnav[hidden],
+#rbtools-app .rb-admin-guide[hidden],
+#rbtools-app .rb-admin-workspace[hidden]{display:none!important}
+#rbtools-app .rbtools-tools-subnav{margin-top:8px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}
+#rbtools-app .rbtools-tools-subnav .tabbtn{font-size:13px}
+#rbtools-app .rbtools-top-level{cursor:pointer;font-weight:750}
+#rbtools-app .rbtools-top-level.active{background:var(--accent);color:var(--accentText);border-color:var(--accent)}
+#rbtools-app .rb-admin-subnav{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+#rbtools-app .rb-admin-subtab{flex:1 1 230px;text-align:center;min-height:45px;font-weight:700}
+#rbtools-app .rb-admin-subtab.active{background:var(--accent);color:var(--accentText);border-color:var(--accent)}
+#rbtools-app .rb-admin-subtab[data-admin-view="live"].active{background:#8c1727;color:white;border-color:#751426}
+#rbtools-app .rb-admin-mode-banner{margin-bottom:15px;padding:14px 19px;border:2px solid var(--line);border-left-width:8px;border-radius:10px;background:var(--panel2);line-height:1.5}
+#rbtools-app .rb-admin-mode-banner strong{display:block;font-size:17px;letter-spacing:.01em}
+#rbtools-app .rb-admin-mode-banner p{margin:5px 0 0}
+#rbtools-app .rb-admin-mode-banner[data-mode="draft"],
+#rbtools-app .rb-admin-editor-ribbon[data-mode="draft"]{background:#e9f3ff;color:#153b62;border-color:#86b4dd}
+#rbtools-app .rb-admin-mode-banner[data-mode="live"],
+#rbtools-app .rb-admin-editor-ribbon[data-mode="live"]{background:#fff0f0;color:#7f1d1d;border-color:#b42332}
+#rbtools-app[data-theme="dark"] .rb-admin-mode-banner[data-mode="draft"],
+#rbtools-app[data-theme="dark"] .rb-admin-editor-ribbon[data-mode="draft"]{background:#17314b;color:#e5f2ff}
+#rbtools-app[data-theme="dark"] .rb-admin-mode-banner[data-mode="live"],
+#rbtools-app[data-theme="dark"] .rb-admin-editor-ribbon[data-mode="live"]{background:#4b1923;color:#ffe5e5}
+#rbtools-app .rb-admin-editor-ribbon{border:2px solid var(--line);border-radius:9px;margin-bottom:12px;padding:10px 14px;font-weight:800}
+#rbtools-app .rb-admin-guide-intro{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:0 0 15px}
+#rbtools-app .rb-admin-guide-action{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:16px}
+#rbtools-app .rb-admin-guide-action[data-mode="live"]{border:2px solid #b42332}
+#rbtools-app .rb-admin-guide-action h3{margin:0 0 7px;font-size:16px}
+#rbtools-app .rb-admin-guide-action p{margin:0 0 12px}
+#rbtools-app .rb-admin-guide-action button{width:100%;font-weight:750}
+#rbtools-app .rb-admin-guide-detail{margin:10px 0}
+#rbtools-app .rb-admin-guide-detail summary{cursor:pointer;font-weight:750;background:var(--panel2);border-radius:7px;border:1px solid var(--line);padding:10px}
+#rbtools-app #rbtools-tab-admin[data-editor-mode="draft"] .blogger-published{display:none!important}
+#rbtools-app #rbtools-tab-admin[data-editor-mode="live"] .blogger-workflow,
+#rbtools-app #rbtools-tab-admin[data-editor-mode="live"] .rb-admin-draft-only{display:none!important}
+#rbtools-app #rbtools-tab-admin[data-editor-mode="live"] .admin-blogger-panel>.grid3{display:block}
+#rbtools-app #rbtools-tab-admin[data-editor-mode="live"] .admin-blogger-panel>.grid3>.field{max-width:550px}
+#rbtools-app #rbtools-tab-admin[data-editor-mode="live"] .blogger-published{border-top:0;margin-top:12px;padding-top:0}
+@media(max-width:620px){
+#rbtools-app .rb-admin-subtab{flex-basis:100%;text-align:left}
+#rbtools-app .rb-admin-mode-banner{padding:12px;border-left-width:6px}
+#rbtools-app .rb-admin-mode-banner strong{font-size:15px}
+}
 </style>
 <script src="/live-timeline.js?v=59"></script>
 <script src="/corrector-core.js?v=59"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v60";
+const RBTOOLS_VERSION="pages-v61";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 const CORRECTOR=window.RBTOOLS_CORRECTOR;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
@@ -2150,16 +2206,117 @@ if(window.matchMedia){
 }
 
 /* ---------- Általános UI ---------- */
+
+let rbLastEditingMode=null;
+function rbSetAdminView(view){
+  const admin=rbGet("tab-admin");
+  if(!admin||!["guide","draft","live"].includes(view))return false;
+  if(view!=="guide"&&rbLastEditingMode&&rbLastEditingMode!==view){
+    // The WYSIWYG has a single active Blogger post ID. Switching mode must detach it.
+    if(!window.RBTOOLS_PUBLISHED_BRIDGE?.confirmDiscard?.())return false;
+    bloggerNewLocal();
+  }
+  if(view!=="guide")rbLastEditingMode=view;
+  admin.dataset.editorMode=view;
+  rbGet("adminGuidePage").hidden=view!=="guide";
+  rbGet("adminSharedWorkspace").hidden=view==="guide";
+  admin.querySelectorAll(".rb-admin-subtab").forEach(button=>{
+    const active=button.dataset.adminView===view;
+    button.classList.toggle("active",active);
+    if(active)button.setAttribute("aria-current","page");
+    else button.removeAttribute("aria-current");
+  });
+  const labels={
+    guide:["GYORSTALPALÓ · A CIKKADMIN KEZDŐLAPJA",
+      "Válassz munkafolyamatot. A két szerkesztési mód közös WYSIWYG-et és képtárat használ."],
+    draft:["ÚJ BEJEGYZÉS / PISZKOZAT SZERKESZTÉSE",
+      "PISZKOZAT MÓD. Új cikk indítása, illetve nem publikált Blogger-piszkozat szerkesztése. A zöld mentés nem publikálja a cikket."],
+    live:["ÉLES, PUBLIKÁLT CIKK SZERKESZTÉSE",
+      "FIGYELEM: AZ ÉLES MENTÉS AZONNAL MÓDOSÍTJA A PUBLIKÁLT CIKKET! Mielőtt bárki szerkeszteni kezdene, egyeztessen Adorján Péterrel és/vagy Halász Péterrel!"]
+  };
+  const [headline,detail]=labels[view],banner=rbGet("adminModeBanner");
+  banner.dataset.mode=view;
+  banner.replaceChildren();
+  const strong=document.createElement("strong");strong.textContent=headline;
+  const description=document.createElement("p");description.textContent=detail;
+  banner.append(strong,description);
+  const ribbon=rbGet("adminEditorModeRibbon");
+  ribbon.hidden=view==="guide";
+  if(view!=="guide"){
+    ribbon.dataset.mode=view;
+    ribbon.textContent=view==="live"?
+      "ÉLES CIKK MUNKATERÜLET · Egyeztess Adorján Péterrel és/vagy Halász Péterrel · AZONNALI ÉLES MENTÉS":
+      "PISZKOZAT MUNKATERÜLET · A mentés nem publikálja a cikket";
+  }
+  window.RBTOOLS_PUBLISHED?.sync?.();
+  return true;
+}
+function rbInitAdminViews(){
+  const admin=rbGet("tab-admin");
+  if(!admin)return;
+  const quick=admin.querySelector(".admin-quickguide");
+  if(!quick)return;
+  const guide=document.createElement("div");
+  guide.id="rbtools-adminGuidePage";guide.className="rb-admin-guide";
+  const workspace=document.createElement("div");
+  workspace.id="rbtools-adminSharedWorkspace";workspace.className="rb-admin-workspace";
+  for(const child of Array.from(admin.children)){
+    if(child.classList.contains("rb-admin-subnav")||child.classList.contains("rb-admin-mode-banner"))continue;
+    if(child===quick)guide.appendChild(child);
+    else workspace.appendChild(child);
+  }
+  admin.append(guide,workspace);
+  // Only Blogger status/record selection changes; all editing tools are the SAME nodes.
+  for(const id of ["bloggerDraftSearch","bloggerDraftSelect","bloggerSchedule"])
+    rbGet(id)?.closest(".field")?.classList.add("rb-admin-draft-only");
+  const ribbon=document.createElement("div");
+  ribbon.id="rbtools-adminEditorModeRibbon";ribbon.className="rb-admin-editor-ribbon";
+  workspace.querySelector(".admin-editor-panel")?.before(ribbon);
+  const entry=document.createElement("div");
+  entry.className="rb-admin-guide-intro";
+  entry.innerHTML='<div class="rb-admin-guide-action" data-mode="draft">'+
+    '<h3>1.2 Új bejegyzés / piszkozat</h3>'+
+    '<p>Új cikk indítása, piszkozat megnyitása, képek és WYSIWYG-szerkesztés, mentés publikálás nélkül.</p>'+
+    '<button type="button" data-admin-go="draft">Új bejegyzés vagy piszkozat →</button></div>'+
+    '<div class="rb-admin-guide-action" data-mode="live">'+
+    '<h3>1.3 Éles cikk szerkesztése</h3>'+
+    '<p>Korábban megjelent cikkek keresése és javítása. Előzetes egyeztetés szükséges Adorján Péterrel és/vagy Halász Péterrel.</p>'+
+    '<button type="button" data-admin-go="live">Publikált cikk szerkesztése →</button></div>';
+  guide.prepend(entry);
+  const instructions=quick.querySelector(".admin-quicksteps");
+  if(instructions){
+    const detail=document.createElement("details");
+    detail.className="rb-admin-guide-detail";
+    const label=document.createElement("summary");
+    label.textContent="Részletes Gyorstalpaló: formázás, képek, #nyúz, HTML, Blogger és korrektúra";
+    instructions.before(detail);detail.append(label,instructions);
+  }
+  entry.querySelectorAll("[data-admin-go]").forEach(button=>
+    button.addEventListener("click",()=>rbSetAdminView(button.dataset.adminGo)));
+  admin.querySelectorAll(".rb-admin-subtab").forEach(button=>
+    button.addEventListener("click",()=>rbSetAdminView(button.dataset.adminView)));
+  rbSetAdminView("guide");
+}
 function rbActivateTab(name){
   const btn=RBAPP.querySelector('.tabbtn[data-tab="'+name+'"]'),tab=rbGet("tab-"+name);
   if(!btn||!tab)return;
   RBAPP.querySelectorAll(".tabbtn").forEach(x=>x.classList.remove("active"));
   RBAPP.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
   btn.classList.add("active");tab.classList.add("active");
+  const toolMode=name!=="admin",toggle=rbGet("toolsMenuToggle"),subnav=rbGet("toolsSubnav");
+  if(toggle){
+    toggle.classList.toggle("active",toolMode);
+    toggle.setAttribute("aria-expanded",String(toolMode));
+  }
+  if(subnav)subnav.hidden=!toolMode;
+  if(toolMode)RBAPP.dataset.lastTool=name;
+  else rbSetAdminView("guide");
 }
+rbInitAdminViews();
 RBAPP.querySelectorAll(".tabbtn").forEach(btn=>{
   btn.addEventListener("click",()=>rbActivateTab(btn.dataset.tab));
 });
+rbGet("toolsMenuToggle")?.addEventListener("click",()=>rbActivateTab(RBAPP.dataset.lastTool||"boxed"));
 rbGet("adminHelpLink")?.addEventListener("click",e=>{
   e.preventDefault();rbActivateTab("help");
   requestAnimationFrame(()=>document.getElementById("rbtools-help-cikkadmin")?.scrollIntoView({behavior:"smooth",block:"start"}));
