@@ -251,8 +251,19 @@ function planLivePatch(original,baseline,current,importIssues=[]){
       if(targeted.content!==String(original.content||"")){body.content=targeted.content;mode="surgical";}
       else{mode="already-live";issues=[];} // a visszapótolt link már a publikált cikkben szerepel
       issues=[];
-    }else if(issues.length){body.content=content;mode="unsafe";}
-    else{body.content=content;mode="full";}
+    }else{
+      // A link áthelyezését az egyszerű href-számolás nem veszi észre:
+      // azonos URL másik szóra téve is kockázatos, ha nem tudtuk célzottan átvezetni.
+      const oldLinks=rbTextLinkList(baseline.content||"");
+      const editedLinks=rbTextLinkList(content);
+      const linksDiffer=!oldLinks||!editedLinks||
+        JSON.stringify(oldLinks.map(rbLinkKey))!==JSON.stringify(editedLinks.map(rbLinkKey));
+      const structureDiffer=rbEditorStructureWithoutLinks(baseline.content||"")!==
+        rbEditorStructureWithoutLinks(content);
+      body.content=content;
+      mode=issues.length||linksDiffer||structureDiffer?"unsafe":"full";
+      if(!issues.length&&mode==="unsafe")issues=["A WYSIWYG hivatkozásai vagy HTML-szerkezete megváltozott; nem sikerült biztonságos, célzott cserét bizonyítani."];
+    }
   }
   return {body,bodyChanged,hasChanges:Object.keys(body).length>0,mode,issues,linkUpdates};
 }
