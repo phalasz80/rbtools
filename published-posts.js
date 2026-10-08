@@ -91,21 +91,73 @@ function auditHtml(original,edited,compareText=false){
   return issues;
 }
 function backupChoiceSatisfied(downloaded,acknowledged){return !!downloaded||!!acknowledged;}
+
+function rbTextView(html){
+  if(typeof DOMParser==="undefined")return null;
+  const d=new DOMParser().parseFromString("<main id='rb-original-text'>"+String(html||"")+"</main>","text/html");
+  const root=d.getElementById("rb-original-text");
+  return root?{d,root,text:String(root.textContent||"")}:null;
+}
+function surgicalTextPatch(originalHtml,baselineHtml,currentHtml){
+  const original=rbTextView(originalHtml),baseline=rbTextView(baselineHtml),edited=rbTextView(currentHtml);
+  if(!original||!baseline||!edited||baseline.text===edited.text)return null;
+  const before=baseline.text,after=edited.text,source=String(originalHtml||"");
+  let prefix=0,suffix=0;
+  while(prefix<before.length&&prefix<after.length&&before[prefix]===after[prefix])prefix++;
+  while(suffix<before.length-prefix&&suffix<after.length-prefix&&before[before.length-suffix-1]===after[after.length-suffix-1])suffix++;
+  const oldText=before.slice(prefix,before.length-suffix),newText=after.slice(prefix,after.length-suffix);
+  if(oldText.length>60||newText.length>60||(!oldText&&!newText))return null;
+  let plainOffset=-1;
+  for(const length of [64,48,32,24,16]){
+    const left=before.slice(Math.max(0,prefix-length),prefix);
+    const right=before.slice(prefix+oldText.length,prefix+oldText.length+length);
+    if(left.length+right.length<16)continue;
+    const fragment=left+oldText+right,found=original.text.indexOf(fragment);
+    if(found>=0&&original.text.indexOf(fragment,found+1)<0){plainOffset=found+left.length;break;}
+  }
+  if(plainOffset<0||original.text.slice(plainOffset,plainOffset+oldText.length)!==oldText)return null;
+  const walker=original.d.createTreeWalker(original.root,4);
+  let at=0,node,rawNode=null,inner=0;
+  while((node=walker.nextNode())){
+    const text=String(node.nodeValue||"");
+    if(plainOffset>=at&&plainOffset+oldText.length<=at+text.length){
+      if(!oldText&&plainOffset===at+text.length){at+=text.length;continue;}
+      rawNode=text;inner=plainOffset-at;break;
+    }
+    at+=text.length;
+  }
+  if(!rawNode||rawNode.slice(inner,inner+oldText.length)!==oldText||/[<>]/.test(rawNode))return null;
+  // Only touch one uniquely identified, verbatim text node in the original source.
+  const location=source.indexOf(rawNode);
+  if(location<0||source.indexOf(rawNode,location+1)>=0)return null;
+  const encoded=String(newText).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const patched=source.slice(0,location+inner)+encoded+source.slice(location+inner+oldText.length);
+  const verified=rbTextView(patched);
+  if(!verified||verified.text!==original.text.slice(0,plainOffset)+newText+original.text.slice(plainOffset+oldText.length))return null;
+  if(auditHtml(source,patched,false).length)return null;
+  return {content:patched,oldText,newText};
+}
 function planLivePatch(original,baseline,current,importIssues=[]){
   if(!original||!baseline||!current)throw Error("Nincs betöltött éles Blogger-cikk.");
   const title=String(current.title||"").trim(),content=String(current.content||"");
   if(!title)throw Error("A cikknek nincs címe.");
   if(!content.trim())throw Error("A cikkszöveg nem lehet üres.");
-  const bodyChanged=content!==String(baseline.content||"");
-  if(bodyChanged&&importIssues.length)
-    throw Error("Az eredeti HTML visszatöltésekor eltérés keletkezett, ezért a TÖRZSSZÖVEG éles felülírását letiltottuk: "+importIssues.join("; ")+". A cím és a címkék külön továbbra is menthetők.");
-  const body={};
+  const bodyChanged=content!==String(baseline.content||""),body={};
   if(title!==String(original.title||""))body.title=title;
   if(!equalLabels(current.labels,original.labels))body.labels=normalizeLabels(current.labels);
-  if(bodyChanged)body.content=content;
-  return {body,bodyChanged,hasChanges:Object.keys(body).length>0};
+  let mode="metadata",issues=[];
+  if(bodyChanged){
+    issues=[...new Set([...(importIssues||[]),...auditHtml(original.content||"",content,false)])];
+    if(issues.length){
+      const small=surgicalTextPatch(original.content||"",baseline.content||"",content);
+      if(small){body.content=small.content;mode="surgical";issues=[];}
+      else{body.content=content;mode="unsafe";}
+    }else{body.content=content;mode="full";}
+  }
+  return {body,bodyChanged,hasChanges:Object.keys(body).length>0,mode,issues};
 }
-const core={postPath,listParams,searchParams,searchLocalFilter,sameRemote,equalLabels,auditHtml,backupChoiceSatisfied,planLivePatch};
+
+const core={postPath,listParams,searchParams,searchLocalFilter,sameRemote,equalLabels,auditHtml,backupChoiceSatisfied,planLivePatch,surgicalTextPatch};
 if(typeof module==="object"&&module.exports)module.exports=core;
 root.RBTOOLS_PUBLISHED_CORE=core;
 if(!root.document||!root.RBTOOLS_PUBLISHED_BRIDGE)return;
@@ -175,6 +227,28 @@ function setupPublishedUi(){
     jump.addEventListener("click",()=>saveSection.scrollIntoView({behavior:"smooth",block:"center"}));
     panel.querySelector(".published-status")?.after(jump);
   }
+
+  const dialog=doc.createElement("dialog");
+  dialog.id="rbtools-publishedUnsafeDialog";
+  dialog.style.cssText="width:min(720px,95vw);max-height:90vh;overflow:auto;border:2px solid #ac2435;border-radius:12px;background:var(--panel,#fff);color:var(--ink,#111);padding:22px;box-shadow:0 24px 70px #0008";
+  dialog.setAttribute("aria-labelledby","rbtools-publishedUnsafeTitle");
+  dialog.innerHTML=`
+    <h2 id="rbtools-publishedUnsafeTitle" style="margin:0;color:#b92335">FIGYELEM: az éles cikk teljes HTML-jének felülírása!</h2>
+    <p>Az eredeti bejegyzés és a WYSIWYG HTML-je eltér. Ha jóváhagyod a felülírást, <strong>korábbi hivatkozások, szövegrészek, képek vagy speciális HTML-elemek eltűnhetnek</strong> a nyilvános cikkből.</p>
+    <p id="rbtools-publishedUnsafePost" style="font-weight:750;overflow-wrap:anywhere"></p>
+    <strong>Észlelt különbségek:</strong>
+    <ul id="rbtools-publishedUnsafeIssues" style="padding-left:24px;max-height:170px;overflow:auto"></ul>
+    <p>Javaslat: nézd át a szerkesztő alatt az eredeti és módosított HTML-t. Az eredeti HTML letöltése, vagy a letöltésről való lemondás <em>külön</em> korábbi biztonsági lépés.</p>
+    <label style="display:flex;gap:10px;align-items:flex-start;border:1px solid #b92335;border-radius:8px;padding:11px;line-height:1.5">
+      <input id="rbtools-publishedUnsafeAck" type="checkbox" style="flex-shrink:0;margin-top:4px">
+      <span><strong>Igen, tutira ezt akarom.</strong> Megértettem, hogy ez a teljes HTML-t felülíró ÉLES frissítés, azonnal látható lesz, és az eredeti tartalom egyes elemei elveszhetnek.</span>
+    </label>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:18px">
+      <button id="rbtools-publishedUnsafeCancel" type="button">Mégse, ne változzon semmi</button>
+      <button id="rbtools-publishedUnsafeApprove" type="button" disabled style="background:#a82435;color:white;font-weight:800">Igen, jóváhagyom az ÉLES felülírást</button>
+    </div>
+  `;
+  doc.querySelector("#rbtools-tab-admin").appendChild(dialog);
 }
 setupPublishedUi();
 const state={items:[],pageTokens:[""],next:"",live:null,backup:false,saving:false,uncertain:false,
@@ -311,9 +385,12 @@ function sync(){
     badge.textContent="ÉLES MÓDOSÍTÁS · biztonsági döntés szükséges";badge.dataset.state="warn";
     if(advice)advice.textContent="Módosítás észlelve"+(plan?.bodyChanged?" a cikkszövegben.":" a címben vagy címkékben.")+" A piros éles mentőgombhoz töltsd le az eredeti HTML-t, vagy jelöld be a kockázatvállalást.";
   }else{
-    badge.textContent="ÉLES MÓDOSÍTÁS · menthető";badge.dataset.state="warn";
+    badge.textContent=plan?.mode==="unsafe"?"TELJES HTML-CSERE · KÜLÖN MEGERŐSÍTÉS":plan?.mode==="surgical"?"CÉLZOTT SZÖVEGJAVÍTÁS · MENTHETŐ":"ÉLES MÓDOSÍTÁS · menthető";
+    badge.dataset.state=plan?.mode==="unsafe"?"danger":"warn";
     if(advice)advice.textContent=state.saving?"Blogger-mentés és visszaellenőrzés folyamatban…":
-      "Mentésre kész. A piros „PUBLIKÁLT CIKK ÉLES FRISSÍTÉSE” gomb a meglévő cikket frissíti, nem új bejegyzést hoz létre.";
+      plan?.mode==="unsafe"?"A WYSIWYG nem őrzött meg mindent az eredeti HTML-ből. Mentéskor további párbeszédablak sorolja fel az eltéréseket; külön jelölőnégyzet és jóváhagyás kell az éles felülíráshoz.":
+      plan?.mode==="surgical"?"A szövegjavítás az eredeti HTML-ben egyértelműen azonosítható. Csak a javított karakterek kerülnek át, a többi HTML változatlan.":
+      "Mentésre kész. A piros mentés a meglévő cikket frissíti, nem új bejegyzést hoz létre.";
   }
 }
 async function requestList(token=""){
@@ -421,6 +498,28 @@ function downloadBackup(){
   el("publishedBackupInfo").textContent="Az eredeti HTML letöltése kezdeményezve. Mentéshez őrizd meg a fájlt.";
   sync();
 }
+
+function confirmUnsafeOverwrite(plan,live){
+  return new Promise(resolve=>{
+    const dialog=el("publishedUnsafeDialog"),ack=el("publishedUnsafeAck"),yes=el("publishedUnsafeApprove"),no=el("publishedUnsafeCancel");
+    const list=el("publishedUnsafeIssues");list.replaceChildren();
+    for(const issue of plan.issues.slice(0,20)){
+      const li=doc.createElement("li");li.textContent=issue;list.appendChild(li);
+    }
+    el("publishedUnsafePost").textContent=String(live.source.title||"")+" · "+String(live.source.url||"");
+    ack.checked=false;yes.disabled=true;dialog.returnValue="";
+    ack.onchange=()=>{yes.disabled=!ack.checked;};
+    yes.onclick=()=>{if(ack.checked)dialog.close("approved");};
+    no.onclick=()=>dialog.close("cancel");
+    dialog.addEventListener("close",()=>{
+      const permitted=dialog.returnValue==="approved"&&ack.checked;
+      ack.onchange=null;yes.onclick=null;no.onclick=null;ack.checked=false;yes.disabled=true;
+      resolve(permitted);
+    },{once:true});
+    try{dialog.showModal();}catch(e){resolve(false);}
+  });
+}
+
 async function saveLive(){
   const live=state.live;
   if(!live||state.saving||state.uncertain)return;
@@ -436,13 +535,15 @@ async function saveLive(){
     plan=planLivePatch(live.source,live.editor,sent,live.issues);
     if(!plan.hasChanges)return report("Nincs új módosítás.","info");
   }catch(e){return report("Éles mentés tiltva: "+e.message,"error");}
-  if(plan.bodyChanged){
-    const problems=updateComparison();
-    if(problems.length)return report("A cikk HTML-jének éles mentése blokkolva: "+problems.join("; "),"error");
-  }
+  if(plan.bodyChanged)updateComparison();
+  if(plan.mode==="unsafe"&&!await confirmUnsafeOverwrite(plan,live))
+    return report("A teljes HTML-felülírás megszakítva. Az éles cikk nem változott.","info");
+  if(live!==state.live||!bridge.sameEditor(sent,bridge.snapshot()))
+    return report("A jóváhagyás közben másik cikkre váltottál vagy megváltozott a szerkesztett tartalom. Mentés megszakítva.","error");
   if(!root.confirm("ÉLES REGIONALBAHN-CIKK FRISSÍTÉSE\n\n"+
     live.source.title+"\n"+live.source.url+"\n\n"+
     "A mentés AZONNAL módosítja a nyilvános cikket.\n"+
+    (plan.mode==="surgical"?"Csak az eredeti HTML-ben azonosított szövegjavítás kerül elmentésre.\n":plan.mode==="unsafe"?"TELJES, KÜLÖN JÓVÁHAGYOTT HTML-FELÜLÍRÁS: korábbi elemek elveszhetnek!\n":"")+
     (waived?"KIFEJEZETTEN MELLŐZÖD az eredeti HTML biztonsági másolatának letöltését. Ez kockázatos.\n":"Az eredeti HTML letöltését választottad. Őrizd meg a fájlt.\n")+
     "A szerkesztést előzetesen egyeztetni kell Adorján Péterrel és/vagy Halász Péterrel.\n\n"+
     "Csak a cím, HTML és címkék módosulnak. Biztosan folytatod?"))return;
@@ -468,13 +569,13 @@ async function saveLive(){
       throw Error("A Blogger módosította a címet, HTML-t, címkéket, URL-t, dátumot vagy állapotot. Az éles eredményt kézzel ellenőrizni kell.");
     }
     live.source=verified;live.editor=sent;
-    // A régi HTML importálási kockázata csak tényleges, ellenőrzött törzsszöveg-csere után szűnhet meg.
-    if(plan.bodyChanged)live.issues=[];
+    // A célzott javítás megtartja a régi linkeket; az importprobléma ezért a WYSIWYG-ben továbbra is jelezhető.
+    live.issues=auditHtml(verified.content||"",sent.content||"",true);
     state.backup=false;
     el("publishedRiskAck").checked=false;
     bridge.markVerified(verified,sent);
     el("publishedBackupInfo").textContent="Sikeresen frissítve. Újabb éles mentéshez ismét töltsd le az eredeti HTML-t, vagy vállald külön a kockázatot.";
-    updateComparison();report("ÉLES CIKK SIKERESEN FRISSÍTVE. Eredeti URL és publikálási dátum megőrizve.","ok");
+    updateComparison();report((plan.mode==="surgical"?"BIZTONSÁGOS SZÖVEGJAVÍTÁS: az eredeti HTML többi része megmaradt. ":plan.mode==="unsafe"?"KÜLÖN JÓVÁHAGYOTT TELJES HTML-FELÜLÍRÁS. ":"")+"ÉLES CIKK SIKERESEN FRISSÍTVE. URL és publikálási dátum megőrizve.","ok");
   }catch(e){
     if(patchAttempted){state.uncertain=true;report("FIGYELEM: a Blogger-frissítés megtörténhetett! "+e.message+" Nyisd meg újra a cikket, mielőtt tovább dolgozol.","error");}
     else report("A mentés elmaradt: "+e.message,"error");
