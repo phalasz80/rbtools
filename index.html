@@ -163,6 +163,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,'Segoe U
       <li><strong>Mentés:</strong> a <strong>Mentés Blogger-piszkozatba</strong> új draftot készít vagy ugyanazt a post ID-t frissíti. Minden normál draftmentés után az időzítési mező biztonsági alapértéke <strong>2049. 12. 31. 23:59</strong>. Ezt a mezőt ne írd át: az időzítést az illetékes szerkesztő a Blogger felületén végzi. Azonnali publikálás nincs.<br><br><strong style="color:#ff0000;">Az időzítés mindig az illetékes szerkesztő feladata a Blogger felületén, így időzítést ezen a felületen nem kell beállítani. Ha bármi kérdésed van, hogy mikor megy ki a cikked, fordulj Adorján Péterhez vagy Halász Péterhez!</strong></li>
       <li><strong>Statikus oldal:</strong> a kész HTML-t másold a Blogger oldal HTML-nézetébe. Választható évválasztó gombsoros vagy egyszerű, ömlesztett sablon.</li>
       <li>A széles <strong>állapotsáv</strong> mindig jelzi, hogy éppen betöltés, mentés, sikeres művelet, figyelmeztetés vagy hiba történt.</li>
+      <li><strong>Szöveg és link pótlása együtt:</strong> a WYSIWYG-ben visszaállított hivatkozás az apró szövegjavítással együtt célzottan menthető. Ha a link az eredeti cikkben már szerepel, megmarad és nem duplázódik; ha új és egyértelmű, az RBTools csak az érintett szövegrészt linkeli. Más HTML-eltérés esetén külön, jelölőnégyzetes éles felülírási jóváhagyás szükséges.</li>
       <li><strong>Éles cikk javítása:</strong> ha a WYSIWYG régi HTML-részeket nem tud veszteségmentesen visszaolvasni, a biztosan beazonosítható apró szövegjavítást az RBTools az EREDETI HTML-ben vezeti át. A többi link és képkód változatlan marad. Ha ez nem lehetséges, külön <strong>jelölőnégyzetes éles felülírási ablak</strong> mutatja az eltéréseket. Csak a pipa, az éles jóváhagyás és a végső megerősítés után történhet teljes HTML-csere. A Mégse nem küld Blogger-módosítást.</li>
     </ol>
 
@@ -1464,6 +1465,7 @@ A következő cikk rövid ajánlója.</pre>
     <p><strong>Szerkesztőségi korlátozás, nem API-tilalom:</strong> az első publikálás és az időzítés technikailag API-ból is lehetséges, de a RegionalBahn belső munkarendje szerint a Bloggerben történik az illetékes szerkesztő által. Az RBToolsban a már publikált cikk célzott javítása külön, védett funkció.</p>
     <p><strong>Képlinkek egyszerű cseréje:</strong> jobb kattintás a WYSIWYG-képen vagy a leadkép miniatűrjén → Kép URL-jeinek cseréje; illetve a Képtár megfelelő gombja. Google/Blogger-képlinknél a felismerhető <code>/s1920/</code> vagy más méretszegmens átírható <code>/s600/</code> és <code>/s200/</code> méretre. Nem támogatott képszolgáltatónál a kis és a nagy URL-t külön add meg. A képaláírás, kredit és fotósnév változatlan marad; a kép valamennyi előfordulása frissül.</p>
     <p>Elsődleges dokumentáció: <a href="https://developers.google.com/blogger/docs/3.0/reference/" target="_blank" rel="noopener">Blogger API v3 referencia ↗</a> és <a href="https://developers.google.com/blogger/docs/3.0/using" target="_blank" rel="noopener">Bejegyzések és PATCH-frissítés ↗</a>.</p>
+    <p><strong>Szöveg- és hivatkozásjavítás:</strong> a WYSIWYG-ben utólag helyreállított linket az RBTools összeveti az eredeti Blogger-HTML-lel. Ha már benne van, csak megőrzi; ha egyértelműen új, célzottan szúrja be. Ez az egyedi, rövid szövegjavítással együtt is használható. A mentés megerősítésekor az érintett linkszöveg és URL is megjelenik. Kétes linkelhelyezés, linktörlés vagy egyéb HTML-szerkezeti változás esetén a külön jelölőnégyzetes teljes felülírási jóváhagyás lép életbe.</p>
     <p><strong>Régi éles cikk célzott javítása:</strong> az RBTools a WYSIWYG-ben elvégzett rövid szövegjavítást először az eredeti, Bloggerből letöltött HTML-ben próbálja meg egyértelműen beazonosítani, és csak ott módosítja. Ezzel elkerülhető, hogy egy hibásan importált linket vagy egyedi HTML-blokkot véletlenül kitöröljön. Nem egyértelmű módosításnál az RBTools külön párbeszédablakban tételesen felsorolja a lehetséges veszteségeket. Teljes felülírás csak az önálló kockázatvállaló jelölőnégyzet, az éles jóváhagyás és az utolsó mentési megerősítés után történik. A Mégse nem módosítja a Bloggerben szereplő bejegyzést.</p>
     <h3>23. Statikus oldalak</h3>
     <p>Statikus módot akkor válassz, ha nem bejegyzést, hanem Blogger <strong>Oldalt</strong> szerkesztesz. Három induló forma van:</p>
@@ -2252,7 +2254,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v64";
+const RBTOOLS_VERSION="pages-v65";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 const CORRECTOR=window.RBTOOLS_CORRECTOR;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
@@ -6951,7 +6953,7 @@ window.RBTOOLS_PAGE_BRIDGE=Object.freeze({
 
 })();
 </script>
-<script src="/published-posts.js?v=64"></script>
+<script src="/published-posts.js?v=65"></script>
 <script src="/collection-page-core.js?v=42"></script>
 <script src="/archive-presets.js?v=42"></script>
 <script src="/page-starters.js?v=42"></script>
