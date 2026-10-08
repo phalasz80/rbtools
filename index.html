@@ -339,7 +339,7 @@ További szöveg..."></textarea>
   <div class="panel admin-editor-panel">
     <div class="admin-section-head">
       <div>
-        <h2 style="margin:0">4. Vizuális cikkszerkesztő</h2>
+        <h2 style="margin:0">Vizuális cikkszerkesztő</h2>
         <p class="small" style="margin:3px 0 0">Szöveget szabadon kijelölhetsz és formázhatsz, a kijelölésen jobb kattintással helyi formázómenüt is kapsz (Shift + jobb kattintás: böngészőmenü). Az eszköztár a cikkszöveg felett marad. A blokkok csak a jobb oldali ⠿ fogantyúnál húzhatók, a kék beszúrási sávokra pedig kép vagy blokk dobható. A szerkesztő függőlegesen átméretezhető az alsó pereménél.</p>
       </div>
       <div class="toolbar" style="margin:0">
@@ -2147,13 +2147,45 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .rb-admin-mode-banner{padding:12px;border-left-width:6px}
 #rbtools-app .rb-admin-mode-banner strong{font-size:15px}
 }
+
+/* RBTools v62: a szövegimport, a képtár és a HTML-műveletek a WYSIWYG részei. */
+#rbtools-app .rb-editor-integrated-tool{margin:12px 0;border:1px solid var(--line);border-radius:10px;background:var(--panel2);overflow:hidden}
+#rbtools-app .rb-editor-integrated-tool>summary{cursor:pointer;padding:13px 15px;font-weight:750;line-height:1.5;list-style-position:inside}
+#rbtools-app .rb-editor-integrated-tool>summary:hover{background:var(--soft)}
+#rbtools-app .rb-editor-integrated-tool[open]>summary{border-bottom:1px solid var(--line)}
+#rbtools-app .rb-editor-integrated-tool>.card{margin:10px 12px 12px;background:var(--panel)}
+#rbtools-app .rb-editor-integrated-help{margin:9px 13px}
+#rbtools-app .rb-editor-text-import{margin:12px 0}
+#rbtools-app .rb-editor-text-import .admin-source{min-height:190px}
+#rbtools-app .rb-editor-text-import #rbtools-adminBuild{font-weight:800}
+#rbtools-app .rb-editor-media{margin:12px 0 14px}
+#rbtools-app .rb-editor-media>.admin-library-card{margin:10px 12px 12px}
+#rbtools-app .rb-editor-media .admin-image-library{max-height:600px;overflow:auto}
+#rbtools-app .rb-editor-media>.rb-editor-image-import{margin:10px 12px}
+#rbtools-app .rb-editor-image-import .admin-source{min-height:140px}
+#rbtools-app .rb-editor-html-hub{margin-top:15px;padding:15px}
+#rbtools-app .rb-editor-html-heading h2{margin:0 0 7px;font-size:18px}
+#rbtools-app .rb-editor-html-heading p{margin:0 0 10px}
+#rbtools-app .rb-editor-html-actions{margin:10px 0 13px}
+#rbtools-app .rb-editor-html-import{margin:10px 0;border:1px solid var(--line);border-radius:10px;background:var(--panel2);padding:0}
+#rbtools-app .rb-editor-html-import>summary{cursor:pointer;padding:13px 15px;font-weight:750}
+#rbtools-app .rb-editor-html-import[open]{padding-bottom:13px}
+#rbtools-app .rb-editor-html-import[open]>:not(summary){margin-left:13px;margin-right:13px}
+#rbtools-app .rb-editor-html-output .admin-output-card{margin:10px 12px 12px}
+#rbtools-app .rb-editor-html-output textarea{min-height:260px}
+@media(max-width:650px){
+  #rbtools-app .rb-editor-integrated-tool>summary{padding:11px}
+  #rbtools-app .rb-editor-integrated-tool>.card{margin:7px}
+  #rbtools-app .rb-editor-html-hub{padding:11px}
+  #rbtools-app .rb-editor-media .admin-image-library{max-height:460px}
+}
 </style>
 <script src="/live-timeline.js?v=59"></script>
 <script src="/corrector-core.js?v=59"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v61";
+const RBTOOLS_VERSION="pages-v62";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 const CORRECTOR=window.RBTOOLS_CORRECTOR;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
@@ -2251,6 +2283,98 @@ function rbSetAdminView(view){
   window.RBTOOLS_PUBLISHED?.sync?.();
   return true;
 }
+
+function rbIntegrateEditorTools(workspace){
+  // A DOM-elemeket helyezzük át, nem másoljuk le: ID-k, eseménykezelők és WYSIWYG-állapot azonos marad.
+  const editor=workspace.querySelector(".admin-editor-panel");
+  const importGrid=workspace.querySelector(".admin-import-grid");
+  const originalCards=importGrid?Array.from(importGrid.children).filter(node=>node.classList.contains("card")):[];
+  const textCard=originalCards[0],imageInputCard=originalCards[1];
+  const imageGallery=workspace.querySelector(".admin-library-card");
+  const existingHtml=workspace.querySelector(".admin-reimport");
+  const outputCard=workspace.querySelector(".admin-output-card");
+  const canvas=rbGet("adminCanvas");
+  const formatbar=editor?.querySelector(".admin-format-shell");
+  if(!editor||!importGrid||!textCard||!imageInputCard||!imageGallery||!existingHtml||!outputCard||!canvas||!formatbar){
+    console.warn("RBTools: a közös WYSIWYG integrálásához hiányzik egy eredeti panel.");
+    return false;
+  }
+  const makeDetails=(className,title,description)=>{
+    const details=document.createElement("details");
+    details.className="rb-editor-integrated-tool "+className;
+    const summary=document.createElement("summary");
+    summary.textContent=title;
+    details.appendChild(summary);
+    if(description){
+      const p=document.createElement("p");
+      p.className="small rb-editor-integrated-help";
+      p.textContent=description;
+      details.appendChild(p);
+    }
+    return details;
+  };
+
+  // Szövegimport és konvertálás közvetlenül a szerkesztő eszköztára mellett.
+  const textDetails=makeDetails("rb-editor-text-import",
+    "Szövegimport és konvertálás (TXT / Markdown / DOCX / ODT / RTF)",
+    "Opcionális kiinduló szöveg. Az itt létrehozott tartalmat a Cikk felépítése gomb helyezi át a WYSIWYG-be.");
+  const textHeading=textCard.querySelector(".cardhead");
+  if(textHeading)textHeading.textContent="Beolvasandó vagy konvertálandó cikkszöveg";
+  const buildButton=rbGet("adminBuild");
+  const textToolbar=textCard.querySelector(".toolbar");
+  if(buildButton&&textToolbar)textToolbar.appendChild(buildButton);
+  textDetails.appendChild(textCard);
+  editor.insertBefore(textDetails,formatbar);
+
+  // A képtár most magának a WYSIWYG-nek a része, közvetlenül a szerkesztővászon előtt.
+  const galleryDetails=makeDetails("rb-editor-media",
+    "Képtár: képek, képaláírások és beszúrás",
+    "A kép miniatűrjét fogd meg, és húzd a WYSIWYG kék beszúrási sávjára. A képaláírások és az ALT/kredit adatok itt maradnak szerkeszthetők.");
+  galleryDetails.open=true;
+  const imageInputDetails=makeDetails("rb-editor-image-import",
+    "Képek beolvasása Blogger HTML-ből",
+    "Illeszd ide a Bloggerben feltöltött képek kódját, vagy válassz HTML-fájlt. A képek a Képtárba kerülnek.");
+  const imageInputHeading=imageInputCard.querySelector(".cardhead");
+  if(imageInputHeading)imageInputHeading.textContent="Blogger-képkódok beolvasása";
+  imageInputDetails.appendChild(imageInputCard);
+  galleryDetails.appendChild(imageInputDetails);
+  const galleryHeading=imageGallery.querySelector(".cardhead span");
+  if(galleryHeading)galleryHeading.textContent="A szerkesztő képtára";
+  galleryDetails.appendChild(imageGallery);
+  editor.insertBefore(galleryDetails,canvas);
+
+  // HTML-mentés, forrásmegtekintés és korábbi HTML visszatöltése a WYSIWYG ALATT.
+  const htmlHub=document.createElement("section");
+  htmlHub.className="panel rb-editor-html-hub";
+  htmlHub.setAttribute("aria-label","HTML mentése és visszatöltése");
+  const header=document.createElement("div");
+  header.className="rb-editor-html-heading";
+  header.innerHTML="<h2>HTML mentése és visszatöltése</h2>"+
+    '<p class="small">A WYSIWYG alatti forrásműveletek. A HTML-fájl helyi mentése nem azonos a Blogger-piszkozat vagy az éles cikk mentésével.</p>';
+  htmlHub.appendChild(header);
+  const actions=document.createElement("div");
+  actions.className="toolbar rb-editor-html-actions";
+  for(const id of ["adminCopyTitle","adminCopyHtml","adminDownload"]){
+    const button=rbGet(id);
+    if(button)actions.appendChild(button);
+  }
+  htmlHub.appendChild(actions);
+  existingHtml.classList.add("rb-editor-html-import");
+  const reloadSummary=existingHtml.querySelector("summary");
+  if(reloadSummary)reloadSummary.textContent="Meglévő HTML-fájl vagy forrás visszatöltése a WYSIWYG-be";
+  htmlHub.appendChild(existingHtml);
+  const sourceDetails=makeDetails("rb-editor-html-output",
+    "Generált Blogger HTML megtekintése / kimásolása",
+    "A végleges kód a WYSIWYG-szerkesztéssel együtt frissül. A fenti gombokkal menthető vagy másolható.");
+  const outputHeading=outputCard.querySelector(".cardhead span");
+  if(outputHeading)outputHeading.textContent="Végleges Blogger HTML";
+  sourceDetails.appendChild(outputCard);
+  htmlHub.appendChild(sourceDetails);
+  editor.after(htmlHub);
+  importGrid.remove();
+  return true;
+}
+
 function rbInitAdminViews(){
   const admin=rbGet("tab-admin");
   if(!admin)return;
@@ -2266,6 +2390,7 @@ function rbInitAdminViews(){
     else workspace.appendChild(child);
   }
   admin.append(guide,workspace);
+  rbIntegrateEditorTools(workspace);
   // Only Blogger status/record selection changes; all editing tools are the SAME nodes.
   for(const id of ["bloggerDraftSearch","bloggerDraftSelect","bloggerSchedule"])
     rbGet(id)?.closest(".field")?.classList.add("rb-admin-draft-only");
