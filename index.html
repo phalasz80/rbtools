@@ -164,6 +164,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,'Segoe U
       <li><strong>Statikus oldal:</strong> a kész HTML-t másold a Blogger oldal HTML-nézetébe. Választható évválasztó gombsoros vagy egyszerű, ömlesztett sablon.</li>
       <li>A széles <strong>állapotsáv</strong> mindig jelzi, hogy éppen betöltés, mentés, sikeres művelet, figyelmeztetés vagy hiba történt.</li>
       <li><strong>Szöveg és link pótlása együtt:</strong> a WYSIWYG-ben visszaállított hivatkozás az apró szövegjavítással együtt célzottan menthető. Ha a link az eredeti cikkben már szerepel, megmarad és nem duplázódik; ha új és egyértelmű, az RBTools csak az érintett szövegrészt linkeli. Más HTML-eltérés esetén külön, jelölőnégyzetes éles felülírási jóváhagyás szükséges.</li>
+      <li><strong>Éles mentés jóváhagyása:</strong> a publikált cikk bármely változtatása esetén a mentőgomb megnyitja a kötelező jóváhagyó ablakot. Ebben a szerkesztőségi egyeztetés, szükség esetén a veszteséges HTML-felülírás, valamint a biztonsági másolat letöltése vagy mellőzése külön nyilatkozattal kezelhető. A Mégse semmit nem módosít.</li>
       <li><strong>Éles cikk javítása:</strong> ha a WYSIWYG régi HTML-részeket nem tud veszteségmentesen visszaolvasni, a biztosan beazonosítható apró szövegjavítást az RBTools az EREDETI HTML-ben vezeti át. A többi link és képkód változatlan marad. Ha ez nem lehetséges, külön <strong>jelölőnégyzetes éles felülírási ablak</strong> mutatja az eltéréseket. Csak a pipa, az éles jóváhagyás és a végső megerősítés után történhet teljes HTML-csere. A Mégse nem küld Blogger-módosítást.</li>
     </ol>
 
@@ -275,7 +276,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,'Segoe U
       <div class="published-save-section">
         <strong>Védett éles mentés</strong>
         <p class="small">Mentés előtt kötelező az eredeti HTML letöltése. Az éles frissítés külön megerősítést kér, ellenőrzi a Blogger változásait, és nem vonja vissza a publikálást.</p>
-        <div class="toolbar"><button id="rbtools-publishedBackup" type="button" disabled>⇩ Eredeti HTML mentése</button><button id="rbtools-publishedCompare" type="button" disabled>≠ HTML összevetése</button><button id="rbtools-publishedSave" type="button" class="published-save-button" disabled>⚠ PUBLIKÁLT CIKK ÉLES FRISSÍTÉSE</button></div>
+        <div class="toolbar"><button id="rbtools-publishedBackup" type="button" disabled>⇩ Eredeti HTML mentése</button><button id="rbtools-publishedCompare" type="button" disabled>≠ HTML összevetése</button><button id="rbtools-publishedSave" type="button" class="published-save-button" disabled>⚠ ÉLES FRISSÍTÉS ÁTTEKINTÉSE ÉS JÓVÁHAGYÁSA</button></div>
         <p id="rbtools-publishedBackupInfo" class="small"></p>
         <details><summary>Eredeti és szerkesztett HTML összehasonlítása</summary><p class="small" id="rbtools-publishedDiffInfo">Nyiss meg egy publikált cikket.</p><div class="grid2"><div class="field"><label for="rbtools-publishedSource">Eredeti HTML</label><textarea id="rbtools-publishedSource" rows="10" readonly spellcheck="false"></textarea></div><div class="field"><label for="rbtools-publishedEdited">Szerkesztett HTML</label><textarea id="rbtools-publishedEdited" rows="10" readonly spellcheck="false"></textarea></div></div></details>
       </div>
@@ -2254,7 +2255,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v65";
+const RBTOOLS_VERSION="pages-v66";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 const CORRECTOR=window.RBTOOLS_CORRECTOR;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
@@ -6953,7 +6954,7 @@ window.RBTOOLS_PAGE_BRIDGE=Object.freeze({
 
 })();
 </script>
-<script src="/published-posts.js?v=65b"></script>
+<script src="/published-posts.js?v=66"></script>
 <script src="/collection-page-core.js?v=42"></script>
 <script src="/archive-presets.js?v=42"></script>
 <script src="/page-starters.js?v=42"></script>
