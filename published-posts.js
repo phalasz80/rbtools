@@ -237,11 +237,23 @@ function surgicalRichPatch(originalHtml,baselineHtml,currentHtml){
 function planLivePatch(original,baseline,current,importIssues=[]){
   if(!original||!baseline||!current)throw Error("Nincs betöltött éles Blogger-cikk.");
   const title=String(current.title||"").trim(),content=String(current.content||"");
-  const bodyChanged=content!==String(baseline.content||""),body={};
+  const editedSinceLoad=content!==String(baseline.content||""),body={};
   if(title!==String(original.title||""))body.title=title;
   if(!equalLabels(current.labels,original.labels))body.labels=normalizeLabels(current.labels);
+  // A pusztán címet/címkét érintő módosítás ne írja felül a Blogger eredeti HTML-jét.
+  // Az alapértelmezett WYSIWYG-betöltés közben létrejött különbség is élesíthető,
+  // de csak kifejezett, teljes HTML-felülírási jóváhagyással.
+  const importOnly=!editedSinceLoad&&Object.keys(body).length===0&&
+    content!==String(original.content||"");
+  const bodyChanged=editedSinceLoad||importOnly;
   let mode="metadata",issues=[],linkUpdates=[];
-  if(bodyChanged){
+  if(importOnly){
+    body.content=content;mode="unsafe";
+    issues=[...new Set([...(importIssues||[]),...auditHtml(original.content||"",content,true)])];
+    issues.unshift("A WYSIWYG már a betöltéskor megváltoztatta az eredeti HTML-t ("+
+      String(original.content||"").length+" → "+content.length+
+      " karakter). Tudatos teljes felülíráskor a régi linkek vagy HTML-elemek elveszhetnek.");
+  }else if(editedSinceLoad){
     issues=[...new Set([...(importIssues||[]),...auditHtml(original.content||"",content,false)])];
     const targeted=surgicalRichPatch(original.content||"",baseline.content||"",content);
     if(targeted){
@@ -264,15 +276,18 @@ function planLivePatch(original,baseline,current,importIssues=[]){
     }
   }
   if(!title||!content.trim()){mode="unsafe";issues.push(!title?"Figyelem: a cím üres.":"Figyelem: a cikkszöveg üres, a teljes éles tartalom eltűnhet.");}
-  return {body,bodyChanged,hasChanges:Object.keys(body).length>0,mode,issues,linkUpdates};
+  return {body,bodyChanged,hasChanges:Object.keys(body).length>0,mode,issues,linkUpdates,importOnly};
 }
 function fallbackLivePlan(original,baseline,current,error){
   const body={},title=String(current?.title??"").trim(),content=String(current?.content??"");
   if(title!==String(original?.title??""))body.title=title;
   if(!equalLabels(current?.labels,original?.labels))body.labels=normalizeLabels(current?.labels);
-  if(content!==String(baseline?.content??""))body.content=content;
+  const editedSinceLoad=content!==String(baseline?.content??"");
+  const importOnly=!editedSinceLoad&&Object.keys(body).length===0&&content!==String(original?.content??"");
+  if(editedSinceLoad||importOnly)body.content=content;
   return {body,bodyChanged:Object.hasOwn(body,"content"),hasChanges:Object.keys(body).length>0,mode:"unsafe",
-    issues:["Az automatikus HTML-vizsgálat hibája: "+String(error?.message||error)+"; csak tudatos teljes felülírás lehetséges."],linkUpdates:[]};
+    issues:["Az automatikus HTML-vizsgálat hibája: "+String(error?.message||error)+"; csak tudatos teljes felülírás lehetséges."],
+    linkUpdates:[],importOnly};
 }
 function approvedLive(ack,unsafeMode,unsafeAck,backupExists,backupAck){
   return !!ack&&(!unsafeMode||!!unsafeAck)&&(!!backupExists||!!backupAck);
@@ -489,7 +504,9 @@ function sync(){
     catch(error){planError=error.message||String(error);}
   }
   const backupReady=backupChoiceSatisfied(state.backup,el("publishedRiskAck").checked);
-  const canSave=!!connected&&!!isCurrent&&(!!dirty||!!plan?.hasChanges)&&!state.saving&&!state.uncertain;
+  // Ha az eredeti HTML eltér az aktuális WYSIWYG-kimenettől, akkor az éles,
+  // kockázatvállaló felülírás a betöltés UTÁNI billentyűleütés nélkül is elérhető.
+  const canSave=!!connected&&!!isCurrent&&(!!plan?.hasChanges||!!planError&&!!dirty)&&!state.saving&&!state.uncertain;
   const revert=el("bloggerRevertPost");if(revert&&isCurrent)revert.disabled=true;
   el("publishedBackup").disabled=!isCurrent||state.saving;
   el("publishedRiskAck").disabled=!isCurrent||state.saving||state.uncertain;
@@ -511,19 +528,23 @@ function sync(){
   }else if(planError){
     badge.textContent="ÉLES VÁLTOZÁS · TELJES JÓVÁHAGYÁSSAL";badge.dataset.state="danger";
     if(advice)advice.textContent="HTML-ellenőrzési hiba: "+planError+". A mentőgomb a külön kockázatvállaló ablakban engedélyezi a teljes felülírást.";
-  }else if(!dirty||!plan?.hasChanges){
+  }else if(!plan?.hasChanges){
     badge.textContent=plan?.mode==="already-live"?"A PÓTOLT LINK MÁR MEGVAN AZ ÉLES CIKKBEN":"PUBLIKÁLT CIKK · nincs új változás";badge.dataset.state="ok";
     if(advice)advice.textContent=plan?.mode==="already-live"?
       "Az ismét beállított hivatkozás az eredeti Blogger-cikkben már szerepel. Nem kell ugyanazt újra publikálni. Ha további szövegjavítást is végzel, azt célzottan mentheted.":
       "Nincs mentendő változás. Ha a WYSIWYG-ben szerkesztettél, az éles mentés itt, a szerkesztő alján jelenik meg.";
   }else if(!backupReady){
-    badge.textContent="ÉLES MÓDOSÍTÁS · biztonsági döntés szükséges";badge.dataset.state="warn";
-    if(advice)advice.textContent="A mentési jóváhagyó ablak azonnal megnyitható: ott töltheted le az eredeti HTML-t, vagy jelölőnégyzettel vállalhatod a letöltés mellőzését.";
+    badge.textContent=plan?.importOnly?"BETÖLTÉSI HTML-ELTÉRÉS · TELJES JÓVÁHAGYÁS":"ÉLES MÓDOSÍTÁS · biztonsági döntés szükséges";badge.dataset.state=plan?.importOnly?"danger":"warn";
+    if(advice)advice.textContent=plan?.importOnly?
+      "A WYSIWYG már a betöltéskor megváltoztatta a cikk HTML-jét ("+
+      String(state.live.source.content||"").length+" → "+String(now.content||"").length+
+      " karakter). Az éles mentés gombja most már megnyitható; a TELJES felülírás csak külön pipa és OK után történhet, mert hivatkozások, képek vagy más elemek veszhetnek el.":
+      "A mentési jóváhagyó ablak azonnal megnyitható: ott töltheted le az eredeti HTML-t, vagy jelölőnégyzettel vállalhatod a letöltés mellőzését.";
   }else{
-    badge.textContent=plan?.mode==="unsafe"?"TELJES HTML-CSERE · KÜLÖN MEGERŐSÍTÉS":plan?.mode==="surgical"?"CÉLZOTT SZÖVEGJAVÍTÁS · MENTHETŐ":"ÉLES MÓDOSÍTÁS · menthető";
+    badge.textContent=plan?.importOnly?"BETÖLTÉSI HTML-ELTÉRÉS · FELÜLÍRHATÓ":plan?.mode==="unsafe"?"TELJES HTML-CSERE · KÜLÖN MEGERŐSÍTÉS":plan?.mode==="surgical"?"CÉLZOTT SZÖVEGJAVÍTÁS · MENTHETŐ":"ÉLES MÓDOSÍTÁS · menthető";
     badge.dataset.state=plan?.mode==="unsafe"?"danger":"warn";
     if(advice)advice.textContent=state.saving?"Blogger-mentés és visszaellenőrzés folyamatban…":
-      plan?.mode==="unsafe"?"A WYSIWYG nem őrzött meg mindent az eredeti HTML-ből. Mentéskor további párbeszédablak sorolja fel az eltéréseket; külön jelölőnégyzet és jóváhagyás kell az éles felülíráshoz.":
+      plan?.importOnly?"Nem történt külön kézi szerkesztés, de a WYSIWYG visszaépített HTML-je eltér az eredetitől. A teljes újraírást csak külön nyilatkozattal lehet jóváhagyni, a régi linkek és képek elvesztésének kockázatával.":plan?.mode==="unsafe"?"A WYSIWYG nem őrzött meg mindent az eredeti HTML-ből. Mentéskor további párbeszédablak sorolja fel az eltéréseket; külön jelölőnégyzet és jóváhagyás kell az éles felülíráshoz.":
       plan?.mode==="surgical"?"A rövid szöveg- és hivatkozásjavítás az eredeti HTML-ben azonosítható. Az érintetlen képek és linkek megmaradnak, csak a tényleges változtatás kerül mentésre.":
       "Mentésre kész. A piros mentés a meglévő cikket frissíti, nem új bejegyzést hoz létre.";
   }
@@ -618,8 +639,10 @@ function updateComparison(){
   el("publishedEdited").value=String(now.content||"");
   const structural=auditHtml(original.content||"",now.content||"",false);
   const isDifferent=!bridge.sameEditor(now,state.live.editor);
+  const importDifference=!isDifferent&&String(original.content||"")!==String(now.content||"");
   const note=el("publishedDiffInfo");
-  note.textContent=(isDifferent?"Szerkesztett változat":"Még nincs szerkesztés")+
+  note.textContent=(isDifferent?"Szerkesztett változat":importDifference?
+    "HTML-eltérés már a betöltéskor, még nincs kézi szerkesztés":"Nincs változás")+
     " · HTML: "+String(original.content||"").length+" → "+String(now.content||"").length+" karakter"+
     (structural.length?" · FIGYELEM: "+structural.join("; "):"");
   return structural;
@@ -649,7 +672,8 @@ function confirmLiveSave(plan,live){
     }
     el("publishedUnsafeIssuesWrap").hidden=!isUnsafe;
     el("publishedUnsafeAckWrap").hidden=!isUnsafe;
-    el("publishedApprovalMode").textContent=isUnsafe?
+    el("publishedApprovalMode").textContent=plan.importOnly?
+      "FIGYELEM: már a WYSIWYG BETÖLTÉSE megváltoztatta az eredeti HTML-t. Külön szerkesztés nélkül is teljes éles felülírás történne!":isUnsafe?
       "KOCKÁZATOS teljes HTML-felülírás: külön jóváhagyás szükséges.":
       plan.mode==="surgical"?"Célzott, eredeti HTML-t megőrző javítás.":
       "Éles cikk módosítása: kötelező előzetes nyilatkozat.";
