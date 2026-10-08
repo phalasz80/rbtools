@@ -1,0 +1,35 @@
+"use strict";
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const root=path.join(__dirname,"..");
+const index=fs.readFileSync(path.join(root,"index.html"),"utf8");
+const privacy=fs.readFileSync(path.join(root,"privacy.html"),"utf8");
+const workflow=fs.readFileSync(path.join(root,".github","workflows","rbtools-tests.yml"),"utf8");
+const fn=name=>{const a=index.indexOf("function "+name+"("),b=index.indexOf("\nfunction ",a+10);assert.ok(a>=0&&b>a,name);return index.slice(a,b)};
+
+assert.match(index,/id="rbtools-adminCorrector"/);
+assert.match(index,/id="rbtools-correctorHu"[^>]*checked/);
+assert.match(index,/id="rbtools-correctorDe"[^>]*checked/);
+assert.match(index,/id="rbtools-correctorEn"[^>]*checked/);
+assert.match(index,/id="rbtools-correctorOnline" type="checkbox">/); // intentionally unchecked by default
+assert.match(index,/id="rbtools-correctorPrimary"/);
+assert.match(index,/data-corrector-lang="hu-HU"/);
+assert.match(index,/data-corrector-lang="de-DE"/);
+assert.match(index,/data-corrector-lang="en-GB"/);
+assert.match(index,/Helyes-e így\?/);
+assert.match(index,/Külön vagy egybe\?/);
+assert.match(index,/DE: Duden/);
+assert.match(index,/href="https:\/\/helyesiras\.mta\.hu\/helyesiras\/default\/akh12"/);
+assert.match(index,/<script src="\/corrector-core\.js\?v=59"><\/script>/);
+assert.match(fn("correctorCheck"),/correctorLanguageTool/);
+assert.match(fn("correctorLanguageTool"),/https:\/\/api\.languagetool\.org\/v2\/check/);
+assert.match(fn("correctorRemoteBatches"),/max=12000/);
+assert.match(fn("correctorSetSelectionLanguage"),/span\.setAttribute\("lang",normalized\)/);
+assert.match(fn("correctorAddDictionaryWord"),/correctorSaveDictionary/);
+assert.match(index,/rbtools-corrector-dictionary-v1/);
+assert.match(privacy,/Online LanguageTool/);
+assert.match(privacy,/api\.languagetool\.org\/v2\/check/);
+assert.match(privacy,/helyesiras\.mta\.hu/);
+assert.match(privacy,/Duden/);
+assert.match(workflow,/- "corrector-core\.js"/);
+assert.ok(index.includes('const RBTOOLS_VERSION="pages-v59"'));
+console.log("Cikkadmin corrector UI, privacy and CI wiring: PASS");

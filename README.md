@@ -296,3 +296,15 @@ Az adatkezelési tájékoztató külön rögzíti a Google API Services User Dat
 Meglévő Blogger-piszkozat vagy cikksablon megnyitásakor a Cikkadmin nem viszi tovább változatlanul a régi vagy vegyes Blogger-képkódot. A normál cikkkép ugyanazt a közös attribútumgyűjtőt és `<img>`-generátort használja, mint a **Képkódok** eszköz. Így a régi `style`, `border` és eseményattribútumok kiesnek, a reszponzív `max-width:100%;height:auto;` forma, az aktuális ALT/kredit és a képaláírás újragenerálódik. A forrásban ténylegesen meglévő, hasznos képmetaadatok, például `data-original-height`, `data-original-width`, `srcset`, `sizes` és `loading`, megmaradnak.
 
 A főkép és a keretes kép saját szerkezete nem változik: a főkép továbbra is 200 pixeles, balra úsztatott leadkép, a keretes pedig megtartja a szürke hátterét. Ezekben is ugyanaz a közös kép-tag normalizálja az `img` elemet. Emiatt a vegyes, különböző Blogger-generációkból származó képkódok a WYSIWYG megnyitásakor automatikusan egységes, RegionalBahn-kompatibilis kimenetté állnak össze; külön kézi Képkódok-konvertálásra nincs szükség.
+
+## Háromnyelvű Korrektor (pages-v59)
+
+A Cikkadmin WYSIWYG alatt külön **Korrektor** panel működik magyar, német és brit angol nyelven. A három nyelv egyidejűleg engedélyezhető; az elsődleges nyelv lehet automatikusan felismert vagy kézzel rögzített. Kijelölt szöveghez HU, DE vagy EN nyelvjelölés adható, amely szabványos `<span lang="hu-HU|de-DE|en-GB">…</span>` formában a Blogger HTML-ben is megmarad. Ez a vegyes nyelvű cikkeknél segít, miközben a jelöletlen részeket az RBTools egyszerű nyelvfelismeréssel osztályozza.
+
+A helyi ellenőrzés nem módosít automatikusan semmit. A böngésző natív `spellcheck` jelölései mellett az RBTools saját tipográfiai és biztonságosan automatizálható nyelvi szabályokat futtat, majd találatlistát készít. A találatra lehet ugrani, javasolt cserét alkalmazni, illetve szakmai kifejezést a **RegionalBahn saját szótárhoz** adni. A saját kifejezések kizárólag a böngésző `localStorage` tárhelyére kerülnek; teljes cikkszöveg nem.
+
+Az **Online LanguageTool** külön, alapértelmezésben kikapcsolt kapcsoló. Bekapcsolva és a „Teljes cikk ellenőrzése” gomb megnyomásakor a Korrektor nyelvenként, legfeljebb kb. 12 000 karakteres kötegekben hívja a `https://api.languagetool.org/v2/check` végpontot. A LanguageTool-javaslatok ugyanabban a listában jelennek meg, mint a helyi találatok. Ha a szolgáltatás nem érhető el, a helyi ellenőrzés eredménye megmarad és az RBTools nem akad el.
+
+Kézi ellenőrzéshez a panel közvetlenül meg tudja nyitni a kijelölt vagy beírt kifejezést a **helyesiras.mta.hu** „Helyes-e így?” és „Külön vagy egybe?” szolgáltatásában, illetve a **Duden** keresőjében. Az AkH. 12. szabályzat külön linkről érhető el. Ezek a külső oldalak kizárólag külön felhasználói kattintásra nyílnak meg.
+
+A korrektormotor külön `corrector-core.js` modulban él, így a nyelvfelismerés, helyi szabályok, RegionalBahn-alapszótár, LanguageTool-válaszok egységesítése és hivatalos ellenőrző linkek önállóan regressziótesztelhetők.
