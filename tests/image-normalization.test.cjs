@@ -61,5 +61,5 @@ assert.match(fn("adminBoxHtml"),/forceWidth:600/);
 assert.match(fn("imageItemHtml"),/rbCanonicalImageTag\(item/);
 assert.match(fn("collectImageAttrs"),/\^on\/i/);
 assert.match(fn("adminLoadExistingHtml"),/Képkódok eszközzel közös RegionalBahn-szabványra normalizálódtak/);
-assert.ok(source.includes('const RBTOOLS_VERSION="pages-v58"'));
+assert.ok(source.includes('const RBTOOLS_VERSION="pages-v59"'));
 console.log("Cikkadmin and Képkódok shared image normalization: PASS");

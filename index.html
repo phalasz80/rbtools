@@ -147,6 +147,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,'Segoe U
       <li><strong>Többsoros képaláírás:</strong> a képtár kártyáján a képaláírás többsoros mező, a WYSIWYG-ben pedig Enter vagy a <strong>↵ Sortörés</strong> gomb használható. Ha kell a fotós neve, jelöld be a <strong>Fotós neve külön sorban</strong> lehetőséget és add meg a nevet. A kimenetben egyetlen képaláírás lesz, az új sorok és a fotós neve <code>&lt;br /&gt;</code>-rel elválasztva.</li>
       <li><strong>Különleges jelek:</strong> nyisd le az <strong>Ω Különleges karakterek…</strong> panelt Unicode-jelekhez, emojihoz, Unicode felső/alsó indexhez és HTML-entitásokhoz. Kijelölt szövegnél a beszúrt jel vagy entitás <strong>lecseréli a kijelölést</strong>; a <code>&amp;nbsp;</code> rózsaszín szerkesztői jelölést kap.</li>
       <li><strong>Keresés:</strong> a <strong>Keresés a cikkben</strong> mező az aktuális WYSIWYG-szöveg találatait megszámolja és sárgával kiemeli. A kiemelés csak szerkesztési segédlet, nem kerül a Blogger HTML-be.</li>
+      <li><strong>Korrektor HU/DE/EN:</strong> a WYSIWYG alatt külön panel ellenőrzi a magyar, német és brit angol szöveget. Az automatikus nyelvfelismerés kézzel felülírható kijelölt részeken; a saját RegionalBahn-szótár böngészőben tárolódik. Az online LanguageTool külön hozzájáruló kapcsolóval működik, alapból ki van kapcsolva.</li>
       <li><strong>Mentés:</strong> a <strong>Mentés Blogger-piszkozatba</strong> új draftot készít vagy ugyanazt a post ID-t frissíti. Minden normál draftmentés után az időzítési mező biztonsági alapértéke <strong>2049. 12. 31. 23:59</strong>. Ezt a mezőt ne írd át: az időzítést az illetékes szerkesztő a Blogger felületén végzi. Azonnali publikálás nincs.<br><br><strong style="color:#ff0000;">Az időzítés mindig az illetékes szerkesztő feladata a Blogger felületén, így időzítést ezen a felületen nem kell beállítani. Ha bármi kérdésed van, hogy mikor megy ki a cikked, fordulj Adorján Péterhez vagy Halász Péterhez!</strong></li>
       <li><strong>Statikus oldal:</strong> a kész HTML-t másold a Blogger oldal HTML-nézetébe. Választható évválasztó gombsoros vagy egyszerű, ömlesztett sablon.</li>
       <li>A széles <strong>állapotsáv</strong> mindig jelzi, hogy éppen betöltés, mentés, sikeres művelet, figyelmeztetés vagy hiba történt.</li>
@@ -388,6 +389,55 @@ További szöveg..."></textarea>
       <button id="rbtools-adminFindClear" type="button">× Kiemelés törlése</button>
       <span id="rbtools-adminFindCount" class="badge">0 találat</span>
     </div>
+
+    <details class="admin-corrector" id="rbtools-adminCorrector">
+      <summary>✓ Korrektor: magyar · Deutsch · English (UK)</summary>
+      <p class="small">A böngésző saját helyesírás-jelölése mellett az RBTools helyi tipográfiai és nyelvi szabályokat futtat. A nyelv automatikusan felismerhető, vagy a kijelölt szöveghez külön HU/DE/EN jelölés adható. Az <strong>Online LanguageTool</strong> alapból ki van kapcsolva; csak bekapcsolva küld szöveget külső ellenőrzésre.</p>
+      <div class="admin-corrector-controls">
+        <label><input id="rbtools-correctorHu" type="checkbox" checked> HU</label>
+        <label><input id="rbtools-correctorDe" type="checkbox" checked> DE</label>
+        <label><input id="rbtools-correctorEn" type="checkbox" checked> EN-GB</label>
+        <label for="rbtools-correctorPrimary">Elsődleges</label>
+        <select id="rbtools-correctorPrimary">
+          <option value="auto" selected>Automatikus</option>
+          <option value="hu-HU">Magyar</option>
+          <option value="de-DE">Deutsch</option>
+          <option value="en-GB">English (UK)</option>
+        </select>
+        <label class="admin-corrector-online"><input id="rbtools-correctorOnline" type="checkbox"> Online LanguageTool</label>
+        <button id="rbtools-correctorCheck" type="button" class="primary">✓ Teljes cikk ellenőrzése</button>
+        <button id="rbtools-correctorClear" type="button">× Találatok törlése</button>
+        <span id="rbtools-correctorCount" class="badge">0 találat</span>
+      </div>
+      <div class="admin-corrector-language">
+        <strong>Kijelölés nyelve:</strong>
+        <button type="button" data-corrector-lang="auto">Auto / jelölés törlése</button>
+        <button type="button" data-corrector-lang="hu-HU">HU</button>
+        <button type="button" data-corrector-lang="de-DE">DE</button>
+        <button type="button" data-corrector-lang="en-GB">EN</button>
+        <span class="small">A nyelvjelölés <code>&lt;span lang="…"&#62;</code> formában megmarad a Blogger HTML-ben is.</span>
+      </div>
+      <div class="admin-corrector-lookup">
+        <label for="rbtools-correctorLookup"><strong>Szó / kifejezés kézi ellenőrzése</strong></label>
+        <input id="rbtools-correctorLookup" type="text" autocomplete="off" placeholder="Kijelölt szó vagy kifejezés…">
+        <button id="rbtools-correctorUseSelection" type="button">Kijelölés átvétele</button>
+        <button id="rbtools-correctorHuSpelling" type="button">HU: Helyes-e így?</button>
+        <button id="rbtools-correctorHuCompound" type="button">HU: Külön vagy egybe?</button>
+        <button id="rbtools-correctorDeDuden" type="button">DE: Duden</button>
+        <a href="https://helyesiras.mta.hu/helyesiras/default/akh12" target="_blank" rel="noopener">AkH. 12. ↗</a>
+      </div>
+      <div class="admin-corrector-dictionary">
+        <label for="rbtools-correctorDictionary"><strong>RegionalBahn saját szótár</strong></label>
+        <input id="rbtools-correctorDictionary" type="text" autocomplete="off" placeholder="pl. új típusnév vagy intézménynév">
+        <button id="rbtools-correctorDictionaryAdd" type="button">＋ Hozzáadás</button>
+        <button id="rbtools-correctorDictionaryReset" type="button">Alapszótár visszaállítása</button>
+        <span id="rbtools-correctorDictionaryCount" class="small"></span>
+      </div>
+      <div id="rbtools-correctorPrivacy" class="admin-corrector-privacy small">Online LanguageTool kikapcsolva: a cikk szövege nem hagyja el az RBToolst. Bekapcsolás után az ellenőrzéshez szükséges szövegrészek a LanguageTool nyilvános API-jára kerülnek.</div>
+      <div id="rbtools-correctorResults" class="admin-corrector-results" aria-live="polite">
+        <div class="admin-corrector-empty">Még nincs ellenőrzési eredmény.</div>
+      </div>
+    </details>
 
     <details class="admin-char-tools" id="rbtools-adminCharTools">
       <summary>Ω Különleges karakterek, emoji, felső/alsó index és HTML-entitások</summary>
@@ -1701,6 +1751,31 @@ A következő cikk rövid ajánlója.</pre>
 @media(max-width:650px){#rbtools-app .admin-formatbar{max-height:33vh;overflow-y:auto}#rbtools-app .admin-format-shell{top:0}}
 #rbtools-app .admin-findbar{display:grid;grid-template-columns:auto minmax(180px,1fr) auto auto;gap:8px;align-items:center;margin-top:8px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
 #rbtools-app .admin-findbar input{min-width:0;width:100%}
+
+#rbtools-app .admin-corrector{margin-top:8px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
+#rbtools-app .admin-corrector>summary{font-weight:800;cursor:pointer}
+#rbtools-app .admin-corrector-controls{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:10px}
+#rbtools-app .admin-corrector-controls label{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700}
+#rbtools-app .admin-corrector-controls select{min-width:150px}
+#rbtools-app .admin-corrector-online{padding:6px 8px;border:1px solid #c79935;border-radius:7px;background:#fff8df}
+#rbtools-app[data-theme="dark"] .admin-corrector-online{background:#3e3217;border-color:#8f7334}
+#rbtools-app .admin-corrector-language,#rbtools-app .admin-corrector-lookup,#rbtools-app .admin-corrector-dictionary{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:9px;padding-top:9px;border-top:1px solid var(--line)}
+#rbtools-app .admin-corrector-lookup input,#rbtools-app .admin-corrector-dictionary input{min-width:220px;flex:1}
+#rbtools-app .admin-corrector-privacy{margin-top:9px;padding:8px 10px;border-left:4px solid #0b5394;background:var(--panel)}
+#rbtools-app .admin-corrector-results{display:grid;gap:8px;margin-top:10px}
+#rbtools-app .admin-corrector-empty{padding:12px;border:1px dashed var(--line);border-radius:7px;color:var(--muted);text-align:center}
+#rbtools-app .admin-corrector-issue{display:grid;grid-template-columns:auto minmax(0,1fr);gap:7px 10px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+#rbtools-app .admin-corrector-issue[data-severity="error"]{border-left:4px solid #b3261e}
+#rbtools-app .admin-corrector-issue[data-severity="warning"]{border-left:4px solid #c17d00}
+#rbtools-app .admin-corrector-issue[data-severity="style"]{border-left:4px solid #0b5394}
+#rbtools-app .admin-corrector-tag{font-weight:850;font-size:11px;min-width:34px}
+#rbtools-app .admin-corrector-message{font-weight:700}
+#rbtools-app .admin-corrector-context{grid-column:2;font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+#rbtools-app .admin-corrector-actions{grid-column:2;display:flex;flex-wrap:wrap;gap:5px}
+#rbtools-app .admin-corrector-actions button,#rbtools-app .admin-corrector-actions a{font-size:11px;padding:5px 7px}
+#rbtools-app .admin-corrector-actions a{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:6px;background:var(--panel2);color:var(--ink);text-decoration:none;font-weight:700}
+#rbtools-app .rb-corrector-focus{outline:3px solid #f2bd32!important;outline-offset:2px}
+@media(max-width:850px){#rbtools-app .admin-corrector-lookup,#rbtools-app .admin-corrector-dictionary{display:grid;grid-template-columns:1fr}#rbtools-app .admin-corrector-lookup input,#rbtools-app .admin-corrector-dictionary input{min-width:0;width:100%}}
 #rbtools-app .admin-char-tools{margin-top:8px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
 #rbtools-app .admin-char-tools>summary{font-weight:800}
 #rbtools-app .admin-char-section{margin-top:12px}
@@ -1978,13 +2053,16 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-box-variant{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel2);font-size:12px}
 #rbtools-app .admin-box-variant select{max-width:240px;min-width:140px}
 </style>
-<script src="/live-timeline.js?v=58"></script>
+<script src="/live-timeline.js?v=59"></script>
+<script src="/corrector-core.js?v=59"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v58";
+const RBTOOLS_VERSION="pages-v59";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
+const CORRECTOR=window.RBTOOLS_CORRECTOR;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
+if(!CORRECTOR)throw Error("A Korrektor modulja nem töltődött be.");
 const RBAPP = document.getElementById("rbtools-app");
 const rbGet = id => RBAPP ? RBAPP.querySelector("#rbtools-"+CSS.escape(id)) : null;
 
@@ -3633,6 +3711,227 @@ function adminSearchText(){
   rbGet("adminStatus").textContent=ranges.length?"Keresés: "+ranges.length+" találat – „"+q+"”":"Keresés: nincs találat – „"+q+"”";
 }
 
+
+const CORRECTOR_DICT_KEY="rbtools-corrector-dictionary-v1";
+let correctorIssues=[];
+function correctorEnabledLanguages(){
+  const out=[];
+  if(rbGet("correctorHu").checked)out.push("hu-HU");
+  if(rbGet("correctorDe").checked)out.push("de-DE");
+  if(rbGet("correctorEn").checked)out.push("en-GB");
+  return out.length?out:["hu-HU"];
+}
+function correctorCustomDictionary(){
+  try{
+    const value=JSON.parse(localStorage.getItem(CORRECTOR_DICT_KEY)||"[]");
+    return Array.isArray(value)?value.filter(x=>typeof x==="string"&&x.trim()):[];
+  }catch{return [];}
+}
+function correctorSaveDictionary(items){
+  const clean=Array.from(new Set((items||[]).map(x=>String(x).trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b,"hu"));
+  localStorage.setItem(CORRECTOR_DICT_KEY,JSON.stringify(clean));
+  correctorRefreshDictionaryCount();
+  return clean;
+}
+function correctorRefreshDictionaryCount(){
+  const extra=correctorCustomDictionary();
+  rbGet("correctorDictionaryCount").textContent=(CORRECTOR.DEFAULT_DICTIONARY.length+extra.length)+" szó/kifejezés ("+extra.length+" saját)";
+}
+function correctorAddDictionaryWord(value){
+  value=String(value||"").trim();if(!value)return false;
+  const list=correctorCustomDictionary();
+  if(!list.some(x=>CORRECTOR.dictionaryKey(x)===CORRECTOR.dictionaryKey(value)))list.push(value);
+  correctorSaveDictionary(list);return true;
+}
+function correctorExplicitRanges(root){
+  const ranges=[];
+  for(const el of Array.from(root.querySelectorAll("[lang]"))){
+    if(el.parentElement?.closest?.("[lang]"))continue;
+    const r=document.createRange();r.selectNodeContents(root);r.setEndBefore(el);
+    ranges.push({start:r.toString().length,end:r.toString().length+(el.textContent||"").length,el,lang:CORRECTOR.normalizeLang(el.getAttribute("lang"))});
+  }
+  return ranges.filter(x=>x.lang!=="auto"&&x.end>x.start);
+}
+function correctorSegments(){
+  const segments=[],primary=rbGet("correctorPrimary").value,enabled=correctorEnabledLanguages();
+  const title=rbGet("adminTitle");
+  if(title.value.trim())segments.push({target:title,syncRoot:null,text:title.value,lang:primary==="auto"?CORRECTOR.detectLanguage(title.value,{enabled,primary:"hu-HU"}):primary,label:"Cikk címe",exclude:[]});
+  const roots=Array.from(rbGet("adminCanvas").querySelectorAll('[contenteditable="true"]'));
+  roots.forEach((root,index)=>{
+    const text=root.innerText||root.textContent||"";if(!text.trim())return;
+    const explicit=correctorExplicitRanges(root);
+    let lang=primary==="auto"?CORRECTOR.detectLanguage(text,{enabled,primary:"hu-HU"}):primary;
+    segments.push({target:root,syncRoot:root,text,lang,label:"WYSIWYG blokk "+(index+1),exclude:explicit});
+    explicit.forEach((x,n)=>{
+      segments.push({target:x.el,syncRoot:root,text:x.el.innerText||x.el.textContent||"",lang:x.lang,label:"Nyelvjelölt rész "+(index+1)+"."+(n+1),exclude:[],explicit:true});
+    });
+  });
+  return segments;
+}
+function correctorOverlapsExplicit(item,segment){
+  if(segment.explicit||!segment.exclude?.length)return false;
+  const a=item.offset,b=item.offset+item.length;
+  return segment.exclude.some(x=>a<x.end&&b>x.start);
+}
+function correctorRange(target,offset,length){
+  if(target instanceof HTMLInputElement||target instanceof HTMLTextAreaElement)return null;
+  const walker=document.createTreeWalker(target,NodeFilter.SHOW_TEXT);
+  let pos=0,startNode=null,endNode=null,startOffset=0,endOffset=0;
+  while(walker.nextNode()){
+    const n=walker.currentNode,len=(n.nodeValue||"").length;
+    if(startNode===null&&offset>=pos&&offset<=pos+len){startNode=n;startOffset=Math.max(0,offset-pos);}
+    const end=offset+length;
+    if(end>=pos&&end<=pos+len){endNode=n;endOffset=Math.max(0,end-pos);break;}
+    pos+=len;
+  }
+  if(!startNode||!endNode)return null;
+  const r=document.createRange();r.setStart(startNode,startOffset);r.setEnd(endNode,endOffset);return r;
+}
+function correctorReplace(item,replacement){
+  const target=item.segment.target,repl=String(replacement??"");
+  if(target instanceof HTMLInputElement||target instanceof HTMLTextAreaElement){
+    target.setRangeText(repl,item.offset,item.offset+item.length,"end");target.dispatchEvent(new Event("input",{bubbles:true}));
+  }else{
+    const r=correctorRange(target,item.offset,item.length);if(!r)return;
+    r.deleteContents();const n=document.createTextNode(repl);r.insertNode(n);
+    if(item.segment.syncRoot){adminActiveEditable=item.segment.syncRoot;adminSyncActiveEditable();}
+  }
+  rbGet("adminStatus").textContent="Korrektori javítás alkalmazva. Érdemes újra lefuttatni az ellenőrzést.";
+  item.card?.remove();correctorIssues=correctorIssues.filter(x=>x!==item);rbGet("correctorCount").textContent=correctorIssues.length+" találat";
+}
+function correctorFocus(item){
+  const target=item.segment.target;
+  target.scrollIntoView?.({behavior:"smooth",block:"center"});
+  target.classList?.add("rb-corrector-focus");setTimeout(()=>target.classList?.remove("rb-corrector-focus"),1400);
+  if(target instanceof HTMLInputElement||target instanceof HTMLTextAreaElement){target.focus();target.setSelectionRange(item.offset,item.offset+item.length);return;}
+  const r=correctorRange(target,item.offset,item.length);if(!r)return;
+  const sel=window.getSelection();sel.removeAllRanges();sel.addRange(r);adminActiveEditable=item.segment.syncRoot||target;adminSavedRange=r.cloneRange();
+}
+function correctorIssueTerm(item){return item.segment.text.slice(item.offset,item.offset+item.length).trim();}
+function correctorRender(){
+  const box=rbGet("correctorResults");box.innerHTML="";
+  rbGet("correctorCount").textContent=correctorIssues.length+" találat";
+  if(!correctorIssues.length){box.innerHTML='<div class="admin-corrector-empty">Nincs találat a jelenlegi beállításokkal.</div>';return;}
+  correctorIssues.forEach(item=>{
+    const card=document.createElement("div");card.className="admin-corrector-issue";card.dataset.severity=item.severity||"warning";item.card=card;
+    const tag=document.createElement("div");tag.className="admin-corrector-tag";tag.textContent=(CORRECTOR.LANGS[item.language]?.short||"AUTO")+" · "+(item.source==="languagetool"?"LT":"RB");
+    const body=document.createElement("div"),msg=document.createElement("div");msg.className="admin-corrector-message";msg.textContent=item.message;body.appendChild(msg);
+    const ctx=document.createElement("div");ctx.className="admin-corrector-context";ctx.textContent=CORRECTOR.context(item.segment.text,item.offset,item.length);
+    const actions=document.createElement("div");actions.className="admin-corrector-actions";
+    const jump=document.createElement("button");jump.type="button";jump.textContent="Ugrás";jump.addEventListener("click",()=>correctorFocus(item));actions.appendChild(jump);
+    (item.replacements||[]).slice(0,3).forEach(rep=>{const b=document.createElement("button");b.type="button";b.textContent="Csere: "+rep;b.addEventListener("click",()=>correctorReplace(item,rep));actions.appendChild(b);});
+    const term=correctorIssueTerm(item);
+    if(term&&/^[-+\p{L}\p{N}. ]+$/u.test(term)&&term.length<80){
+      const dict=document.createElement("button");dict.type="button";dict.textContent="RB-szótárhoz";dict.addEventListener("click",()=>{correctorAddDictionaryWord(term);card.remove();correctorIssues=correctorIssues.filter(x=>x!==item);rbGet("correctorCount").textContent=correctorIssues.length+" találat";});actions.appendChild(dict);
+    }
+    const links=CORRECTOR.lookupUrls(term,item.language);
+    Object.entries(links).forEach(([kind,url])=>{const a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener";a.textContent=kind==="compound"?"Külön/egybe ↗":kind==="rules"?"AkH. 12. ↗":kind==="dictionary"?"Duden ↗":"Helyes-e így? ↗";actions.appendChild(a);});
+    card.append(tag,body,ctx,actions);box.appendChild(card);
+  });
+}
+function correctorLocal(segment){
+  let issues=CORRECTOR.localIssues(segment.text,segment.lang,{enabled:correctorEnabledLanguages(),primary:"hu-HU"})
+    .filter(x=>!correctorOverlapsExplicit(x,segment));
+  issues=CORRECTOR.suppressDictionary(issues,segment.text,correctorCustomDictionary());
+  return issues.map(x=>({...x,segment}));
+}
+function correctorRemoteBatches(segments){
+  const batches=[];
+  for(const lang of correctorEnabledLanguages()){
+    const pool=segments.filter(x=>x.lang===lang),max=12000;let batch=null;
+    for(const segment of pool){
+      if(!segment.text.trim())continue;
+      const needed=segment.text.length+(batch?.text?2:0);
+      if(!batch||batch.text.length+needed>max){batch={lang,text:"",maps:[]};batches.push(batch);}
+      if(batch.text)batch.text+="\n\n";
+      const start=batch.text.length;batch.text+=segment.text;batch.maps.push({start,end:start+segment.text.length,segment});
+    }
+  }
+  return batches;
+}
+async function correctorLanguageTool(segments){
+  const endpoint="https://api.languagetool.org/v2/check",out=[];
+  for(const batch of correctorRemoteBatches(segments)){
+    const response=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:CORRECTOR.languageToolBody(batch.text,batch.lang)});
+    if(!response.ok)throw Error("LanguageTool HTTP "+response.status);
+    const data=await response.json();
+    for(const raw of data.matches||[]){
+      const map=batch.maps.find(x=>raw.offset>=x.start&&raw.offset+raw.length<=x.end);if(!map)continue;
+      const converted=CORRECTOR.fromLanguageTool(raw,batch.lang),item={...converted,offset:converted.offset-map.start,segment:map.segment};
+      if(correctorOverlapsExplicit(item,map.segment))continue;
+      out.push(item);
+    }
+  }
+  return out;
+}
+async function correctorCheck(){
+  const button=rbGet("correctorCheck");button.disabled=true;rbGet("correctorCount").textContent="ellenőrzés…";
+  try{
+    const segments=correctorSegments();
+    let issues=segments.flatMap(correctorLocal);
+    if(rbGet("correctorOnline").checked){
+      try{issues=issues.concat(await correctorLanguageTool(segments));}
+      catch(err){console.error(err);rbGet("adminStatus").textContent="A helyi ellenőrzés elkészült, de a LanguageTool nem volt elérhető: "+err.message;}
+    }
+    const dict=correctorCustomDictionary();
+    issues=issues.filter(item=>{
+      const term=correctorIssueTerm(item),key=CORRECTOR.dictionaryKey(term);
+      return !(key&&CORRECTOR.dictionarySet(dict).has(key));
+    });
+    const seen=new Set();
+    correctorIssues=issues.filter(x=>{const key=[x.segment.label,x.offset,x.length,x.ruleId,x.message].join("|");if(seen.has(key))return false;seen.add(key);return true;})
+      .sort((a,b)=>a.segment.label.localeCompare(b.segment.label,"hu")||a.offset-b.offset);
+    correctorRender();
+    if(!correctorIssues.length)rbGet("adminStatus").textContent="A Korrektor nem talált problémát a jelenlegi beállításokkal.";
+    else rbGet("adminStatus").textContent="Korrektor: "+correctorIssues.length+" lehetséges probléma. A javaslatok nem módosítják automatikusan a cikket.";
+  }finally{button.disabled=false;}
+}
+function correctorSetSelectionLanguage(lang){
+  adminRememberRange();const r=adminSavedRange,root=r?adminEditableForRange(r):null;
+  if(!root){rbGet("adminStatus").textContent="Jelölj ki szöveget a WYSIWYG-ben a nyelv megadásához.";return;}
+  const normalized=CORRECTOR.normalizeLang(lang);
+  if(normalized==="auto"){
+    const node=r.startContainer.nodeType===1?r.startContainer:r.startContainer.parentElement;
+    const span=node?.closest?.("span[lang]");
+    if(span&&root.contains(span)){span.replaceWith(...Array.from(span.childNodes));root.normalize();adminActiveEditable=root;adminSyncActiveEditable();rbGet("adminStatus").textContent="A kézi nyelvjelölés törölve.";return;}
+    rbGet("adminStatus").textContent="A kijelölésnél nincs törölhető kézi nyelvjelölés.";return;
+  }
+  const span=document.createElement("span");span.setAttribute("lang",normalized);
+  if(r.collapsed){
+    span.appendChild(document.createTextNode("\u200b"));r.insertNode(span);const nr=document.createRange();nr.setStart(span.firstChild,1);nr.collapse(true);window.getSelection().removeAllRanges();window.getSelection().addRange(nr);adminSavedRange=nr.cloneRange();
+  }else{
+    try{r.surroundContents(span);}catch{span.appendChild(r.extractContents());r.insertNode(span);}
+  }
+  adminActiveEditable=root;adminSyncActiveEditable();rbGet("adminStatus").textContent="Nyelvjelölés alkalmazva: "+(CORRECTOR.LANGS[normalized]?.label||normalized)+".";
+}
+function correctorSelectionText(){
+  adminRememberRange();return String(adminSavedRange?.toString()||"").trim();
+}
+function correctorOpenLookup(kind){
+  const term=rbGet("correctorLookup").value.trim();if(!term){rbGet("adminStatus").textContent="Adj meg vagy jelölj ki egy ellenőrzendő szót/kifejezést.";return;}
+  let url="";
+  if(kind==="hu-spelling")url=CORRECTOR.lookupUrls(term,"hu-HU").spelling;
+  if(kind==="hu-compound")url=CORRECTOR.lookupUrls(term,"hu-HU").compound;
+  if(kind==="de-duden")url=CORRECTOR.lookupUrls(term,"de-DE").dictionary;
+  if(url)window.open(url,"_blank","noopener");
+}
+function correctorInit(){
+  correctorRefreshDictionaryCount();
+  rbGet("correctorCheck").addEventListener("click",correctorCheck);
+  rbGet("correctorClear").addEventListener("click",()=>{correctorIssues=[];correctorRender();});
+  rbGet("correctorOnline").addEventListener("change",()=>{rbGet("correctorPrivacy").textContent=rbGet("correctorOnline").checked
+    ?"Online LanguageTool bekapcsolva: a következő ellenőrzéskor a szükséges cikkszöveg külső LanguageTool API-ra kerül."
+    :"Online LanguageTool kikapcsolva: a cikk szövege nem hagyja el az RBToolst. Bekapcsolás után az ellenőrzéshez szükséges szövegrészek a LanguageTool nyilvános API-jára kerülnek.";});
+  RBAPP.querySelectorAll("[data-corrector-lang]").forEach(b=>b.addEventListener("mousedown",e=>e.preventDefault()));
+  RBAPP.querySelectorAll("[data-corrector-lang]").forEach(b=>b.addEventListener("click",()=>correctorSetSelectionLanguage(b.dataset.correctorLang)));
+  rbGet("correctorUseSelection").addEventListener("click",()=>{const value=correctorSelectionText();if(value)rbGet("correctorLookup").value=value;});
+  rbGet("correctorHuSpelling").addEventListener("click",()=>correctorOpenLookup("hu-spelling"));
+  rbGet("correctorHuCompound").addEventListener("click",()=>correctorOpenLookup("hu-compound"));
+  rbGet("correctorDeDuden").addEventListener("click",()=>correctorOpenLookup("de-duden"));
+  rbGet("correctorDictionaryAdd").addEventListener("click",()=>{const input=rbGet("correctorDictionary");if(correctorAddDictionaryWord(input.value)){input.value="";rbGet("adminStatus").textContent="Kifejezés hozzáadva a helyi RegionalBahn-szótárhoz.";}});  
+  rbGet("correctorDictionaryReset").addEventListener("click",()=>{localStorage.removeItem(CORRECTOR_DICT_KEY);correctorRefreshDictionaryCount();rbGet("adminStatus").textContent="A saját szótár törölve; a beépített RegionalBahn-alapszótár megmaradt.";});
+}
+
 function adminImageAttrs(img){
   // Keep Cikkadmin imports on exactly the same attribute path as the Képkódok converter.
   return collectImageAttrs(img);
@@ -5208,6 +5507,7 @@ rbGet("adminFooter").addEventListener("change",()=>adminGenerateHtml(false));
 rbGet("adminAddLive").addEventListener("click",adminAddLiveUpdate);
 rbGet("adminLiveAddToolbar").addEventListener("click",adminAddLiveUpdate);
 adminContentTypeChanged(false);
+correctorInit();
 rbGet("adminBuild").addEventListener("click",adminBuildFromSource);
 rbGet("adminParseImages").addEventListener("click",()=>adminParseImages(rbGet("adminImageSource").value));
 rbGet("adminInsertAllImages").addEventListener("click",adminInsertAllImages);

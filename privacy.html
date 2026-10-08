@@ -13,7 +13,7 @@ a{color:#0759c7}.muted{color:#6b7280}
 </head>
 <body>
 <h1>RegionalBahn Tools – adatkezelési tájékoztató</h1>
-<p class="muted">Utolsó frissítés: 2026. október 7.</p>
+<p class="muted">Utolsó frissítés: 2026. október 8.</p>
 <p>A RegionalBahn Tools (RBTools) a <a href="https://www.regionalbahn.hu/">RegionalBahn.hu</a> szerkesztői munkáját segítő, böngészőben futó eszköz. A Blogger-kapcsolat a Google hivatalos OAuth 2.0 és Blogger API szolgáltatásait használja. A Google-hozzáférés célja kizárólag az, hogy a felhasználó a saját Blogger-jogosultságaival elérhető blogokat és bejegyzéseket az RBTools felületén megnyithassa és szerkeszthesse.</p>
 
 <h2>Milyen Google-adatokhoz fér hozzá?</h2>
@@ -23,7 +23,7 @@ a{color:#0759c7}.muted{color:#6b7280}
 <p>A Bloggerből lekért tartalom kizárólag a szerkesztői funkciók biztosítására jelenik meg és dolgozódik fel a felhasználó böngészőjében. A RegionalBahn Toolsnak nincs saját alkalmazásszervere vagy adatbázisa, amelybe a Bloggerből lekért cikkek, piszkozatok vagy hozzáférési tokenek feltöltésre kerülnének.</p>
 
 <h2>Tárolás a böngészőben</h2>
-<p>A Google OAuth hozzáférési token csak az aktuális oldal munkamenetének memóriájában marad, és oldalfrissítéskor elveszik. A böngésző helyi tárhelye a Google OAuth Client ID helyi felülírását tárolhatja. A Bloggerből lekért cikkek és hozzáférési tokenek tartós helyi tárolását az alkalmazás nem végzi.</p>
+<p>A Google OAuth hozzáférési token csak az aktuális oldal munkamenetének memóriájában marad, és oldalfrissítéskor elveszik. A böngésző helyi tárhelye a Google OAuth Client ID helyi felülírását, valamint a Korrektorhoz kézzel hozzáadott RegionalBahn-szótári kifejezéseket tárolhatja. A saját korrektorszótár nem tartalmaz teljes cikkeket; a Bloggerből lekért cikkek és hozzáférési tokenek tartós helyi tárolását az alkalmazás nem végzi.</p>
 
 <h2>Adattovábbítás</h2>
 <p>A Bloggerrel kapcsolatos API-kérések közvetlenül a felhasználó böngészője és a Google szolgáltatásai között történnek. A RegionalBahn Tools nem értékesít Google-felhasználói adatot, nem használja azt reklámcélra, hitelbírálatra vagy profilalkotásra, és nem továbbítja más félnek önálló célú felhasználásra.</p>
@@ -33,6 +33,8 @@ a{color:#0759c7}.muted{color:#6b7280}
 
 <h2>Harmadik fél szolgáltatásai</h2>
 <p>Az oldal GitHub Pages tárhelyen működik, és a Google Identity Services JavaScript-könyvtárát tölti be a Google-fiókos engedélyezéshez. E szolgáltatók saját műszaki naplózási és adatkezelési szabályai külön alkalmazandók.</p>
+<p>A Cikkadmin Korrektorának <strong>Online LanguageTool</strong> funkciója alapértelmezés szerint ki van kapcsolva. Ha a felhasználó ezt külön bekapcsolja és elindítja az ellenőrzést, az ellenőrzéshez szükséges cikkszöveg a LanguageTool nyilvános <code>https://api.languagetool.org/v2/check</code> végpontjára kerül helyesírási, nyelvtani és stilisztikai elemzés céljából. Kikapcsolt állapotban az RBTools nem küld cikkszöveget a LanguageToolnak.</p>
+<p>A Korrektor kézi magyar helyesírási és különírás/egybeírás ellenőrző gombjai a <a href="https://helyesiras.mta.hu/">helyesiras.mta.hu</a>, a német szótári gomb pedig a <a href="https://www.duden.de/">Duden</a> oldalát nyitja meg új lapon a felhasználó által megadott vagy kijelölt kifejezéssel. Ezek csak külön felhasználói kattintásra történnek.</p>
 
 <h2>Hozzáférés visszavonása</h2>
 <p>A Google-fiókban bármikor visszavonható a RegionalBahn Tools számára adott hozzáférés. Az RBToolsban a „Kapcsolat bontása” gomb az aktuális böngészőmunkamenetben tárolt hozzáférési tokent elfelejti.</p>

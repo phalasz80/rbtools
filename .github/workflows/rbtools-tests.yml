@@ -9,6 +9,7 @@ on:
       - "archive-presets.js"
       - "page-starters.js"
       - "live-timeline.js"
+      - "corrector-core.js"
       - "collection-pages.js"
       - "tests/**"
       - ".github/workflows/rbtools-tests.yml"
