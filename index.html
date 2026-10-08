@@ -3066,6 +3066,7 @@ function bloggerSnapshotEquals(a,b){
 }
 function bloggerUpdateSaveBanner(){
   const badge=rbGet("bloggerSaveIndicator");if(!badge)return;
+  const live=String(bloggerCurrentPost?.status||"").toLowerCase()==="live";
   const current=bloggerLocalSnapshot(),known=bloggerKnownSnapshot;
   const time=known?.when?new Date(known.when).toLocaleString("hu-HU"):"";
   const hasContent=!!(current.title||current.content.trim()||current.labels);
@@ -3086,12 +3087,12 @@ function bloggerUpdateSaveBanner(){
       ". Kapcsolódj újra;"+(bloggerSnapshotEquals(known,current)?" nem látszik új helyi módosítás.":" a helyi módosítások nincsenek elmentve.");icon="!";
   }else if(known&&bloggerSnapshotEquals(known,current)){
     if(known.origin==="saved"){
-      state="saved";title="MENTVE A BLOGGERBE";
+      state="saved";title=live?"PUBLIKÁLT CIKK FRISSÍTVE":"MENTVE A BLOGGERBE";
       detail="Sikeresen visszaigazolt cím, szöveg és címkék"+(time?" • "+time:"")+
         ". Azóta nem történt helyi módosítás.";icon="✓";
     }else{
-      state="loaded";title="BLOGGER-PISZKOZAT BETÖLTVE";
-      detail="A betöltés óta nincs helyi módosítás. Az első mentéskor a WYSIWYG által előállított HTML kerül a Bloggerbe.";icon="✓";
+      state="loaded";title=live?"PUBLIKÁLT CIKK BETÖLTVE":"BLOGGER-PISZKOZAT BETÖLTVE";
+      detail=live?"Nincs szerkesztői módosítás. Éles mentéshez biztonsági másolat és megerősítés szükséges.":"A betöltés óta nincs helyi módosítás. Az első mentéskor a WYSIWYG által előállított HTML kerül a Bloggerbe.";icon="✓";
     }
   }else if(known){
     state="dirty";title="NINCS MENTVE • HELYI MÓDOSÍTÁSOK!";
@@ -3107,6 +3108,7 @@ function bloggerUpdateSaveBanner(){
     rbGet("bloggerSaveHeadline").textContent=title;rbGet("bloggerSaveDetail").textContent=detail;
     bloggerLastBannerState=state;bloggerLastBannerText=pair;
   }
+  window.RBTOOLS_PUBLISHED?.sync?.();
 }
 function bloggerStatus(msg){const el=rbGet("bloggerStatus");if(el)el.textContent=msg;}
 function bloggerConnected(){return !!bloggerAccessToken&&Date.now()<bloggerTokenExpiresAt-15000;}
@@ -3121,11 +3123,11 @@ function bloggerSetUi(){
   rbGet("bloggerDraftSelect").disabled=!connected||!bloggerDrafts.length;
   rbGet("bloggerOpenDraft").disabled=!connected||!rbGet("bloggerDraftSelect").value;
   const staticMode=rbGet("adminContentType")?.value==="static";
-  rbGet("bloggerSaveDraft").disabled=staticMode||!connected||!rbGet("bloggerBlogSelect").value;
-  rbGet("bloggerSchedulePost").disabled=staticMode||!connected||!rbGet("bloggerBlogSelect").value;
-  rbGet("bloggerRevertPost").disabled=staticMode||!connected||!bloggerCurrentPost||!["scheduled","live"].includes(String(bloggerCurrentPost.status||"").toLowerCase());
+  rbGet("bloggerSaveDraft").disabled=staticMode||!connected||!rbGet("bloggerBlogSelect").value||String(bloggerCurrentPost?.status||"").toLowerCase()==="live";
+  rbGet("bloggerSchedulePost").disabled=staticMode||!connected||!rbGet("bloggerBlogSelect").value||String(bloggerCurrentPost?.status||"").toLowerCase()==="live";
+  rbGet("bloggerRevertPost").disabled=staticMode||!connected||!bloggerCurrentPost||!["scheduled","live"].includes(String(bloggerCurrentPost.status||"").toLowerCase())||!!window.RBTOOLS_PUBLISHED?.hasLive?.();
   rbGet("bloggerConnectionBadge").closest(".admin-blogger-panel")?.classList.toggle("connected",connected);
-  bloggerUpdateSaveBanner();
+  bloggerUpdateSaveBanner();window.RBTOOLS_PUBLISHED?.sync?.();
 }
 function bloggerClientId(){
   return rbGet("bloggerClientId").value.trim();
@@ -3146,7 +3148,7 @@ function bloggerDisconnect(){
   rbGet("bloggerDraftSelect").innerHTML='<option value="">Nincs betöltve</option>';
   rbGet("bloggerCurrentPost").textContent="Nincs Blogger-bejegyzés hozzárendelve.";
   bloggerSavePending=false;bloggerSaveError="";
-  bloggerStatus("Kapcsolat bontva. Az access token elfelejtve.");bloggerSetUi();
+  bloggerStatus("Kapcsolat bontva. Az access token elfelejtve.");bloggerSetUi();window.RBTOOLS_PUBLISHED?.reset?.();
 }
 async function bloggerApi(path,{method="GET",body=null}={}){
   if(!bloggerConnected()){
@@ -3246,6 +3248,7 @@ async function bloggerOpenDraft(){
   adminRenderCanvas();adminGenerateHtml(false);bloggerPostMeta();bloggerSetSafeSchedule();
   bloggerKnownSnapshot={...bloggerLocalSnapshot(),origin:"loaded",when:post.updated||""};
   bloggerSaveError="";bloggerSavePending=false;bloggerUpdateSaveBanner();
+  window.RBTOOLS_PUBLISHED?.reset?.();
   bloggerStatus("Piszkozat megnyitva. A mentés ugyanazt a Blogger-bejegyzést frissíti. Biztonsági időzítés: 2049. 12. 31. 23:59.");
 }
 function bloggerSetSafeSchedule(){
@@ -3318,6 +3321,7 @@ async function bloggerRevertPost(){
 function bloggerNewLocal(){
   rbGet("bloggerLabels").value="";bloggerSetSafeSchedule();adminClear();
   bloggerKnownSnapshot=null;bloggerSaveError="";bloggerUpdateSaveBanner();
+  window.RBTOOLS_PUBLISHED?.reset?.();
   bloggerStatus("Új helyi cikk. A Mentés Blogger-piszkozatba új draftot fog létrehozni. Biztonsági időzítés: 2049. 12. 31. 23:59.");
 }
 try{rbGet("bloggerClientId").value=localStorage.getItem(BLOGGER_CLIENT_ID_KEY)||BLOGGER_DEFAULT_CLIENT_ID;}catch{rbGet("bloggerClientId").value=BLOGGER_DEFAULT_CLIENT_ID;}
@@ -3326,7 +3330,7 @@ rbGet("bloggerForgetClientId").addEventListener("click",bloggerForgetClientId);
 rbGet("bloggerConnect").addEventListener("click",bloggerConnect);
 rbGet("bloggerDisconnect").addEventListener("click",bloggerDisconnect);
 rbGet("bloggerRefreshBlogs").addEventListener("click",()=>bloggerLoadBlogs().catch(e=>bloggerStatus("Hiba: "+e.message)));
-rbGet("bloggerBlogSelect").addEventListener("change",()=>{bloggerCurrentPost=null;bloggerKnownSnapshot=null;bloggerSaveError="";bloggerPostMeta();bloggerLoadDrafts().catch(e=>bloggerStatus("Hiba: "+e.message));});
+rbGet("bloggerBlogSelect").addEventListener("change",()=>{bloggerCurrentPost=null;bloggerKnownSnapshot=null;bloggerSaveError="";bloggerPostMeta();window.RBTOOLS_PUBLISHED?.reset?.();bloggerLoadDrafts().catch(e=>bloggerStatus("Hiba: "+e.message));});
 rbGet("bloggerLabels").addEventListener("input",bloggerUpdateSaveBanner);
 rbGet("bloggerDraftSearch").addEventListener("input",bloggerRenderDrafts);
 rbGet("bloggerDraftSelect").addEventListener("change",bloggerSetUi);
