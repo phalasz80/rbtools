@@ -14,7 +14,7 @@ function sourceFunction(name){
 const names=[
   "esc","compact","inlineMd","adminCleanCaptionText","adminCaptionParts",
   "rbImageAltText","rbCaptionFromAlt","adminCaptionHtml","rbImageHtml",
-  "rbBoxParagraphsHtml","rbBoxHtml","adminImageBodyHtml","adminMainImageHtml",
+  "rbBoxParagraphsHtml","rbBoxHtml","rbCanonicalImageTag","adminImageBodyHtml","adminMainImageHtml",
   "adminBoxHtml","imageItemHtml"
 ];
 const setup=`
@@ -28,7 +28,7 @@ const setup=`
   const adminBoxBodyParts=x=>[x];
 `;
 const api=new Function(setup+names.map(sourceFunction).join("\n")+
-  ";return {rbImageAltText,rbCaptionFromAlt,rbImageHtml,rbBoxHtml,adminImageBodyHtml,adminMainImageHtml,adminBoxHtml,imageItemHtml};")();
+  ";return {rbImageAltText,rbCaptionFromAlt,rbImageHtml,rbBoxHtml,rbCanonicalImageTag,adminImageBodyHtml,adminMainImageHtml,adminBoxHtml,imageItemHtml};")();
 
 assert.equal(api.rbImageAltText("Első<br />Második","fotó: © Halász Péter • RegionalBahn.hu"),
   "Első; Második +++ fotó: Halász Péter");

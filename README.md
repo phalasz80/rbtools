@@ -290,3 +290,9 @@ A böngészők biztonsági modellje nem engedi, hogy egy weboldal programból me
 A Google Auth Platform production/verifikációs követelményeihez az RBTools főoldala állandóan és könnyen elérhetően linkeli a `/privacy.html` adatkezelési tájékoztatót és a `/terms.html` használati feltételeket. A Blogger-kapcsolat panel külön, látható adatvédelmi értesítést tartalmaz arról, hogy az OAuth-jogosultság kizárólag a felhasználó által elérhető Blogger-tartalmak szerkesztésére szolgál, az access token pedig csak az aktuális böngészőmunkamenet memóriájában marad.
 
 Az adatkezelési tájékoztató külön rögzíti a Google API Services User Data Policy és Limited Use elveinek megfelelő felhasználást. A Google Auth Platform Branding oldalhoz használt URL-ek: homepage `https://tools.regionalbahn.hu/`, privacy policy `https://tools.regionalbahn.hu/privacy.html`, terms `https://tools.regionalbahn.hu/terms.html`.
+
+## Automatikus képkód-normalizálás (pages-v58)
+
+Meglévő Blogger-piszkozat vagy cikksablon megnyitásakor a Cikkadmin nem viszi tovább változatlanul a régi vagy vegyes Blogger-képkódot. A normál cikkkép ugyanazt a közös attribútumgyűjtőt és `<img>`-generátort használja, mint a **Képkódok** eszköz. Így a régi `style`, `border` és eseményattribútumok kiesnek, a reszponzív `max-width:100%;height:auto;` forma, az aktuális ALT/kredit és a képaláírás újragenerálódik. A forrásban ténylegesen meglévő, hasznos képmetaadatok, például `data-original-height`, `data-original-width`, `srcset`, `sizes` és `loading`, megmaradnak.
+
+A főkép és a keretes kép saját szerkezete nem változik: a főkép továbbra is 200 pixeles, balra úsztatott leadkép, a keretes pedig megtartja a szürke hátterét. Ezekben is ugyanaz a közös kép-tag normalizálja az `img` elemet. Emiatt a vegyes, különböző Blogger-generációkból származó képkódok a WYSIWYG megnyitásakor automatikusan egységes, RegionalBahn-kompatibilis kimenetté állnak össze; külön kézi Képkódok-konvertálásra nincs szükség.

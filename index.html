@@ -1142,7 +1142,7 @@ A következő cikk rövid ajánlója.</pre>
       <li>Kattints a <strong>Piszkozatok frissítése</strong> gombra.</li>
       <li>Nyisd meg a kívánt draftot.</li>
     </ol>
-    <p>Megnyitáskor az RBTools a draft HTML-jében szereplő Blogger-képeket a <strong>Képtárba</strong> gyűjti. Ott szerkeszthető a képaláírás és kredit, kijelölhető a főkép, és a kép behúzható a kék beszúrási sávok egyikére. Ha csak a képkódot akarod átvenni, a <strong>Bloggerben feltöltött képek HTML-je</strong> mező is használható.</p>
+    <p>Megnyitáskor az RBTools a draft HTML-jében szereplő Blogger-képeket a <strong>Képtárba</strong> gyűjti. A Cikkadmin ilyenkor automatikusan ugyanarra a RegionalBahn-képkódra normalizálja a normál, főkép- és keretes képeket, amelyet a külön <strong>Képkódok</strong> eszköz is használ: a régi Blogger-stílusok és <code>border</code> attribútumok kiesnek, a reszponzív képstílus, az ALT/kredit és a képaláírás egységesen újragenerálódik, a hasznos eredeti képméret- és reszponzív metaadatok pedig megmaradnak. Ott szerkeszthető a képaláírás és kredit, kijelölhető a főkép, és a kép behúzható a kék beszúrási sávok egyikére. Ha csak a képkódot akarod átvenni, a <strong>Bloggerben feltöltött képek HTML-je</strong> mező is használható.</p>
 
     <h3>8. Meglévő Blogger-piszkozat megnyitása</h3>
     <p>Kapcsolódás után válaszd ki a blogot. A <strong>Piszkozat keresése</strong> mező cím vagy post ID alapján szűr. A <strong>Piszkozat</strong> listából válassz, majd <strong>Piszkozat megnyitása</strong>. A program betölti a címet, HTML-t, Blogger-címkéket, képeket, iframe-eket és a felismerhető szerkezeti blokkokat.</p>
@@ -1978,11 +1978,11 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-box-variant{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel2);font-size:12px}
 #rbtools-app .admin-box-variant select{max-width:240px;min-width:140px}
 </style>
-<script src="/live-timeline.js?v=57"></script>
+<script src="/live-timeline.js?v=58"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v57";
+const RBTOOLS_VERSION="pages-v58";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
 const RBAPP = document.getElementById("rbtools-app");
@@ -3634,14 +3634,8 @@ function adminSearchText(){
 }
 
 function adminImageAttrs(img){
-  const attrs=[];
-  for(const a of Array.from(img?.attributes||[])){
-    const n=a.name.toLowerCase();
-    if(n==="style"||n==="border"||n==="src")continue;
-    attrs.push({name:a.name,value:a.value});
-  }
-  if(!attrs.some(a=>a.name.toLowerCase()==="alt"))attrs.push({name:"alt",value:""});
-  return attrs;
+  // Keep Cikkadmin imports on exactly the same attribute path as the Képkódok converter.
+  return collectImageAttrs(img);
 }
 function adminCleanCaptionText(value){
   return String(value||"").replace(/<br\s*\/?>/gi,"\n").replace(/\r\n?/g,"\n")
@@ -3926,22 +3920,44 @@ function adminBuildFromSource(){
   adminRenderCanvas();adminGenerateHtml();
   rbGet("adminStatus").textContent=adminBlocks.length+" szövegblokk felépítve. A cikk vizuálisan szerkeszthető.";
 }
-function adminImageBodyHtml(img){
-  const attrs=[],alt=rbImageAltText(img.caption,img.credit,img.photoName);
-  for(const a of img.attrs||[]){
-    if(a.name.toLowerCase()==="src")continue;
-    if(a.name.toLowerCase()==="alt"){attrs.push('alt="'+esc(alt,true)+'"');continue;}
-    attrs.push(a.name+'="'+esc(a.value,true)+'"');
+function rbCanonicalImageTag(item,{display="",alt="",forceWidth=null,style="max-width:100%;height:auto;"}={}){
+  const source=Array.isArray(item?.attrs)?item.attrs:[];
+  const attrs=[],seen=new Set();
+  const src=String(display||item?.display||"").trim();
+  let hasAlt=false,hasSrc=false,hasWidth=false;
+  for(const a of source){
+    const name=String(a?.name||"").trim(),low=name.toLowerCase();
+    if(!name||seen.has(low)||low==="style"||low==="border"||/^on/i.test(low))continue;
+    seen.add(low);
+    if(low==="alt"){attrs.push('alt="'+esc(alt,true)+'"');hasAlt=true;continue;}
+    if(low==="src"){attrs.push('src="'+esc(src||a.value||"",true)+'"');hasSrc=true;continue;}
+    if(low==="width"){
+      const width=forceWidth!==null?forceWidth:a.value;
+      if(String(width??"").trim())attrs.push('width="'+esc(String(width),true)+'"');
+      hasWidth=true;continue;
+    }
+    attrs.push(name+'="'+esc(a.value,true)+'"');
   }
-  if(!attrs.some(x=>/^alt=/.test(x)))attrs.unshift('alt="'+esc(alt,true)+'"');
-  if(!(img.attrs||[]).some(a=>a.name.toLowerCase()==="style"))attrs.push('style="max-width:100%;height:auto;"');
-  attrs.push('src="'+esc(img.display,true)+'"');
-  return '<div class="separator" style="clear: both; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img '+attrs.join(" ")+' /></a></div>\n'
+  if(!hasAlt)attrs.unshift('alt="'+esc(alt,true)+'"');
+  if(!hasSrc)attrs.push('src="'+esc(src,true)+'"');
+  if(forceWidth!==null&&!hasWidth)attrs.push('width="'+esc(String(forceWidth),true)+'"');
+  if(style)attrs.push('style="'+esc(style,true)+'"');
+  return '<img '+attrs.join(" ")+' />';
+}
+function adminImageBodyHtml(img){
+  const alt=rbImageAltText(img.caption,img.credit,img.photoName);
+  const imageTag=rbCanonicalImageTag(img,{display:img.display,alt});
+  return '<div class="separator" style="clear: both; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'>'+imageTag+'</a></div>\n'
     +'<div style="text-align: center;">'+adminCaptionHtml(img)+'</div>\n<br />';
 }
 function adminMainImageHtml(img){
   if(!img)return "";
-  return '<a href="'+esc(img.full||img.display,true)+'" style="clear: left; float: left; padding: 0px 1em 1em 0px; max-width:100%; box-sizing:border-box;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="200" style="max-width:100%; height:auto; box-sizing:border-box;" alt="'+esc(rbImageAltText(img.caption,img.credit,img.photoName),true)+'" /></a>';
+  const alt=rbImageAltText(img.caption,img.credit,img.photoName);
+  const imageTag=rbCanonicalImageTag(img,{
+    display:img.display,alt,forceWidth:200,
+    style:"max-width:100%; height:auto; box-sizing:border-box;"
+  });
+  return '<a href="'+esc(img.full||img.display,true)+'" style="clear: left; float: left; padding: 0px 1em 1em 0px; max-width:100%; box-sizing:border-box;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'>'+imageTag+'</a>';
 }
 function adminBoxBodyParts(html){
   const t=document.createElement("template");t.innerHTML=String(html||"");
@@ -3966,7 +3982,9 @@ function adminBoxHtml(block){
   });
   const img=adminFindImage(block.imageId);
   if(img){
-    out.push('<div class="separator" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'><img src="'+esc(img.display,true)+'" width="600" alt="'+esc(rbImageAltText(img.caption,img.credit,img.photoName),true)+'" /></a></div>');
+    const alt=rbImageAltText(img.caption,img.credit,img.photoName);
+    const imageTag=rbCanonicalImageTag(img,{display:img.display,alt,forceWidth:600});
+    out.push('<div class="separator" style="background-color: #c3c3c3; clear: both; padding: 15px 15px 5px; text-align: center;"><a href="'+esc(img.full||img.display,true)+'" style="padding: 0px 1em;"'+(img.credit?' title="'+esc(img.credit,true)+'"':"")+'>'+imageTag+'</a></div>');
     out.push('<div style="background-color: #c3c3c3; padding: 0px 15px 15px; text-align: center;">'+adminCaptionHtml(img)+'</div>');
   }
   const classic=out.join("\n");return block.variant==="accent"?rbBoxAccentWrap(classic):classic;
@@ -5152,6 +5170,7 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false}={}){
   adminRenderImageLibrary();adminRenderCanvas();adminGenerateHtml(false);
   rbGet("adminStatus").textContent="Meglévő HTML visszatöltve: "+adminBlocks.length+" törzsblokk, "+adminImages.length+" kép"+(recoveredHeadings?", "+recoveredHeadings+" hibás #nyúz H-címsor szétszedve":"")+(recoveredPrelude?", #nyúz cím/lead/Még kell előszoba helyreállítva":"")+(strippedFooterCount>1?", "+strippedFooterCount+" régi/dupla szerzői footer eltávolítva":"")+"; a főkép és a lead a <!--more--> előtt, közös blokkban van."+
     (incomingLive?" A percről percre frissítéseket külön, időbélyeges szerkesztőelemekként azonosítottuk.":"")
+    +(adminImages.length?" A képkódok automatikusan a Képkódok eszközzel közös RegionalBahn-szabványra normalizálódtak.":"")
     +(!adminLeadHtml?" Töltsd ki a valódi leadet.":"");
 }
 async function adminLoadTextFile(file){
@@ -5696,7 +5715,7 @@ function collectImageAttrs(img){
   }
   for(const attr of Array.from(img.attributes)){
     const low=attr.name.toLowerCase();
-    if(seen.has(low)||low==="border"||low==="style")continue;
+    if(seen.has(low)||low==="border"||low==="style"||/^on/i.test(low))continue;
     attrs.push({name:attr.name,value:attr.value});
   }
   if(!attrs.some(a=>a.name.toLowerCase()==="alt"))attrs.unshift({name:"alt",value:""});
@@ -5750,20 +5769,10 @@ function parseImageSource(raw){
 function imageItemHtml(item){
   const caption=adminCaptionParts(item.caption||"",item.credit||"");
   const alt=rbImageAltText(caption.caption,item.credit,caption.photoName);
-  const attrs=[];
-  let hasSrc=false,hasAlt=false;
-  for(const a of item.attrs){
-    const low=a.name.toLowerCase();
-    if(low==="src"){attrs.push('src="'+esc(item.display,true)+'"');hasSrc=true;continue;}
-    if(low==="alt"){attrs.push('alt="'+esc(alt,true)+'"');hasAlt=true;continue;}
-    attrs.push(a.name+'="'+esc(a.value,true)+'"');
-  }
-  if(!hasSrc)attrs.push('src="'+esc(item.display,true)+'"');
-  if(!hasAlt)attrs.unshift('alt="'+esc(alt,true)+'"');
-  if(!item.attrs.some(a=>a.name.toLowerCase()==="style"))attrs.push('style="max-width:100%;height:auto;"');
+  const imageTag=rbCanonicalImageTag(item,{display:item.display,alt});
   const full=item.full||item.display||"";
   const title=item.credit?' title="'+esc(item.credit,true)+'"':"";
-  return '<div class="separator" style="clear: both; text-align: center;"><a href="'+esc(full,true)+'" style="padding: 0px 1em;"'+title+'><img '+attrs.join(" ")+' /></a></div>\n'
+  return '<div class="separator" style="clear: both; text-align: center;"><a href="'+esc(full,true)+'" style="padding: 0px 1em;"'+title+'>'+imageTag+'</a></div>\n'
     +'<div style="text-align: center;">'+adminCaptionHtml(caption)+'</div>\n<br />';
 }
 function renderImagesOutput(setStatus=true){

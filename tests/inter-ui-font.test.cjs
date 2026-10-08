@@ -14,5 +14,5 @@ assert.match(index,/Consolas,"Courier New",monospace/);
 for(const m of index.matchAll(/font(?::|-[a-z-]+:)[^;\n}]*Arial[^;\n}]*/g)){
   assert.ok(m[0].includes("Inter,"),"Arial fallback must not precede Inter: "+m[0]);
 }
-assert.ok(index.includes('const RBTOOLS_VERSION="pages-v57"'));
+assert.ok(index.includes('const RBTOOLS_VERSION="pages-v58"'));
 console.log("Inter everywhere with symbol/emoji fallbacks and monospace code editors: PASS");

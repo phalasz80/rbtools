@@ -17,5 +17,5 @@ assert.match(privacy,/hogyan használjuk az adatokat/i);
 assert.match(privacy,/Tárolás a böngészőben/);
 assert.match(privacy,/Adattovábbítás/);
 assert.match(terms,/href="\/privacy\.html"/);
-assert.ok(index.includes('const RBTOOLS_VERSION="pages-v57"'));
+assert.ok(index.includes('const RBTOOLS_VERSION="pages-v58"'));
 console.log("Google OAuth homepage/privacy production-readiness links and disclosures: PASS");
