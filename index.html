@@ -6428,6 +6428,61 @@ function rbBuildHelpContents(){
 }
 rbBuildHelpContents();
 
+
+/* A publikált bejegyzések modulja kizárólag a Blogger Cikkadmin OAuth kapcsolatát használja. */
+window.RBTOOLS_PUBLISHED_BRIDGE=Object.freeze({
+ connected:()=>bloggerConnected(),
+ blogId:()=>String(rbGet("bloggerBlogSelect").value||""),
+ blogUrl:()=>{const id=String(rbGet("bloggerBlogSelect").value||"");return bloggerBlogs.find(b=>String(b.id)===id)?.url||"";},
+ currentPostId:()=>String(bloggerCurrentPost?.id||""),
+ snapshot:()=>({title:rbGet("adminTitle").value.trim(),content:rbGet("adminOutput").value,labels:bloggerParseLabels()}),
+ sameEditor:(a,b)=>!!a&&!!b&&a.title===b.title&&a.content===b.content&&
+   JSON.stringify(a.labels.slice().sort())===JSON.stringify(b.labels.slice().sort()),
+ prepareOutput:()=>adminGenerateHtml(false),
+ confirmDiscard:()=>{
+   const snap=bloggerLocalSnapshot();
+   if(bloggerKnownSnapshot&&!bloggerSnapshotEquals(bloggerKnownSnapshot,snap))
+     return window.confirm("A Cikkadmin mentetlen változásai elvesznek. Biztosan másik cikket nyitsz meg?");
+   if(!bloggerKnownSnapshot&&(snap.title||snap.content.trim()))
+     return window.confirm("A helyben írt cikked el fog veszni. Folytatod?");
+   return true;
+ },
+ loadPost:post=>{
+   if(!post?.id||String(post.status||"").toLowerCase()!=="live")throw Error("Nem publikált Blogger-bejegyzés.");
+   bloggerCurrentPost=post;rbGet("adminTitle").value=post.title||"";
+   rbGet("bloggerLabels").value=Array.isArray(post.labels)?post.labels.join(", "):"";
+   rbGet("adminSource").value="";rbGet("adminImageSource").value="";rbGet("adminExistingHtml").value=post.content||"";
+   adminLoadExistingHtml(post.content||"");rbGet("adminTitle").value=post.title||rbGet("adminTitle").value;
+   adminRenderCanvas();adminGenerateHtml(false);bloggerPostMeta();
+   bloggerKnownSnapshot={...bloggerLocalSnapshot(),origin:"loaded",when:post.updated||""};
+   bloggerSaveError="";bloggerSavePending=false;bloggerSetUi();bloggerUpdateSaveBanner();
+ },
+ markVerified:(post,sent)=>{
+   if(!post?.id||String(post.status||"").toLowerCase()!=="live")throw Error("Érvénytelen éles visszaigazolás.");
+   bloggerCurrentPost=post;
+   bloggerKnownSnapshot={blogId:String(rbGet("bloggerBlogSelect").value),postId:String(post.id),
+     title:sent.title,content:sent.content,labels:sent.labels.slice().sort((a,b)=>a.localeCompare(b,"hu")).join("\u001f"),
+     origin:"saved",when:post.updated||new Date().toISOString()};
+   bloggerSaveError="";bloggerSavePending=false;bloggerPostMeta();bloggerUpdateSaveBanner();
+ },
+ request:async ({blogId,route,postId="",method="GET",query="",body=null})=>{
+   if(!bloggerConnected())throw Error("Nincs aktív Blogger-kapcsolat.");
+   if(String(blogId)!==String(rbGet("bloggerBlogSelect").value)||!bloggerBlogs.some(b=>String(b.id)===String(blogId)))
+     throw Error("Eltérő blog vagy hiányzó jogosultság.");
+   if(!["list","search","bypath","post"].includes(route)||!["GET","PATCH"].includes(method))
+     throw Error("Érvénytelen Blogger-művelet.");
+   if(method==="PATCH"&&(route!=="post"||!postId||String(bloggerCurrentPost?.id)!==String(postId)||
+     String(bloggerCurrentPost?.status||"").toLowerCase()!=="live"||
+     !body||Object.keys(body).some(k=>!["title","content","labels"].includes(k))))
+     throw Error("Éles módosítás kizárólag a megnyitott publikált bejegyzésnél engedélyezett.");
+   const path="/blogs/"+encodeURIComponent(blogId)+"/posts"+
+     (route==="post"?"/"+encodeURIComponent(postId):route==="bypath"?"/bypath":route==="search"?"/search":"")+
+     (method==="GET"&&query?"?"+query:"");
+   return bloggerApi(path,{method,body});
+ },
+ download:(filename,content)=>downloadText(filename,content,"text/html;charset=utf-8")
+});
+
 /* A statikusoldal-szerkesztő önálló JS-moduljának korlátozott Blogger-kapcsolata. */
 window.RBTOOLS_PAGE_BRIDGE=Object.freeze({
   isConnected:()=>bloggerConnected(),
