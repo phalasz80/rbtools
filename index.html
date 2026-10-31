@@ -147,6 +147,7 @@ html,body{margin:0;min-height:100%;background:#f3f4f6;font-family:Inter,'Segoe U
       <li><strong>Rövidítések:</strong> jelöld ki a rövidítés szövegét, kattints az <strong>ABBR</strong> gyorsgombra vagy válaszd a jobb kattintásos helyi menüt; add meg a teljes feloldást a <code>title</code> mezőben.</li>
       <li><strong>#nyúz lead-szabvány:</strong> a Blogger címe kizárólag a külön Cikk címe mezőben van. A <code>&lt;!--more--&gt;</code> előtt egyetlen közös <code>&lt;strong&gt;</code> blokk tartalmazza a valódi leadet és közvetlenül utána a „Még kell:” listát; ezek nem kerülnek külön törzsblokkokba.</li>
       <li><strong>Jobbra zárt szerzői sor:</strong> a WYSIWYG és a haladó konverter azonos, a Blogger előnézetével szemben is megerősített jobbra igazító HTML-t készít minden cikkzáráshoz. A szerzőnevek tartalma nem módosul.</li>
+      <li><strong>#nyúz „Még kell” lista:</strong> a lead és a <code>&lt;!--more--&gt;</code> közötti, tetszőleges tartalmú <code>&lt;ul&gt;</code> lista külön, szerkeszthető blokkban marad. Visszatöltéskor nem törlődik; ha hiányzik vagy a szerkesztő módosítása nélkül megváltozik, a Blogger-piszkozat mentése leáll.</li>
       <li><strong>Szerzők és #nyúz:</strong> a szerzőmező és a footer formája közvetlenül a WYSIWYG alatt található. Megnyitott piszkozatból a szabványos szerzői sor és az „Összeállította:” változat automatikusan visszatöltődik, de utána szabadon módosítható.</li>
       <li><strong>Percről percre:</strong> töltsd be az élő sablont, írd meg a leadet, majd az <strong>＋ Időbélyeges frissítés</strong> gombbal add hozzá az időpontot, helyszínt, tudósító nevét és a frissítés WYSIWYG-szövegét. A képtárból képet is húzhatsz a frissítésbe. Alapértelmezés szerint a legújabb bejegyzés alul jelenik meg, mint a 2020-as RegioJet-tudósításnál. Fordított sorrend is választható. Készülő frissítést ugyanabba a Blogger-piszkozatba ments vissza, az éles közzététel a szerkesztő dolga.</li>
       <li><strong>Cikkcím:</strong> a címet a külön, Blogger-szerű <strong>Cikk címe</strong> mezőbe írd. Nem lesz belőle megismételt törzsszöveg vagy automatikus lead.</li>
@@ -1444,6 +1445,7 @@ A következő cikk rövid ajánlója.</pre>
 
     <p><strong>Kép URL-jének cseréje:</strong> kattints a képre jobb egérgombbal (ez a leadkép esetén is működik), vagy válaszd a Képtár „Kép URL-jeinek cseréje” gombját. A nagy Blogger-kép linkjéből a program felismerhető méretjelölés esetén automatikusan s600-as törzsképet és s200-as leadképet képez. Egyéb URL-eknél külön kis és nagy képlinket kell megadni. A fotósnév, képkomment, képaláírás és a kép cikkbeli helye változatlan.</p>
     <h3>20. Blogger-címkék, cím, szerző és footer</h3>
+    <p><strong>#nyúz „Még kell” munkalista:</strong> a lead alatti, <code>&lt;!--more--&gt;</code> előtti <code>&lt;ul&gt;</code> lista az RBToolsban külön szerkeszthető. A Blogger-piszkozatból visszaolvasott valamennyi listaelem és hivatkozás változatlanul megmarad, hacsak magát a listát nem szerkeszted. A lista teljes kijelöléses törlését visszaállítja, és a piszkozat mentését megakadályozza, ha az eredeti felsorolás hiányozna. Éles cikkekre nem vezetünk be ilyen új listát.</p>
     <p><strong>A szerzői sor igazítása:</strong> a cikkzárást mind a WYSIWYG, mind a haladó konverter azonos jobbra zárt HTML-kóddal készíti. A Blogger-témában is működő <code>align="right"</code> attribútum és az inline <code>text-align: right !important</code> stílus a szerzőnevek balra csúszását akadályozza meg. A cikkek szerzősége változatlan.</p>
     <p><strong>A szerző(k) és a cikkzárás</strong> közvetlenül a WYSIWYG alatt található, függetlenül a választott cikksablontól. A <strong>Szerző(k) neve</strong>, <strong>Összeállította: név</strong> és <strong>Nincs footer</strong> változat között bármikor válthatsz. Régi piszkozat megnyitásakor az utolsó, valóban szabványos (vízszintes vonallal elválasztott, 85%-os dőlt, jobbra zárt) szerzői blokk adatait olvassuk vissza. Hiányzó footernél nem találgatunk: a mező üres, a footer kikapcsolt. Változtatáskor a végleges HTML azonnal frissül.</p>
     <ul>
@@ -2271,13 +2273,18 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app #rbtools-tab-admin[data-editor-mode="live"]:not([data-live-loaded="true"]) .rb-live-readback-notice{display:block}
 #rbtools-app .rb-live-author-lock{padding:10px;border:1px solid #bd914a;border-radius:8px;font-weight:650}
 #rbtools-app .rb-live-author-lock[hidden]{display:none!important}
+
+#rbtools-app .admin-news-todo-panel{border:2px solid #b98d42;background:var(--panel2);border-radius:10px;padding:12px 14px;margin:10px 0}
+#rbtools-app .admin-news-todo-panel>strong{display:block;margin-bottom:8px}
+#rbtools-app .admin-news-todo-editor{min-height:54px;padding:9px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel);outline-offset:2px}
+#rbtools-app .admin-news-todo-editor ul{margin:4px 0;padding-left:26px}
 </style>
 <script src="/live-timeline.js?v=59"></script>
 <script src="/corrector-core.js?v=59"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v69";
+const RBTOOLS_VERSION="pages-v70";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 const CORRECTOR=window.RBTOOLS_CORRECTOR;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
@@ -3471,6 +3478,7 @@ let bloggerTokenClient=null;
 let bloggerBlogs=[];
 let bloggerDrafts=[];
 let bloggerCurrentPost=null;
+let bloggerDraftProtectedChecklistUl="";
 let bloggerKnownSnapshot=null,bloggerSavePending=false,bloggerSaveError="",bloggerLastBannerState="",bloggerLastBannerText="";
 
 function bloggerLocalSnapshot(){
@@ -3661,6 +3669,7 @@ async function bloggerOpenDraft(){
     post=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts/"+encodeURIComponent(postId)+"?view=AUTHOR&fetchBody=true&fetchImages=true");
   }
   bloggerCurrentPost=post;
+  bloggerDraftProtectedChecklistUl=adminNewsTodoListFromHtml(post.content||"");
   rbGet("adminTitle").value=post.title||"";
   rbGet("bloggerLabels").value=Array.isArray(post.labels)?post.labels.join(", "):"";
   rbGet("adminSource").value="";rbGet("adminImageSource").value="";rbGet("adminExistingHtml").value=post.content||"";
@@ -3679,6 +3688,14 @@ async function bloggerSaveDraft({resetSchedule=true}={}){
   const blogId=rbGet("bloggerBlogSelect").value;if(!blogId)throw new Error("Nincs kiválasztott blog.");
   adminGenerateHtml(false);
   const title=rbGet("adminTitle").value.trim(),content=rbGet("adminOutput").value;
+  const checklist=adminNewsTodoListFromHtml(content);
+  if(bloggerDraftProtectedChecklistUl&&!checklist)
+    throw new Error("A #nyúz „Még kell” listája hiányzik a mentendő HTML-ből. A Blogger-piszkozatot nem írtuk felül.");
+  if(bloggerDraftProtectedChecklistUl&&!adminNewsChecklistTouched&&
+     !adminNewsChecklistIsIntact(bloggerDraftProtectedChecklistUl,checklist))
+    throw new Error("A #nyúz „Még kell” listája észrevétlenül megváltozna vagy elveszne. A mentés leállt.");
+  if(rbGet("adminContentType").value==="news"&&adminNewsChecklistLastSafeUl&&!checklist)
+    throw new Error("A #nyúz piszkozat „Még kell” felsorolása nem törölhető. Mentés megszakítva.");
   if(!title)throw new Error("A cikknek nincs címe.");
   if(!content.trim())throw new Error("A cikk tartalma üres.");
   const body={kind:"blogger#post",title,content,labels:bloggerParseLabels()};
@@ -3693,6 +3710,8 @@ async function bloggerSaveDraft({resetSchedule=true}={}){
     }else post=await bloggerApi("/blogs/"+encodeURIComponent(blogId)+"/posts?isDraft=true",{method:"POST",body});
     if(!post?.id)throw new Error("A Blogger-válasz nem igazolta vissza a bejegyzésazonosítót.");
     bloggerCurrentPost=post;
+    bloggerDraftProtectedChecklistUl=adminNewsTodoListFromHtml(content);
+    adminNewsChecklistTouched=false;
     bloggerKnownSnapshot={...sent,blogId,postId:String(post.id),origin:"saved",when:new Date().toISOString()};
     bloggerPostMeta();
     try{await bloggerLoadDrafts();}catch(error){bloggerStatus("Mentve, de a piszkozatlista frissítése sikertelen: "+error.message);}
@@ -3770,6 +3789,9 @@ let adminBlocks=[];
 let adminImages=[];
 let adminSourcesHtml="";
 let adminLeadHtml="";
+let adminNewsChecklistUl="";
+let adminNewsChecklistLastSafeUl="";
+let adminNewsChecklistTouched=false;
 let adminLeadAlign="justify";
 let adminMainImageId=null;
 let adminSeq=0;
@@ -3969,12 +3991,15 @@ function adminApplyTemplate(){
   const type=rbGet("adminContentType").value,staticLayout=rbGet("adminStaticLayout").value;
   if(adminHasMeaningfulContent()&&!window.confirm("A sablon lecseréli a jelenlegi címet, leadet és tartalmi blokkokat. A képtár és a Blogger-bejegyzés hozzárendelése megmarad. Folytatod?"))return;
   adminSourcesHtml="";adminLeadAlign="justify";adminActiveEditable=null;adminSavedRange=null;
+  if(type!=="news"){adminNewsChecklistUl="";adminNewsChecklistLastSafeUl="";adminNewsChecklistTouched=false;}
   rbGet("adminExistingHtml").value="";rbGet("adminSource").value="";
   if(type==="article"){
     rbGet("adminTitle").value="Cikk címe";adminLeadHtml="Lead / bevezető.";rbGet("adminFooter").value="author";
   }else if(type==="news"){
     rbGet("adminTitle").value="Hétvégi gyors – ";
-    adminLeadHtml='Lead szövege.<br /><br />Még kell:<ul><li>Hír X (by MM)</li><li>Hír X (by MM)</li></ul>';
+    adminLeadHtml="Lead szövege.";
+    adminNewsSetChecklist((bloggerCurrentPost?.id&&bloggerDraftProtectedChecklistUl)||adminNewsChecklistUl||
+      '<ul><li>Hír X (by MM)</li><li>Hír X (by MM)</li></ul>');
     rbGet("adminAuthor").value="Adorján Péter";rbGet("adminFooter").value="compiled";
   }else if(type==="podcast"){
     rbGet("adminTitle").value="Podcast címe";adminLeadHtml="Podcast felvezető szövege.";rbGet("adminAuthor").value="RegionalBahn szerkesztőség";rbGet("adminFooter").value="author";
@@ -4843,9 +4868,13 @@ function adminGenerateHtml(setStatus=true){
     out=adminBlocks.map(adminBlockHtml).filter(Boolean).join("\n");
   }else{
     if(adminRepairLegacyLeadBlock())adminRenderCanvas();
+    if(contentType==="news"){
+      if(!adminNewsChecklistUl)adminNewsSetChecklist(adminNewsTodoListFromHtml(adminLeadHtml));
+      adminNewsSeparateChecklistFromLead();
+    }
     const topHtml=adminNormalizeInlineHtml(adminLeadHtml);
     const main=adminFindImage(adminMainImageId);
-    out='<div style="text-align: '+adminValidAlign(adminLeadAlign,"justify")+'; display: flow-root; line-height: 1.5; overflow-wrap: anywhere;">\n'+adminMainImageHtml(main)+'<strong>'+topHtml+'</strong></div>\n<br />\n<!--more-->\n<br />\n';
+    out='<div style="text-align: '+adminValidAlign(adminLeadAlign,"justify")+'; display: flow-root; line-height: 1.5; overflow-wrap: anywhere;">\n'+adminMainImageHtml(main)+'<strong>'+topHtml+'</strong></div>\n<br />\n'+adminNewsChecklistOutput()+'<!--more-->\n<br />\n';
     if(contentType==="live"){
       const last=LIVE_TIMELINE.latest(adminBlocks);
       if(last&&LIVE_TIMELINE.safeAnchor(last.anchor)){
@@ -5268,6 +5297,28 @@ function adminRenderCanvas(){
       }
     });
     panel.appendChild(shell);host.appendChild(panel);
+    if(rbGet("adminContentType").value==="news"&&adminNewsChecklistUl){
+      const pane=document.createElement("section");pane.className="admin-news-todo-panel";
+      const heading=document.createElement("strong");
+      heading.textContent="Még kell: szerkesztőségi lista (piszkozatban megőrzendő)";
+      pane.appendChild(heading);
+      const editor=document.createElement("div");
+      editor.className="admin-news-todo-editor";editor.contentEditable="true";editor.spellcheck=true;
+      editor.setAttribute("aria-label","Még kell: listaelemek szerkesztése");
+      editor.innerHTML=adminVisualizeSpecials(adminNewsChecklistUl);
+      adminTrackEditable(editor,()=>{
+        const updated=adminNewsValidUl(editor.innerHTML);
+        if(updated){
+          if(updated!==adminNewsChecklistUl)adminNewsChecklistTouched=true;
+          adminNewsChecklistUl=updated;adminNewsChecklistLastSafeUl=updated;
+        }else{
+          editor.innerHTML=adminNewsChecklistLastSafeUl;
+          adminNewsChecklistUl=adminNewsChecklistLastSafeUl;
+          rbGet("adminStatus").textContent="A #nyúz „Még kell” listája nem törölhető; csak a listaelemek szerkeszthetők.";
+        }
+      });
+      pane.appendChild(editor);host.appendChild(pane);
+    }
     const more=document.createElement("div");more.className="admin-more";host.appendChild(more);
   }
 
@@ -5807,6 +5858,54 @@ function adminNewsNodeInnerWithoutOuterStrong(node){
   }
   return node.innerHTML.trim();
 }
+
+function adminNewsTodoListFromHtml(raw){
+  const tpl=document.createElement("template");
+  tpl.innerHTML=String(raw||"");
+  for(const ul of Array.from(tpl.content.querySelectorAll("ul"))){
+    for(let parent=ul.parentElement;parent;parent=parent.parentElement){
+      const source=parent.innerHTML||"",index=source.indexOf(ul.outerHTML);
+      if(index<0)continue;
+      const prefix=source.slice(0,index)
+        .replace(/<[^>]*>/g," ").replace(/&nbsp;|&#160;/gi," ").replace(/\s+/g," ").trim();
+      if(/Még\s*kell\s*:\s*$/i.test(prefix))return ul.outerHTML;
+    }
+  }
+  return "";
+}
+function adminNewsValidUl(source){
+  const tpl=document.createElement("template");tpl.innerHTML=String(source||"");
+  return tpl.content.querySelector("ul")?.outerHTML||"";
+}
+function adminNewsSetChecklist(source){
+  const ul=adminNewsValidUl(source);if(!ul)return false;
+  adminNewsChecklistUl=ul;adminNewsChecklistLastSafeUl=ul;adminNewsChecklistTouched=false;
+  return true;
+}
+function adminNewsSeparateChecklistFromLead(){
+  if(!adminNewsChecklistUl)return;
+  const value=String(adminLeadHtml||""),match=/Még\s*kell\s*:/i.exec(value);
+  if(!match||!/<ul\b/i.test(value.slice(match.index)))return;
+  adminLeadHtml=value.slice(0,match.index).replace(/(?:\s*<br\s*\/?>\s*)+$/gi,"").trim();
+}
+function adminNewsChecklistOutput(){
+  if(rbGet("adminContentType")?.value!=="news")return "";
+  const ul=adminNewsValidUl(adminNewsChecklistUl)||adminNewsValidUl(adminNewsChecklistLastSafeUl);
+  if(!ul)return "";
+  adminNewsChecklistUl=ul;
+  return '<div style="text-align: justify;"><b>Még kell:\n'+ul+'</b></div>\n<br />\n';
+}
+function adminNewsChecklistIsIntact(original,current){
+  const a=document.createElement("template"),b=document.createElement("template");
+  a.innerHTML=original;b.innerHTML=current;
+  const first=a.content.querySelector("ul"),second=b.content.querySelector("ul");
+  if(!first||!second)return false;
+  return first.textContent===second.textContent&&
+    first.querySelectorAll("li").length===second.querySelectorAll("li").length&&
+    Array.from(first.querySelectorAll("a[href]")).map(x=>x.getAttribute("href")).join("\u0000")===
+    Array.from(second.querySelectorAll("a[href]")).map(x=>x.getAttribute("href")).join("\u0000");
+}
+
 function adminNewsChecklistNode(node){
   if(!node||node.nodeType!==1||!["DIV","P"].includes(node.tagName))return false;
   const text=(node.textContent||"").replace(/\s+/g," ").trim();
@@ -5869,17 +5968,12 @@ function adminRecoverNewsPrelude(nodes,title){
     }
   }
 
-  // 3) A "Még kell:" lista ugyanabba a lead <strong>...</strong> tartalomba kerül.
+  // 3) Régi, <!--more--> mögé került "Még kell:" lista külön védett blokk.
   i=nextIndex();
   if(i>=0&&adminNewsChecklistNode(nodes[i])){
-    const checklist=adminNewsNodeInnerWithoutOuterStrong(nodes[i]);
-    if(checklist){
-      const current=String(adminLeadHtml||"").trim();
-      const currentText=adminComparableText(current);
-      const checklistText=adminComparableText(checklist);
-      if(!currentText.includes(checklistText)){
-        adminLeadHtml=current?(current+"<br /><br />"+checklist):checklist;
-      }
+    const found=adminNewsTodoListFromHtml(nodes[i].outerHTML);
+    if(found&&(!adminNewsChecklistUl||adminNewsChecklistUl===found)){
+      if(!adminNewsChecklistUl)adminNewsSetChecklist(found);
       adminNewsRemoveNodeAndAdjacentBreaks(nodes,i);changed=true;
     }
   }
@@ -5893,6 +5987,7 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false,fromPublishedBlogg
   raw=String(raw||"").trim();if(!raw){rbGet("adminStatus").textContent="Nincs visszatöltendő HTML.";return;}
   const chosen=preserveCurrentMain?adminFindImage(adminMainImageId):null;
   adminBlocks=[];adminImages=chosen?[chosen]:[];adminSourcesHtml="";adminLeadHtml="";adminLeadAlign="justify";adminMainImageId=chosen?.id||null;
+  adminNewsChecklistUl="";adminNewsChecklistLastSafeUl="";adminNewsChecklistTouched=false;
   rbGet("adminAuthor").value="";rbGet("adminFooter").value="none";
   const titleDoc=new DOMParser().parseFromString(raw,"text/html").querySelector("title");
   if(titleDoc&&titleDoc.textContent.trim()&&!rbGet("adminTitle").value.trim())rbGet("adminTitle").value=titleDoc.textContent.trim();
@@ -5912,6 +6007,11 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false,fromPublishedBlogg
   let nodes=Array.from(tpl.content.childNodes);
   const looksLikeNews=/^Hétvégi gyors\b/i.test(rbGet("adminTitle").value.trim())||
     /Összeállította:/i.test(post)&&nodes.filter(n=>n.nodeType===1&&n.tagName==="HR").length>=2;
+  if(looksLikeNews||rbGet("adminContentType").value==="news"){
+    const beforeMore=adminNewsTodoListFromHtml(pre);
+    if(beforeMore)adminNewsSetChecklist(beforeMore);
+    adminNewsSeparateChecklistFromLead();
+  }
   if(looksLikeNews&&rbGet("adminContentType").value!=="news"){
     rbGet("adminContentType").value="news";adminContentTypeChanged(false);
   }
@@ -5960,6 +6060,13 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false,fromPublishedBlogg
       continue;
     }
     const text=(n.textContent||"").trim();
+    if(looksLikeNews&&adminNewsChecklistNode(n)){
+      const list=adminNewsTodoListFromHtml(n.outerHTML);
+      if(list&&(!adminNewsChecklistUl||adminNewsChecklistUl===list)){
+        if(!adminNewsChecklistUl)adminNewsSetChecklist(list);
+        continue;
+      }
+    }
     if(tag==="aside"&&n.classList.contains("rb-box-accent")){
       const previous=adminBlocks.length;
       adminImportBoxGroup(Array.from(n.childNodes),0);
@@ -6030,6 +6137,7 @@ function adminInsertAllImages(){
 function adminClear(){
   adminClearSearchHighlights(true);
   adminBlocks=[];adminImages=[];adminSourcesHtml="";adminLeadHtml="";adminLeadAlign="justify";adminMainImageId=null;adminActiveEditable=null;adminSavedRange=null;
+  adminNewsChecklistUl="";adminNewsChecklistLastSafeUl="";adminNewsChecklistTouched=false;bloggerDraftProtectedChecklistUl="";
   adminBlocks.push({id:adminUid("b"),type:"p",html:"",align:"justify"});
   ["adminSource","adminImageSource","adminExistingHtml","adminTitle","adminOutput"].forEach(id=>rbGet(id).value="");
   rbGet("adminAuthor").value="Halász Péter";rbGet("adminFooter").value="author";
