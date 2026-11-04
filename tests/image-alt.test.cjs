@@ -24,6 +24,7 @@ const setup=`
     photoName:"Halász Péter"
   }:null;
   const adminNormalizeInlineHtml=x=>x;
+  const rbBloggerSizeVariant=url=>url;
   const adminValidAlign=(x,f)=>x||f;
   const adminBoxBodyParts=x=>[x];
 `;
