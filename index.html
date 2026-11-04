@@ -2274,17 +2274,18 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .rb-live-author-lock{padding:10px;border:1px solid #bd914a;border-radius:8px;font-weight:650}
 #rbtools-app .rb-live-author-lock[hidden]{display:none!important}
 
-#rbtools-app .admin-news-todo-panel{border:2px solid #b98d42;background:var(--panel2);border-radius:10px;padding:12px 14px;margin:10px 0}
+#rbtools-app .admin-news-todo-panel{border:2px solid #b98d42;background:var(--panel2);color:var(--ink);border-radius:10px;padding:12px 14px;margin:10px 0}
 #rbtools-app .admin-news-todo-panel>strong{display:block;margin-bottom:8px}
-#rbtools-app .admin-news-todo-editor{min-height:54px;padding:9px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel);outline-offset:2px}
+#rbtools-app .admin-news-todo-editor{min-height:54px;padding:9px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);caret-color:var(--ink);outline-offset:2px}
 #rbtools-app .admin-news-todo-editor ul{margin:4px 0;padding-left:26px}
+#rbtools-app .admin-news-todo-editor a{color:var(--accent)}
 </style>
 <script src="/live-timeline.js?v=59"></script>
 <script src="/corrector-core.js?v=59"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v70";
+const RBTOOLS_VERSION="pages-v71";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 const CORRECTOR=window.RBTOOLS_CORRECTOR;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
@@ -4883,7 +4884,17 @@ function adminGenerateHtml(setStatus=true){
          '" style="color:#155477">Ugrás a legfrissebb frissítéshez ('+esc(last.time)+')</a></nav>\n';
       }
     }
-    out+=adminBlocks.map(adminBlockHtml).filter(Boolean).join("\n");
+    let bodyMarkup=adminBlocks.map(adminBlockHtml).filter(Boolean).join("\n");
+    // A legacy author line may have been loaded as an editable news body block.
+    // Remove only trailing credits before generating the single official footer.
+    if(contentType==="news"&&rbGet("tab-admin")?.dataset.editorMode!=="live"){
+      const bodyTpl=document.createElement("template");bodyTpl.innerHTML=bodyMarkup;
+      const bodyNodes=Array.from(bodyTpl.content.childNodes);
+      let legacyCredits=0;
+      while(adminReadAuthorFooter(bodyNodes))legacyCredits++;
+      if(legacyCredits)bodyMarkup=bodyNodes.map(n=>n.nodeType===3?n.textContent:(n.outerHTML||"")).join("");
+    }
+    out+=bodyMarkup;
     if(adminSourcesHtml)out+="\n"+adminSourcesHtml;
     if(["author","compiled"].includes(rbGet("adminFooter").value)&&author)out+='\n<hr align="center" />\n'+rbAuthorFooterMarkup((rbGet("adminFooter").value==="compiled"?"Összeállította: ":"")+esc(author));
   }
@@ -5769,27 +5780,27 @@ function adminRepairLegacyLeadBlock(){
 }
 
 function adminReadAuthorFooter(nodes){
- let i=nodes.length-1;
- while(i>=0&&(nodes[i].nodeType===3&&!nodes[i].textContent.trim()||
-   nodes[i].nodeType===1&&nodes[i].tagName==="BR"))i--;
- const last=nodes[i];
- if(!last||last.nodeType!==1||!["DIV","P"].includes(last.tagName))return null;
- const em=last.querySelector("em"),span=em?.closest("span");
- if(!em||!/85%|0\.85em/i.test(span?.getAttribute("style")||""))return null;
- const value=(em.textContent||"").trim();if(!value)return null;
- const compiled=/^Összeállította:\s*/i.test(value);
- const right=/text-align\s*:\s*right/i.test(last.getAttribute("style")||"")||/^right$/i.test(last.getAttribute("align")||"");
- if(!right&&!compiled)return null;
- let h=i-1;
- while(h>=0&&(nodes[h].nodeType===3&&!nodes[h].textContent.trim()||
-   nodes[h].nodeType===1&&nodes[h].tagName==="BR"))h--;
- const hasRule=h>=0&&nodes[h].nodeType===1&&nodes[h].tagName==="HR";
- if(!hasRule&&!compiled)return null;
- nodes.splice(i,1);
- if(hasRule)nodes.splice(h,1);
- return {name:value.replace(/^Összeállította:\s*/i,"").trim(),mode:compiled?"compiled":"author"};
+  // Recognize legacy Blogger credits without the 85% wrapper or right alignment.
+  let i=nodes.length-1;
+  while(i>=0&&(nodes[i].nodeType===3&&!nodes[i].textContent.trim()||
+    nodes[i].nodeType===1&&nodes[i].tagName==="BR"))i--;
+  const last=nodes[i];
+  if(!last||last.nodeType!==1||!["DIV","P"].includes(last.tagName))return null;
+  const em=last.querySelector("em,i"),span=em?.closest("span");
+  const value=String(last.textContent||em?.textContent||"").replace(/\s+/g," ").trim();
+  const compiledMatch=/^Összeállította\s*:\s*(\S.*)$/i.exec(value);
+  const right=/text-align\s*:\s*right/i.test(last.getAttribute("style")||"")||
+    /^right$/i.test(last.getAttribute("align")||"");
+  const small=/85%|0\.85em/i.test((span?.getAttribute("style")||"")+" "+(em?.getAttribute?.("style")||""));
+  let h=i-1;
+  while(h>=0&&(nodes[h].nodeType===3&&!nodes[h].textContent.trim()||
+    nodes[h].nodeType===1&&nodes[h].tagName==="BR"))h--;
+  const hasRule=h>=0&&nodes[h].nodeType===1&&nodes[h].tagName==="HR";
+  if(compiledMatch?!(hasRule||right||em||small):!(value&&em&&small&&right&&hasRule))return null;
+  nodes.splice(i,1);
+  if(hasRule)nodes.splice(h,1);
+  return {name:compiledMatch?compiledMatch[1].trim():value,mode:compiledMatch?"compiled":"author"};
 }
-
 
 function adminNewsInlineFragmentHtml(node){
   const box=document.createElement("div");
