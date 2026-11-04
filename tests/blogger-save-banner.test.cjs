@@ -18,6 +18,7 @@ const api=new Function("nodes","isConnected",`
  let bloggerCurrentPost={id:"post1"};
  let bloggerKnownSnapshot=null,bloggerSavePending=false,bloggerSaveError="";
  let bloggerLastBannerState="",bloggerLastBannerText="";
+ const window={RBTOOLS_PUBLISHED:{sync(){}}};
  const rbGet=id=>nodes[id],bloggerConnected=isConnected;
  const bloggerParseLabels=()=>nodes.bloggerLabels.value.split(",").map(x=>x.trim()).filter(Boolean);
  `+fn("bloggerLocalSnapshot")+fn("bloggerSnapshotEquals")+fn("bloggerUpdateSaveBanner")+
