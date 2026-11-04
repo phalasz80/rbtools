@@ -5,7 +5,7 @@ const pos=t=>{const i=index.indexOf(t);assert.ok(i>=0,"Missing "+t);return i};
 assert.ok(pos('id="rbtools-help-cikkadmin"')<pos('id="rbtools-help-gyujtooldalak"'));
 assert.ok(pos('id="rbtools-help-gyujtooldalak"')<pos("<h2>Markdown formázási szabályok</h2>"));
 assert.ok(index.includes('href="/release-notes.html"'));
-assert.ok(index.includes('const RBTOOLS_VERSION="pages-v59"'));
+assert.ok(index.includes('const RBTOOLS_VERSION="pages-v71"'));
 assert.ok(index.includes('id="rbtools-helpChapterLinks"'));
 assert.ok(index.includes('button("Összes",()=>choose(null))'));
 assert.ok(index.includes('e.panel.hidden=!!entry&&e!==entry'));
