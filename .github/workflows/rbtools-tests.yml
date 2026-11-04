@@ -58,8 +58,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          failed=0
           for spec in tests/*.test.cjs; do
             echo "::group::$spec"
-            node "$spec"
+            if node "$spec"; then :; else failed=$((failed+1)); fi
             echo "::endgroup::"
           done
+          if [ "$failed" -ne 0 ]; then
+            echo "::error::$failed regression test suite(s) failed."
+            exit 1
+          fi
