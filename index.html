@@ -359,7 +359,8 @@ További szöveg..."></textarea>
     <div class="admin-section-head">
       <div>
         <h2 style="margin:0">Vizuális cikkszerkesztő</h2>
-        <p class="small" style="margin:3px 0 0">Szöveget szabadon kijelölhetsz és formázhatsz, a kijelölésen jobb kattintással helyi formázómenüt is kapsz (Shift + jobb kattintás: böngészőmenü). Az eszköztár a cikkszöveg felett marad. A blokkok csak a jobb oldali ⠿ fogantyúnál húzhatók, a kék beszúrási sávokra pedig kép vagy blokk dobható. A szerkesztő függőlegesen átméretezhető az alsó pereménél.</p>
+        <p class="small" style="margin:3px 0 0">Szerkesztés a cikkben: Enter = új blokk, Backspace/Delete = üres blokk törlése vagy bekezdések összefűzése. A képtár a szöveg melletti oldalsávban nyitható meg.</p>
+        <details class="rb-editor-guide"><summary>Részletes szerkesztési tippek</summary><p class="small">Jelöld ki a szöveget a formázáshoz; jobb kattintással helyi menüt kapsz (Shift + jobb kattintás: böngészőmenü). A blokkokat csak a ⠿ fogantyúval húzd; a képeket a kék beszúrási sávokra is dobhatod. Shift+Enter = sortörés egy blokkon belül. A szerkesztő alsó pereme függőlegesen átméretezhető.</p></details>
       </div>
       <div class="toolbar" style="margin:0">
         <button id="rbtools-adminAddParagraph" type="button" title="Új önálló kenyérszövegblokk: &lt;div style=&quot;text-align: justify;&quot;&gt;…&lt;/div&gt;">＋ Új bekezdésblokk</button>
@@ -2279,13 +2280,48 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-news-todo-editor{min-height:54px;padding:9px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);caret-color:var(--ink);outline-offset:2px}
 #rbtools-app .admin-news-todo-editor ul{margin:4px 0;padding-left:26px}
 #rbtools-app .admin-news-todo-editor a{color:var(--accent)}
+
+/* v72: a WYSIWYG cikk melletti, összecsukható képtár és látható blokkvezérlők. */
+#rbtools-app .rb-editor-stage{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-items:start;margin-top:12px}
+#rbtools-app .rb-editor-stage.gallery-open{grid-template-columns:minmax(0,1fr) minmax(255px,310px)}
+#rbtools-app .rb-editor-stage>.admin-canvas{min-width:0;margin-top:0}
+#rbtools-app .rb-editor-gallery[hidden]{display:none!important}
+#rbtools-app .rb-editor-gallery{min-width:0;max-height:75vh;overflow-y:auto;overscroll-behavior:contain;position:sticky;top:82px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px}
+#rbtools-app .rb-gallery-top{display:flex;align-items:center;justify-content:space-between;gap:9px;border-bottom:1px solid var(--line);padding:5px 3px 9px}
+#rbtools-app .rb-gallery-top button{font-size:12px;padding:5px 8px}
+#rbtools-app .rb-gallery-hint{margin:8px 3px}
+#rbtools-app .rb-gallery-toggle{border-color:#6394c2;font-weight:800;white-space:nowrap}
+#rbtools-app .rb-gallery-toggle.active{background:#0b5394;color:#fff;border-color:#0b5394}
+#rbtools-app .rb-editor-gallery .admin-library-card{margin:6px 0 0}
+#rbtools-app .rb-editor-gallery .admin-library-card>.cardhead{padding:8px;gap:5px}
+#rbtools-app .rb-editor-gallery .admin-library-card>.cardhead>.small{display:none}
+#rbtools-app .rb-editor-gallery .admin-image-library{grid-template-columns:minmax(0,1fr);gap:8px;padding:8px}
+#rbtools-app .rb-editor-gallery .admin-image-thumb{height:116px;padding:5px}
+#rbtools-app .rb-editor-gallery .admin-image-thumb img{max-height:106px}
+#rbtools-app .rb-gallery-caption{padding:6px 9px 2px;color:var(--ink);font-size:11px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#rbtools-app .rb-gallery-quick-actions{display:flex;flex-wrap:wrap;gap:5px;padding:6px 8px 9px}
+#rbtools-app .rb-gallery-quick-actions button{flex:1 1 auto;padding:5px;font-size:12px;font-weight:700}
+#rbtools-app .rb-gallery-meta{margin:0!important;border-top:1px solid var(--line)}
+#rbtools-app .rb-gallery-meta>summary{padding:7px 10px;background:var(--panel2);font-size:12px;color:var(--ink)}
+#rbtools-app .rb-gallery-meta>.admin-image-fields{padding:9px}
+#rbtools-app .rb-editor-guide{margin:5px 0!important}
+#rbtools-app .rb-editor-guide summary{font-size:12px;color:var(--muted)}
+#rbtools-app .rb-editor-guide p{margin:7px 0}
+#rbtools-app .admin-block-controls{opacity:.82;z-index:2}
+#rbtools-app .admin-block-controls button:last-child{color:#9b1c1c;border-color:#d5a8a8;font-weight:900;background:#fff6f6}
+#rbtools-app .admin-block-controls button:last-child:hover,#rbtools-app .admin-block-controls button:last-child:focus-visible{background:#fee2e2;color:#7f1d1d}
+@media(max-width:930px){
+  #rbtools-app .rb-editor-stage.gallery-open{grid-template-columns:minmax(0,1fr)}
+  #rbtools-app .rb-editor-gallery{position:static;max-height:42vh;grid-row:1}
+  #rbtools-app .rb-editor-stage>.admin-canvas{grid-row:2}
+}
 </style>
 <script src="/live-timeline.js?v=59"></script>
 <script src="/corrector-core.js?v=59"></script>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v71";
+const RBTOOLS_VERSION="pages-v72";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 const CORRECTOR=window.RBTOOLS_CORRECTOR;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
@@ -2434,22 +2470,45 @@ function rbIntegrateEditorTools(workspace){
   textDetails.appendChild(textCard);
   editor.insertBefore(textDetails,formatbar);
 
-  // A képtár most magának a WYSIWYG-nek a része, közvetlenül a szerkesztővászon előtt.
-  const galleryDetails=makeDetails("rb-editor-media",
-    "Képtár: képek, képaláírások és beszúrás",
-    "A kép miniatűrjét fogd meg, és húzd a WYSIWYG kék beszúrási sávjára. A képaláírások és az ALT/kredit adatok itt maradnak szerkeszthetők.");
-  galleryDetails.open=true;
+  // Egyetlen képtár marad: a vászon MELLETT, alapból csukott oldalsávban.
+  // A korábbi DOM-csomópontot mozgatjuk, így a képadatok és az ID-k nem másolódnak.
+  const stage=document.createElement("div");stage.className="rb-editor-stage";
+  stage.setAttribute("aria-label","Cikkszöveg és közös képtár");
+  const galleryPanel=document.createElement("aside");
+  galleryPanel.id="rbtools-adminGalleryPanel";galleryPanel.className="rb-editor-gallery";
+  galleryPanel.hidden=true;galleryPanel.setAttribute("aria-label","WYSIWYG képtár");
+  const galleryTop=document.createElement("div");galleryTop.className="rb-gallery-top";
+  const galleryTitle=document.createElement("strong");galleryTitle.textContent="Képtár";
+  const galleryClose=document.createElement("button");galleryClose.type="button";
+  galleryClose.textContent="× Bezárás";galleryClose.setAttribute("aria-label","Képtár bezárása");
+  galleryTop.append(galleryTitle,galleryClose);galleryPanel.appendChild(galleryTop);
+  const galleryInfo=document.createElement("p");galleryInfo.className="small rb-gallery-hint";
+  galleryInfo.textContent="Húzd a képet a kék beszúrási sávra, vagy használd a Beszúrás gombot. A képaláírások a képenkénti Adatok menüben szerkeszthetők.";
+  galleryPanel.appendChild(galleryInfo);
   const imageInputDetails=makeDetails("rb-editor-image-import",
-    "Képek beolvasása Blogger HTML-ből",
-    "Illeszd ide a Bloggerben feltöltött képek kódját, vagy válassz HTML-fájlt. A képek a Képtárba kerülnek.");
+    "＋ Képek beolvasása Blogger HTML-ből",
+    "A Bloggerből feltöltött képek HTML-kódját vagy fájlját itt olvashatod be.");
   const imageInputHeading=imageInputCard.querySelector(".cardhead");
   if(imageInputHeading)imageInputHeading.textContent="Blogger-képkódok beolvasása";
   imageInputDetails.appendChild(imageInputCard);
-  galleryDetails.appendChild(imageInputDetails);
+  galleryPanel.appendChild(imageInputDetails);
   const galleryHeading=imageGallery.querySelector(".cardhead span");
-  if(galleryHeading)galleryHeading.textContent="A szerkesztő képtára";
-  galleryDetails.appendChild(imageGallery);
-  editor.insertBefore(galleryDetails,canvas);
+  if(galleryHeading)galleryHeading.textContent="A cikk képei";
+  galleryPanel.appendChild(imageGallery);
+  const galleryToggle=document.createElement("button");galleryToggle.type="button";
+  galleryToggle.id="rbtools-adminGalleryToggle";galleryToggle.className="rb-gallery-toggle";
+  galleryToggle.textContent="▣ Képtár (0)";
+  galleryToggle.setAttribute("aria-controls",galleryPanel.id);
+  galleryToggle.setAttribute("aria-expanded","false");
+  const setGalleryOpen=open=>{
+    galleryPanel.hidden=!open;stage.classList.toggle("gallery-open",open);
+    galleryToggle.setAttribute("aria-expanded",String(open));
+    galleryToggle.classList.toggle("active",open);
+  };
+  galleryToggle.addEventListener("click",()=>setGalleryOpen(galleryPanel.hidden));
+  galleryClose.addEventListener("click",()=>{setGalleryOpen(false);galleryToggle.focus();});
+  formatbar.querySelector(".admin-formatbar")?.prepend(galleryToggle);
+  editor.insertBefore(stage,canvas);stage.append(canvas,galleryPanel);
 
   // HTML-mentés, forrásmegtekintés és korábbi HTML visszatöltése a WYSIWYG ALATT.
   const htmlHub=document.createElement("section");
@@ -4638,6 +4697,65 @@ function adminSplitTextBlockAtCaret(el){
   rbGet("adminStatus").textContent='Új önálló bekezdésblokk nyílt. A két <div> közti <br /> az első blokk BR gombjával állítható.';
   return true;
 }
+function adminFocusBlockEnd(id){
+  requestAnimationFrame(()=>{
+    const el=RBAPP.querySelector('.admin-editable[data-admin-block-id="'+CSS.escape(id)+'"]');
+    if(!el)return;
+    el.focus();
+    const range=document.createRange();range.selectNodeContents(el);range.collapse(false);
+    const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);
+    adminActiveEditable=el;adminSavedRange=range.cloneRange();
+  });
+}
+function adminTextBlockIsEmpty(html){
+  const tpl=document.createElement("template");tpl.innerHTML=String(html||"");
+  const text=(tpl.content.textContent||"").replace(/[\u200b\u00a0]/g," ").trim();
+  return !text&&!tpl.content.querySelector("img,iframe,table,ul,ol,video,audio");
+}
+function adminRangeContentAtEdge(el,range,which){
+  const probe=document.createRange();probe.selectNodeContents(el);
+  if(which==="before")probe.setEnd(range.startContainer,range.startOffset);
+  else probe.setStart(range.endContainer,range.endOffset);
+  const fragment=probe.cloneContents();
+  return !!(probe.toString()||fragment.querySelector("img,iframe,table,ul,ol,video,audio,br"));
+}
+function adminRemoveOrMergeBlockAtCaret(el,key){
+  const id=el?.dataset?.adminBlockId;
+  const index=adminBlocks.findIndex(b=>b.id===id),block=adminBlocks[index];
+  if(index<0||!block||block.type!=="p")return false;
+  const selection=window.getSelection();
+  if(!selection?.rangeCount)return false;
+  const range=selection.getRangeAt(0);
+  if(!range.collapsed||!(el===range.commonAncestorContainer||el.contains(range.commonAncestorContainer)))return false;
+  const before=adminRangeContentAtEdge(el,range,"before");
+  const after=adminRangeContentAtEdge(el,range,"after");
+  if(adminTextBlockIsEmpty(block.html)){
+    // Egy Enterrel létrehozott, üres blokk azonnal törölhető mindkét billentyűvel.
+    const neighbour=key==="Backspace"?(adminBlocks[index-1]||adminBlocks[index+1]):
+      (adminBlocks[index+1]||adminBlocks[index-1]);
+    adminBlocks.splice(index,1);
+    adminRenderCanvas();adminGenerateHtml(false);
+    if(neighbour)key==="Backspace"?adminFocusBlockEnd(neighbour.id):adminFocusBlockStart(neighbour.id);
+    return true;
+  }
+  if(key==="Backspace"&&!before&&index>0&&adminBlocks[index-1].type==="p"){
+    const previous=adminBlocks[index-1];
+    previous.html=String(previous.html||"")+String(block.html||"");
+    previous.breakAfter=block.breakAfter;
+    adminBlocks.splice(index,1);
+    adminRenderCanvas();adminGenerateHtml(false);adminFocusBlockEnd(previous.id);
+    return true;
+  }
+  if(key==="Delete"&&!after&&index+1<adminBlocks.length&&adminBlocks[index+1].type==="p"){
+    const following=adminBlocks[index+1];
+    block.html=String(block.html||"")+String(following.html||"");
+    block.breakAfter=following.breakAfter;
+    adminBlocks.splice(index+1,1);
+    adminRenderCanvas();adminGenerateHtml(false);adminFocusBlockEnd(block.id);
+    return true;
+  }
+  return false;
+}
 function adminInsertParagraphAfterActive(){
   const id=adminActiveEditable?.dataset?.adminBlockId;
   const index=id?adminBlocks.findIndex(b=>b.id===id):-1;
@@ -4917,7 +5035,7 @@ function adminMoveBlock(id,delta){
 function adminRemoveBlock(id){adminBlocks=adminBlocks.filter(x=>x.id!==id);adminRenderCanvas();adminGenerateHtml();}
 function adminBlockControls(block){
   const box=document.createElement("div");box.className="admin-block-controls";
-  const mk=(t,title,fn)=>{const b=document.createElement("button");b.type="button";b.textContent=t;b.title=title;b.addEventListener("click",fn);return b;};
+  const mk=(t,title,fn)=>{const b=document.createElement("button");b.type="button";b.textContent=t;b.title=title;b.setAttribute("aria-label",title);b.addEventListener("click",fn);return b;};
   const handle=document.createElement("button");handle.type="button";handle.className="admin-drag-handle";handle.draggable=true;
   handle.textContent="⠿";handle.title="Blokk áthúzása: kizárólag ennél a fogantyúnál fogd meg";handle.setAttribute("aria-label","Blokk áthúzása");
   handle.addEventListener("dragstart",e=>{
@@ -4944,6 +5062,9 @@ function adminTrackEditable(el,onInput){
   el.addEventListener("keydown",e=>{
     if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.isComposing&&e.key.toLowerCase()==="k"){
       e.preventDefault();adminRememberRange();adminLink();return;
+    }
+    if((e.key==="Backspace"||e.key==="Delete")&&!e.isComposing&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&el.dataset.adminBlockId&&adminRemoveOrMergeBlockAtCaret(el,e.key)){
+      e.preventDefault();return;
     }
     if(e.key==="Enter"&&!e.isComposing&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&el.dataset.adminBlockId){
       const block=adminBlocks.find(b=>b.id===el.dataset.adminBlockId);
@@ -5260,7 +5381,7 @@ function adminDropZone(index){
   return dz;
 }
 function adminRenderCanvas(){
-  const host=rbGet("adminCanvas");adminHideContextMenu();adminCloseLinkPanel();adminActiveEditable=null;adminSavedRange=null;host.textContent="";
+  const host=rbGet("adminCanvas"),previousScrollTop=host.scrollTop;adminHideContextMenu();adminCloseLinkPanel();adminActiveEditable=null;adminSavedRange=null;host.textContent="";
   if(rbGet("adminContentType").value!=="static"){
     const panel=document.createElement("section");panel.className="admin-lead-panel";panel.setAttribute("aria-label","Főkép és valódi lead");
     const top=document.createElement("div");top.className="admin-lead-panel-head";
@@ -5333,7 +5454,7 @@ function adminRenderCanvas(){
     const more=document.createElement("div");more.className="admin-more";host.appendChild(more);
   }
 
-  if(!adminBlocks.length){host.appendChild(adminDropZone(0));const empty=document.createElement("div");empty.className="admin-empty";empty.textContent="Nincsenek törzsszöveg-blokkok. Adj hozzá bekezdést, keretest, vagy húzz ide képet.";host.appendChild(empty);return;}
+  if(!adminBlocks.length){host.appendChild(adminDropZone(0));const empty=document.createElement("div");empty.className="admin-empty";empty.textContent="Nincsenek törzsszöveg-blokkok. Adj hozzá bekezdést, keretest, vagy húzz ide képet.";host.appendChild(empty);host.scrollTop=previousScrollTop;return;}
   host.appendChild(adminDropZone(0));
   adminBlocks.forEach((block,index)=>{
     const shell=document.createElement("div");shell.className="admin-block";shell.dataset.blockId=block.id;
@@ -5349,10 +5470,12 @@ function adminRenderCanvas(){
     else if(block.type==="raw")shell.appendChild(adminRawElement(block));
     shell.appendChild(adminBlockControls(block));host.appendChild(shell);host.appendChild(adminDropZone(index+1));
   });
+  host.scrollTop=previousScrollTop;
   if(rbGet("adminFind")?.value)requestAnimationFrame(adminSearchText);
 }
 function adminRenderImageLibrary(){
   const host=rbGet("adminImageLibrary");host.textContent="";rbGet("adminImageCount").textContent=adminImages.length+" kép";
+  const galleryToggle=rbGet("adminGalleryToggle");if(galleryToggle)galleryToggle.textContent="▣ Képtár ("+adminImages.length+")";
   if(!adminImages.length){const e=document.createElement("div");e.className="admin-empty";e.textContent="Még nincs beolvasott kép.";host.appendChild(e);return;}
   adminImages.forEach(img=>{
     const tile=document.createElement("article");tile.className="admin-image-tile"+(img.id===adminMainImageId?" main-image":"");
@@ -5385,7 +5508,24 @@ function adminRenderImageLibrary(){
     const addBtn=document.createElement("button");addBtn.type="button";addBtn.textContent="＋ Cikk végére";addBtn.addEventListener("click",()=>adminInsertImageAt(img.id,adminBlocks.length));
     const mainBtn=document.createElement("button");mainBtn.type="button";mainBtn.textContent=img.id===adminMainImageId?"★ Főkép":"☆ Főkép";mainBtn.addEventListener("click",()=>{adminMainImageId=adminMainImageId===img.id?null:img.id;adminRepairLegacyLeadBlock();adminRenderImageLibrary();adminRenderCanvas();adminGenerateHtml();});
     const urls=document.createElement("button");urls.type="button";urls.className="admin-edit-image-urls";urls.textContent="🔗 Kép URL-jeinek cseréje";urls.addEventListener("click",()=>adminOpenImageUrls(img.id));
-    buttons.append(addBtn,mainBtn,urls);fields.appendChild(buttons);tile.append(thumb,fields);host.appendChild(tile);
+    buttons.append(addBtn,urls);fields.appendChild(buttons);
+    const quick=document.createElement("div");quick.className="rb-gallery-quick-actions";
+    const insertHere=document.createElement("button");insertHere.type="button";
+    insertHere.textContent="＋ Beszúrás ide";
+    insertHere.title="Az utoljára szerkesztett szövegblokk után; kijelölés nélkül a cikk végére.";
+    insertHere.addEventListener("click",()=>{
+      const active=adminActiveEditable?.dataset?.adminBlockId;
+      const at=active?adminBlocks.findIndex(b=>b.id===active):-1;
+      adminInsertImageAt(img.id,at>=0?at+1:adminBlocks.length);
+    });
+    quick.append(insertHere,mainBtn);
+    const caption=document.createElement("div");caption.className="rb-gallery-caption";
+    caption.textContent=adminCleanCaptionText(img.caption||"")||"Képaláírás nélkül";
+    caption.title=caption.textContent;
+    const metadata=document.createElement("details");metadata.className="rb-gallery-meta";
+    const summary=document.createElement("summary");summary.textContent="Képaláírás, kredit és képadatok";
+    metadata.append(summary,fields);
+    tile.append(thumb,caption,quick,metadata);host.appendChild(tile);
   });
 }
 function adminQuickBox(){
