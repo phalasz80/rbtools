@@ -19,5 +19,5 @@ assert.match(load,/adminNewsTodoListFromHtml\(pre\)/);
 assert.match(load,/adminNewsSeparateChecklistFromLead\(\)/);
 const gen=fn("adminGenerateHtml");
 assert.match(gen,/adminNewsChecklistOutput\(\)\+'<!--more-->/);
-assert.ok(src.includes('const RBTOOLS_VERSION="pages-v71"'));
+assert.ok(src.includes('const RBTOOLS_VERSION="pages-v72"'));
 console.log("#nyúz title, lead and protected checklist: PASS");

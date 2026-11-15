@@ -31,5 +31,5 @@ assert.match(privacy,/api\.languagetool\.org\/v2\/check/);
 assert.match(privacy,/helyesiras\.mta\.hu/);
 assert.match(privacy,/Duden/);
 assert.match(workflow,/- "corrector-core\.js"/);
-assert.ok(index.includes('const RBTOOLS_VERSION="pages-v71"'));
+assert.ok(index.includes('const RBTOOLS_VERSION="pages-v72"'));
 console.log("Cikkadmin corrector UI, privacy and CI wiring: PASS");
