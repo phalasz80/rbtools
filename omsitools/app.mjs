@@ -2,6 +2,9 @@ import {PLACES,validatePlace,parseOmSi,normalizeApi,parseOverrides,overridesFor,
 import {TOPICS,GROUPS,validateVehicle,parseAilist,parseParklist,buildTrafficFiles,researchPlan,buildReport} from './traffic.mjs';
 import {catalogCounts,recommendCatalog} from './catalog-core.mjs';
 import {PLATE_SYSTEMS,AREA_OPTIONS,FICTIONAL_AREAS,generateRegistrations} from './registrations.mjs';
+import {VEHICLE_CATEGORIES} from './registration-special.mjs';
+import {plateDateRange} from './registration-history.mjs';
+import {generateHistoricalRegistrations,historicalReport,historicalCSV} from './registration-period.mjs';
 import {FLEET_PROFILES,fleetProfile,parseFleetCSV,fleetShares,applyFleetProfile,fleetCSVTemplate} from './fleet-evidence.mjs';
 import {COUNTRIES,REGIONS,CITIES,countryMeta,regionName,apiSubdivisionOptions,matchRemoteRegion,codepageFor,normalizeLabel} from './geography.mjs';
 import {openSubdivisionList,openGroups,openHolidayEvents,ukHolidayEvents,builtinCityEvents} from './calendar-sources.mjs';
@@ -281,70 +284,120 @@ $('downloadCalendar').addEventListener('click',()=>{
  }catch(e){err(e,'calStatus');}
 });
 
-/* registrations.txt generator: project-local, deterministic, no external service */
+/* Period-aware registrations.txt builder with individually editable service fleets. */
 let lastReg=null,loadedProfile=null;
-const countries=[['HU','Magyarország'],['CS','Csehszlovákia'],['CZ','Csehország'],['SK','Szlovákia'],['AT','Ausztria'],['CH','Svájc'],['DE','Németország és NSZK'],['DD','NDK'],['FR','Franciaország'],['GB','Egyesült Királyság'],['RS','Szerbia'],['HR','Horvátország']];
-for(const [c,label] of countries)$('regCountry').append(el('option',{value:c},label));
-function populateRegSchemes(preferred=''){
- const country=val('regCountry'),schemes=PLATE_SYSTEMS.filter(x=>x.country===country);
- $('regScheme').replaceChildren(...schemes.map(x=>el('option',{value:x.id},x.title)));
- $('regScheme').value=schemes.some(x=>x.id===preferred)?preferred:schemes[0].id;
- populateRegAreas();
+const regCountries=[['HU','Magyarország'],['CS','Csehszlovákia'],['CZ','Csehország'],['SK','Szlovákia'],['AT','Ausztria'],['CH','Svájc'],['DE','Németország / NSZK'],['DD','NDK'],['FR','Franciaország'],['GB','Egyesült Királyság'],['RS','Szerbia'],['HR','Horvátország']];
+for(const [code,name] of regCountries)$('regCountry').append(el('option',{value:code},name));
+const regCategoryControls=new Map();
+for(const [kind,title] of VEHICLE_CATEGORIES){
+ const card=el('div',{class:'reg-class-card'});
+ const header=el('label',{class:'reg-class-name'});
+ const chk=el('input',{type:'checkbox'});chk.checked=kind==='civil';
+ header.append(chk,document.createTextNode(title));card.append(header);
+ const tools=el('div',{class:'reg-class-tools'});
+ const w=el('input',{type:'number',min:1,max:1000,value:kind==='civil'?100:1,'aria-label':title+' relatív súlya'});
+ const pattern=el('input',{type:'text',placeholder:'Egyéni minta (nem kötelező)',maxlength:110,'aria-label':title+' egyéni sablon'});
+ const area=el('input',{type:'text',placeholder:'Egyedi körzetek: B, AH:3','aria-label':title+' saját körzetei'});
+ tools.append(el('span',{class:'fine'},'Súly'),w,pattern,area);card.append(tools);$('regCategoryEditor').append(card);
+ regCategoryControls.set(kind,{chk,w,pattern,area});
 }
-function populateRegAreas(){
- const scheme=PLATE_SYSTEMS.find(x=>x.id===val('regScheme'));if(!scheme)return;
- $('regAreaSection').hidden=!scheme.area;
- $('regCustomSection').hidden=!scheme.area;
- const list=$('regAreaChoices');list.replaceChildren();
- if(scheme.area){
-  let opts=(AREA_OPTIONS[scheme.id]||[]).slice();
-  if(scheme.id==='DE_WB')opts=[['B','Nyugat-Berlin']];
-  const initial=opts.length?opts[0][0]:'';
-  for(const [code,label] of opts){
-   const item=el('label',{class:'area-check'}),input=el('input',{type:'checkbox'});
-   input.className='area-check-input';input.dataset.code=code;input.checked=code===initial;
-   item.append(input,document.createTextNode(code+' · '+label));list.append(item);
-  }
-  if(['DE_NEW','DE_FRG','DE_WB'].includes(scheme.id)){
-   list.append(el('p',{class:'fine'},'Fiktív OMSI-kódok (csak szimulációhoz):'));
-   for(const [code,location] of FICTIONAL_AREAS){
-    const item=el('label',{class:'area-check'}),input=el('input',{type:'checkbox'});
-    input.className='area-check-input';input.dataset.code=code;
-    item.append(input,document.createTextNode(code+' · '+location+' [fiktív]'));list.append(item);
-   }
-  }
+function regSwitchCategories(onlyCivil,all){
+ for(const [id,fields] of regCategoryControls)fields.chk.checked=all||onlyCivil&&id==='civil';
+}
+$('regCivilOnly').addEventListener('click',()=>regSwitchCategories(true,false));
+$('regEveryCategory').addEventListener('click',()=>regSwitchCategories(false,true));
+$('regNoCategory').addEventListener('click',()=>regSwitchCategories(false,false));
+function readRegCategories(){
+ const categories={};
+ for(const [kind,inputs] of regCategoryControls){
+  categories[kind]={enabled:inputs.chk.checked,weight:Number(inputs.w.value),template:inputs.pattern.value.trim(),areas:inputs.area.value.trim()};
  }
- $('regYear').min=String(scheme.start);$('regYear').max=String(scheme.end);
- const prior=Number(val('regYear'));
- if(!Number.isInteger(prior)||prior<scheme.start||prior>scheme.end)$('regYear').value=String(Math.min(scheme.end,Math.max(scheme.start,1986)));
- $('regSecondHalf').closest('.field').hidden=scheme.id!=='UK_CURRENT';
- $('regSecondHalf').checked=false;
- $('regNotes').textContent=scheme.example+' · '+scheme.start+'–'+scheme.end+'. A valós rendszámfelépítés országonként különbözik. A kért kötőjel OMSI-matricahelyet eredményezhet. A fiktív kódok a játékhoz készülnek.';
- lastReg=null;$('regDownload').disabled=true;
+ return categories;
 }
-$('regCountry').addEventListener('change',()=>populateRegSchemes());
-$('regScheme').addEventListener('change',populateRegAreas);
-function plateAreas(){
+for(const [i,month] of ['Január','Február','Március','Április','Május','Június','Július','Augusztus','Szeptember','Október','November','December'].entries()){
+ const opts={value:String(i+1)};
+ $('regFromMonth').append(el('option',opts,month));
+ $('regToMonth').append(el('option',opts,month));
+}
+$('regFromMonth').value='1';$('regToMonth').value='12';
+function regSystems(){
+ const country=val('regCountry'),systemList=PLATE_SYSTEMS.filter(s=>s.country===country),wanted=val('regScheme');
+ $('regScheme').replaceChildren(el('option',{value:'AUTO'},'Automatikus: az időszak valamennyi megfelelő rendszere'));
+ for(const s of systemList)$('regScheme').append(el('option',{value:s.id},s.title));
+ $('regScheme').value=systemList.some(s=>s.id===wanted)?wanted:'AUTO';
+ regAreas();
+}
+function regAreas(){
+ const country=val('regCountry'),selected=val('regScheme');
+ const schemes=selected==='AUTO'?PLATE_SYSTEMS.filter(s=>s.country===country):PLATE_SYSTEMS.filter(s=>s.id===selected);
+ const areaSchemes=schemes.filter(s=>s.area);
+ const box=$('regAreaChoices');box.replaceChildren();
+ $('regAreaSection').hidden=!areaSchemes.length;
+ $('regCustomSection').hidden=!areaSchemes.length;
+ const unique=new Map();
+ for(const s of areaSchemes)for(const [code,name] of AREA_OPTIONS[s.id]||[])if(!unique.has(code))unique.set(code,name);
+ for(const [code,name] of unique){
+  const lab=el('label',{class:'area-check'}),input=el('input',{type:'checkbox'});
+  input.dataset.code=code;input.className='area-check-input';input.checked=code===[...unique.keys()][0];
+  lab.append(input,document.createTextNode(code+' · '+name));box.append(lab);
+ }
+ if(country==='DE')for(const [code,name] of FICTIONAL_AREAS)if(!unique.has(code)){
+  const lab=el('label',{class:'area-check'}),input=el('input',{type:'checkbox'});
+  input.className='area-check-input';input.dataset.code=code;
+  lab.append(input,document.createTextNode(code+' · '+name+' [fiktív]'));box.append(lab);
+ }
+ const from=schemes.map(s=>plateDateRange(s.id).from),to=schemes.map(s=>plateDateRange(s.id).to||'folyamatos');
+ $('regSchemesInfo').textContent='Elérhető történeti sorozatok: '+schemes.map(s=>s.title).join(' | ')+'. Az érvényesség rendszerenként, hónapra ellenőrzött; nem minden területi vagy betűkombináció forrásolt.';
+ lastReg=null;$('regDownload').disabled=true;$('regDownloadZip').disabled=true;
+}
+$('regCountry').addEventListener('change',regSystems);
+$('regScheme').addEventListener('change',regAreas);
+function readRegAreas(){
  const selected=[...document.querySelectorAll('.area-check-input:checked')].map(x=>x.dataset.code);
- const custom=val('regCustomAreas');
- const extra=custom?custom.split(/[\n,;]+/).map(x=>x.trim()).filter(Boolean):[];
- return [...selected,...extra];
+ const custom=val('regCustomAreas').split(/[\n,;]+/).map(x=>x.trim()).filter(Boolean);
+ return [...selected,...custom];
 }
 $('regGenerate').addEventListener('click',()=>{
  try{
-  const r=generateRegistrations({scheme:val('regScheme'),count:Number(val('regCount')),year:Number(val('regYear')),separator:$('regSeparator').value,seed:val('regSeed'),areas:plateAreas(),secondHalf:$('regSecondHalf').checked});
-  lastReg=r;$('regDownload').disabled=false;
+  const opts={
+   country:val('regCountry'),scheme:val('regScheme'),fromYear:Number(val('regFromYear')),toYear:Number(val('regToYear')),
+   fromMonth:Number(val('regFromMonth')),toMonth:Number(val('regToMonth')),
+   count:Number(val('regCount')),separator:$('regSeparator').value,seed:val('regSeed'),
+   mode:val('regMode'),maxAge:Number(val('regMaxAge')),areas:readRegAreas(),
+   categories:readRegCategories(),allowOrdinary:$('regAllowOrdinary').checked
+  };
+  const r=generateHistoricalRegistrations(opts);
+  lastReg={r,opts};$('regDownload').disabled=false;$('regDownloadZip').disabled=false;
   $('regActual').textContent=r.count.toLocaleString('hu-HU');
-  $('regBytes').textContent=r.bytes.toLocaleString('hu-HU');
-  $('regAreaNumber').textContent=r.areas.length;
-  $('regPreview').textContent=r.rows.slice(0,50).join('\n')+(r.rows.length>50?'\n… további '+(r.rows.length-50)+' sor a letöltésben':'');
-  $('regNotes').textContent='Területi megoszlás: '+r.occurrences.map(x=>(x.code||'(országos)')+': '+x.count).join(', ')+'. '+(r.notes.join(' ')||'Minden sor egyedi a generált állományon belül.');
-  status('regStatus',r.count+' egyedi rendszám elkészült, '+r.bytes+' bájt. A kimenet a böngészőben készült, a rendszámok valós kiadását és minden korabeli kombináció hitelességét nem ellenőrzi.','good');
- }catch(e){lastReg=null;$('regDownload').disabled=true;err(e,'regStatus');}
+  $('regBytes').textContent=(r.text.length).toLocaleString('hu-HU');
+  $('regAreaNumber').textContent=r.territories.length;
+  $('regPreview').textContent=r.rows.slice(0,55).join('\n')+(r.rows.length>55?'\n… +'+(r.rows.length-55)+' további sor':'');
+  const dist=$('regDistribution');dist.replaceChildren();
+  for(const [title,array,label] of [['Járműkategóriák',r.categories,'category'],['Történeti rendszámrendszerek',r.schemes,'id'],['Területek',r.territories,'code']]){
+   const card=el('div',{class:'list-card'});card.append(el('strong',{},title));
+   card.append(el('div',{class:'meta'},array.map(x=>(x[label]||'országos')+': '+x.count).join(' · ')));
+   dist.append(card);
+  }
+  $('regNotes').textContent=r.warnings.slice(0,5).join(' ') +(r.warnings.length>5?' További '+(r.warnings.length-5)+' figyelmeztetés a ZIP jelentésében.':'');
+  status('regStatus',r.count+' egyedi sor elkészült, '+r.schemes.length+' rendszer, '+r.categories.length+' kategória. A rendszámok a kiválasztott korszakok szerint keletkeztek. A pontos helyi kibocsátási sorozatok nem minden esetben hitelesítettek.','good');
+ }catch(e){lastReg=null;$('regDownload').disabled=true;$('regDownloadZip').disabled=true;err(e,'regStatus');}
 });
-$('regDownload').addEventListener('click',()=>{if(!lastReg)return;fileDownload('registrations.txt',lastReg.text,'text/plain;charset=utf-8');});
-$('regCountry').value='DE';populateRegSchemes('DE_WB');
-
+$('regDownload').addEventListener('click',()=>{if(!lastReg)return;fileDownload('registrations.txt',lastReg.r.text,'text/plain;charset=utf-8');});
+$('regDownloadZip').addEventListener('click',()=>{
+ if(!lastReg)return;
+ try{
+  const {r,opts}=lastReg;
+  const files=[
+   {path:'registrations.txt',bytes:encoder.encode(r.text)},
+   {path:'TORTENETI_FORRASOK_ES_ELLENORZES.txt',bytes:encoder.encode(historicalReport(r,opts))},
+   {path:'TETELES_REGISZTRACIOS_ADATOK.csv',bytes:encoder.encode(historicalCSV(r))},
+   {path:'GENERATOR_BEALLITASOK.json',bytes:encoder.encode(JSON.stringify(opts,null,2))}
+  ];
+  const zip=makeZip(files);
+  fileDownload('omsitools_registrations_'+opts.country+'_'+opts.fromYear+'-'+opts.toYear+'.zip',zip,'application/zip');
+ }catch(e){err(e,'regStatus');}
+});
+$('regCountry').value='DE';regSystems();
 /* Statistical brand shares and evidence labels */
 for(const p of FLEET_PROFILES)$('mixProfile').append(el('option',{value:p.id},p.title));
 $('mixProfile').append(el('option',{value:'uploaded'},'Saját feltöltött márkaállomány (CSV)'));

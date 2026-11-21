@@ -116,3 +116,11 @@ A külön Rendszámok fülön lehet országot, rendszámrendszert, korszakot, el
 ## Márkasúlyok (1.4.0)
 Az új Járműarányok fül hiteles városi nyilvántartásból vagy dokumentált országos újautó-modellrészösszegből épülő *különböző* profilt kínál; a hiányzó márkák és gyártási korszakok nem kerülnek kitalálásra. A müncheni 1981-es márkaállomány a városi Statisztikai Hivatal tényleges regisztere (471 998 autó); az 1985-ös NSZK és Nyugat-Berlin adatsor csak meghatározott újautó-típusok országos értékesítési/rendszám szerinti részösszege, *nem* 1986-os nyugat-berlini utcakép. A berlini 1987-es összesített 612 309 személygépkocsi márkarészlet hiányában csak kontextus. Az adatok forrása az alkalmazásban kattintható.
 CSV-import formátum: `marka;darab`. A projektben a súlyok alkalmazása csak a beazonosított közúti márkákat érinti; a márkán belüli modellek relatív aránya becslés, nem igazolt típusstatisztika.
+
+## Történeti, kategóriás rendszámok (1.5.0)
+
+A Rendszámok fülön a kezdő és záró év/hónap, valamint az adott időszakban **újonnan kiadható** táblák és a forgalomban **továbbhasználható** régi sorozatok külön választhatók. Az automatikus rendszámcsalád-választó átnyúlhat a korszakváltáson. A továbbhasználatnál megadott maximum életkor csak becsült mintavételi szabály, nem nyilvántartási statisztika.
+
+A 22 járműkategória külön ki-be kapcsolható, hozzá súly, egyedi sablon és külön terület rendelhető. A forrásokkal nem igazolt különleges rendszám-kombináció nem lesz észrevétlenül kitalálva: az adott kategória kimarad, vagy kifejezett felhasználói jóváhagyással normál rendszámot kap. Szimulált egyéni sablonnál mindegyik sor `fictional` besorolást kap. A források az új `registration-history.mjs` és `registration-special.mjs` modulokban olvashatók.
+
+A ZIP tartalmazza a tiszta OMSI `registrations.txt` állományt, a `TORTENETI_FORRASOK_ES_ELLENORZES.txt` forrásjelentést, a `TETELES_REGISZTRACIOS_ADATOK.csv` tételes jelentést (rendszám, járműkategória, kiadás éve/hónapja, terület, szabály) és a `GENERATOR_BEALLITASOK.json` konfigurációt. A korábbi OMSI-fájlokat nem módosítja.

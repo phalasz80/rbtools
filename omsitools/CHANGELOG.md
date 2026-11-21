@@ -1,3 +1,13 @@
+## 1.5.0 (2026-11-21)
+- Hónapra pontos, akár többéves rendszám-időszak, automatikus történeti rendszerkiválasztással.
+- Három működési mód: az időszakban újonnan kiadható, az időszak valamely pontján látható, vagy a teljes időszakot lefedő továbbhasználat.
+- 27 történeti országos rendszer, többek között magyar 1958–1990, osztrák 1947–1990, cseh/szlovák/csehszlovák, nyugat-berlini/NSZK/NDK, jugoszláv és brit rendszámok.
+- 22 egymástól külön kapcsolható járműkategória, súlyozással, egyéni rendszámmintákkal és saját területi szűréssel.
+- Forrásokhoz kötött speciális sorozatok (Bundeswehr, THW, NVA, Volkspolizei, Magyar Posta, OMSZ, rendőrség, stb.); nem dokumentált esetben automatikus betűkód helyett hiányjelzés.
+- Tételes történeti CSV, forráskritikai TXT, beállítások JSON, valamint tiszta registrations.txt ZIP- és önálló exporttal.
+- A nyári/őszi brit számjelölések, az 1974-es NDK és az 1990/2022-es magyar rendszerhatárok külön kezelése.
+- A magyar 1958–1990-es táblák kötelező cseréjének 1995. december 31-i határideje a 20/1990. (VIII. 6.) BM rendeletből; a régi svájci P/A-sorozatok későbbi fennmaradásának korlátozása.
+
 ## 1.4.0 (2026-11-21)
 - Önálló `registrations.txt` generáló oldal: 21 rendszer, 12 ország/történeti állam, 100 000 sorig, meghatározott seed, duplikátummentes generálás, kötőjel/szóköz.
 - Valós és fiktív körzetkódok többes kiválasztása súlyokkal; AH, TH, HER, WIN külön jelölőnégyzetekkel; 671 eredeti nyugat-berlini rendszám megőrizve.

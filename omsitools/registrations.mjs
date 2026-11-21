@@ -1,5 +1,13 @@
+import {britishAgeLetter,ukNumericAge} from './registration-history.mjs';
+import {hungarianOldCivil,hungarianNewCivil} from './registration-series.mjs';
 /* Synthetic registrations for OMSI only. No database verification, no real plate allocation claims. */
 export const PLATE_SYSTEMS=Object.freeze([
+ {id:'HU_PRE90',country:'HU',title:'Magyarország · 1958–1990 (AB-12-34)',start:1958,end:1990,example:'CA-12-34'},
+ {id:'AT_PRE90',country:'AT',title:'Ausztria · fekete 1947–1990 (W 123456)',start:1947,end:1990,area:true,example:'W 123456'},
+ {id:'RS_YUG',country:'RS',title:'Szerbia · jugoszláv korabeli (1960–2010)',start:1960,end:2010,area:true,example:'BG 12-345'},
+ {id:'HR_YUG',country:'HR',title:'Horvátország · jugoszláv korabeli (1960–1991)',start:1960,end:1991,area:true,example:'ZG 12-345'},
+ {id:'UK_DATELESS',country:'GB',title:'Nagy-Britannia · dateless történeti (1904–1963)',start:1904,end:1963,area:true,example:'AB 1234'},
+ {id:'UK_NI',country:'GB',title:'Észak-Írország · saját területi rendszer',start:1950,end:2099,area:true,example:'AZ 1234'},
  {id:'HU_OLD',country:'HU',title:'Magyarország · ABC-123 (1990–2022)',start:1990,end:2022,example:'ABC-123'},
  {id:'HU_NEW',country:'HU',title:'Magyarország · AB-CD 123 (2022-től)',start:2022,end:2099,example:'AB-CD 123'},
  {id:'CS_OLD',country:'CS',title:'Csehszlovákia · járáskódos (1960–1992)',start:1960,end:1992,area:true,example:'AB 12-34'},
@@ -23,6 +31,12 @@ export const PLATE_SYSTEMS=Object.freeze([
  {id:'HR_NEW',country:'HR',title:'Horvátország · területi (jelenlegi)',start:1992,end:2099,area:true,example:'ZG 1234-AB'}
 ]);
 export const AREA_OPTIONS=Object.freeze({
+ AT_PRE90:[['W','Wien'],['N','Niederösterreich'],['B','Burgenland'],['O','Oberösterreich'],['G','Graz'],['L','Linz'],['K','Kärnten'],['S','Salzburg'],['T','Tirol'],['V','Vorarlberg'],['ST','Steiermark']],
+ RS_YUG:[['BG','Beograd'],['NS','Novi Sad'],['NI','Niš'],['SU','Subotica'],['PA','Pančevo']],
+ HR_YUG:[['ZG','Zagreb'],['ST','Split'],['RI','Rijeka'],['OS','Osijek'],['PU','Pula'],['ZD','Zadar']],
+ UK_DATELESS:[['B','Birmingham (régi kód csak közelítés)'],['L','London (régi kód csak közelítés)'],['M','Manchester (régi kód csak közelítés)']],
+ UK_NI:[['AZ','Belfast'],['BZ','Belfast, történeti betűpár vizsgálandó'],['CZ','Belfast']],
+
  CS_OLD:[['AB','Prága környéke, demonstráció'],['BA','Bratislava, korabeli kód ellenőrizendő'],['OV','Ostrava'],['KE','Košice']],
  CZ_OLD:[['AB','Praha, régi járáskód szimuláció'],['BR','Brno, szimuláció'],['OV','Ostrava, szimuláció'],['PL','Plzeň, szimuláció']],
  CZ_NEW:[['A','Praha'],['B','Dél-Morvaország'],['T','Morva-Szilézia'],['P','Plzeň'],['S','Közép-Csehország'],['L','Liberec'],['C','Dél-Csehország'],['K','Karlovy Vary'],['E','Pardubice'],['H','Hradec Králové'],['J','Vysočina'],['M','Olomouc'],['Z','Zlín'],['U','Ústí nad Labem']],
@@ -69,16 +83,42 @@ function normalizeAreas(values,system){
 }
 function pickArea(r,a){const total=a.reduce((s,x)=>s+x.weight,0);let t=r()*total;for(const x of a){t-=x.weight;if(t<0)return x.code;}return a.at(-1).code;}
 function ageCode(year,secondHalf=false){const n=year%100;return String((n+(secondHalf?50:0))%100).padStart(2,'0');}
-function registration(system,area,r,sep,year,half){
+
+/* Approximate year-of-first-issue civilian letters by historical Hungarian listings.
+   Do not equate a given block with all plates visible that year. */
+const HU_PRIVATE_YEAR={
+ 1958:'CA',1959:'CA',1960:'CB',1961:'CE',1962:'CE CF CH',1963:'CH CI',
+ 1964:'CG CH CI CL',1965:'CI CL CM',1966:'CM CN CO',1967:'CO CP CR',1968:'CS',1969:'CT CU CZ CX',
+ 1970:'CY IB IC ID',1971:'IE IF IG IH IK IL',1972:'IM IN IO IP IR IS IT',
+ 1973:'IV IZ IX IY UB UC UD UE UF',1974:'UF UG UH UI UK UL UM UN UO UP UR',
+ 1975:'UP UR US',1976:'US UT UU UV UW UX UY UZ',1977:'ZA ZB ZC ZD ZE ZF ZG ZH',
+ 1978:'ZI ZJ ZK ZL ZM ZN ZO ZP ZR ZS ZT ZU ZV ZW ZX ZY PA PB PC PD PE PF PG PH PI PJ PK PL PM',
+ 1979:'PN PO PP PR PS PT PU PV PW PX PY PZ',1980:'TA TB TC TD TE TF TG',
+ 1981:'TH TI TJ TK TL TM TN TO TP',1982:'TR TS TT TU TV TW TX TY TZ KA KB',
+ 1983:'KC KD KE KF KG KH KI KJ KK KL KM KN',1984:'KO KP KR KS KT KU KV KW KX KY KZ',
+ 1985:'GA GB GC GD GE GF GG GH GI GJ GK GL GM GN',
+ 1986:'GO GP GR GS GT GU GV GW GX GY DB DC DD DE DF DG',
+ 1987:'DA DB DC DD DE DF DG',1988:'DH DI DJ DK DL DM NH NI NJ NK',
+ 1989:'DN DO DP DR DS DT DU DV DW DX DY DZ JJ LL MM NN VV',
+ 1990:'JE JF JG JH JI JK EA EB EC ED EE EF EG EH EI EJ EK EL EM EN EO EP ER ES ET EU EV YJ YK'
+};
+function huPrivatePlate(r,sep,year){
+ const choices=(HU_PRIVATE_YEAR[year]||HU_PRIVATE_YEAR[1986]).split(' ');
+ return pick(r,choices)+sep+digits(r,2,true)+' '+digits(r,2,true);
+}
+
+function registration(system,area,r,sep,year,half,month){
  const d=n=>digits(r,n),l=n=>letters(r,n),a=area;
  switch(system){
+ case 'HU_PRE90':return huPrivatePlate(r,sep,year);
  case 'HU_OLD':return l(3)+sep+d(3);
  case 'HU_NEW':return letters(r,2,pick(r,[VOWELS,CONS]))+sep+l(2)+' '+d(3);
- case 'CS_OLD':return a+' '+d(2)+sep+d(2);
+ case 'CS_OLD':return a+(year<1984?sep:' ')+d(2)+sep+d(2);
  case 'CZ_OLD':return a+l(1)+' '+d(2)+sep+d(2);
  case 'CZ_NEW':return digits(r,1)+a+digits(r,1,true)+' '+d(4);
  case 'SK_OLD':return a+sep+d(3)+l(2);
  case 'SK_NEW':return l(2)+sep+d(3)+l(2);
+ case 'AT_PRE90':return a+(a==='O'?'-':' ')+number(r,999999);
  case 'AT_NEW':return a+sep+d(a.length===1?5:4)+' '+l(1);
  case 'CH_NEW':return a+sep+number(r,999999);
  case 'DE_NEW':case 'DE_FRG':case 'DE_WB':{
@@ -91,11 +131,14 @@ function registration(system,area,r,sep,year,half){
  case 'DE_GDR_OLD':return a+l(1)+' '+d(2)+sep+d(2);
  case 'DE_GDR_NEW':return a+l(2)+' '+d(1)+sep+d(2);
  case 'FR_FNI':return number(r,9999)+' '+l(2)+' '+a;
- case 'FR_SIV':return l(2)+sep+d(3)+sep+l(2);
- case 'UK_SUFFIX':return l(3)+' '+number(r,999)+l(1);
- case 'UK_PREFIX':return l(1)+number(r,999)+' '+l(3);
- case 'UK_CURRENT':return a+ageCode(year,half)+' '+l(3);
+ case 'FR_SIV':return letters(r,2,'ABCDEFGHJKLMNPRSTVWXYZ')+sep+d(3)+sep+letters(r,2,'ABCDEFGHJKLMNPRSTVWXYZ');
+ case 'UK_SUFFIX':return l(3)+' '+number(r,999)+britishAgeLetter('suffix',year,month);
+ case 'UK_PREFIX':return britishAgeLetter('prefix',year,month)+number(r,999)+' '+l(3);
+ case 'UK_CURRENT':return a+ukNumericAge(year,month)+' '+l(3);
  case 'RS_NEW':return a+' '+d(3)+sep+l(2);
+ case 'RS_YUG':case 'HR_YUG':return a+' '+d(2)+sep+d(3);
+ case 'UK_DATELESS':return a+' '+number(r,9999);
+ case 'UK_NI':return a+' '+number(r,9999);
  case 'HR_NEW':return a+' '+d(4)+sep+l(2);
  default:throw Error('Nem támogatott rendszámrendszer: '+system);
  }
@@ -103,12 +146,13 @@ function registration(system,area,r,sep,year,half){
 export function generateRegistrations(opts={}){
  const scheme=PLATE_SYSTEMS.find(x=>x.id===opts.scheme);
  if(!scheme)throw Error('Válassz rendszámrendszert.');
- const count=Number(opts.count||1000),year=Number(opts.year||2020),sep=opts.separator===' '? ' ':opts.separator==='-'?'-':null;
+ const count=Number(opts.count||1000),year=Number(opts.year||2020),month=opts.month===undefined?(opts.secondHalf?9:(year===2001&&opts.scheme==='UK_CURRENT'?9:year===1983&&opts.scheme==='UK_PREFIX'?9:year===2022&&opts.scheme==='HU_NEW'?7:year===1997&&opts.scheme==='SK_OLD'?4:3)):Number(opts.month),sep=opts.separator===' '? ' ':opts.separator==='-'?'-':null;
  if(!Number.isInteger(count)||count<1||count>100000)throw Error('A fájl 1–100 000 sort tartalmazhat.');
  if(!Number.isInteger(year)||year<scheme.start||year>scheme.end)throw Error('Az év nem illik a kiválasztott rendszerhez ('+scheme.start+'–'+scheme.end+').');
  if(!sep)throw Error('Válassz kötőjelet vagy szóközt elválasztónak.');
+ if(!Number.isInteger(month)||month<1||month>12)throw Error('A hónap 1 és 12 közötti egész legyen.');
  const areas=normalizeAreas(opts.areas,scheme);
- const r=rng(seedFrom(String(opts.seed??'OMSI')+'|'+scheme.id+'|'+year+'|'+areas.map(x=>x.code+':'+x.weight).join(',')));
+ const r=rng(seedFrom(String(opts.seed??'OMSI')+'|'+scheme.id+'|'+year+'|'+month+'|'+areas.map(x=>x.code+':'+x.weight).join(',')));
  const unique=new Set(),rows=[],occurrences=new Map(),notes=[];
  const permitted=system=>system.startsWith('DE_GDR')?'NDK':system==='DE_WB'?'Nyugat-Berlin':null;
  if(permitted(scheme.id))notes.push('A történeti NDK/NSZK-kombinációk regionális betűállománya egyszerűsített; nem minden sor igazolt történeti kiosztás.');
@@ -119,13 +163,27 @@ export function generateRegistrations(opts={}){
  const cap=Math.max(1000,count*30);
  for(let i=0,attempt=0;i<count;attempt++){
   if(attempt>cap)throw Error('A megadott terület és sorozat nem ad elegendő egyedi rendszámot. Csökkentsd a darabszámot vagy adj meg több területet.');
-  const area=pickArea(r,areas),plate=registration(scheme.id,area,r,sep,year,Boolean(opts.secondHalf));
+  const area=pickArea(r,areas),plate=registration(scheme.id,area,r,sep,year,Boolean(opts.secondHalf),month);
   if(unique.has(plate))continue;
   unique.add(plate);rows.push(plate);occurrences.set(area,(occurrences.get(area)||0)+1);i++;
  }
  return {text:rows.join('\r\n')+'\r\n',rows,scheme,year,areas,occurrences:[...occurrences].map(([code,count])=>({code,count})),
-  count,notes,bytes:rows.reduce((n,p)=>n+p.length+2,0)};
+  count,month,notes,bytes:rows.reduce((n,p)=>n+p.length+2,0)};
 }
+
+/* Entry points for documented period-oriented selection. Preserve legacy generator. */
+export function historicalPlateRng(seed){return rng(seedFrom(seed));}
+export function historicalPlateAreas(values,schemeId){
+ const scheme=PLATE_SYSTEMS.find(s=>s.id===schemeId);
+ if(!scheme)throw Error('Ismeretlen rendszámrendszer: '+schemeId);
+ return normalizeAreas(values,scheme);
+}
+export function historicalPlateVariant({scheme,area='',year,month,separator='-',secondHalf=false},random){
+ if(scheme==='HU_OLD')return hungarianOldCivil(year,month,random,separator);
+ if(scheme==='HU_NEW')return hungarianNewCivil(year,month,random,separator);
+ return registration(scheme,area,random,separator,year,secondHalf,month);
+}
+
 export function summarizeReferenceBerlin(text){
  const rows=String(text||'').replace(/\r/g,'').split('\n').map(s=>s.trim()).filter(Boolean);
  const good=rows.filter(s=>/^B-[A-Z]{1,2} [1-9][0-9]{0,3}$/.test(s));
