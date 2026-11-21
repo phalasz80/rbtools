@@ -1,3 +1,10 @@
+## 1.4.0 (2026-11-21)
+- Önálló `registrations.txt` generáló oldal: 21 rendszer, 12 ország/történeti állam, 100 000 sorig, meghatározott seed, duplikátummentes generálás, kötőjel/szóköz.
+- Valós és fiktív körzetkódok többes kiválasztása súlyokkal; AH, TH, HER, WIN külön jelölőnégyzetekkel; 671 eredeti nyugat-berlini rendszám megőrizve.
+- Valós járműarányok külön oldalon: hivatalos müncheni 1981-es állomány, nyugatnémet és nyugat-berlini 1985-ös újregisztrációs modellminta, 1987-es nyugat-berlini teljes Pkw-darabszám kontextus.
+- Más területről vagy évből származó adatok csak külön megerősítéssel használhatók becsléshez. Márka szerinti relatív OMSI-súlyozás, területi/éves CSV-import, forrásminősítés, hiányzó márkák jelzése. A modellrészarányok becslések.
+- Új modulok: `registrations.mjs`, `fleet-evidence.mjs`, `tests/registrations-fleet.test.mjs`.
+
 ## 1.3.0 (2026-11-21)
 - A felhasználó által küldött teljes `kozuti_ai.txt` (2727 sor) és `kozut_parklist.txt` (1090 sor) a webalkalmazás elsődleges járműkatalógusa.
 - Rendszámváltozatok, LOD-objektumok és azonos típusok deduplikálása; típuscsoportok, modelldátumok és területi preferenciák.

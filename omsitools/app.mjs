@@ -1,6 +1,8 @@
 import {PLACES,validatePlace,parseOmSi,normalizeApi,parseOverrides,overridesFor,mergeEvents,holidayText,timezoneText,omsiEncode,makeZip} from './engine.mjs';
 import {TOPICS,GROUPS,validateVehicle,parseAilist,parseParklist,buildTrafficFiles,researchPlan,buildReport} from './traffic.mjs';
 import {catalogCounts,recommendCatalog} from './catalog-core.mjs';
+import {PLATE_SYSTEMS,AREA_OPTIONS,FICTIONAL_AREAS,generateRegistrations} from './registrations.mjs';
+import {FLEET_PROFILES,fleetProfile,parseFleetCSV,fleetShares,applyFleetProfile,fleetCSVTemplate} from './fleet-evidence.mjs';
 import {COUNTRIES,REGIONS,CITIES,countryMeta,regionName,apiSubdivisionOptions,matchRemoteRegion,codepageFor,normalizeLabel} from './geography.mjs';
 import {openSubdivisionList,openGroups,openHolidayEvents,ukHolidayEvents,builtinCityEvents} from './calendar-sources.mjs';
 const $=id=>document.getElementById(id);
@@ -278,5 +280,127 @@ $('downloadCalendar').addEventListener('click',()=>{
   fileDownload(`omsitools_naptar_${slug(place.name)}_${start}-${end}${incomplete?'_RESZLEGES':''}.zip`,makeZip(files),'application/zip');
  }catch(e){err(e,'calStatus');}
 });
+
+/* registrations.txt generator: project-local, deterministic, no external service */
+let lastReg=null,loadedProfile=null;
+const countries=[['HU','Magyarország'],['CS','Csehszlovákia'],['CZ','Csehország'],['SK','Szlovákia'],['AT','Ausztria'],['CH','Svájc'],['DE','Németország és NSZK'],['DD','NDK'],['FR','Franciaország'],['GB','Egyesült Királyság'],['RS','Szerbia'],['HR','Horvátország']];
+for(const [c,label] of countries)$('regCountry').append(el('option',{value:c},label));
+function populateRegSchemes(preferred=''){
+ const country=val('regCountry'),schemes=PLATE_SYSTEMS.filter(x=>x.country===country);
+ $('regScheme').replaceChildren(...schemes.map(x=>el('option',{value:x.id},x.title)));
+ $('regScheme').value=schemes.some(x=>x.id===preferred)?preferred:schemes[0].id;
+ populateRegAreas();
+}
+function populateRegAreas(){
+ const scheme=PLATE_SYSTEMS.find(x=>x.id===val('regScheme'));if(!scheme)return;
+ $('regAreaSection').hidden=!scheme.area;
+ $('regCustomSection').hidden=!scheme.area;
+ const list=$('regAreaChoices');list.replaceChildren();
+ if(scheme.area){
+  let opts=(AREA_OPTIONS[scheme.id]||[]).slice();
+  if(scheme.id==='DE_WB')opts=[['B','Nyugat-Berlin']];
+  const initial=opts.length?opts[0][0]:'';
+  for(const [code,label] of opts){
+   const item=el('label',{class:'area-check'}),input=el('input',{type:'checkbox'});
+   input.className='area-check-input';input.dataset.code=code;input.checked=code===initial;
+   item.append(input,document.createTextNode(code+' · '+label));list.append(item);
+  }
+  if(['DE_NEW','DE_FRG','DE_WB'].includes(scheme.id)){
+   list.append(el('p',{class:'fine'},'Fiktív OMSI-kódok (csak szimulációhoz):'));
+   for(const [code,location] of FICTIONAL_AREAS){
+    const item=el('label',{class:'area-check'}),input=el('input',{type:'checkbox'});
+    input.className='area-check-input';input.dataset.code=code;
+    item.append(input,document.createTextNode(code+' · '+location+' [fiktív]'));list.append(item);
+   }
+  }
+ }
+ $('regYear').min=String(scheme.start);$('regYear').max=String(scheme.end);
+ const prior=Number(val('regYear'));
+ if(!Number.isInteger(prior)||prior<scheme.start||prior>scheme.end)$('regYear').value=String(Math.min(scheme.end,Math.max(scheme.start,1986)));
+ $('regSecondHalf').closest('.field').hidden=scheme.id!=='UK_CURRENT';
+ $('regSecondHalf').checked=false;
+ $('regNotes').textContent=scheme.example+' · '+scheme.start+'–'+scheme.end+'. A valós rendszámfelépítés országonként különbözik. A kért kötőjel OMSI-matricahelyet eredményezhet. A fiktív kódok a játékhoz készülnek.';
+ lastReg=null;$('regDownload').disabled=true;
+}
+$('regCountry').addEventListener('change',()=>populateRegSchemes());
+$('regScheme').addEventListener('change',populateRegAreas);
+function plateAreas(){
+ const selected=[...document.querySelectorAll('.area-check-input:checked')].map(x=>x.dataset.code);
+ const custom=val('regCustomAreas');
+ const extra=custom?custom.split(/[\n,;]+/).map(x=>x.trim()).filter(Boolean):[];
+ return [...selected,...extra];
+}
+$('regGenerate').addEventListener('click',()=>{
+ try{
+  const r=generateRegistrations({scheme:val('regScheme'),count:Number(val('regCount')),year:Number(val('regYear')),separator:$('regSeparator').value,seed:val('regSeed'),areas:plateAreas(),secondHalf:$('regSecondHalf').checked});
+  lastReg=r;$('regDownload').disabled=false;
+  $('regActual').textContent=r.count.toLocaleString('hu-HU');
+  $('regBytes').textContent=r.bytes.toLocaleString('hu-HU');
+  $('regAreaNumber').textContent=r.areas.length;
+  $('regPreview').textContent=r.rows.slice(0,50).join('\n')+(r.rows.length>50?'\n… további '+(r.rows.length-50)+' sor a letöltésben':'');
+  $('regNotes').textContent='Területi megoszlás: '+r.occurrences.map(x=>(x.code||'(országos)')+': '+x.count).join(', ')+'. '+(r.notes.join(' ')||'Minden sor egyedi a generált állományon belül.');
+  status('regStatus',r.count+' egyedi rendszám elkészült, '+r.bytes+' bájt. A kimenet a böngészőben készült, a rendszámok valós kiadását és minden korabeli kombináció hitelességét nem ellenőrzi.','good');
+ }catch(e){lastReg=null;$('regDownload').disabled=true;err(e,'regStatus');}
+});
+$('regDownload').addEventListener('click',()=>{if(!lastReg)return;fileDownload('registrations.txt',lastReg.text,'text/plain;charset=utf-8');});
+$('regCountry').value='DE';populateRegSchemes('DE_WB');
+
+/* Statistical brand shares and evidence labels */
+for(const p of FLEET_PROFILES)$('mixProfile').append(el('option',{value:p.id},p.title));
+$('mixProfile').append(el('option',{value:'uploaded'},'Saját feltöltött márkaállomány (CSV)'));
+function currentFleetProfile(){
+ if(val('mixProfile')!=='uploaded')return fleetProfile(val('mixProfile'));
+ if(!loadedProfile)throw Error('Tölts fel CSV-t a saját márkastatisztikához.');
+ return loadedProfile;
+}
+function viewFleetProfile(p){
+ const root=$('mixTable');root.replaceChildren();
+ const subtitle=p.place+' · '+p.year+' · '+p.kind+' · '+p.grade;
+ const info=el('div',{class:'source-row'});
+ info.append(el('strong',{},subtitle));
+ if(/^https?:\/\//i.test(p.source||''))info.append(el('a',{href:p.source,target:'_blank',rel:'noopener noreferrer'},p.source));
+ else info.append(el('span',{class:'fine'},'Nincs megadott nyilvános forrás.'));
+ info.append(el('p',{class:'fine'},p.note));
+ $('mixProvenance').textContent='Adatforrás: '+subtitle+'. '+p.note;
+ root.append(info);
+ const rows=fleetShares(p);
+ if(!rows.length){root.append(el('p',{class:'alert'},'Ennek a forrásnak csak összesített állományadata van. Márkákhoz súlyozás nem készíthető.'));return;}
+ const table=el('table',{class:'mix-table-data'}),body=el('tbody');
+ const head=el('tr');for(const col of ['Gyártómárka','Darab','Profilon belüli arány*'])head.append(el('th',{},col));table.append(head);
+ for(const x of rows){const tr=el('tr');for(const txt of [x.brand,x.count.toLocaleString('hu-HU'),x.percent.toLocaleString('hu-HU')+'%'])tr.append(el('td',{},txt));body.append(tr);}
+ table.append(body);root.append(table);
+ root.append(el('p',{class:'hint'},'* A müncheni adatoknál a teljes 471 998 autóból, az 1985-ös országos újregisztrációs mintánál csak a felsorolt modellek darabszámösszegéből számított arány. Nem azonos a mozgó közúti forgalomban mért százalékkal.'));
+}
+$('mixInspect').addEventListener('click',()=>{try{const p=currentFleetProfile();viewFleetProfile(p);status('mixStatus','Forrásadatok megjelenítve. A városi/országos és állományi/újautó adatok különböző jelentésűek.','good');}catch(e){err(e,'mixStatus');}});
+$('mixProfile').addEventListener('change',()=>{try{viewFleetProfile(currentFleetProfile());}catch(e){status('mixStatus',e.message);$('mixTable').replaceChildren();}});
+$('mixTemplate').addEventListener('click',()=>fileDownload('omsitools_marka_stat_sablon.csv',fleetCSVTemplate(),'text/csv;charset=utf-8'));
+$('mixCSV').addEventListener('change',async()=>{
+ try{
+  const f=mounted('mixCSV');if(!f)return;
+  loadedProfile=parseFleetCSV(await fileText(f),{place:val('mixPlace'),year:val('mixYear'),source:val('mixSource')});
+  $('mixProfile').value='uploaded';viewFleetProfile(loadedProfile);
+  status('mixStatus','Saját statisztikai CSV beolvasva. Az adat eredetét és mintavételi módszerét neked kell ellenőrizned.','good');
+ }catch(e){err(e,'mixStatus');}
+});
+$('mixApply').addEventListener('click',()=>{
+ try{
+  const p=currentFleetProfile();const projectData=project();
+  const sourceRecords=vehicles.length?vehicles:recommendCatalog({
+   country:projectData.country,region:projectData.region,year:projectData.start,eastWest:projectData.area.toLowerCase().includes('ost')?'east':projectData.area.toLowerCase().includes('west')?'west':'auto',maxAI:35,maxPark:30
+  }).records;
+  const correctCity=p.id==='munich81'&&/münchen|munich/i.test(projectData.place);
+  const exactYear=p.year===projectData.start&&p.year===projectData.end;
+  const sameArea=(p.id==='uploaded')||(correctCity&&exactYear);
+  if(!sameArea&&!$('mixProxyConfirm').checked)throw Error('A kiválasztott adatsor nem pontosan ennek a helynek és időszaknak az állománya. Jelöld be a más területű/évű adatok közelítő használatának engedélyezését.');
+  const result=applyFleetProfile(sourceRecords,p,{unknownPolicy:val('mixUnknown')});
+  vehicles=result.records.map((r,i)=>({...r,_id:r._id||'mix-'+Date.now()+'-'+i}));
+  renderVehicles();
+  viewFleetProfile(p);
+  const coverage=result.notes.join(' ');
+  status('mixStatus',result.changed+' AI-jármű relatív súlya újraszámítva, '+result.dropped+' ismeretlen kategóriájú kihagyva. '+coverage,'warning');
+ }catch(e){err(e,'mixStatus');}
+});
+viewFleetProfile(FLEET_PROFILES[0]);
+
 chooseCalendarLocation('DE','DE-BE','Berlin');
 clearVehicle();renderVehicles();
