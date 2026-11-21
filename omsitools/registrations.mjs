@@ -57,7 +57,7 @@ function number(r,max=9999,min=1){return String(Math.floor(r()*(max-min+1))+min)
 export function readAreas(text){return String(text||'').split(/[\n,;]+/).map(s=>s.trim()).filter(Boolean).map(v=>{const m=/^(.+?)(?::([1-9][0-9]*))?$/.exec(v);if(!m)throw Error('Hibás területkód: '+v);return {code:m[1].trim().toUpperCase(),weight:Math.min(1000,Number(m[2]||1))};});}
 function normalizeAreas(values,system){
  if(!system.area)return [{code:'',weight:1}];
- const arr=typeof values==='string'?readAreas(values):Array.isArray(values)?values.map(x=>typeof x==='string'?{code:x.toUpperCase(),weight:1}:{code:String(x.code||'').toUpperCase(),weight:Number(x.weight||1)}):[];
+ const arr=typeof values==='string'?readAreas(values):Array.isArray(values)?values.flatMap(x=>typeof x==='string'?readAreas(x):[{code:String(x.code||'').toUpperCase(),weight:Number(x.weight||1)}]):[];
  if(!arr.length)throw Error('A rendszerhez legalább egy területkódot adj meg.');
  const valid=system.id==='FR_FNI'?/^[0-9]{2,3}$|^2[AB]$/:system.id.startsWith('DE_GDR')?/^[A-Z]$/:system.id==='CZ_NEW'?/^[A-Z]$/:system.id==='UK_CURRENT'?/^[A-Z]{2}$/:system.id==='CH_NEW'?/^[A-Z]{2}$/:/^[A-Z]{1,4}$/;
  const seen=new Map();
