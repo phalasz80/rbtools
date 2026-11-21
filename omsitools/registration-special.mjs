@@ -73,9 +73,11 @@ const SPECIAL=[
  {country:'DE',kind:'rescue',from:1956,to:2007,title:'Korábbi német katasztrófavédelmi hatósági számkör',source:'de',format:q=>q.area+q.sep+N(q.r,8000,8999)},
  {country:'DE',kind:'border',from:1956,to:2006,title:'Bundesgrenzschutz BG',source:'de_codes',format:q=>'BG'+q.sep+NUM(q.r,4)},
  // DDR specialty independent from civilian district markers
- {country:'DD',kind:'nva',from:1956,to:1975,title:'NVA VA korai számsor',source:'dd',format:q=>'VA '+N(q.r,1,9)+q.sep+P(q.r,4)},
+ {country:'DD',kind:'nva',from:1956,to:1959,title:'NVA VA egyjegyű első csoport (1956–1959)',source:'dd',format:q=>'VA '+N(q.r,1,9)+q.sep+P(q.r,4)},
+ {country:'DD',kind:'nva',from:1960,to:1975,title:'NVA VA kétjegyű első csoport (kb. 1960–1975)',source:'dd',format:q=>'VA '+N(q.r,10,99)+q.sep+P(q.r,4),note:'Kb. 1960-tól kétjegyű első csoport. Az 1976-os módosítás már meglévő kétjegyű szerkezetet érintett.'},
  {country:'DD',kind:'nva',from:1976,to:1990,title:'NVA VA késői számsor (1976-tól)',source:'dd',format:q=>'VA '+N(q.r,10,99)+q.sep+P(q.r,4)},
- {country:'DD',kind:'military',from:1956,to:1975,title:'NVA VA korai számsor',source:'dd',format:q=>'VA '+N(q.r,1,9)+q.sep+P(q.r,4)},
+ {country:'DD',kind:'military',from:1956,to:1959,title:'NVA VA egyjegyű első csoport (1956–1959)',source:'dd',format:q=>'VA '+N(q.r,1,9)+q.sep+P(q.r,4)},
+ {country:'DD',kind:'military',from:1960,to:1975,title:'NVA VA kétjegyű első csoport (kb. 1960–1975)',source:'dd',format:q=>'VA '+N(q.r,10,99)+q.sep+P(q.r,4),note:'Kb. 1960-tól kétjegyű első csoport. Az 1976-os módosítás már meglévő kétjegyű szerkezetet érintett.'},
  {country:'DD',kind:'military',from:1976,to:1990,title:'NVA VA késői számsor',source:'dd',format:q=>'VA '+N(q.r,10,99)+q.sep+P(q.r,4)},
  {country:'DD',kind:'police',from:1953,to:1990,title:'Volkspolizei VP körzeti sorozat',source:'dd',format:q=>'VP '+({I:'00',R:'12',S:'13',T:'14',D:'04',E:'05',Z:'06',H:'07',K:'08',L:'09',N:'10',O:'11',C:'03'}[q.area]||'00')+q.sep+P(q.r,4),note:'A területi kódok körzetenként változtak; egyes körzetekhez a történeti táblázat ellenőrzendő.'},
  {country:'DD',kind:'border',from:1961,to:1990,title:'Grenztruppen GT',source:'dd',format:q=>(q.year===1990&&q.month>=3?'GS':'GT')+' '+NUM(q.r,2)+q.sep+P(q.r,4),note:'A GT–GS átállás 1990-ben nem január 1-jén történt; a pontos hónapot is vizsgálni kell.'},
