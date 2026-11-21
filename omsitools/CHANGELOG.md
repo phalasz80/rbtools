@@ -1,3 +1,9 @@
+## 1.1.1 (2026-11-21)
+- Az OpenHolidays 2020 előtti lefedettségének helyes kezelése. A hiányzó év már nem szakítja meg az egész naptárat.
+- Magyarországon 2017-től országos munkaszüneti napok törvényi szabályok alapján kiszámíthatók, ha az API nem ad adatot. Iskolaszüneteket nem becsülünk.
+- Évenkénti forráslefedettség, részleges adatok hangsúlyos figyelmeztetése, valamint _RESZLEGES ZIP-elnevezés.
+- Az API-hiba és az adathiány az ellenőrzési jelentésben elkülönül.
+
 # OMSI Tools – Változásnapló
 
 ## v1.1.0 – 2026. november 21.

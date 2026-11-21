@@ -95,3 +95,7 @@ Node.js 22+: `node --test tests/*.test.mjs`. A GitHub Actions ugyanígy futtatja
 Nincsenek dokumentált, ellenőrzött történeti járműlisták beégetve a programba. A járműrekordokat a felhasználó állítja össze ellenőrizhető forrásokból.
 
 Az adatforrások dokumentációja: https://openholidaysapi.org/swagger/index.html , https://www.gov.uk/bank-holidays.json , https://nagerholidays.com/api . Az API-k feltételei és az internetkapcsolat az online generálásra hatással lehetnek.
+
+
+### 1.1.1: hiányzó évek kezelése
+Az OpenHolidays országonként 2020-tól közöl adatokat. A 2020 előtti iskolaszüneteket nem rekonstruáljuk automatikusan. Magyarország esetében 2017-től a 2012. évi I. törvény 102. § alapján kiszámíthatók a szokásos országos munkaszüneti napok (a nagypéntek 2017-től). Ezek forrása a ZIP jelentésében szerepel. Hiányzó évek esetén a ZIP neve `_RESZLEGES`, és a felhasználónak hivatalos vagy saját CSV-adatokkal kell pótolnia a szüneteket. Egy sikeres generálás nem jelenti a történeti iskolarend teljességét.
