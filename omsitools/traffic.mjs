@@ -170,7 +170,7 @@ export function researchPlan(project){
  for(const k of topics){if(!labels[k])continue;for(const term of labels[k]){const query=[loc,route,period,term].filter(Boolean).join(' ');rows.push({topic:TOPICS[k],query,url:safeSearch(query)});}}
  const intro=[`# OMSI történeti járműkutatás: ${str(place)||'helyszín nélkül'}`, '',`Időszak: ${start}–${end}`,`Területi fókusz: ${str(area)||'nincs megadva'}`,`Szolgáltató: ${str(operator)||'nincs megadva'}`,`Járat/helyszín: ${str(route)||'nincs megadva'}`,'', '## Kutatási feladat','',`Hol keressünk: ${str(where)||'nincs megadva'}`,`Mit ellenőrizzünk: ${str(what)||'nincs megadva'}`,`Megjegyzés: ${str(notes)||'nincs megadva'}`, '', '## Témakörök',...topics.map(k=>`- ${TOPICS[k]||k}`),'', '## Célzott internetes keresések',''];
  for(const r of rows)intro.push(`- ${r.topic}: [${r.query}](${r.url})`);
- intro.push('', '## Forráskritika', '- Egy link vagy fénykép önmagában nem bizonyítja a jármű típusarányát.', '- Külön ellenőrizd az üzemeltetés éveit, helyét, festését és a pontos járműszámot.', '- Az OMSI elérési útvonalakat a saját telepített modjaid alapján kell kitölteni.', '- A „feltételezett” és „igazolt” járművek elkülönülnek; automatikus történeti állományadat nincs.', '');
+ intro.push('', '## Forráskritika', '- Egy link vagy fénykép önmagában nem bizonyítja a jármű típusarányát.', '- Külön ellenőrizd az üzemeltetés éveit, helyét, festését és a pontos járműszámot.', '- Az eredeti referencialistából származó OMSI elérési utaknál is ellenőrizd, hogy az adott mod telepítve van-e.', '- A „feltételezett” és „igazolt” járművek elkülönülnek; automatikus történeti állományadat nincs.', '');
  return {markdown:intro.join('\n'),searches:rows};
 }
 export function buildReport(project,records,result){

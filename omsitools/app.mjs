@@ -1,5 +1,6 @@
 import {PLACES,validatePlace,parseOmSi,normalizeApi,parseOverrides,overridesFor,mergeEvents,holidayText,timezoneText,omsiEncode,makeZip} from './engine.mjs';
 import {TOPICS,GROUPS,validateVehicle,parseAilist,parseParklist,buildTrafficFiles,researchPlan,buildReport} from './traffic.mjs';
+import {catalogCounts,recommendCatalog} from './catalog-core.mjs';
 import {COUNTRIES,REGIONS,CITIES,countryMeta,regionName,apiSubdivisionOptions,matchRemoteRegion,codepageFor,normalizeLabel} from './geography.mjs';
 import {openSubdivisionList,openGroups,openHolidayEvents,ukHolidayEvents,builtinCityEvents} from './calendar-sources.mjs';
 const $=id=>document.getElementById(id);
@@ -32,6 +33,67 @@ for(const [key,label] of Object.entries(TOPICS)){const lab=el('label',{class:'ch
 function doResearch(){const p=project();if(!p.place)throw new Error('Add meg a vizsgálandó települést.');const plan=researchPlan(p);lastResearch=plan;$('researchLinks').replaceChildren();for(const r of plan.searches){const wrap=el('div',{class:'source-row'}),body=el('div');body.append(el('strong',{},r.topic));const a=el('a',{href:r.url,target:'_blank',rel:'noopener noreferrer'},r.query);body.append(a);wrap.append(body);$('researchLinks').append(wrap);}status('researchStatus',`${p.place}, ${p.start}–${p.end}: ${plan.searches.length} célzott keresés. Ezek kutatási javaslatok, nem ellenőrzött forrásállítások.`,'good');}
 $('makeResearch').addEventListener('click',()=>{try{doResearch();}catch(e){err(e,'researchStatus');}});
 $('downloadResearch').addEventListener('click',()=>{try{doResearch();const p=project();fileDownload(`omsitools_kutatas_${slug(p.place)}_${p.start}_${p.end}.md`,lastResearch.markdown,'text/markdown;charset=utf-8');}catch(e){err(e,'researchStatus');}});
+
+let catalogRecommendation=null;
+const inventory=catalogCounts();
+$('catalogCountAI').textContent=inventory.ai;
+$('catalogCountPark').textContent=inventory.park;
+function catalogOptions(){
+ const p=project();
+ const y=Number(val('catalogYear')||p.start);
+ return {country:p.country,region:p.region,year:y,eastWest:val('catalogEastWest'),
+ area:val('catalogArea'),maxAI:Number(val('catalogMaxAI')),maxPark:Number(val('catalogMaxPark')),
+ search:val('catalogSearch'),special:$('catalogIncludeSpecial').checked,
+ uncertain:$('catalogIncludeUncertain').checked,lod:$('catalogUseLOD').checked};
+}
+function catalogRecommend(){
+ const options=catalogOptions();
+ if(!options.country)throw new Error('Előbb add meg az országot a Hely és kutatás fülön.');
+ const result=recommendCatalog(options);
+ catalogRecommendation={result,options};
+ $('catalogCountKnown').textContent=result.stats.knownAI;
+ const container=$('catalogResults');container.replaceChildren();
+ const records=result.records;
+ for(let i=0;i<records.length;i++){
+  const r=records[i],card=el('label',{class:'catalog-choice'});
+  const check=el('input',{type:'checkbox'});check.className='catalog-check';check.dataset.i=String(i);check.checked=true;
+  const body=el('span',{class:'catalog-choice-body'});
+  body.append(el('strong',{},r.name+' · '+(r.mode==='park'?'parkoló':'közúti AI')));
+  const path=r.aiPath||r.parkPath;
+  body.append(el('span',{class:'catalog-path'},path));
+  if(r.parkPath&&r.aiPath)body.append(el('span',{class:'catalog-sub'},'Parkoló pár: '+r.parkPath));
+  body.append(el('span',{class:'catalog-sub'},'Típuskorszak: '+(r.from||'?')+'–'+(r.to||'?')+' · javaslat / ellenőrizendő'));
+  card.append(check,body);container.append(card);
+ }
+ $('catalogAdd').disabled=!records.length;
+ $('catalogSelectAll').disabled=!records.length;
+ $('catalogSelectNone').disabled=!records.length;
+ const warnings=result.warnings.join(' ');
+ status('catalogStatus',records.length+' járműrekord javasolt ('+result.ai.length+' AI, '+result.park.length+' parkoló modell). '+(warnings||'')+(records.length?' A jelölőnégyzetekkel szűkítheted a válogatást.':''),records.length?'good':'warning');
+ return result;
+}
+$('catalogSuggest').addEventListener('click',()=>{try{catalogRecommend();}catch(e){err(e,'catalogStatus');}});
+$('catalogSelectAll').addEventListener('click',()=>{document.querySelectorAll('.catalog-check').forEach(c=>c.checked=true);});
+$('catalogSelectNone').addEventListener('click',()=>{document.querySelectorAll('.catalog-check').forEach(c=>c.checked=false);});
+$('catalogAdd').addEventListener('click',()=>{
+ try{
+  if(!catalogRecommendation)throw new Error('Előbb állíts össze ajánlást.');
+  const picked=[...document.querySelectorAll('.catalog-check:checked')].map(c=>catalogRecommendation.result.records[Number(c.dataset.i)]).filter(Boolean);
+  const present=new Set(vehicles.map(v=>v.aiPath||v.parkPath));
+  let added=0,skipped=0;
+  for(const record of picked){
+   const key=record.aiPath||record.parkPath;
+   if(present.has(key)){skipped++;continue;}
+   const errors=validateVehicle(record);
+   if(errors.length){skipped++;continue;}
+   vehicles.push({...record,_id:'catalog-'+Date.now()+'-'+added});
+   present.add(key);added++;
+  }
+  renderVehicles();
+  status('catalogStatus',added+' jármű hozzáadva a projekt állományához; '+skipped+' már szerepelt vagy érvénytelen volt. Minden automatikus besorolás ellenőrizendő.','good');
+ }catch(e){err(e,'catalogStatus');}
+});
+
 const vFields={name:'vName',mode:'vMode',status:'vStatus',from:'vFrom',to:'vTo',aiPath:'vAiPath',group:'vGroup',weight:'vWeight',parkPath:'vParkPath',parkWeight:'vParkWeight',depot:'vDepot',hof:'vHof',fleet:'vFleet',reg:'vReg',repaint:'vRepaint',validFrom:'vValidFrom',validTo:'vValidTo',source:'vSource',evidence:'vEvidence'};
 const defaultVehicle=()=>({mode:'random',status:'proposed',group:'NormalCars',weight:1,parkWeight:1});
 function readVehicle(){const r={};for(const [name,id] of Object.entries(vFields))r[name]=val(id);return r;}
@@ -56,9 +118,9 @@ $('vehicleForm').addEventListener('submit',e=>{e.preventDefault();try{const v=re
 $('exportProject').addEventListener('click',()=>{try{const p=project();fileDownload(`omsitools_projekt_${slug(p.place)}_${p.start}_${p.end}.json`,JSON.stringify({schema:'omsitools-project-v1',project:p,vehicles},null,2),'application/json;charset=utf-8');}catch(e){global(e.message,'error');}});
 $('importProjectBtn').addEventListener('click',()=>$('importProject').click());
 $('importProject').addEventListener('change',async()=>{try{const file=mounted('importProject');if(!file)return;const saved=JSON.parse(await fileText(file));if(saved.schema!=='omsitools-project-v1'||!Array.isArray(saved.vehicles)||!saved.project||saved.vehicles.length>5000)throw new Error('Nem megfelelő OMSI-projektfájl.');for(const [i,v] of saved.vehicles.entries()){const errs=validateVehicle(v);if(errs.length)throw new Error(`${i+1}. rekord: ${errs.join(', ')}`);}updateProject(saved.project);vehicles=saved.vehicles.map((v,i)=>({...v,_id:'import-'+i}));clearVehicle();renderVehicles();global(`${vehicles.length} jármű és a projekt adatai betöltve.`);}catch(e){global(e.message,'error');}finally{$('importProject').value='';}});
-$('generateTraffic').addEventListener('click',()=>{try{const p=project(),res=buildTrafficFiles(vehicles,p.start,p.end,{onlyVerified:$('onlyVerified').checked});if(!res.selected.length)throw new Error('Nincs a megadott időszakban felhasználható jármű. Előbb add meg vagy engedélyezd őket.');lastTraffic={project:p,res};$('aiPreview').textContent=res.ailist;$('parkPreview').textContent=res.parklist||'(nincs parkoló modell)';$('downloadTraffic').disabled=false;status('trafficStatus',`${res.selected.length} jármű kiválasztva. ${res.warnings.length} figyelmeztetés: ${res.warnings.join(' | ')||'nincs'}`,'good');}catch(e){lastTraffic=null;$('downloadTraffic').disabled=true;err(e,'trafficStatus');}});
-$('downloadTraffic').addEventListener('click',()=>{try{if(!lastTraffic)throw new Error('Előbb generáld le a fájlokat.');const {project:p,res}=lastTraffic;
- const files=[['ailists.cfg',res.ailist],['parklist_p.txt',res.parklist],['FORRASOK_ES_ELLENORZES.txt',buildReport(p,vehicles,res)],['KUTATASI_TERV.md',researchPlan(p).markdown,true]];
+$('generateTraffic').addEventListener('click',()=>{try{const p=project(),baseRecords=vehicles.length?vehicles:($('onlyVerified').checked?[]:catalogRecommend().records),res=buildTrafficFiles(baseRecords,p.start,p.end,{onlyVerified:$('onlyVerified').checked});if(!res.selected.length)throw new Error('Nincs a megadott időszakban felhasználható jármű. Előbb add meg vagy engedélyezd őket.');lastTraffic={project:p,res,records:baseRecords};$('aiPreview').textContent=res.ailist;$('parkPreview').textContent=res.parklist||'(nincs parkoló modell)';$('downloadTraffic').disabled=false;status('trafficStatus',`${res.selected.length} jármű kiválasztva. ${res.warnings.length} figyelmeztetés: ${res.warnings.join(' | ')||'nincs'}`,'good');}catch(e){lastTraffic=null;$('downloadTraffic').disabled=true;err(e,'trafficStatus');}});
+$('downloadTraffic').addEventListener('click',()=>{try{if(!lastTraffic)throw new Error('Előbb generáld le a fájlokat.');const {project:p,res,records}=lastTraffic;
+ const files=[['ailists.cfg',res.ailist],['parklist_p.txt',res.parklist],['FORRASOK_ES_ELLENORZES.txt',buildReport(p,records,res)],['KUTATASI_TERV.md',researchPlan(p).markdown,true]];
  const bytes=zipIt(`${slug(p.place)}_${p.start}-${p.end}`,files);fileDownload(`omsitools_jarmuvek_${slug(p.place)}_${p.start}-${p.end}.zip`,bytes,'application/zip');}catch(e){err(e,'trafficStatus');}});
 $('inspectFiles').addEventListener('click',async()=>{try{const a=mounted('fileAilist'),b=mounted('fileParklist');if(!a&&!b)throw new Error('Válassz legalább egy meglévő OMSI-fájlt.');const target=$('inspectResults');target.replaceChildren();let summary=[];
   if(a){const parsed=parseAilist(await fileText(a,cp()));const box=el('div',{class:'list-card'});box.append(el('strong',{},`ailists.cfg: ${parsed.groups.length} csoport, ${parsed.counts.random} AI és ${parsed.counts.scheduled} menetrendi bejegyzés`));for(const w of parsed.warnings)box.append(el('p',{class:'fine'},'• '+w));if(!parsed.warnings.length)box.append(el('p',{class:'fine'},'A vizsgált OMSI 2 csoportokban nem találtam szerkezeti figyelmeztetést.'));target.append(box);summary.push('AI-lista ellenőrizve.');}

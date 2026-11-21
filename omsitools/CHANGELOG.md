@@ -1,3 +1,12 @@
+## 1.3.0 (2026-11-21)
+- A felhasználó által küldött teljes `kozuti_ai.txt` (2727 sor) és `kozut_parklist.txt` (1090 sor) a webalkalmazás elsődleges járműkatalógusa.
+- Rendszámváltozatok, LOD-objektumok és azonos típusok deduplikálása; típuscsoportok, modelldátumok és területi preferenciák.
+- Történeti Németország: Nyugat-Berlin/Kelet-Berlin választó, 1970-es és 1980-as évek modellezése, korszakból kilógó járművek alapértelmezett kizárása.
+- Új katalóguspanel kereséssel, részletes javaslatokkal, tételenkénti kijelöléssel és projektbe emeléssel. Üres projekt esetén a közúti fájlgenerálás saját katalógus-ajánlást használ.
+- A besorolási jegyzet külön `CATALOG_RESEARCH.md` fájlban, a felületre linkelve; a modellváltások külön ellenőrzésével.
+- Az automatikus megjelenési arányok és típusbesorolások heurisztikusak, a modellek OMSI-telepítettsége ellenőrzendő; forráskritikai figyelmeztetés megmarad.
+- Német DIN/EU-, francia FNI/SIV- és magyar 1990/2004/2022-es rendszámváltások időbeli korlátozása, cseh/szlovák 1993-as időhatár. A régi táblák későbbi jelenléte egyszerűsített súlyozással modellezett.
+
 ## 1.2.0 (2026-11-21)
 - Külön NDK / NSZK történeti üzemmód, Berlinnél kötelező East/West kiválasztás.
 - 1970–1989 eltérő ünnepek (NSZK június 17., NDK október 7.; 1975/1985 külön NDK-ünnepek) és tartományi, helyi ünnepek részleges jelölése.
