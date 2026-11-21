@@ -5,6 +5,7 @@
 - Iskolaszünetek: 1970 NDK ismert dátumai másodlagos forrásból, más évek hiányként szerepelnek, nincs becslés.
 - Naptár 1970–2027 egyetlen kérésben, legfeljebb 11 API-s évvel.
 - Történeti források a generált ZIP jelentésében.
+- Rövidített státuszüzenet a több évtizedes naptárakhoz; a részletes figyelmeztetések a ZIP-ben maradnak, és a történeti választó csak Németországnál látszik.
 
 ## 1.1.1 (2026-11-21)
 - Az OpenHolidays 2020 előtti lefedettségének helyes kezelése. A hiányzó év már nem szakítja meg az egész naptárat.

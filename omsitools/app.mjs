@@ -200,7 +200,8 @@ $('generateCalendar').addEventListener('click',async()=>{
   $('holidayPreview').textContent=holidays?holidays.slice(0,2000)+(holidays.length>2000?'\r\n[… az előnézet rövidítve]':''):'Csak timezone.txt';
   lastCalendar={place,start,end,tz,holidays,desc,publicCount,schoolCount,sources,notes,coverage,incomplete};
   $('downloadCalendar').disabled=false;
-  status('calStatus',`${incomplete?'RÉSZLEGES NAPTÁR. ':''}${place.name}, ${start}–${end}: ${publicCount} munkaszüneti esemény, ${schoolCount} szünetidőszak, ${tz.count} nyáriidőszámítási időszak. ${notes.join(' ')}`,notes.length?'warning':'good');
+  const shortNotes=notes.slice(0,3).join(' ')+(notes.length>3?` +${notes.length-3} további megjegyzés a letölthető ZIP ellenőrzési jelentésében.`:'');
+  status('calStatus',`${incomplete?'RÉSZLEGES NAPTÁR. ':''}${place.name}, ${start}–${end}: ${publicCount} munkaszüneti esemény, ${schoolCount} szünetidőszak, ${tz.count} nyáriidőszámítási időszak. ${shortNotes}`,notes.length?'warning':'good');
  }catch(e){lastCalendar=null;$('downloadCalendar').disabled=true;err(e,'calStatus');}
  finally{$('generateCalendar').disabled=false;}
 });
