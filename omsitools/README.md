@@ -1,4 +1,4 @@
-# OMSI Tools (RegionalBahn) · v1.0.1
+# OMSI Tools (RegionalBahn) · v1.1.0
 
 Statikus, böngészőben futó alkalmazás OMSI 2 / openOMSI pályák járműállományának és naptárállományainak összeállításához. A cél: `https://tools.regionalbahn.hu/omsitools/`.
 
@@ -26,12 +26,20 @@ Statikus, böngészőben futó alkalmazás OMSI 2 / openOMSI pályák járműál
 - Nem állapítja meg automatikusan, hogy a megadott OMSI járműfájl valóban telepítve van-e, illetve hogy a pálya forgalmi útvonalai milyen AI-csoportot használnak. Az ilyen ellenőrzéshez a pályát és a Vehicles mappát külön meg kell vizsgálni.
 
 ### 4. Ünnepnapok és időzóna
+
+**Támogatott területek (v1.1.0):** Németország mind a 16 tartománya, Ausztria, Svájc, Franciaország, Magyarország, Csehország, Szlovákia és az Egyesült Királyság. A felület több mint 200 fontosabb várost kínál előbeállításként. Ország → tartomány/kanton/régió → város; a területi szűrőket az OpenHolidays hivatalos API-listája tölti be (a helyileg eltérő kódokat nem szabad egyszerűen ISO-kóddá átírni).
+
+**Egyesült Királyság:** az OpenHolidays nem támogatja GB-t. A hivatalos GOV.UK bank holidays JSON-ból és annak elérhetetlensége vagy időbeli hiánya esetén a Nager.Holidays szolgáltatásból töltődnek a munkaszüneti napok az Anglia és Wales, Skócia, Észak-Írország bontásban. Az iskolaszüneteket a helyi hatóságok és iskolák határozzák meg; ezek csak a felhasználó által megadott, ellenőrzött CSV-kivételekből kerülhetnek bele. A letölthető ZIP forrásjelentése külön jelzi, ha a szünetadat hiányzik.
+
+**Területi pontosság:** a városok előbeállításai földrajzi helyszínt és területi szűrőt adnak, nem garantálnak teljes települési ünnep- és iskolaszünet-nyilvántartást. Biztos, különálló helyi ünnepként Augsburg augusztus 8-i Hohes Friedensfest napja automatikusan bekerül a város saját naptárába. Más helyi eltéréseket a hivatalos helyi források alapján CSV-vel lehet felvinni. Különösen Bajorország települési Mária mennybevétele ünnepe, Franciaország iskolai zónái és Svájc iskolai/községi szünetei szorulnak ellenőrzésre.
+
+**Kódolás:** Magyarország, Csehország, Szlovákia Windows-1250; Németország, Ausztria, Svájc, Franciaország és Egyesült Királyság Windows-1252. A telepített OMSI kódlapját külön ellenőrizd.
 - `timezone.txt` generálás a futtató böngésző IANA időzónaadataiból. Az óraátállítás történeti és jövőbeli érvényessége a böngésző adatcsomagjától függ; új szabályozás esetén frissítés szükséges.
 - `Holidays.txt` az OpenHolidays API-ból (`PublicHolidays`, `SchoolHolidays`), illetve feltöltött OMSI `Holidays.txt` fájlból.
 - Városi eltérések CSV-vel; helyszínspecifikus jogosultságot az API nem mindig tud megkülönböztetni.
 - Az online API-üzemmód legfeljebb 11 évre kér adatot; évente külön ellenőrzi mindkét adatkategóriát, és hiányzó év esetén nem készít hiányos naptárat. Az API hivatalosan általában 2020-tól publikál adatot.
 - Minden naptár ZIP-ben külön `Holidays.txt` és `timezone.txt` (vagy csak időzóna) + forrásjelentés.
-- Magyar helyhez Windows-1250, más előre beállított helyekhez Windows-1252 kódolás; a karakterek kódolhatóságát ellenőrzi.
+- Magyar, cseh és szlovák helyszínhez Windows-1250, más országokhoz Windows-1252 kódolás; a karakterek kódolhatóságát ellenőrzi.
 
 ## Böngészős használat
 
@@ -75,6 +83,8 @@ Node.js 22+: `node --test tests/*.test.mjs`. A GitHub Actions ugyanígy futtatja
 ## Szerkezeti fájlok
 
 - `index.html`, `style.css`, `app.mjs`: felület és interakció
+- `geography.mjs`: országok, régiók, városok és országfüggő kódlapok
+- `calendar-sources.mjs`: OpenHolidays, GOV.UK és Nager.Holidays API-hívások
 - `engine.mjs`: naptár, Windows-kódlap, saját ZIP
 - `traffic.mjs`: AI-lista, parklist, diagnosztika és kutatási terv
 - `example_overrides.csv`: helyi kivételek mintája
@@ -83,3 +93,5 @@ Node.js 22+: `node --test tests/*.test.mjs`. A GitHub Actions ugyanígy futtatja
 - `tests/`: regressziós tesztek
 
 Nincsenek dokumentált, ellenőrzött történeti járműlisták beégetve a programba. A járműrekordokat a felhasználó állítja össze ellenőrizhető forrásokból.
+
+Az adatforrások dokumentációja: https://openholidaysapi.org/swagger/index.html , https://www.gov.uk/bank-holidays.json , https://nagerholidays.com/api . Az API-k feltételei és az internetkapcsolat az online generálásra hatással lehetnek.

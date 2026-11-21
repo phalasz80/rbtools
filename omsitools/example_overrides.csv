@@ -1,2 +1,3 @@
 place_id;kind;start;end;name;action
-augsburg;public;08-08;08-08;Augsburger Hohes Friedensfest;add
+# Az alábbi sor csak szerkezeti példa, ne használd ellenőrzés nélkül:
+# de-essen;school;20260401;20260402;Helyi iskolaszünet;add

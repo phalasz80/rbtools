@@ -1,5 +1,17 @@
 # OMSI Tools – Változásnapló
 
+## v1.1.0 – 2026. november 21.
+
+### Területi naptárbővítés
+- Németország mind a 16 tartománya, Ausztria, Svájc, Franciaország, Magyarország, Csehország, Szlovákia és az Egyesült Királyság.
+- Összesen 204 város kiválasztási lehetősége, országonként és régiónként rendezve.
+- OpenHolidays Subdivisions és Groups, hivatalos területi/szünetcsoport-adatok dinamikus beolvasása.
+- Brit munkaszüneti napok GOV.UK forrásból, hiányzó év esetén Nager.Holidays tartalékkal.
+- Brit iskolaszüneteknél egyértelmű hiányjelzés, ellenőrzött helyi CSV-bővítési lehetőség.
+- Augsburg önálló városi ünnepe, az Augsburger Hohes Friedensfest.
+- Magyar, cseh és szlovák OMSI-kódolás Windows-1250; más országokban Windows-1252.
+- 18 automatizált regressziós teszt.
+
 ## v1.0.1 – 2026. november 21.
 
 ### Közzétételi csomag javítása

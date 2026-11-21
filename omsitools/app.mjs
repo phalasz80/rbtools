@@ -1,5 +1,7 @@
 import {PLACES,validatePlace,parseOmSi,normalizeApi,parseOverrides,overridesFor,mergeEvents,holidayText,timezoneText,omsiEncode,makeZip} from './engine.mjs';
 import {TOPICS,GROUPS,validateVehicle,parseAilist,parseParklist,buildTrafficFiles,researchPlan,buildReport} from './traffic.mjs';
+import {COUNTRIES,REGIONS,CITIES,countryMeta,regionName,apiSubdivisionOptions,matchRemoteRegion,codepageFor,normalizeLabel} from './geography.mjs';
+import {openSubdivisionList,openGroups,openHolidayEvents,ukHolidayEvents,builtinCityEvents} from './calendar-sources.mjs';
 const $=id=>document.getElementById(id);
 const val=id=>$(id).value.trim();
 const button=id=>$(id);
@@ -16,15 +18,15 @@ function project(){const [start,end]=serialYears();const topics=[...document.que
 function updateProject(p){const fields={place:'place',country:'country',region:'region',start:'periodStart',end:'periodEnd',area:'area',operator:'operator',route:'route',where:'where',what:'what',notes:'notes'};for(const [k,id] of Object.entries(fields))if(p[k]!==undefined)$(id).value=p[k];for(const node of document.querySelectorAll('[data-topic]'))node.checked=(p.topics||[]).includes(node.dataset.topic);}
 function fileDownload(filename,content,type='application/octet-stream'){const blob=content instanceof Uint8Array?new Blob([content],{type}):new Blob([content],{type});const url=URL.createObjectURL(blob);const a=el('a',{href:url});a.download=filename;a.style.display='none';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function slug(s){return String(s||'helyszin').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,45)||'helyszin';}
-function cp(){return val('country').toUpperCase()==='HU'?'1250':'1252';}
+function cp(){return codepageFor(val('country').toUpperCase());}
 function tryEncode(text){return omsiEncode(text,cp());}
 function zipIt(root,list){const files=list.map(([path,text,isUtf8])=>({path:root+'/'+path,bytes:isUtf8?encoder.encode(text):tryEncode(text)}));return makeZip(files);}
 async function fileText(file,codepage='1252') {const buf=await file.arrayBuffer();try{return new TextDecoder('utf-8',{fatal:true}).decode(buf);}catch{return new TextDecoder('windows-'+codepage).decode(buf);}}
 function mounted(name){return button(name).files?.[0]||null;}
 function tabSwitch(key){for(const tab of document.querySelectorAll('.tab')){const yes=tab.dataset.tab===key;tab.classList.toggle('active',yes);tab.setAttribute('aria-selected',yes?'true':'false');}for(const section of document.querySelectorAll('.section'))section.classList.toggle('active',section.id===key);window.scrollTo({top:80,behavior:'smooth'});}
 for(const tab of document.querySelectorAll('[data-tab]'))tab.addEventListener('click',()=>tabSwitch(tab.dataset.tab));
-for(const place of PLACES){$('placePreset').append(el('option',{value:place.id},place.name));$('calPlace').append(el('option',{value:place.id},place.name));}
-$('placePreset').addEventListener('change',()=>{const pl=PLACES.find(p=>p.id===val('placePreset'));if(!pl)return;$('place').value=pl.name;$('country').value=pl.country;$('region').value=pl.subdivision;$('calPlace').value=pl.id;updateCalPlace();});
+for(const place of PLACES){$('placePreset').append(el('option',{value:place.id},place.name));}
+$('placePreset').addEventListener('change',()=>{const pl=PLACES.find(p=>p.id===val('placePreset'));if(!pl)return;$('place').value=pl.name;$('country').value=pl.country;$('region').value=pl.subdivision;chooseCalendarLocation(pl.country,pl.subdivision,pl.name);});
 for(const [name,label] of GROUPS)$('vGroup').append(el('option',{value:name},label+' ('+name+')'));
 for(const [key,label] of Object.entries(TOPICS)){const lab=el('label',{class:'check'});const input=el('input',{type:'checkbox'});input.dataset.topic=key;input.checked=['urbanBus','cars','parking','liveries'].includes(key);lab.append(input,document.createTextNode(label));$('topicChecks').append(lab);}
 function doResearch(){const p=project();if(!p.place)throw new Error('Add meg a vizsgálandó települést.');const plan=researchPlan(p);lastResearch=plan;$('researchLinks').replaceChildren();for(const r of plan.searches){const wrap=el('div',{class:'source-row'}),body=el('div');body.append(el('strong',{},r.topic));const a=el('a',{href:r.url,target:'_blank',rel:'noopener noreferrer'},r.query);body.append(a);wrap.append(body);$('researchLinks').append(wrap);}status('researchStatus',`${p.place}, ${p.start}–${p.end}: ${plan.searches.length} célzott keresés. Ezek kutatási javaslatok, nem ellenőrzött forrásállítások.`,'good');}
@@ -63,50 +65,152 @@ $('inspectFiles').addEventListener('click',async()=>{try{const a=mounted('fileAi
   if(b){const parsed=parseParklist(await fileText(b,cp()));const box=el('div',{class:'list-card'});box.append(el('strong',{},`parklist_p.txt: ${parsed.paths.length} járműobjektum, ${parsed.repeats.length} ismétlődő típus`));for(const w of parsed.warnings)box.append(el('p',{class:'fine'},'• '+w));if(!parsed.warnings.length)box.append(el('p',{class:'fine'},'Nem találtam szerkezeti figyelmeztetést.'));target.append(box);summary.push('Parkolólista ellenőrizve.');}
   global(summary.join(' ')+' Nem módosítottam a feltöltött fájlokat.');
  }catch(e){global(e.message,'error');}});
-function updateCalPlace(){const pl=PLACES.find(x=>x.id===val('calPlace'));if(pl){$('calZone').value=pl.zone;$('calLat').value=pl.lat;$('calLon').value=pl.lon;return;}
- const p=PLACES.find(x=>x.name.toLowerCase()===val('place').toLowerCase());if(p){$('calZone').value=p.zone;$('calLat').value=p.lat;$('calLon').value=p.lon;}}
-$('calPlace').addEventListener('change',updateCalPlace);
-$('calSource').addEventListener('change',()=>{$('holidayUploadRow').hidden=val('calSource')!=='file';});
-function selectedCalPlace(){const p=PLACES.find(x=>x.id===val('calPlace'));const place=p?{...p}:{id:slug(val('place')),name:val('place'),country:val('country').toUpperCase(),subdivision:val('region').toUpperCase(),language:val('country').toUpperCase()==='HU'?'HU':'DE'};
- place.zone=val('calZone');place.lat=Number(val('calLat'));place.lon=Number(val('calLon'));validatePlace(place);return place;}
-function apiUrl(endpoint,place,year){const url=new URL('https://openholidaysapi.org/'+endpoint);url.searchParams.set('countryIsoCode',place.country);url.searchParams.set('subdivisionCode',place.subdivision);url.searchParams.set('validFrom',year+'-01-01');url.searchParams.set('validTo',year+'-12-31');url.searchParams.set('languageIsoCode',place.language);return url.href;}
-async function fetchCalendarEvents(place,from,to){const records=[];
- for(let year=from;year<=to;year++){
-  for(const [endpoint,kind] of [['PublicHolidays','public'],['SchoolHolidays','school']]){
-   const response=await fetch(apiUrl(endpoint,place,year),{headers:{Accept:'application/json'}});
-   if(!response.ok)throw new Error(`OpenHolidays API: ${year} / ${endpoint} HTTP ${response.status}. A hiányos naptárat nem mentem el.`);
-   const arr=await response.json();const items=normalizeApi(arr,kind,place);
-   if(items.length===0)throw new Error(`${year}: nincs ${kind==='public'?'munkaszüneti nap':'iskolaszünet'} a közzétett adatokban ehhez a térséghez. Ne tekintsd teljesnek a naptárat.`);
-   records.push(...items);
+// Calendar geography is intentionally independent from research geography.
+let regionOptions=[],regionRequest=0,lastCalendarWarnings=[];
+const geoOption=(value,label)=>el('option',{value},label);
+for(const country of COUNTRIES)$('calCountry').append(geoOption(country.code,country.name));
+function fillCities(preferred=''){
+ const country=val('calCountry'),selected=val('calRegion'),cities=CITIES.filter(c=>c.country===country&&(!selected||matchRemoteRegion(c,regionOptions)===selected)).sort((a,b)=>a.name.localeCompare(b.name,'hu'));
+ $('calCity').replaceChildren(geoOption('','A teljes kiválasztott tartomány / körzet'));
+ for(const city of cities){const region=regionName(country,city.subdivision),label=city.name+' ('+region+')';$('calCity').append(geoOption(city.id,label));}
+ if(preferred){const city=cities.find(c=>c.id===preferred||normalizeLabel(c.name)===normalizeLabel(preferred));if(city)$('calCity').value=city.id;}
+ if(!val('calCity'))$('calCity').value='';
+}
+function setPlaceCoordinates(city){
+ const country=countryMeta(val('calCountry'));
+ if(!country)return;
+ const point=city||CITIES.find(c=>c.country===country.code&&matchRemoteRegion(c,regionOptions)===val('calRegion'))||country;
+ $('calZone').value=country.zone;$('calLat').value=point.lat;$('calLon').value=point.lon;
+}
+function selectCity(city){
+ if(!city){setPlaceCoordinates();updateGeoInfo();return;}
+ const match=matchRemoteRegion(city,regionOptions);
+ if(match)$('calRegion').value=match;
+ setPlaceCoordinates(city);
+ updateGeoInfo();
+}
+function updateGeoInfo(extra=''){
+ const c=countryMeta(val('calCountry'));if(!c)return;
+ const city=CITIES.find(x=>x.id===val('calCity'));
+ const r=regionOptions.find(x=>x.code===val('calRegion'));
+ const uk=c.code==='GB';
+ const level=city?city.name+' (városi helyszín; a lekért szünetek területi pontossága az adatforrástól függ)':r?r.name+' (tartomány/körzet)':c.name+' (országos)';
+ const hint=uk?'Az Egyesült Királyságban a munkaszüneti napok országonként eltérnek; az iskolaszünetek helyi tanácsi/iskolai adatok, ezeket CSV-vel add hozzá.':
+ 'A hivatalos területi egységek és iskola-szüneti körzetek az OpenHolidays adataiból frissülnek. A város kiválasztása önmagában nem bizonyít külön városi ünnepeket vagy iskolai eltéréseket.';
+ const key=city?.id||c.code.toLowerCase()+'-'+(val('calRegion')||'national').toLowerCase().replace(/[^a-z0-9_-]/g,'_');
+ $('calGeoNote').textContent=level+'. CSV helyazonosító: '+key+'. '+hint+(extra?' '+extra:'');
+}
+async function loadCalendarRegions(country,prefRegion='',prefCity=''){
+ const request=++regionRequest,meta=countryMeta(country);
+ let preliminary=(REGIONS[country]||[]).map(x=>({...x}));
+ regionOptions=preliminary;
+ const publish=(preferred)=>{
+  const elRegion=$('calRegion');elRegion.replaceChildren();
+  if(country!=='GB')elRegion.append(geoOption('','Országos (nincs tartományi szűrés)'));
+  for(const region of regionOptions)elRegion.append(geoOption(region.code,`${region.name} [${region.code}]`));
+  const direct=regionOptions.find(x=>x.code===preferred);
+  elRegion.value=direct?direct.code:(country==='GB'?'GB-EAW':'');
+  fillCities(prefCity);
+  if(prefCity){const city=CITIES.find(c=>c.country===country&&normalizeLabel(c.name)===normalizeLabel(prefCity));
+   if(city){$('calCity').value=city.id;const mapped=matchRemoteRegion(city,regionOptions);if(mapped)elRegion.value=mapped;}
   }
- }
- return records;
+  setPlaceCoordinates(CITIES.find(c=>c.id===val('calCity')));
+  updateGeoInfo();
+ };
+ publish(prefRegion);
+ $('calGroup').replaceChildren(geoOption('','Általános (nincs iskolatípus-szűrés)'));
+ $('calGroupRow').hidden=country==='GB';
+ if(country==='GB')return;
+ $('calGeoNote').textContent='Területi és iskolatípus-adatok lekérése az OpenHolidays rendszerből…';
+ try{
+  const [subgroups,groups]=await Promise.allSettled([openSubdivisionList(country),openGroups(country)]);
+  if(request!==regionRequest)return;
+  if(subgroups.status==='fulfilled'){
+   const fetched=apiSubdivisionOptions(subgroups.value);
+   if(fetched.length)regionOptions=fetched;
+   else throw new Error('A külső API nem adott területi listát.');
+  }else throw subgroups.reason;
+  const desired=regionOptions.some(x=>x.code===prefRegion)?prefRegion:(()=>{
+   const original=preliminary.find(x=>x.code===prefRegion);if(!original)return '';
+   const normalized=normalizeLabel(original.name);return regionOptions.find(x=>normalizeLabel(x.name)===normalized)?.code||'';
+  })();
+  publish(desired);
+  if(groups.status==='fulfilled')for(const group of groups.value||[]){if(!group.code)continue;
+   const name=Array.isArray(group.name)?group.name.find(x=>x.language===meta.language)?.text||group.name.find(x=>x.language==='EN')?.text||group.name[0]?.text:group.name;
+   $('calGroup').append(geoOption(group.code,String(name||group.code)+' ['+group.code+']'));
+  }
+  updateGeoInfo();
+ }catch(e){if(request!==regionRequest)return;updateGeoInfo('A területi API most nem érhető el. A választóban statikus ISO-kódok látszanak; az online generálásnál ellenőrizd a területi kódot. '+(e?.message||''));}
+}
+async function chooseCalendarLocation(country,region,city=''){
+ $('calCountry').value=country;
+ await loadCalendarRegions(country,region,city);
+}
+$('calCountry').addEventListener('change',()=>loadCalendarRegions(val('calCountry'),val('calCountry')==='GB'?'GB-EAW':'',''));
+$('calRegion').addEventListener('change',()=>{ $('calCity').value='';setPlaceCoordinates();updateGeoInfo();});
+$('calCity').addEventListener('change',()=>selectCity(CITIES.find(x=>x.id===val('calCity'))));
+$('calSource').addEventListener('change',()=>{$('holidayUploadRow').hidden=val('calSource')!=='file';});
+function selectedCalPlace(){
+ const country=countryMeta(val('calCountry'));if(!country)throw new Error('Válassz támogatott országot.');
+ const subdivision=val('calRegion'),city=CITIES.find(c=>c.id===val('calCity'));
+ if(country.code==='GB'&&!subdivision)throw new Error('A brit országrész megadása kötelező.');
+ if(country.code!=='GB'&&country.code!=='HU'&&!subdivision&&val('calSource')==='online')throw new Error('A pontos iskolaszünetekhez válassz tartományt, kantont vagy iskolaövezetet. Országos szűrés minden régió szüneteit összekeverheti.');
+ if(city&&!matchRemoteRegion(city,regionOptions)&&country.code!=='GB'&&val('calSource')==='online')throw new Error('A kiválasztott városhoz nem található megfelelő, API-ban támogatott tartomány/körzet. Válassz területet a listából, vagy tölts fel saját Holidays.txt fájlt.');
+ const chosenName=city?.name||regionOptions.find(x=>x.code===subdivision)?.name||country.name;
+ const place={id:city?.id||country.code.toLowerCase()+'-'+(subdivision||'national').toLowerCase().replace(/[^a-z0-9_-]/g,'_'),name:chosenName,country:country.code,subdivision,language:country.language,zone:val('calZone'),lat:Number(val('calLat')),lon:Number(val('calLon')),citySelected:!!city};
+ validatePlace(place);return place;
 }
 $('generateCalendar').addEventListener('click',async()=>{
- $('generateCalendar').disabled=true;status('calStatus','Az időzóna kiszámítása és az adatok feldolgozása folyamatban…');
- try{const place=selectedCalPlace(),start=Number(val('calStart')),end=Number(val('calEnd'));
+ $('generateCalendar').disabled=true;$('downloadCalendar').disabled=true;
+ status('calStatus','Az időzóna és a kiválasztott terület ünnep- és szünetadatai feldolgozás alatt…');
+ try{
+  const place=selectedCalPlace(),start=Number(val('calStart')),end=Number(val('calEnd'));
   if(!Number.isInteger(start)||!Number.isInteger(end)||start<1970||end>2098||start>end||end-start>50)throw new Error('A naptár kezdő és záró éve 1970–2098 közé essen; legfeljebb 51 évet kérj egyszerre.');
-  const tz=timezoneText(place,start,end),source=val('calSource');let events=[],desc='';
-  if(source==='file'){const f=mounted('calHolidayFile');if(!f)throw new Error('Válaszd ki a beolvasandó Holidays.txt fájlt.');events=parseOmSi(await fileText(f,place.country==='HU'?'1250':'1252'));desc='Felhasználó által beolvasott, tartalmilag külön nem hitelesített OMSI-fájl';}
-  if(source==='online'){
-   if(end-start>10)throw new Error('Az API-s üzemmódban legfeljebb 11 év tölthető le egyszerre.');
-   events=await fetchCalendarEvents(place,start,end);desc='OpenHolidays API, ország+tartomány szűréssel; a helyi kivételeket külön ellenőrizni kell';
+  const tz=timezoneText(place,start,end),source=val('calSource');let events=[],desc='',sources=[],notes=[];
+  if(source==='file'){
+   const f=mounted('calHolidayFile');if(!f)throw new Error('Válaszd ki a beolvasandó Holidays.txt fájlt.');
+   events=parseOmSi(await fileText(f,codepageFor(place.country)));
+   desc='Felhasználó által beolvasott OMSI-állomány (tartalma külön nem hitelesített)';
   }
-  let overrides=[];if(mounted('calOverrides'))overrides=parseOverrides(await fileText(mounted('calOverrides')));
+  if(source==='online'){
+   if(end-start>10)throw new Error('API-s üzemmódban legfeljebb 11 év tölthető le egyszerre.');
+   const progress=text=>status('calStatus',text+'…');
+   const fetched=place.country==='GB'?await ukHolidayEvents(place,start,end,{progress}):await openHolidayEvents(place,start,end,{progress,group:val('calGroup')});
+   events=fetched.events;sources=fetched.sources;notes=fetched.notes;
+   desc=place.country==='GB'?'GOV.UK / Nager.Holidays, területi bank holidays (iskolaszünetek külön)':'OpenHolidays API, kiválasztott területi és iskolatípus-szűréssel';
+   events.push(...builtinCityEvents(place,start,end));
+   if(place.country==='DE'&&place.subdivision==='DE-BY')notes.push('Bajorországban a Mariä Himmelfahrt települési hatályát a hivatalos önkormányzati jegyzék szerint külön ellenőrizd.');
+   if(place.country==='FR')notes.push('Franciaországban az iskolai A/B/C zónák és a helyi ünnepek miatt a kiválasztott académie/területi egység helyességét ellenőrizd.');
+   if(place.country==='CH')notes.push('Svájcban a szünetek egyes községekben és iskolatípusokban kantonon belül is eltérhetnek.');
+  }
+  const overrides=mounted('calOverrides')?parseOverrides(await fileText(mounted('calOverrides'))):[];
   const rules=overridesFor(place,start,end,overrides);
   events=mergeEvents(events,rules.added,rules.removed,start,end);
-  if(source!=='time'&&!events.length)throw new Error('A kiválasztott időszakra nem érkezett ellenőrizhető esemény; Holidays.txt nem készül.');
+  if(source!=='time'&&!events.length)throw new Error('Nincs feldolgozható esemény. Nem készül Holidays.txt.');
   const holidays=source==='time'?null:holidayText(events,start,end);
   const publicCount=events.filter(x=>x.kind==='public').length,schoolCount=events.filter(x=>x.kind==='school').length;
+  if(place.country==='GB'&&source==='online'&&schoolCount===0)notes.unshift('Figyelem: a Holidays.txt csak a munkaszüneti napokat tartalmazza. Brit iskolaszünetet nem tartalmaz, amíg nem adsz hozzá helyileg igazolt CSV-kivételt.');
+  if(place.citySelected&&source==='online')notes.push('A város kiválasztása nem feltétlenül városi szintű ünnep-/szünetszűrés. Helyi szabályokat külön ellenőrizni kell.');
+  lastCalendarWarnings=notes;
   $('calCountPublic').textContent=String(publicCount);$('calCountSchool').textContent=String(schoolCount);$('calCountDst').textContent=String(tz.count);
-  $('timezonePreview').textContent=tz.text.slice(0,1600)+(tz.text.length>1600?'\r\n[… az előnézet rövidítve]':'');$('holidayPreview').textContent=holidays?holidays.slice(0,2000)+(holidays.length>2000?'\r\n[… az előnézet rövidítve]':''):'Csak timezone.txt';
-  lastCalendar={place,start,end,tz,holidays,desc,publicCount,schoolCount};
-  $('downloadCalendar').disabled=false;status('calStatus',`${place.name}, ${start}–${end}: ${publicCount} ünnepi esemény, ${schoolCount} szünetintervallum, ${tz.count} nyáriidőszámítási időszak. Forrás: ${desc||'csak időzóna'}.`,'good');
- }catch(e){lastCalendar=null;$('downloadCalendar').disabled=true;err(e,'calStatus');}finally{$('generateCalendar').disabled=false;}
+  $('timezonePreview').textContent=tz.text.slice(0,1600)+(tz.text.length>1600?'\r\n[… az előnézet rövidítve]':'');
+  $('holidayPreview').textContent=holidays?holidays.slice(0,2000)+(holidays.length>2000?'\r\n[… az előnézet rövidítve]':''):'Csak timezone.txt';
+  lastCalendar={place,start,end,tz,holidays,desc,publicCount,schoolCount,sources,notes};
+  $('downloadCalendar').disabled=false;
+  status('calStatus',`${place.name}, ${start}–${end}: ${publicCount} munkaszüneti esemény, ${schoolCount} szünetidőszak, ${tz.count} nyáriidőszámítási időszak. ${notes.join(' ')}`,notes.length?'warning':'good');
+ }catch(e){lastCalendar=null;$('downloadCalendar').disabled=true;err(e,'calStatus');}
+ finally{$('generateCalendar').disabled=false;}
 });
-$('downloadCalendar').addEventListener('click',()=>{try{if(!lastCalendar)throw new Error('Előbb generáld le a naptárat.');const {place,start,end,tz,holidays,desc,publicCount,schoolCount}=lastCalendar;const cpName=place.country==='HU'?'1250':'1252';
- const report=`OMSI Tools naptár\r\nHelyszín: ${place.name}\r\nOrszág: ${place.country}\r\nRégió: ${place.subdivision}\r\nÉvek: ${start}–${end}\r\nIdőzóna: ${place.zone}\r\nForrás: ${desc||'kizárólag IANA-időzóna'}\r\nHelyi eltérések: felhasználói CSV, ha megadva\r\nMunkaszüneti események: ${publicCount}\r\nIskolaszünetek: ${schoolCount}\r\nOMSI karakterkódolás: Windows-${cpName}\r\nA történeti adatok minőségét, iskolai körzetet és a városi kivételeket ellenőrizni kell.\r\n`;
- const files=[{path:`${slug(place.name)}_${start}-${end}/timezone.txt`,bytes:omsiEncode(tz.text,cpName)},{path:`${slug(place.name)}_${start}-${end}/FORRASOK_ES_ELLENORZES.txt`,bytes:omsiEncode(report,cpName)}];if(holidays)files.push({path:`${slug(place.name)}_${start}-${end}/Holidays.txt`,bytes:omsiEncode(holidays,cpName)});
- const archive=makeZip(files);fileDownload(`omsitools_naptar_${slug(place.name)}_${start}-${end}.zip`,archive,'application/zip');
- }catch(e){err(e,'calStatus');}});
+$('downloadCalendar').addEventListener('click',()=>{
+ try{
+  if(!lastCalendar)throw new Error('Előbb generáld le a naptárat.');
+  const {place,start,end,tz,holidays,desc,publicCount,schoolCount,sources,notes}=lastCalendar,codepage=codepageFor(place.country);
+  const report=`OMSI Tools - naptár 1.1.0\r\nHelyszín: ${place.name}\r\nOrszág: ${place.country}\r\nTartomány/iskolakörzet: ${place.subdivision||'országos'}\r\nÉvek: ${start}–${end}\r\nIdőzóna: ${place.zone}\r\nForrás: ${desc||'kizárólag IANA-időzóna'}\r\nForráscímek:\r\n${sources.join('\r\n')}\r\nFelhasználói helyi eltérések: ${mounted('calOverrides')?'igen':'nincs'}\r\nMunkaszüneti események: ${publicCount}\r\nIskolaszünetek: ${schoolCount}\r\nOMSI kódlap: Windows-${codepage}\r\n\r\nFIGYELMEZTETÉSEK:\r\n${notes.join('\r\n')||'Az adatok tényleges területi hatályát és a hivatalos naptárakat ellenőrizd.'}\r\n`;
+  const dir=`${slug(place.name)}_${start}-${end}`;
+  const files=[{path:`${dir}/timezone.txt`,bytes:omsiEncode(tz.text,codepage)},{path:`${dir}/FORRASOK_ES_ELLENORZES.txt`,bytes:omsiEncode(report,codepage)}];
+  if(holidays)files.push({path:`${dir}/Holidays.txt`,bytes:omsiEncode(holidays,codepage)});
+  fileDownload(`omsitools_naptar_${slug(place.name)}_${start}-${end}.zip`,makeZip(files),'application/zip');
+ }catch(e){err(e,'calStatus');}
+});
+chooseCalendarLocation('DE','DE-BE','Berlin');
 clearVehicle();renderVehicles();
