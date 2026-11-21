@@ -99,3 +99,7 @@ Az adatforrások dokumentációja: https://openholidaysapi.org/swagger/index.htm
 
 ### 1.1.1: hiányzó évek kezelése
 Az OpenHolidays országonként 2020-tól közöl adatokat. A 2020 előtti iskolaszüneteket nem rekonstruáljuk automatikusan. Magyarország esetében 2017-től a 2012. évi I. törvény 102. § alapján kiszámíthatók a szokásos országos munkaszüneti napok (a nagypéntek 2017-től). Ezek forrása a ZIP jelentésében szerepel. Hiányzó évek esetén a ZIP neve `_RESZLEGES`, és a felhasználónak hivatalos vagy saját CSV-adatokkal kell pótolnia a szüneteket. Egy sikeres generálás nem jelenti a történeti iskolarend teljességét.
+
+
+## Történeti Németország (1.2.0)
+A német naptár 1970-től külön NSZK/NDK ünneprendszereket kezel. A `Történeti Németország` mezőben választható automatikus (mai területi besorolás alapján) vagy kézi NSZK/NDK mód. Berlin esetében a kézi választás kötelező. Az 1970–2019 időszak nem a modern OpenHolidays adataiból származik. 1970–1989 NDK alapünnepek, NSZK szövetségi napok és válogatott, régóta ismert tartományi napok kerülnek be; a felekezeti/városi kivételek és az 1990-es átmeneti jogrend részleges jelölést kapnak. 1991–2019 között az országos minimum áll rendelkezésre, nem a teljes tartományi ünnepnaptár. A hiányzó iskolaszüneteket a CSV-kivételekkel lehet pótolni; a program nem találja ki azokat. Források: Bundestag 17. Juni; Feiertev 1990; KMK Ferienarchiv; Deutsche Rentenversicherung DDR Ferienübersicht; datumsrechner.de DATR.PDF és schulferien.org történeti adatok. Más országoknál 2020 előtti ünnepek/szünetek egyelőre nem teljesek.

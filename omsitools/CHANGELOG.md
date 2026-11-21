@@ -1,3 +1,11 @@
+## 1.2.0 (2026-11-21)
+- Külön NDK / NSZK történeti üzemmód, Berlinnél kötelező East/West kiválasztás.
+- 1970–1989 eltérő ünnepek (NSZK június 17., NDK október 7.; 1975/1985 külön NDK-ünnepek) és tartományi, helyi ünnepek részleges jelölése.
+- 1990 átmeneti év és 1991–2019 országos alapnaptár, nem igazolt regionális dátumok _RESZLEGES megjelöléssel.
+- Iskolaszünetek: 1970 NDK ismert dátumai másodlagos forrásból, más évek hiányként szerepelnek, nincs becslés.
+- Naptár 1970–2027 egyetlen kérésben, legfeljebb 11 API-s évvel.
+- Történeti források a generált ZIP jelentésében.
+
 ## 1.1.1 (2026-11-21)
 - Az OpenHolidays 2020 előtti lefedettségének helyes kezelése. A hiányzó év már nem szakítja meg az egész naptárat.
 - Magyarországon 2017-től országos munkaszüneti napok törvényi szabályok alapján kiszámíthatók, ha az API nem ad adatot. Iskolaszüneteket nem becsülünk.

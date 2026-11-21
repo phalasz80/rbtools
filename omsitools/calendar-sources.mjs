@@ -1,5 +1,6 @@
 /* Network adapters and source-specific validation; dependency-free and testable with injected fetch. */
 import {normalizeApi} from './engine.mjs';
+import {germanHistoricalYear} from './historical-germany.mjs';
 
 export const OPENHOLIDAYS = 'https://openholidaysapi.org';
 export const UK_GOV_URL = 'https://www.gov.uk/bank-holidays.json';
@@ -25,9 +26,17 @@ export async function openSubdivisionList(country,fetcher=fetch){
 export async function openGroups(country,fetcher=fetch){
  return jsonFrom(OPENHOLIDAYS+'/Groups?countryIsoCode='+encodeURIComponent(country),fetcher);
 }
-export async function openHolidayEvents(place,from,to,{fetcher=fetch,progress=()=>{},group=''}={}){
+export async function openHolidayEvents(place,from,to,{fetcher=fetch,progress=()=>{},group='',germanRegime='auto'}={}){
  const events=[],sources=[],notes=[],coverage=[];
  for(let year=from;year<=to;year++){
+  if(place.country==='DE'&&year<2020){
+   const historical=germanHistoricalYear(place,year,germanRegime);
+   events.push(...historical.events);
+   sources.push(...historical.sources);
+   notes.push(...historical.notes.map(x=>year+': '+x));
+   coverage.push(...historical.coverage);
+   continue;
+  }
   for(const [endpoint,kind] of [['PublicHolidays','public'],['SchoolHolidays','school']]){
    const url=openHolidayUrl(endpoint,place,year,group);
    let arr=[],reason='',statutory=false;

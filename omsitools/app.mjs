@@ -94,6 +94,7 @@ function updateGeoInfo(extra=''){
  const city=CITIES.find(x=>x.id===val('calCity'));
  const r=regionOptions.find(x=>x.code===val('calRegion'));
  const uk=c.code==='GB';
+ $('calHistoryRow').hidden=c.code!=='DE';
  const level=city?city.name+' (városi helyszín; a lekért szünetek területi pontossága az adatforrástól függ)':r?r.name+' (tartomány/körzet)':c.name+' (országos)';
  const hint=uk?'Az Egyesült Királyságban a munkaszüneti napok országonként eltérnek; az iskolaszünetek helyi tanácsi/iskolai adatok, ezeket CSV-vel add hozzá.':
  'A hivatalos területi egységek és iskola-szüneti körzetek az OpenHolidays adataiból frissülnek. A város kiválasztása önmagában nem bizonyít külön városi ünnepeket vagy iskolai eltéréseket.';
@@ -154,8 +155,8 @@ function selectedCalPlace(){
  const country=countryMeta(val('calCountry'));if(!country)throw new Error('Válassz támogatott országot.');
  const subdivision=val('calRegion'),city=CITIES.find(c=>c.id===val('calCity'));
  if(country.code==='GB'&&!subdivision)throw new Error('A brit országrész megadása kötelező.');
- if(country.code!=='GB'&&country.code!=='HU'&&!subdivision&&val('calSource')==='online')throw new Error('A pontos iskolaszünetekhez válassz tartományt, kantont vagy iskolaövezetet. Országos szűrés minden régió szüneteit összekeverheti.');
- if(city&&!matchRemoteRegion(city,regionOptions)&&country.code!=='GB'&&val('calSource')==='online')throw new Error('A kiválasztott városhoz nem található megfelelő, API-ban támogatott tartomány/körzet. Válassz területet a listából, vagy tölts fel saját Holidays.txt fájlt.');
+ if(country.code!=='GB'&&country.code!=='HU'&&!(country.code==='DE'&&val('calHistoryMode')!=='auto')&&!subdivision&&val('calSource')==='online')throw new Error('A pontos iskolaszünetekhez válassz tartományt, kantont vagy iskolaövezetet. Országos szűrés minden régió szüneteit összekeverheti.');
+ if(city&&!matchRemoteRegion(city,regionOptions)&&country.code!=='GB'&&val('calSource')==='online'&&!(country.code==='DE'&&val('calHistoryMode')!=='auto'))throw new Error('A kiválasztott városhoz nem található megfelelő, API-ban támogatott tartomány/körzet. Válassz területet a listából, vagy tölts fel saját Holidays.txt fájlt.');
  const chosenName=city?.name||regionOptions.find(x=>x.code===subdivision)?.name||country.name;
  const place={id:city?.id||country.code.toLowerCase()+'-'+(subdivision||'national').toLowerCase().replace(/[^a-z0-9_-]/g,'_'),name:chosenName,country:country.code,subdivision,language:country.language,zone:val('calZone'),lat:Number(val('calLat')),lon:Number(val('calLon')),citySelected:!!city};
  validatePlace(place);return place;
@@ -165,7 +166,7 @@ $('generateCalendar').addEventListener('click',async()=>{
  status('calStatus','Az időzóna és a kiválasztott terület ünnep- és szünetadatai feldolgozás alatt…');
  try{
   const place=selectedCalPlace(),start=Number(val('calStart')),end=Number(val('calEnd'));
-  if(!Number.isInteger(start)||!Number.isInteger(end)||start<1970||end>2098||start>end||end-start>50)throw new Error('A naptár kezdő és záró éve 1970–2098 közé essen; legfeljebb 51 évet kérj egyszerre.');
+  if(!Number.isInteger(start)||!Number.isInteger(end)||start<1970||end>2098||start>end||end-start>80)throw new Error('A naptár kezdő és záró éve 1970–2098 közé essen; legfeljebb 81 évet kérj egyszerre.');
   const tz=timezoneText(place,start,end),source=val('calSource');let events=[],desc='',sources=[],notes=[],coverage=[];
   if(source==='file'){
    const f=mounted('calHolidayFile');if(!f)throw new Error('Válaszd ki a beolvasandó Holidays.txt fájlt.');
@@ -173,11 +174,11 @@ $('generateCalendar').addEventListener('click',async()=>{
    desc='Felhasználó által beolvasott OMSI-állomány (tartalma külön nem hitelesített)';
   }
   if(source==='online'){
-   if(end-start>10)throw new Error('API-s üzemmódban legfeljebb 11 év tölthető le egyszerre.');
+   if(end-Math.max(start,2020)>=11)throw new Error('Az OpenHolidays API 2020 utáni időszakából egyszerre legfeljebb 11 évet kérj. A 1970–2019 közötti német történeti szabályok e kereten kívül kezelhetők.');
    const progress=text=>status('calStatus',text+'…');
-   const fetched=place.country==='GB'?await ukHolidayEvents(place,start,end,{progress}):await openHolidayEvents(place,start,end,{progress,group:val('calGroup')});
+   const fetched=place.country==='GB'?await ukHolidayEvents(place,start,end,{progress}):await openHolidayEvents(place,start,end,{progress,group:val('calGroup'),germanRegime:val('calHistoryMode')});
    events=fetched.events;sources=fetched.sources;notes=fetched.notes;coverage=fetched.coverage||[];
-   desc=place.country==='GB'?'GOV.UK / Nager.Holidays, területi bank holidays (iskolaszünetek külön)':'OpenHolidays API, kiválasztott területi és iskolatípus-szűréssel';
+   desc=place.country==='GB'?'GOV.UK / Nager.Holidays, területi bank holidays (iskolaszünetek külön)':place.country==='DE'?'Német történeti törvény- és archívum-alapú szabályok (1970–2019), OpenHolidays API (2020-tól)':'OpenHolidays API, kiválasztott területi és iskolatípus-szűréssel';
    events.push(...builtinCityEvents(place,start,end));
    if(place.country==='DE'&&place.subdivision==='DE-BY')notes.push('Bajorországban a Mariä Himmelfahrt települési hatályát a hivatalos önkormányzati jegyzék szerint külön ellenőrizd.');
    if(place.country==='FR')notes.push('Franciaországban az iskolai A/B/C zónák és a helyi ünnepek miatt a kiválasztott académie/területi egység helyességét ellenőrizd.');
@@ -188,7 +189,7 @@ $('generateCalendar').addEventListener('click',async()=>{
   events=mergeEvents(events,rules.added,rules.removed,start,end);
   if(source!=='time'&&!events.length)throw new Error('Nincs feldolgozható esemény. Nem készül Holidays.txt.');
   const holidays=source==='time'?null:holidayText(events,start,end);
-  const incomplete=coverage.some(x=>x.status==='HIÁNYZIK');
+  const incomplete=coverage.some(x=>['HIÁNYZIK','RÉSZLEGES'].includes(x.status));
   if(incomplete)notes.unshift('FIGYELEM: A kért időszak naptára RÉSZLEGES. A hiányzó éveket/forrásokat a ZIP ellenőrzési jelentése sorolja fel.');
   const publicCount=events.filter(x=>x.kind==='public').length,schoolCount=events.filter(x=>x.kind==='school').length;
   if(place.country==='GB'&&source==='online'&&schoolCount===0)notes.unshift('Figyelem: a Holidays.txt csak a munkaszüneti napokat tartalmazza. Brit iskolaszünetet nem tartalmaz, amíg nem adsz hozzá helyileg igazolt CSV-kivételt.');
@@ -207,7 +208,7 @@ $('downloadCalendar').addEventListener('click',()=>{
  try{
   if(!lastCalendar)throw new Error('Előbb generáld le a naptárat.');
   const {place,start,end,tz,holidays,desc,publicCount,schoolCount,sources,notes,coverage,incomplete}=lastCalendar,codepage=codepageFor(place.country);
-  const report=`OMSI Tools - naptár 1.1.1\r\nTeljesség: ${incomplete?'RÉSZLEGES – HIÁNYZÓ ADATOK':'A LEKÉRT ADATFORRÁSOK SZERINT'}\r\nHelyszín: ${place.name}\r\nOrszág: ${place.country}\r\nTartomány/iskolakörzet: ${place.subdivision||'országos'}\r\nÉvek: ${start}–${end}\r\nIdőzóna: ${place.zone}\r\nForrás: ${desc||'kizárólag IANA-időzóna'}\r\nForráscímek:\r\n${sources.join('\r\n')}\r\nFelhasználói helyi eltérések: ${mounted('calOverrides')?'igen':'nincs'}\r\nMunkaszüneti események: ${publicCount}\r\nIskolaszünetek: ${schoolCount}\r\nOMSI kódlap: Windows-${codepage}\r\n\r\nÉVENKÉNTI FORRÁSLEFEDETTSÉG:\r\n${coverage.map(x=>x.year+' / '+(x.kind==='school'?'iskolaszünet':'munkaszünet')+': '+x.status+' ('+x.count+' bejegyzés)'+(x.reason?' – '+x.reason:'')).join('\r\n')}\r\n\r\nFIGYELMEZTETÉSEK:\r\n${notes.join('\r\n')||'Az adatok tényleges területi hatályát és a hivatalos naptárakat ellenőrizd.'}\r\n`;
+  const report=`OMSI Tools - naptár 1.2.0\r\nTeljesség: ${incomplete?'RÉSZLEGES – HIÁNYZÓ ADATOK':'A LEKÉRT ADATFORRÁSOK SZERINT'}\r\nHelyszín: ${place.name}\r\nOrszág: ${place.country}\r\nTartomány/iskolakörzet: ${place.subdivision||'országos'}\r\nTörténeti német állam: ${place.country==='DE'?val('calHistoryMode'):'nem alkalmazható'}\r\nÉvek: ${start}–${end}\r\nIdőzóna: ${place.zone}\r\nForrás: ${desc||'kizárólag IANA-időzóna'}\r\nForráscímek:\r\n${sources.join('\r\n')}\r\nFelhasználói helyi eltérések: ${mounted('calOverrides')?'igen':'nincs'}\r\nMunkaszüneti események: ${publicCount}\r\nIskolaszünetek: ${schoolCount}\r\nOMSI kódlap: Windows-${codepage}\r\n\r\nÉVENKÉNTI FORRÁSLEFEDETTSÉG:\r\n${coverage.map(x=>x.year+' / '+(x.kind==='school'?'iskolaszünet':'munkaszünet')+': '+x.status+' ('+x.count+' bejegyzés)'+(x.reason?' – '+x.reason:'')).join('\r\n')}\r\n\r\nFIGYELMEZTETÉSEK:\r\n${notes.join('\r\n')||'Az adatok tényleges területi hatályát és a hivatalos naptárakat ellenőrizd.'}\r\n`;
   const dir=`${slug(place.name)}_${start}-${end}`;
   const files=[{path:`${dir}/timezone.txt`,bytes:omsiEncode(tz.text,codepage)},{path:`${dir}/FORRASOK_ES_ELLENORZES.txt`,bytes:omsiEncode(report,codepage)}];
   if(holidays)files.push({path:`${dir}/Holidays.txt`,bytes:omsiEncode(holidays,codepage)});
