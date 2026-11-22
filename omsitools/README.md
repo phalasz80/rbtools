@@ -124,3 +124,12 @@ A Rendszámok fülön a kezdő és záró év/hónap, valamint az adott időszak
 A 22 járműkategória külön ki-be kapcsolható, hozzá súly, egyedi sablon és külön terület rendelhető. A forrásokkal nem igazolt különleges rendszám-kombináció nem lesz észrevétlenül kitalálva: az adott kategória kimarad, vagy kifejezett felhasználói jóváhagyással normál rendszámot kap. Szimulált egyéni sablonnál mindegyik sor `fictional` besorolást kap. A források az új `registration-history.mjs` és `registration-special.mjs` modulokban olvashatók.
 
 A ZIP tartalmazza a tiszta OMSI `registrations.txt` állományt, a `TORTENETI_FORRASOK_ES_ELLENORZES.txt` forrásjelentést, a `TETELES_REGISZTRACIOS_ADATOK.csv` tételes jelentést (rendszám, járműkategória, kiadás éve/hónapja, terület, szabály) és a `GENERATOR_BEALLITASOK.json` konfigurációt. A korábbi OMSI-fájlokat nem módosítja.
+
+
+## Német történeti szünidők, verzió 1.6.0
+
+A német naptár 1970 és 2019 között a Kultusministerkonferenz (KMK) hivatalos, tartományonként közzétett **nyári szüneteit** is használja. 1970–1990 között ezek az NSZK és Nyugat-Berlin adatai. Az NDK-t nem szabad összekeverni a nyugatnémet dátumokkal; az NDK többi történeti dátuma továbbra is külön levéltári feldolgozást igényel. A KMK hivatalos nyári szünetei forrásfájlonként: https://www.kmk.org/service/ferienregelung.html. A KMK-archívumban 1976-ra Hamburgnál hibás, fordított dátumtartomány szerepel; ezt a program kifejezetten hiányként kezeli, nem találgat.
+
+2017-től az alkalmazás egyes német iskolaszünetekhez lekérdezheti a nyílt, külön adatfelhasználási engedélyt nem igénylő ferien-api.de adatait; a 2022 utáni hiányokhoz schulferien-api.de, 2025-től schulferiendaten.de is tartalék szolgáltatás. A ferien-api.de UTC-időpontokat és **kizáró végdátumot**, a schulferien-api.de **beleértett végdátumot** használ. A program ezt konvertálja. Ha az API nem elérhető vagy egy tartomány/év hiányzik, az alap KMK-nyári szünet megmarad, de az év **RÉSZLEGES** marad.
+
+A Schulferien.org külön adatbázisát nem másoljuk át: az oldal ingyenes webes megtekintése nem jelent szabad automatikus adatkivételt. A szolgáltató fizetős REST API licencet ajánl: https://www.schulferien.org/news/api-fur-schulferien-und-feiertage-35/; https://www.schulferien.org/shop/excel/. A felhasználó saját forrással ellenőrzött adatát továbbra is a helyi CSV-kivétel funkcióval adhatja meg, de a vásárolt Schulferien.org XLS újrafelhasználásához külön jogosultság kell.

@@ -1,6 +1,7 @@
 /* Network adapters and source-specific validation; dependency-free and testable with injected fetch. */
 import {normalizeApi} from './engine.mjs';
 import {germanHistoricalYear} from './historical-germany.mjs';
+import {extraGermanSchoolHolidays} from './school-api.mjs';
 
 export const OPENHOLIDAYS = 'https://openholidaysapi.org';
 export const UK_GOV_URL = 'https://www.gov.uk/bank-holidays.json';
@@ -26,11 +27,29 @@ export async function openSubdivisionList(country,fetcher=fetch){
 export async function openGroups(country,fetcher=fetch){
  return jsonFrom(OPENHOLIDAYS+'/Groups?countryIsoCode='+encodeURIComponent(country),fetcher);
 }
-export async function openHolidayEvents(place,from,to,{fetcher=fetch,progress=()=>{},group='',germanRegime='auto'}={}){
+export async function openHolidayEvents(place,from,to,{fetcher=fetch,progress=()=>{},group='',germanRegime='auto',germanSchoolSources='auto'}={}){
  const events=[],sources=[],notes=[],coverage=[];
  for(let year=from;year<=to;year++){
   if(place.country==='DE'&&year<2020){
    const historical=germanHistoricalYear(place,year,germanRegime);
+   if(year>=2017&&germanSchoolSources==='auto'){
+    const ext=await extraGermanSchoolHolidays(place,year,{fetcher,progress});
+    if(ext.events.length){
+     const originalSummer=historical.events.find(x=>x.kind==='school'&&/Sommerferien/.test(x.name));
+     for(const e of ext.events){
+      if(/Sommerferien/.test(e.name)&&originalSummer){
+       if(e.start!==originalSummer.start||e.end!==originalSummer.end)
+        historical.notes.push('ELTÉRÉS: '+year+' tartományi nyári szünet az API-ban: '+e.start+'–'+e.end+'; hivatalos KMK: '+originalSummer.start+'–'+originalSummer.end+'. A KMK-adat marad.');
+       continue;
+      }
+      if(!historical.events.some(x=>x.kind==='school'&&x.start===e.start&&x.end===e.end))historical.events.push(e);
+     }
+     historical.sources.push(...ext.sources);
+     historical.notes.push(...ext.notes);
+     const c=historical.coverage.find(x=>x.kind==='school');
+     if(c){c.count=historical.events.filter(x=>x.kind==='school').length;c.status='RÉSZLEGES';c.reason='KMK archív nyári szünet és kiegészítő, nem teljesként hitelesített API-s szünidők.';}
+    }else historical.notes.push(...ext.notes);
+   }
    events.push(...historical.events);
    sources.push(...historical.sources);
    notes.push(...historical.notes.map(x=>year+': '+x));
@@ -48,6 +67,12 @@ export async function openHolidayEvents(place,from,to,{fetcher=fetch,progress=()
     catch(e){reason=e?.message||String(e);}
     if(!arr.length&&!reason)reason='Az adatforrás erre az évre és területre nem adott használható eseményt.';
    }
+   if(!arr.length&&kind==='school'&&place.country==='DE'&&germanSchoolSources==='auto'){
+    const ext=await extraGermanSchoolHolidays(place,year,{fetcher,progress});
+    arr=ext.events;
+    notes.push(...ext.notes.map(x=>year+': '+x));
+    if(arr.length){reason='';sources.push(...ext.sources);}
+   }
    if(!arr.length&&kind==='public'&&place.country==='HU'&&year>=2017){
     arr=hungarianStatutoryHolidays(year);
     statutory=true;
@@ -57,7 +82,7 @@ export async function openHolidayEvents(place,from,to,{fetcher=fetch,progress=()
    if(arr.length){
     events.push(...arr);
     if(!statutory)sources.push(url);
-    coverage.push({year,kind,status:statutory?'jogszabályi számítás':'API',count:arr.length});
+    coverage.push({year,kind,status:statutory?'jogszabályi számítás':kind==='school'&&place.country==='DE'&&arr.some(x=>x.certainty==='external-open-api')?'KÜLSŐ API - ELLENŐRIZENDŐ':'API',count:arr.length});
     if(statutory)notes.push(`${year}: a magyar munkaszüneti napok jogszabályi szabályok alapján kiszámítva; a szabály és a későbbi jogváltozások ellenőrzendők.`);
    }else{
     coverage.push({year,kind,status:'HIÁNYZIK',count:0,reason,url});
@@ -66,7 +91,7 @@ export async function openHolidayEvents(place,from,to,{fetcher=fetch,progress=()
   }
  }
  if(!events.length)throw new Error(`${place.name}, ${from}–${to}: az adatforrás nem adott alkalmazható eseményt. A timezone.txt külön elkészíthető, a Holidays.txt-hez saját, ellenőrzött adat szükséges.`);
- return {events,sources:[...new Set(sources)],notes,coverage,incomplete:coverage.some(x=>x.status==='HIÁNYZIK')};
+ return {events,sources:[...new Set(sources)],notes,coverage,incomplete:coverage.some(x=>['HIÁNYZIK','RÉSZLEGES'].includes(x.status))};
 }
 
 /* Hungarian nationwide statutory holidays, not school breaks. The 2017 law added Good Friday. */

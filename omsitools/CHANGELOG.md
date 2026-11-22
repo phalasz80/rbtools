@@ -1,3 +1,10 @@
+## 1.6.0 (2026-11-22)
+- Német nyári szünetek 1970–2019 az eredeti KMK hivatalos táblázataiból, tartományonként és évre ellenőrizve, az NSZK/NDK különbségének megőrzésével.
+- 2017-től kiegészítő ingyenes iskolaszüneti API: ferien-api.de; 2022 után schulferien-api.de; 2025 után schulferiendaten.de; mindegyik külön konvertáló adapterrel.
+- Az API- és KMK-dátumütközések naplózása, a KMK-adat megőrzése, az egyéb szünidők részleges bővítése.
+- 1976 Hamburg nyári szünetének hibás archív cellája nincs kitalált időponttal helyettesítve.
+- Schulferien.org a fizetős licenc feltételei miatt közvetlen adatforrásként nem kerül automatikusan lehúzásra; az NDK-történeti oldal ellenőrző forrásként linkelve.
+
 ## 1.5.0 (2026-11-21)
 - Hónapra pontos, akár többéves rendszám-időszak, automatikus történeti rendszerkiválasztással.
 - Három működési mód: az időszakban újonnan kiadható, az időszak valamely pontján látható, vagy a teljes időszakot lefedő továbbhasználat.

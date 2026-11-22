@@ -1,3 +1,4 @@
+import {kmkSummerHoliday,KMK_SOURCE_FOR_YEAR} from './kmk-summer.mjs';
 /* German historical calendars 1970-2019. The differentiated state baseline is intentionally marked partial.
  * All dates remain sourced/reviewable, particularly the 1990 transition.
  */
@@ -100,6 +101,8 @@ export function germanHistoricalYear(place,year,setting='auto'){
  const regime=year>1990?'REUNIFIED':germanHistoricRegime(place,setting,year);
  const events=germanHistoricalPublic(year,regime,place.subdivision);
  const school=germanHistoricalSchool(year,regime);
+ const kmk=kmkSummerHoliday(place,year,regime);
+ if(kmk&&!school.some(e=>e.start===kmk.start&&e.end===kmk.end))school.push(kmk);
  const transition=year===1990;
  const publicStatus=regime==='GDR'&&year<1990?'TÖRTÉNETI SZABÁLY':'RÉSZLEGES';
  const notes=[
@@ -107,6 +110,7 @@ export function germanHistoricalYear(place,year,setting='auto'){
   regime==='REUNIFIED'?'1991–2019: csak a német országos ünnepnapi alap. A tartományi és helyi eltéréseket külön archív forrásból kell pótolni.':
   regime==='FRG'?'Az NSZK tartományi, felekezeti és városi ünnepnapjai nem mindenütt igazoltak teljeskörűen; a naptár részleges.':
   'Az NDK 1967 utáni általános munkaszüneti napjainak történeti rekonstrukciója.',
+  kmk?'A KMK hivatalos táblázatából a nyári szünet dátumai ellenőrizhetők. A többi iskolaszünet (téli, húsvéti, őszi, karácsonyi stb.) továbbra is hiányozhat.':
   year===1970&&regime==='GDR'?'Az 1970-es NDK-iskolaszünetek történeti naptárból átvett dátumai másodlagos források, további levéltári ellenőrzés ajánlott.':
   'Történeti iskolaszünetekhez teljes, hiteles évenkénti szünidei jegyzék szükséges.'
  ];
@@ -114,7 +118,7 @@ export function germanHistoricalYear(place,year,setting='auto'){
    coverage:[
     {year,kind:'public',status:publicStatus,count:events.length,reason:publicStatus==='RÉSZLEGES'?'A regionális történeti szabályok és az átmenet ellenőrzendő.':''},
     {year,kind:'school',status:school.length?'RÉSZLEGES':'HIÁNYZIK',count:school.length,
-     reason:school.length?'Másodlagos forrás; archív ellenőrzés szükséges.':'Nincs teljes igazolt iskolaszüneti adatkészlet.'}
+     reason:kmk?'KMK-archívum: nyári szünet igazolt; a többi szünet nincs teljes körűen feldolgozva.':school.length?'Az NDK-adatok másodlagosak; levéltári ellenőrzés szükséges.':'Nincs teljes igazolt iskolaszüneti adatkészlet.'}
    ],
-   notes,sources:[...GERMAN_HISTORY_SOURCES,...(school.length?[DDR_SCHOOL_1970_SOURCE,DDR_SCHOOL_1970_NEXT_SOURCE]:[])]};
+   notes,sources:[...GERMAN_HISTORY_SOURCES,...(kmk?[KMK_SOURCE_FOR_YEAR(year)]:[]),...(regime==='GDR'&&school.length?[DDR_SCHOOL_1970_SOURCE,DDR_SCHOOL_1970_NEXT_SOURCE]:[])]};
 }
