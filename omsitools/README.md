@@ -1,4 +1,4 @@
-# OMSI Tools (RegionalBahn) · v1.1.0
+# OMSI Tools (RegionalBahn) · v1.7.0
 
 Statikus, böngészőben futó alkalmazás OMSI 2 / openOMSI pályák járműállományának és naptárállományainak összeállításához. A cél: `https://tools.regionalbahn.hu/omsitools/`.
 
@@ -133,3 +133,7 @@ A német naptár 1970 és 2019 között a Kultusministerkonferenz (KMK) hivatalo
 2017-től az alkalmazás egyes német iskolaszünetekhez lekérdezheti a nyílt, külön adatfelhasználási engedélyt nem igénylő ferien-api.de adatait; a 2022 utáni hiányokhoz schulferien-api.de, 2025-től schulferiendaten.de is tartalék szolgáltatás. A ferien-api.de UTC-időpontokat és **kizáró végdátumot**, a schulferien-api.de **beleértett végdátumot** használ. A program ezt konvertálja. Ha az API nem elérhető vagy egy tartomány/év hiányzik, az alap KMK-nyári szünet megmarad, de az év **RÉSZLEGES** marad.
 
 A Schulferien.org külön adatbázisát nem másoljuk át: az oldal ingyenes webes megtekintése nem jelent szabad automatikus adatkivételt. A szolgáltató fizetős REST API licencet ajánl: https://www.schulferien.org/news/api-fur-schulferien-und-feiertage-35/; https://www.schulferien.org/shop/excel/. A felhasználó saját forrással ellenőrzött adatát továbbra is a helyi CSV-kivétel funkcióval adhatja meg, de a vásárolt Schulferien.org XLS újrafelhasználásához külön jogosultság kell.
+
+
+## 7. FOK-GYEM 1.1 HOF-konverter
+A hetedik fülön válassz egy vagy több `.hof` fájlt vagy ZIP-csomagot, majd az Átalakítás gombot. Az eredmények egyenként vagy ZIP-ben tölthetők le. A fájlnév `_FOKGYEM_1.1.hof`, a `[name]` mező ` - FOK-GYEM 1.1` toldalékot kap. A konverter bővíti a célállomási és megállói mezőket (legalább 41/30); az egyedi FOK-GYEM-feliratokat nem írja felül. A hiányzó megállódefiníciók pótlása kikapcsolható. A régi és táblázatos HOF-formátum, ANSI bájtmegőrzés, UTF-8 és BOM-os UTF-16 támogatott. A feldolgozás helyi; a hibák és a szintetikus megállópótlások a jelentésbe kerülnek. A generált kijelzőszövegek és a tényleges működés ellenőrzendők; ez nem hivatalos The Creators-eszköz. Hangfájlokat nem generál.
