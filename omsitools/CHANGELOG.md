@@ -1,3 +1,8 @@
+## 1.7.0 (2026-11-26)
+- FOK-GYEM 1.1 HOF-konverter: egyedi és kötegelt HOF/ZIP-bemenet, régi és táblázatos formátum, 41/30 mezőre bővítés, eredeti célkódok és útvonalak megőrzése, választható szintetikus megállópótlás.
+- FOK-GYEM jelölés a fájlnévben és [name] mezőben, meglévő egyedi feliratok megőrzése, bájtpontos ANSI-kódlapkezelés, UTF-8 és BOM-os UTF-16, ellenőrzési jelentés.
+- Új regressziós tesztek; közzétételi fájllista kiegészítése a HOF- és a korábban kimaradt katalógusmodulokkal. Játékon belüli kompatibilitás pályánként ellenőrzendő.
+
 ## 1.6.0 (2026-11-22)
 - Német nyári szünetek 1970–2019 az eredeti KMK hivatalos táblázataiból, tartományonként és évre ellenőrizve, az NSZK/NDK különbségének megőrzésével.
 - 2017-től kiegészítő ingyenes iskolaszüneti API: ferien-api.de; 2022 után schulferien-api.de; 2025 után schulferiendaten.de; mindegyik külön konvertáló adapterrel.
