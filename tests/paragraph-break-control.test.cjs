@@ -19,5 +19,5 @@ assert.match(fn("adminBlockControls"),/block\.breakAfter=block\.breakAfter===fal
 assert.ok(fn("adminBlockHtml").includes('b.breakAfter===false?"":"\\n<br />"'));
 assert.match(fn("adminHtmlToBlocks"),/breakAfter:adminNodeHasBreakAfter\(nodes,i\)/);
 assert.match(fn("adminLoadExistingHtml"),/breakAfter:adminNodeHasBreakAfter\(nodes,i\)/);
-assert.ok(src.includes('const RBTOOLS_VERSION="pages-v74"'));
+assert.ok(src.includes('const RBTOOLS_VERSION="pages-v75"'));
 console.log("Enter paragraph split + per-paragraph BR spacing: PASS");

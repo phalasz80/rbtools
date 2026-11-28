@@ -381,9 +381,9 @@ További szöveg..."></textarea>
     <div class="admin-format-shell">
     <div class="admin-formatbar" role="toolbar" aria-label="Szövegformázás">
       <span class="small">Kijelölt szöveg:</span>
-      <button id="rbtools-adminFmtBold" type="button" title="Félkövér"><strong>B</strong></button>
-      <button id="rbtools-adminFmtItalic" type="button" title="Dőlt"><em>I</em></button>
-      <button id="rbtools-adminFmtUnderline" type="button" title="Aláhúzott"><u>U</u></button>
+      <button id="rbtools-adminFmtBold" type="button" title="Félkövér (Ctrl+B)" aria-keyshortcuts="Control+B Meta+B"><strong>B</strong></button>
+      <button id="rbtools-adminFmtItalic" type="button" title="Dőlt (Ctrl+I)" aria-keyshortcuts="Control+I Meta+I"><em>I</em></button>
+      <button id="rbtools-adminFmtUnderline" type="button" title="Aláhúzott (Ctrl+U)" aria-keyshortcuts="Control+U Meta+U"><u>U</u></button>
       <button id="rbtools-adminFmtStrike" type="button" title="Áthúzott"><s>S</s></button>
       <button id="rbtools-adminFmtLink" type="button" title="Kijelölt szöveghez hivatkozás hozzáadása vagy meglévő link szerkesztése (Ctrl+K)">🔗 Link</button>
       <button id="rbtools-adminFmtAbbr" type="button" title="A kijelölt rövidítés teljes feloldása (abbr title)">ABBR</button>
@@ -427,6 +427,7 @@ További szöveg..."></textarea>
     <div id="rbtools-adminCanvas" class="admin-canvas">
       <div class="admin-empty">Tölts be vagy illessz be cikkszöveget, majd kattints a „Cikk felépítése” gombra.</div>
     </div>
+    <div id="rbtools-adminArticleStats" class="rb-editor-stats" aria-label="Cikk szövegstatisztikája" title="Cím, lead, törzs, alcímek, keretesek, látható képaláírások és források; szerkesztőségi lista, automatikus szerzői zárás és HTML-kód nélkül. A bekezdésszám a cím nélküli nem üres szövegegységeket mutatja.">0 karakter szóközzel · 0 karakter szóköz nélkül · 0 szó · 0 bekezdés</div>
     <section class="admin-author-panel" aria-label="Szerzők és cikkzárás">
       <h3>Szerzők és cikkzárás – ez az egyetlen forrás</h3>
       <p class="small">A mezők a sablontól függetlenül szerkeszthetők. Meglévő Blogger-piszkozatból a tényleges szerzői láblécet olvassuk vissza, ha van.</p>
@@ -1903,6 +1904,7 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-paper-title:focus{border-color:#a1a1aa}
 #rbtools-app .admin-title-panel{margin-top:15px;border:1px solid var(--line);border-radius:11px}
 #rbtools-app .admin-title-panel>label{display:block;font-weight:800;font-size:15px;margin-bottom:8px}
+#rbtools-app .rb-editor-stats{display:flex;flex-wrap:wrap;justify-content:flex-end;color:var(--muted);font-size:12px;line-height:1.55;font-variant-numeric:tabular-nums;padding:6px 3px 2px;text-align:right}
 #rbtools-app .admin-author-panel{margin:12px 0 16px;padding:14px;border:2px solid var(--line);border-radius:10px;background:var(--panel2)}
 #rbtools-app .admin-author-panel h3{margin:0 0 8px;font-size:1.08rem}
 #rbtools-app .admin-title-panel input.admin-blogger-title{box-sizing:border-box;width:100%;border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--panel);font:700 25px/1.4 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif}
@@ -2323,7 +2325,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v74";
+const RBTOOLS_VERSION="pages-v75";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 const CORRECTOR=window.RBTOOLS_CORRECTOR;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
@@ -4997,15 +4999,24 @@ function adminMainImageHtml(img){
 }
 function adminBoxBodyParts(html){
   const t=document.createElement("template");t.innerHTML=String(html||"");
-  const els=Array.from(t.content.childNodes).filter(n=>n.nodeType===1||n.textContent.trim());
-  const parts=[];
-  for(const n of els){
-    if(n.nodeType===3){if(n.textContent.trim())parts.push(esc(n.textContent.trim()));continue;}
-    if(["DIV","P"].includes(n.tagName))parts.push(adminNormalizeInlineHtml(n.innerHTML));
-    else if(n.tagName==="BR")continue;
-    else parts.push(adminNormalizeInlineHtml(n.outerHTML));
+  const parts=[];let pending=document.createElement("div");
+  const flush=()=>{
+    if(pending.textContent.trim()||pending.querySelector("img,iframe,table,ul,ol,svg,video,audio"))parts.push(adminNormalizeInlineHtml(pending.innerHTML));
+    pending=document.createElement("div");
+  };
+  // Inline text, links, emphasis, abbreviations and spans form one paragraph.
+  // Only actual block-level elements mark paragraph boundaries, not every HTML tag.
+  const blocks=new Set(["DIV","P","H1","H2","H3","H4","H5","H6","UL","OL","BLOCKQUOTE","PRE","TABLE","HR","SECTION","ARTICLE","ASIDE"]);
+  for(const n of Array.from(t.content.childNodes)){
+    if(n.nodeType!==1&&n.nodeType!==3)continue;
+    if(n.nodeType===1&&blocks.has(n.tagName)){
+      flush();
+      const inner=["DIV","P"].includes(n.tagName)?n.innerHTML:n.outerHTML;
+      if(["DIV","P"].includes(n.tagName)&&!n.textContent.trim()&&!n.querySelector("img,iframe,table,ul,ol,svg,video,audio"))continue;
+      if(inner.trim())parts.push(adminNormalizeInlineHtml(inner));
+    }else pending.appendChild(n.cloneNode(true));
   }
-  if(!parts.length&&String(html||"").trim())parts.push(adminNormalizeInlineHtml(html));
+  flush();
   return parts;
 }
 function adminBoxHtml(block){
@@ -5039,6 +5050,48 @@ function adminBlockHtml(b){
   if(b.type==="iframe"){const html=adminNormalizeIframeHtml(b.html);return html?'<div style="text-align: '+adminValidAlign(b.align,"justify")+'; max-width:100%; overflow:auto;">'+html+'</div>\n<br />':"";}
   if(b.type==="raw")return String(b.html||"")+(b.noBreak?"\n":"\n<br />");
   return "";
+}
+function adminStatsParagraphs(html){
+  const t=document.createElement("template");t.innerHTML=String(html||"");
+  const paragraphs=[];let text="";
+  const skip=new Set(["SCRIPT","STYLE","TEMPLATE","NOSCRIPT","IFRAME","OBJECT","EMBED","SVG","MATH","INPUT","BUTTON","TEXTAREA","SELECT","IMG","VIDEO","AUDIO"]);
+  const blocks=new Set(["DIV","P","H1","H2","H3","H4","H5","H6","LI","UL","OL","BLOCKQUOTE","PRE","TABLE","TR","TD","TH","SECTION","ARTICLE","ASIDE","NAV","FIGCAPTION","FIGURE","HR"]);
+  const flush=()=>{const line=text.replace(/[\s\u200b]+/gu," ").trim();if(line)paragraphs.push(line);text="";};
+  function visit(n){
+    if(n.nodeType===3){text+=n.nodeValue||"";return;}
+    if(n.nodeType!==1||skip.has(n.tagName)||n.hasAttribute("hidden"))return;
+    if(n.tagName==="BR"){text+=" ";return;}
+    const block=blocks.has(n.tagName);if(block)flush();
+    Array.from(n.childNodes).forEach(visit);if(block)flush();
+  }
+  Array.from(t.content.childNodes).forEach(visit);flush();return paragraphs;
+}
+function adminArticleStats(title,lead,blocks,sources,findImage){
+  const cleanTitle=String(title||"").replace(/\s+/gu," ").trim();
+  const body=[];
+  const add=html=>body.push(...adminStatsParagraphs(html));
+  const addCaption=id=>{const img=id&&findImage(id);if(img)add(adminCaptionHtml(img));};
+  add(lead);
+  for(const b of blocks||[]){
+    if(b.type==="box"){add(b.title);add(b.html);addCaption(b.imageId);}
+    else if(b.type==="image")addCaption(b.imageId);
+    else if(b.type==="live"){add(b.html);addCaption(b.imageId);}
+    else if(["p","h2","h3","h4","h5","raw"].includes(b.type))add(b.html);
+  }
+  add(sources);
+  const units=cleanTitle?[cleanTitle,...body]:body;
+  return {characters:units.reduce((n,t)=>n+Array.from(t).length,0),
+    nonspace:units.reduce((n,t)=>n+Array.from(t.replace(/\s/gu,"")).length,0),
+    words:units.reduce((n,t)=>n+t.split(/\s+/u).filter(w=>/[\p{L}\p{N}]/u.test(w)).length,0),
+    paragraphs:body.length};
+}
+function adminUpdateArticleStats(){
+  const target=rbGet("adminArticleStats");if(!target)return;
+  const isStatic=rbGet("adminContentType")?.value==="static";
+  const result=adminArticleStats(rbGet("adminTitle")?.value,isStatic?"":adminLeadHtml,adminBlocks,isStatic?"":adminSourcesHtml,adminFindImage);
+  const fmt=n=>n.toLocaleString("hu-HU");
+  const label=fmt(result.characters)+" karakter szóközzel · "+fmt(result.nonspace)+" karakter szóköz nélkül · "+fmt(result.words)+" szó · "+fmt(result.paragraphs)+" bekezdés";
+  if(target.textContent!==label)target.textContent=label;
 }
 function adminGenerateHtml(setStatus=true){
   const author=rbGet("adminAuthor").value.trim().replace(/^Összeállította:\s*/i,"").trim();
@@ -5078,6 +5131,7 @@ function adminGenerateHtml(setStatus=true){
     if(["author","compiled"].includes(rbGet("adminFooter").value)&&author)out+='\n<hr align="center" />\n'+rbAuthorFooterMarkup((rbGet("adminFooter").value==="compiled"?"Összeállította: ":"")+esc(author));
   }
   rbGet("adminOutput").value=rbCleanGeneratedHtml(out);
+  adminUpdateArticleStats();
   if(contentType==="live"){
     const updates=adminBlocks.filter(b=>b.type==="live");
     const missing=updates.filter(b=>!LIVE_TIMELINE.validTime(b.time));
@@ -5121,6 +5175,12 @@ function adminTrackEditable(el,onInput){
   el.addEventListener("mouseup",adminRememberRange);el.addEventListener("keyup",adminRememberRange);
   el.addEventListener("touchend",()=>requestAnimationFrame(adminRememberRange));
   el.addEventListener("keydown",e=>{
+    if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&!e.isComposing){
+      const command=({b:"bold",i:"italic",u:"underline"})[e.key.toLowerCase()];
+      if(command){
+        e.preventDefault();e.stopPropagation();adminRememberRange();adminExec(command,null,true);return;
+      }
+    }
     if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.isComposing&&e.key.toLowerCase()==="k"){
       e.preventDefault();adminRememberRange();adminLink();return;
     }
@@ -5949,7 +6009,7 @@ function adminImportBoxGroup(nodes,start){
   }
   const titleNode=group.find(n=>/text-align\s*:\s*center/i.test(n.getAttribute?.("style")||"")&&n.querySelector?.("strong"));
   const bodyNode=group.find(n=>n!==titleNode&&!n.classList?.contains("separator"));
-  adminBlocks.push({id:adminUid("b"),type:"box",title:title||"Keretes cím",html:body.join("<div></div>")||"Keretes szöveg.",imageId,titleAlign:adminAlignFromNode(titleNode,"center"),bodyAlign:adminAlignFromNode(bodyNode,"justify")});
+  adminBlocks.push({id:adminUid("b"),type:"box",title:title||"Keretes cím",html:body.map(part=>"<div>"+part+"</div>").join("")||"Keretes szöveg.",imageId,titleAlign:adminAlignFromNode(titleNode,"center"),bodyAlign:adminAlignFromNode(bodyNode,"justify")});
   return i;
 }
 function adminComparableText(raw){
