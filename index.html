@@ -1999,6 +1999,9 @@ A következő cikk rövid ajánlója.</pre>
 
 #rbtools-app .admin-box-title{padding:15px;text-align:center;font-weight:700;min-height:42px;outline:none}
 #rbtools-app .admin-box-body{padding:0 15px 15px;text-align:justify;min-height:54px;outline:none}
+#rbtools-app .admin-box-title:empty:before,#rbtools-app .admin-box-body:empty:before{content:attr(data-placeholder);color:#555;font-style:italic;pointer-events:none}
+#rbtools-app .admin-box-body>div,#rbtools-app .admin-box-body>p{margin:0 0 5px;text-align:inherit}
+#rbtools-app .admin-box-body>div:last-child,#rbtools-app .admin-box-body>p:last-child{margin-bottom:0}
 #rbtools-app .admin-box-image{padding:10px 15px 15px;text-align:center}
 #rbtools-app .admin-box-image img{max-width:100%;height:auto;max-height:550px}
 #rbtools-app .admin-box-image .admin-caption-tools{justify-content:center}
@@ -2150,7 +2153,7 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .rb-release-link{display:inline-flex;align-items:center;color:inherit;text-decoration:none;cursor:pointer}
 #rbtools-app .rb-release-link:hover,#rbtools-app .rb-release-link:focus-visible{outline:2px solid #0b5394;outline-offset:3px;text-decoration:underline}
 #rbtools-app #rbtools-help-gyujtooldalak,#rbtools-app #rbtools-help-keretes{scroll-margin-top:20px}
-#rbtools-app .admin-box-variant{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel2);font-size:12px}
+#rbtools-app .admin-box-variant{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel2);color:var(--ink);font-size:12px}
 #rbtools-app .admin-box-variant select{max-width:240px;min-width:140px}
 
 #rbtools-app .blogger-published{margin-top:20px;padding-top:18px;border-top:2px solid #9dacc0;display:flex;flex-direction:column;gap:12px}
@@ -2325,7 +2328,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v75";
+const RBTOOLS_VERSION="pages-v76";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 const CORRECTOR=window.RBTOOLS_CORRECTOR;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
@@ -4841,6 +4844,8 @@ function adminHtmlToBlocks(html){
       continue;
     }
     if(node.matches?.('.rb-live-navigation'))continue; // regenerated from current timestamps
+    if(tag==="aside"&&node.classList.contains("rb-box-accent")){const previous=blocks.length;adminImportBoxGroup(Array.from(node.childNodes),0,blocks);if(blocks.length>previous)blocks.at(-1).variant="accent";continue;}
+    if(adminIsGrayNode(node)){i=adminImportBoxGroup(nodes,i,blocks)-1;continue;}
     if(tag==="hr"){blocks.push({id:adminUid("b"),type:"hr"});continue;}
     if(/^h[2-5]$/.test(tag)){
       const inline=adminNewsInlineFragmentHtml(node);
@@ -5368,9 +5373,9 @@ function adminBoxElement(block){
   variant.value=block.variant||"classic";
   variant.addEventListener("change",()=>{block.variant=variant.value;wrap.classList.toggle("admin-box-accent",block.variant==="accent");adminGenerateHtml();});
   chooser.appendChild(variant);wrap.appendChild(chooser);
-  const title=document.createElement("div");title.className="admin-box-title admin-editable";title.contentEditable="true";title.spellcheck=true;title.innerHTML=adminVisualizeSpecials(block.title||"Keretes cím");title.dataset.adminBlockId=block.id;title.dataset.adminAlignTarget="boxTitle";title.style.textAlign=adminValidAlign(block.titleAlign,"center");
+  const title=document.createElement("div");title.className="admin-box-title admin-editable";title.contentEditable="true";title.spellcheck=true;title.innerHTML=adminVisualizeSpecials(block.title||"");title.dataset.placeholder="Keretes cím (opcionális)";title.setAttribute("aria-label","Keretes címe");title.dataset.adminBlockId=block.id;title.dataset.adminAlignTarget="boxTitle";title.style.textAlign=adminValidAlign(block.titleAlign,"center");
   adminTrackEditable(title,()=>{block.title=title.innerHTML;});wrap.appendChild(title);
-  const body=document.createElement("div");body.className="admin-box-body admin-editable";body.contentEditable="true";body.spellcheck=true;body.innerHTML=adminVisualizeSpecials(block.html||"Keretes szöveg.");body.dataset.adminBlockId=block.id;body.dataset.adminAlignTarget="boxBody";body.style.textAlign=adminValidAlign(block.bodyAlign,"justify");
+  const body=document.createElement("div");body.className="admin-box-body admin-editable";body.contentEditable="true";body.spellcheck=true;body.innerHTML=adminVisualizeSpecials(block.html||"");body.dataset.placeholder="Keretes szövege";body.dataset.adminBlockId=block.id;body.dataset.adminAlignTarget="boxBody";body.style.textAlign=adminValidAlign(block.bodyAlign,"justify");
   adminTrackEditable(body,()=>{block.html=body.innerHTML;});wrap.appendChild(body);
   const img=adminFindImage(block.imageId);
   if(img){
@@ -5988,14 +5993,44 @@ function adminIsGrayNode(node){
   if(node?.nodeType!==1)return false;
   return /background-color\s*:\s*(?:#c3c3c3|rgb\(\s*195\s*,\s*195\s*,\s*195\s*\))/i.test(node.getAttribute("style")||"");
 }
-function adminImportBoxGroup(nodes,start){
+function adminBoxTitleNode(node){
+  if(!node||node.nodeType!==1||node.classList.contains("separator")||node.querySelector("img,iframe,table"))return null;
+  if(adminAlignFromNode(node,"justify")!=="center")return null;
+  const bold=node.querySelector("strong,b");
+  if(!bold)return null;
+  const text=(node.textContent||"").replace(/\s+/g," ").trim();
+  return text&&text===(bold.textContent||"").replace(/\s+/g," ").trim()?bold:null;
+}
+function adminRecoverBoxFragments(body){
+  // The old generator split standalone inline tags into separate gray DIVs.
+  // Only repair a clearly interrupted sentence: inline fragment, then punctuation.
+  // Leave intentionally separated paragraphs and centered/standalone labels intact.
+  const parts=body.slice();
+  for(let i=1;i+1<parts.length;i++){
+    const t=document.createElement("template");t.innerHTML=parts[i];
+    const children=Array.from(t.content.childNodes).filter(n=>n.nodeType!==3||n.textContent.trim());
+    if(children.length!==1||children[0].nodeType!==1||!["A","B","STRONG","I","EM","U","S","DEL","SPAN","ABBR","SUP","SUB"].includes(children[0].tagName)||!t.content.textContent.trim())continue;
+    const prev=document.createElement("template");prev.innerHTML=parts[i-1];
+    const next=document.createElement("template");next.innerHTML=parts[i+1];
+    const p=(prev.content.textContent||"").trim(),n=(next.content.textContent||"").trim();
+    if(!p||/[.!?…:;]$/.test(p)||!(/^[,;:!?)]/.test(n)||/^\.(?!\.)/.test(n)))continue;
+    parts.splice(i-1,3,parts[i-1].trimEnd()+" "+parts[i].trim()+parts[i+1].trimStart());
+    i=Math.max(0,i-2);
+  }
+  return parts;
+}
+function adminImportBoxGroup(nodes,start,target=adminBlocks){
   const group=[];let i=start;
   while(i<nodes.length){
     const n=nodes[i];if(n.nodeType===3&&!n.textContent.trim()){i++;continue;}
     if(n.nodeType===1&&n.tagName==="BR"){i++;continue;}
     if(!adminIsGrayNode(n))break;group.push(n);i++;
   }
-  let title="",imageId=null,body=[];
+  if(!group.length)return i;
+  const firstText=group.find(n=>!n.classList.contains("separator")&&n.textContent.trim());
+  const titleElement=adminBoxTitleNode(firstText);
+  const titleNode=titleElement?firstText:null;
+  let imageId=null,bodyNode=null;const body=[];
   for(let gi=0;gi<group.length;gi++){
     const n=group[gi];
     if(n.classList.contains("separator")&&n.querySelector("img")){
@@ -6003,13 +6038,12 @@ function adminImportBoxGroup(nodes,start){
       const image=adminAddImageFromElement(n,caption);if(image)imageId=image.id;
       gi=lastIndex;continue;
     }
-    const centered=/text-align\s*:\s*center/i.test(n.getAttribute("style")||"");
-    if(!title&&centered&&n.querySelector("strong")){title=n.querySelector("strong").innerHTML;continue;}
+    if(n===titleNode)continue;
+    if(!bodyNode&&(n.textContent.trim()||n.querySelector("img,iframe,table")))bodyNode=n;
     body.push(n.innerHTML);
   }
-  const titleNode=group.find(n=>/text-align\s*:\s*center/i.test(n.getAttribute?.("style")||"")&&n.querySelector?.("strong"));
-  const bodyNode=group.find(n=>n!==titleNode&&!n.classList?.contains("separator"));
-  adminBlocks.push({id:adminUid("b"),type:"box",title:title||"Keretes cím",html:body.map(part=>"<div>"+part+"</div>").join("")||"Keretes szöveg.",imageId,titleAlign:adminAlignFromNode(titleNode,"center"),bodyAlign:adminAlignFromNode(bodyNode,"justify")});
+  const recovered=adminRecoverBoxFragments(body);
+  target.push({id:adminUid("b"),type:"box",title:titleElement?adminNormalizeInlineHtml(titleElement.innerHTML):"",html:recovered.map(part=>"<div>"+part+"</div>").join(""),imageId,titleAlign:adminAlignFromNode(titleNode,"center"),bodyAlign:adminAlignFromNode(bodyNode,"justify")});
   return i;
 }
 function adminComparableText(raw){
