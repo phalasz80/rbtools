@@ -43,7 +43,8 @@ const cases=[
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),"rbtools-caption-"));
 try{
  const file=path.join(dir,"caption.html");
- fs.writeFileSync(file,"<!doctype html><meta charset=utf-8><body>CAPTION_DOM_PENDING<script>"+funcs+"\ntry{\n"+cases+"\n}catch(e){document.body.textContent='CAPTION_DOM_FAIL: '+e.stack;}</"+"script>");
+ const script=(funcs+"\ntry{\n"+cases+"\n}catch(e){document.body.textContent='CAPTION_DOM_FAIL: '+e.stack;}").replace(/<\/script/gi,"<\\/script");
+ fs.writeFileSync(file,"<!doctype html><meta charset=utf-8><body>CAPTION_DOM_PENDING<script>"+script+"</"+"script>");
  const result=cp.spawnSync(browser,["--headless","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--dump-dom","file://"+file],{encoding:"utf8",timeout:25000,maxBuffer:2e6});
  assert.equal(result.status,0,String(result.error||result.stderr));
  assert.match(result.stdout,/<body>CAPTION_DOM_PASS<\/body>/,result.stdout.slice(-6000));
