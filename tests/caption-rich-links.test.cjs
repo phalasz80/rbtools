@@ -15,7 +15,6 @@ assert.ok(browser,"A Chromium-family browser is needed for caption DOM regressio
 const funcs=["esc","inlineMd","rbCleanGeneratedHtml","adminEntityToken","adminNormalizeInlineHtml","adminCleanCaptionText","adminCaptionParts","adminCaptionHtml","adminCaptionRichParts","adminCaptionNodeData","adminCaptionNodeText","adminConsumeImageCaption","rbImageAltText","rbCaptionFromAlt","adminSetLinkTarget","adminAddImageFromElement"].map(fn).join("\n");
 const cases=[
 'const check=(condition,message)=>{if(!condition)throw Error(message);};',
-'const adminImages=[];let id=0;const adminUid=()=>String(++id),adminImageAttrs=()=>[];',
 'const href="https://www.regionalbahn.hu/2026/07/BVG-J-Option.html";',
 'const rich="<strong>Villamos</strong> <a href=\\""+href+"\\" target=\\"_blank\\" rel=\\"nofollow noopener\\">korábbi cikkünkben</a><br>Második sor";',
 'const edited=adminCaptionRichParts(rich);',
@@ -43,7 +42,7 @@ const cases=[
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),"rbtools-caption-"));
 try{
  const file=path.join(dir,"caption.html");
- const script=(funcs+"\ntry{\n"+cases+"\n}catch(e){document.body.textContent='CAPTION_DOM_FAIL: '+e.stack;}").replace(/<\/script/gi,"<\\/script");
+ const script=("const adminImages=[];let id=0;const adminUid=()=>String(++id),adminImageAttrs=()=>[];\n"+funcs+"\ntry{\n"+cases+"\n}catch(e){document.body.textContent='CAPTION_DOM_FAIL: '+e.stack;}").replace(/<\/script/gi,"<\\/script");
  fs.writeFileSync(file,"<!doctype html><meta charset=utf-8><body>CAPTION_DOM_PENDING<script>"+script+"</"+"script>");
  const result=cp.spawnSync(browser,["--headless","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--dump-dom","file://"+file],{encoding:"utf8",timeout:25000,maxBuffer:2e6});
  assert.equal(result.status,0,String(result.error||result.stderr));
