@@ -2323,7 +2323,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v73";
+const RBTOOLS_VERSION="pages-v74";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 const CORRECTOR=window.RBTOOLS_CORRECTOR;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
@@ -4541,32 +4541,87 @@ function rbCaptionFromAlt(rawAlt){
 }
 function adminCaptionHtml(img,{includePhoto=true}={}){
   const text=adminCleanCaptionText(img?.caption||"");
-  const textHtml=text.split("\n").map(line=>inlineMd(line)).join("<br />");
+  const textHtml=typeof img?.captionRich==="string"?img.captionRich:text.split("\n").map(line=>inlineMd(line)).join("<br />");
   const photo=includePhoto&&img?.captionPhoto&&String(img?.photoName||"").trim()
     ?"(fotó: "+esc(String(img.photoName).trim())+")":"";
   return textHtml+(photo?(textHtml?"<br />":"")+photo:"");
 }
-function adminCaptionNodeText(node){
+function adminCaptionRichParts(raw,{credit="",stripPhoto=false}={}){
+  // Keep the editable inline HTML separately from the plain caption used for ALT and comparisons.
+  const source=document.createElement("template");source.innerHTML=adminNormalizeInlineHtml(raw);
+  const out=document.createElement("template");
+  const inline=new Set(["A","STRONG","EM","B","I","U","S","STRIKE","DEL","SUP","SUB","ABBR","SPAN","SMALL","MARK"]);
+  const blocked=new Set(["SCRIPT","STYLE","IFRAME","OBJECT","EMBED","IMG","SVG","MATH","VIDEO","AUDIO","INPUT","BUTTON","FORM","TEMPLATE"]);
+  function appendBreak(parent){parent.appendChild(document.createElement("br"));}
+  function copy(parent,node){
+    if(node.nodeType===3){parent.appendChild(document.createTextNode(node.nodeValue));return;}
+    if(node.nodeType!==1||blocked.has(node.tagName))return;
+    if(node.tagName==="BR"){appendBreak(parent);return;}
+    if(node.tagName==="DIV"||node.tagName==="P"){
+      if(parent.lastChild&&parent.lastChild.nodeName!=="BR")appendBreak(parent);
+      Array.from(node.childNodes).forEach(n=>copy(parent,n));
+      if(node.nextSibling&&parent.lastChild?.nodeName!=="BR")appendBreak(parent);
+      return;
+    }
+    let el=null;
+    if(inline.has(node.tagName)){
+      el=document.createElement(node.tagName.toLowerCase());
+      for(const key of ["title","lang","dir"]){if(node.hasAttribute(key))el.setAttribute(key,node.getAttribute(key));}
+      for(const key of ["font-weight","font-style","text-decoration","color","background-color","vertical-align"]){
+        const value=node.style?.getPropertyValue(key);if(value)el.style.setProperty(key,value);
+      }
+      if(node.tagName==="A"){
+        const href=(node.getAttribute("href")||"").trim();
+        try{
+          if(!href||!["http:","https:","mailto:","tel:"].includes(new URL(href,"https://www.regionalbahn.hu/").protocol))throw Error("unsafe href");
+          el.setAttribute("href",href);
+          if(node.hasAttribute("target"))el.setAttribute("target",node.getAttribute("target"));
+          if(node.hasAttribute("rel"))el.setAttribute("rel",node.getAttribute("rel"));
+          if(el.getAttribute("target")==="_blank")adminSetLinkTarget(el,true);
+        }catch{el=null;}
+      }
+    }
+    if(el){Array.from(node.childNodes).forEach(n=>copy(el,n));parent.appendChild(el);}
+    else Array.from(node.childNodes).forEach(n=>copy(parent,n));
+  }
+  Array.from(source.content.childNodes).forEach(n=>copy(out.content,n));
+  // Browser-generated trailing empty lines are not part of the published caption.
+  while(out.content.lastChild?.nodeName==="BR")out.content.lastChild.remove();
+  const clone=out.content.cloneNode(true);
+  clone.querySelectorAll("br").forEach(br=>br.replaceWith(document.createTextNode("\n")));
+  const plain=adminCleanCaptionText(clone.textContent);
+  const parts=adminCaptionParts(plain,credit);
+  if(stripPhoto&&parts.captionPhoto){
+    const last=Array.from(out.content.querySelectorAll("br")).at(-1);
+    if(last){const range=out.content.ownerDocument.createRange();range.selectNodeContents(out.content);range.setStartBefore(last);range.deleteContents();}
+    else out.content.replaceChildren();
+  }
+  return {plain,caption:stripPhoto?parts.caption:plain,captionRich:out.innerHTML,
+    captionPhoto:stripPhoto&&parts.captionPhoto,photoName:parts.photoName};
+}
+function adminCaptionNodeData(node){
   if(!node||node.nodeType!==1||node.tagName!=="DIV"
     ||node.classList?.contains("separator")
     ||!/text-align\s*:\s*center/i.test(node.getAttribute("style")||"")
-    ||node.querySelector("img,iframe,table"))return "";
-  const clone=node.cloneNode(true);
-  clone.querySelectorAll("br").forEach(br=>br.replaceWith(document.createTextNode("\n")));
-  return adminCleanCaptionText(clone.textContent);
+    ||node.querySelector("img,iframe,table"))return null;
+  return adminCaptionRichParts(node.innerHTML,{stripPhoto:true});
+}
+function adminCaptionNodeText(node){
+  return adminCaptionNodeData(node)?.plain||"";
 }
 function adminConsumeImageCaption(nodes,index){
-  let caption="",lastIndex=index;
+  let caption="",captionRich="",lastIndex=index;
   for(let j=index+1;j<nodes.length;j++){
     const n=nodes[j];
     if((n.nodeType===3&&!n.textContent.trim())||(n.nodeType===1&&n.tagName==="BR"))continue;
-    const text=adminCaptionNodeText(n);
+    const data=adminCaptionNodeData(n),text=data?.plain||"";
     if(!text)break;
-    if(!caption){caption=text;lastIndex=j;continue;}
+    if(!caption){caption=text;captionRich=data.captionRich;lastIndex=j;continue;}
     if(text===caption
       ||(adminCaptionParts(text).caption===adminCaptionParts(caption).caption
         &&!!adminCaptionParts(text).caption)){
       if(adminCaptionParts(text).captionPhoto&&!adminCaptionParts(caption).captionPhoto)caption=text;
+      if(/<a\b/i.test(data.captionRich)&&!/<a\b/i.test(captionRich))captionRich=data.captionRich;
       lastIndex=j;continue;
     }
     if(/^\(\s*fotó\s*:\s*[^)]+\)$/i.test(text)&&!adminCaptionParts(caption).captionPhoto){
@@ -4574,12 +4629,12 @@ function adminConsumeImageCaption(nodes,index){
     }
     break;
   }
-  return {caption,lastIndex};
+  return {caption,captionRich,lastIndex};
 }
 function adminNearbyCaption(sep){
   if(!sep?.parentNode)return "";
   const siblings=Array.from(sep.parentNode.childNodes),idx=siblings.indexOf(sep);
-  return idx<0?"":adminConsumeImageCaption(siblings,idx).caption;
+  return idx<0?"":adminConsumeImageCaption(siblings,idx);
 }
 function adminPruneDuplicateCaptionBlocks(imageId,previousCaption){
   const expected=String(previousCaption||"").replace(/\s+/g," ").trim().toLocaleLowerCase("hu-HU");
@@ -4604,11 +4659,14 @@ function adminAddImageFromElement(holder,caption="",forceCredit=""){
   let item=adminImages.find(x=>(x.full||"")==full&&(x.display||"")==display);
   const altParts=rbCaptionFromAlt(img.getAttribute("alt")||"");
   const detectedCredit=forceCredit||(a.getAttribute("title")||"").trim()||altParts.credit;
-  const inputCaption=caption||altParts.caption;
+  const imported=caption&&typeof caption==="object"?caption:null;
+  const inputCaption=(imported?imported.caption:caption)||altParts.caption;
   const parts=adminCaptionParts(inputCaption,detectedCredit);
   if(item){
-    if(inputCaption){
+    if(inputCaption&&(imported?.caption||typeof item.captionRich!=="string")){
+      const sameText=item.caption===parts.caption;
       item.caption=parts.caption||"";
+      if(imported?.caption&&!(sameText&&/<a\b/i.test(item.captionRich||"")&&!/<a\b/i.test(imported.captionRich||"")))item.captionRich=imported.captionRich;
       if(parts.captionPhoto){item.captionPhoto=true;item.photoName=parts.photoName;}
     }
     if(detectedCredit)item.credit=detectedCredit;
@@ -4621,6 +4679,7 @@ function adminAddImageFromElement(holder,caption="",forceCredit=""){
     display:display||full,
     credit:detectedCredit||"",
     caption:parts.caption||"KÉPaláírás",
+    ...(imported?.caption?{captionRich:imported.captionRich}:{}),
     captionPhoto:parts.captionPhoto,
     photoName:parts.photoName||"",
     attrs:adminImageAttrs(img)
@@ -4647,7 +4706,7 @@ function adminLiveFromNode(element){
     imageFromElement:adminAddImageFromElement,
     captionFromNodes:(nodes,sep)=>{
       const position=nodes.indexOf(sep);
-      return position<0?"":adminConsumeImageCaption(nodes,position).caption;
+      return position<0?"":adminConsumeImageCaption(nodes,position);
     }
   });
 }
@@ -4791,7 +4850,7 @@ function adminHtmlToBlocks(html){
     }
     if(tag==="h1"){blocks.push({id:adminUid("b"),type:"h2",html:node.innerHTML,align:adminAlignFromNode(node,"center")});continue;}
     if(tag==="div"&&node.classList.contains("separator")){
-      const {caption,lastIndex}=adminConsumeImageCaption(nodes,i);
+      const caption=adminConsumeImageCaption(nodes,i),{lastIndex}=caption;
       const image=adminAddImageFromElement(node,caption);
       if(image)blocks.push({id:adminUid("b"),type:"image",imageId:image.id});
       i=lastIndex;continue;
@@ -5179,7 +5238,8 @@ function adminCaptionEditor(img){
   cap.setAttribute("aria-label","Képaláírás szerkesztése, Enter: sortörés");
   adminTrackEditable(cap,()=>{
     if(adminPruneDuplicateCaptionBlocks(img.id,img.caption))cap.dataset.repairedCaption="true";
-    img.caption=adminCleanCaptionText(cap.innerText);
+    const data=adminCaptionRichParts(cap.innerHTML);
+    img.caption=data.caption;img.captionRich=data.captionRich;
   });
   cap.addEventListener("blur",()=>{
     if(cap.dataset.repairedCaption==="true")adminRenderCanvas();
@@ -5489,11 +5549,16 @@ function adminRenderImageLibrary(){
     thumb.addEventListener("contextmenu",e=>{if(e.shiftKey)return;e.preventDefault();adminOpenImageUrls(img.id);});
     const fields=document.createElement("div");fields.className="admin-image-fields";
     const makeInput=(name,value,onInput)=>{const l=document.createElement("label");l.textContent=name;const x=document.createElement("input");x.value=value||"";x.addEventListener("input",()=>onInput(x.value));x.addEventListener("change",()=>{adminRenderCanvas();adminGenerateHtml();});l.appendChild(x);return l;};
-    const captionLabel=document.createElement("label");captionLabel.textContent="Képaláírás (Enter: új sor)";
-    const captionBox=document.createElement("textarea");captionBox.rows=3;captionBox.value=img.caption||"";
+    const captionLabel=document.createElement("label");
+    // A formatted caption must never be round-tripped through a plain-text field.
+    const rich=typeof img.captionRich==="string"&&/<(?!br\b)[a-z]/i.test(img.captionRich);
+    captionLabel.textContent=rich?"Képaláírás (formázott HTML; vizuálisan a cikkben is szerkeszthető)":"Képaláírás (Enter: új sor)";
+    const captionBox=document.createElement("textarea");captionBox.rows=3;captionBox.value=rich?img.captionRich:(img.caption||"");
     captionBox.addEventListener("input",()=>{
       adminPruneDuplicateCaptionBlocks(img.id,img.caption);
-      img.caption=adminCleanCaptionText(captionBox.value);adminGenerateHtml(false);
+      if(rich){const data=adminCaptionRichParts(captionBox.value);img.caption=data.caption;img.captionRich=data.captionRich;}
+      else {img.caption=adminCleanCaptionText(captionBox.value);delete img.captionRich;}
+      adminGenerateHtml(false);
     });
     captionBox.addEventListener("change",()=>{adminRenderCanvas();adminGenerateHtml();});
     captionLabel.appendChild(captionBox);fields.appendChild(captionLabel);
@@ -5874,7 +5939,7 @@ function adminImportBoxGroup(nodes,start){
   for(let gi=0;gi<group.length;gi++){
     const n=group[gi];
     if(n.classList.contains("separator")&&n.querySelector("img")){
-      const {caption,lastIndex}=adminConsumeImageCaption(group,gi);
+      const caption=adminConsumeImageCaption(group,gi),{lastIndex}=caption;
       const image=adminAddImageFromElement(n,caption);if(image)imageId=image.id;
       gi=lastIndex;continue;
     }
@@ -6229,7 +6294,7 @@ function adminLoadExistingHtml(raw,{preserveCurrentMain=false,fromPublishedBlogg
     if(tag==="div"&&/Források:/i.test(text)&&n.querySelector("strong")){adminSourcesHtml=n.outerHTML+"\n<br />";continue;}
     if(adminIsGrayNode(n)){i=adminImportBoxGroup(nodes,i)-1;continue;}
     if(tag==="div"&&n.classList.contains("separator")&&n.querySelector("img")){
-      const {caption,lastIndex}=adminConsumeImageCaption(nodes,i);
+      const caption=adminConsumeImageCaption(nodes,i),{lastIndex}=caption;
       const image=adminAddImageFromElement(n,caption);
       if(image)adminBlocks.push({id:adminUid("b"),type:"image",imageId:image.id});
       i=lastIndex;continue;
