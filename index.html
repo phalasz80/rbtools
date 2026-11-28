@@ -1929,12 +1929,14 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-dropzone:after{content:"";position:absolute;left:8%;right:8%;top:2px;border-top:1px solid #bfdbfe;opacity:.42}
 #rbtools-app .admin-dropzone.dragover{height:34px;background:#eff6ff;border-color:#60a5fa}
 #rbtools-app .admin-dropzone.dragover:after{content:"Ide kerül";border:0;top:7px;text-align:center;color:#2563eb;font:12px/1.5 Inter,'Segoe UI Symbol','Segoe UI Emoji',Arial,sans-serif;opacity:1}
-#rbtools-app .admin-block{position:relative;border:1px solid transparent;border-radius:9px;padding:5px 44px 5px 7px;margin:0;transition:.12s;background:#fff}
+#rbtools-app .admin-block{position:relative;display:flex;flex-wrap:wrap;align-items:flex-start;column-gap:8px;row-gap:4px;border:1px solid transparent;border-radius:9px;padding:5px 7px;margin:0;transition:.12s;background:#fff}
+#rbtools-app .admin-block>:not(.admin-block-controls){flex:1 1 200px;min-width:0;max-width:100%;overflow-wrap:anywhere}
+#rbtools-app .admin-block>hr{align-self:center;margin:0}
 #rbtools-app .admin-block:hover,#rbtools-app .admin-block:focus-within{border-color:#d4d4d8;background:#fafafa}
 #rbtools-app .admin-block.dragging{opacity:.4}
-#rbtools-app .admin-block-controls{position:absolute;right:6px;top:6px;display:flex;flex-direction:column;gap:4px;opacity:.22;transition:.12s}
+#rbtools-app .admin-block-controls{position:static;display:flex;flex:0 0 176px;max-width:100%;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:3px;margin-left:auto;opacity:.22;transition:opacity .12s}
 #rbtools-app .admin-block:hover .admin-block-controls,#rbtools-app .admin-block:focus-within .admin-block-controls{opacity:1}
-#rbtools-app .admin-block-controls button{padding:2px 6px;min-width:28px;font-size:12px;background:#fff;color:#222;border-color:#d4d4d8}
+#rbtools-app .admin-block-controls button{box-sizing:border-box;flex:0 0 auto;padding:2px 5px;min-width:28px;min-height:28px;margin:0;line-height:1.2;font-size:12px;background:#fff;color:#222;border-color:#d4d4d8}
 #rbtools-app .admin-editable{outline:none;border:1px dashed transparent;border-radius:6px;padding:2px 4px;min-height:24px;user-select:text;-webkit-user-select:text;cursor:text}
 #rbtools-app .admin-canvas [contenteditable="true"]{user-select:text;-webkit-user-select:text;cursor:text}
 #rbtools-app .admin-canvas [contenteditable="true"]::selection,#rbtools-app .admin-canvas [contenteditable="true"] *::selection{background:#86b7ff;color:#111}
@@ -2012,7 +2014,7 @@ A következő cikk rövid ajánlója.</pre>
 #rbtools-app .admin-integrated-converter-body{padding:12px}
 #rbtools-app .admin-integrated-converter-body>.panel:first-child{margin-top:0}
 #rbtools-app .admin-integrated-converter-body>.panel:last-child{margin-bottom:0}
-@media(max-width:800px){#rbtools-app .admin-embedbar{grid-template-columns:1fr}#rbtools-app .admin-canvas{padding:12px;min-height:460px;height:65vh}#rbtools-app .admin-block{padding-right:38px}#rbtools-app .admin-image-library{grid-template-columns:1fr}}#rbtools-app .admin-block{padding-right:38px}#rbtools-app .admin-image-library{grid-template-columns:1fr}}
+@media(max-width:800px){#rbtools-app .admin-embedbar{grid-template-columns:1fr}#rbtools-app .admin-canvas{padding:12px;min-height:460px;height:65vh}#rbtools-app .admin-image-library{grid-template-columns:1fr}}#rbtools-app .admin-image-library{grid-template-columns:1fr}
 @media(max-width:700px){#rbtools-app .image-url-grid{grid-template-columns:1fr}}
 
 #rbtools-app .unicode-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -2321,7 +2323,7 @@ A következő cikk rövid ajánlója.</pre>
 <script>
 (function(){
 "use strict";
-const RBTOOLS_VERSION="pages-v72";
+const RBTOOLS_VERSION="pages-v73";
 const LIVE_TIMELINE=window.RBTOOLS_LIVE_TIMELINE;
 const CORRECTOR=window.RBTOOLS_CORRECTOR;
 if(!LIVE_TIMELINE)throw Error("Az élő tudósítás modulja nem töltődött be.");
